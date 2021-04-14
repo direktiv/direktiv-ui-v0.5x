@@ -1,6 +1,8 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
 
+import { Link } from 'react-router-dom'
+
 import Speedometer from 'react-bootstrap-icons/dist/icons/speedometer'
 import LightningFill from 'react-bootstrap-icons/dist/icons/lightning-fill'
 import TerminalFill from 'react-bootstrap-icons/dist/icons/terminal-fill'
@@ -68,28 +70,36 @@ export default function Navbar() {
             <div id="nav-ul-holder" className="nav-section divider">
                 <ul>
                     <li>
-                        <div>
-                            <Speedometer style={{ marginRight: "10px" }} />
-                            <span>Dashboard</span>
-                        </div>
+                        <Link to="/" className="nav-link">
+                            <div>
+                                <Speedometer style={{ marginRight: "10px" }} />
+                                <span>Dashboard</span>
+                            </div>
+                        </Link>
                     </li>
                     <li>
-                        <div>
-                            <LightningFill style={{ marginRight: "10px" }} />
-                            <span>Workflows</span>
-                        </div>
+                        <Link to="/w/" className="nav-link">
+                            <div>
+                                <LightningFill style={{ marginRight: "10px" }} />
+                                <span>Workflows</span>
+                            </div>
+                        </Link>
                     </li>
                     <li>
-                        <div>
-                            <TerminalFill style={{ marginRight: "10px" }} />
-                            <span>Events / Logs</span>
-                        </div>
+                        <Link to="/e/" className="nav-link">
+                            <div>
+                                <TerminalFill style={{ marginRight: "10px" }} />
+                                <span>Events / Logs</span>
+                            </div>
+                        </Link>
                     </li>
                     <li>
-                        <div>
-                            <GearFill style={{ marginRight: "10px" }} />
-                            <span>Settings</span>
-                        </div>
+                        <Link to="/s/" className="nav-link">
+                            <div>
+                                <GearFill style={{ marginRight: "10px" }} />
+                                <span>Settings</span>
+                            </div>
+                        </Link>
                     </li>
                 </ul>
             </div>
