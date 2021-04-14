@@ -24,6 +24,15 @@
     display: flex;
 }
 
+.nav-link {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: var(--nav-item-hover-color);
+}
+
 #main-panel {
     flex: auto;
     background-color: var(--primary-light);
