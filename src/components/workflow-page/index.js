@@ -25,7 +25,10 @@ export default function WorkflowPage() {
     return(
         <>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
-                <Breadcrumbs />
+                <div style={{ flex: "auto" }}>
+                    <Breadcrumbs />
+                </div>
+                <WorkflowActions />
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -116,6 +119,16 @@ function EventsList() {
             <ul style={{ margin: "0px" }}>
                 {listItems}
             </ul>
+        </div>
+    )
+}
+
+function WorkflowActions() {
+    return(
+        <div id="workflow-actions" className="neumorph fit-content" style={{ fontSize: "11pt" }}>
+            <span>
+                Actions (disable, trigger, etc.)
+            </span>
         </div>
     )
 }
