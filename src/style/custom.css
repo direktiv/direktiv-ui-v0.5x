@@ -64,8 +64,8 @@
     background-color: var(--primary-light);
     box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
     padding: 10px;
-    width: fit-content;
-    height: fit-content;
+    /* width: fit-content;
+    height: fit-content; */
     color: var(--font-dark);
     margin: 20px;
     margin-right: 10px;
@@ -253,4 +253,27 @@ ul li div {
 
 .pending {
     color: #ffbf32;   
+}
+
+text {
+    color: var(--font-dark);
+    fill: var(--font-dark);
+}
+
+/* ...................... */
+
+.fit-content {
+    width: fit-content;
+    height: fit-content;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.item-0 {
+    flex-grow: 1;
+    align-self: stretch;
 }
