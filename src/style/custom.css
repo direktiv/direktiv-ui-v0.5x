@@ -10,6 +10,7 @@
     --light-divider-color: rgba(0, 0, 0, 0.1);
     --nav-item-hover-color: #4497f5;
     --font-dark: #4a4e4e;
+    --secondary-font-light: #8e8e8e;
 }
 
 #master {
@@ -212,12 +213,28 @@ ul li div {
     border-bottom: solid 1px var(--light-divider-color);
     margin-bottom: 10px;
     text-align: left;
-
+    
     display: flex;
     flex-direction: row;
     align-items: center;
+    
+    height: 17px;
+    flex:none;
 }
 
 .tile-title svg {
     margin-right: 5px;
+}
+
+.event-list-item {
+    padding-left: 0px;
+    color: var(--secondary-font-light);
+    line-height: 24px;
+    border-bottom: solid 1px var(--light-divider-color);
+}
+
+#events-tile {
+    /* max-height: 150px; */
+    height: 100%;
+    overflow-y: auto;
 }

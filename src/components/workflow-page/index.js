@@ -27,12 +27,14 @@ export default function WorkflowPage() {
                             <PieChartFill />
                         </TileTitle>
                     </div>
-                    <div className="chart-tile neumorph">
+                    <div className="chart-tile neumorph" style={{ display: "flex", flexDirection: "column" }}>
                         <TileTitle name="Events">
                             <CardList />
                         </TileTitle>
-                        <div className="tile-contents">
-                            <EventsList />
+                        <div style={{ maxHeight: "80%", overflowY: "auto"}}>
+                            <div id="events-tile" className="tile-contents">
+                                <EventsList />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -54,21 +56,30 @@ function EventsList() {
         "example message 1",
         "lorem ipsum",
         "nu fone hu dis",
+        "how you doin",
+        "example message 1",
+        "lorem ipsum",
+        "nu fone hu dis",
         "how you doin"
     ];
 
     let listItems = [];
     for (let i = 0; i < lines.length; i++) {
         listItems.push(
-            <li>
-                {lines[i]}
+            <li className="event-list-item">
+                <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
+                    10m ago
+                </span>
+                <span>    
+                    {lines[i]}
+                </span>
             </li>
         )
     }
 
     return(
         <div>
-            <ul>
+            <ul style={{ margin: "0px" }}>
                 {listItems}
             </ul>
         </div>
