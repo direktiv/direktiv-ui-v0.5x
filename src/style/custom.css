@@ -33,7 +33,7 @@
     max-height: 100vh;
     overflow-y: auto;
 
-    /* box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6); */
+    box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6);
 }
 
 #nav-panel {
