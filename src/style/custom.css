@@ -180,6 +180,10 @@ ul li div {
     visibility: inherit;
     border-top: solid 1px var(--dark-divider-color);
     height: 150px;
+    max-height: 120px;
+    overflow-y: auto;
+    padding-top: 80px;
+    padding-bottom: 10px;
 }
 
 #namespace-arrow {

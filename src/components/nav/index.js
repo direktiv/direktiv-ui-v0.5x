@@ -42,6 +42,24 @@ export default function Navbar() {
                                 <li>
                                     namespace-03
                                 </li>
+                                <li>
+                                    namespace-04
+                                </li>
+                                <li>
+                                    namespace-05
+                                </li>
+                                <li>
+                                    namespace-06
+                                </li>
+                                <li>
+                                    namespace-07
+                                </li>
+                                <li>
+                                    namespace-08
+                                </li>
+                                <li>
+                                    namespace-09
+                                </li>
                             </ul>
                         </div>
                     </li>

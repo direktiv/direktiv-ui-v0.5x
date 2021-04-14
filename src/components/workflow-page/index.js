@@ -67,12 +67,14 @@ function EventsList() {
     for (let i = 0; i < lines.length; i++) {
         listItems.push(
             <li className="event-list-item">
-                <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
-                    10m ago
-                </span>
-                <span>    
-                    {lines[i]}
-                </span>
+                <div>
+                    <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
+                        10m ago
+                    </span>
+                    <span>    
+                        {lines[i]}
+                    </span>
+                </div>
             </li>
         )
     }
