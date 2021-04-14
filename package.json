@@ -12,8 +12,10 @@
     "react-bootstrap-icons": "^1.4.0",
     "react-dom": "^17.0.2",
     "react-flow-renderer": "^9.4.4",
+    "react-minimal-pie-chart": "^8.2.0",
     "react-scripts": "4.0.3",
     "react-sizeme": "^3.0.1",
+    "react-tooltip": "^4.2.17",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

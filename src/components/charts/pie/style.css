@@ -1,0 +1,56 @@
+
+  /* Circle */
+  /* TODO: Fix height and width hack */
+  .Pie-Background-OuterCircle {
+    border-radius: 100%;
+    height: 220px; 
+    width: 220px;
+    padding: 10px;
+    display: flex;
+    background: #ffffff;
+    box-shadow:  20px 20px 60px var(--neumorph-shadow-dark),
+                -20px -20px 60px var(--neumorph-shadow-light);
+  }
+  
+  .Pie-Background-InnerCircle {
+    border-radius: 100%;
+    display: inline-block;
+    background: #d1d9e6FF;
+  }
+  
+  /* Legend */
+  .Pie-Legend-Background {
+    width: max-content;
+    border-radius: 25px;
+    background: #ffffff;
+    box-shadow:  20px 20px 60px var(--neumorph-shadow-dark),
+                -20px -20px 60px var(--neumorph-shadow-light);
+  }
+  
+  .Pie-Legend-Container {
+    display: flex;
+    flex-direction: row;
+    margin: 6px;
+  }
+  
+  .Pie-Legend-Container-Title {
+    text-align: center;
+    font-size: 18px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .Pie-Legend-Key {
+    margin: auto;
+    width: 10px;
+    height: 10px;
+    flex-grow: 0 !important;
+    border-radius: 3px;
+    box-shadow:  20px 20px 60px var(--neumorph-shadow-dark),
+                -20px -20px 60px var(--neumorph-shadow-light);
+  }
+  
+  .Pie-Legend-Title {
+    text-align: start;
+    padding-left: 6px;
+    flex-grow: 1 !important;
+  }
