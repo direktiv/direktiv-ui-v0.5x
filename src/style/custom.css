@@ -242,3 +242,15 @@ ul li div {
     height: 100%;
     overflow-y: auto;
 }
+
+.success {
+    color: #2fa64d;
+}
+
+.failed {
+    color: #db3447;
+}
+
+.pending {
+    color: #ffbf32;   
+}

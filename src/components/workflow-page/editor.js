@@ -1,6 +1,10 @@
-import Editor, { useMonaco } from "@monaco-editor/react"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { useResizeDetector } from "react-resize-detector"
+import {Controlled as CodeMirror} from "react-codemirror2";
+
+// style editor
+import 'codemirror/lib/codemirror.css';
+// linting yaml
+import "codemirror/mode/yaml/yaml.js";
+import "codemirror/addon/lint/yaml-lint";
 
 const val = `id: noop
 description: "" 
@@ -12,42 +16,18 @@ states:
 
 export default function ReactEditor() {
 
-    const editorRef = useRef(null)   
-    const onResize = useCallback(()=>{
-        if(editorRef.current !== null) {
-            editorRef.current.layout();
-        }
-    },[])
-
-    // useResizeDetector
-    const {ref} = useResizeDetector({
-        handleHeight: true,
-        handleWidth: true,
-        refreshRate: 1000,
-        onResize
-    })
-
-    // On editor mount
-    function handlerEditorDidMount(editor, monaco) {
-        editorRef.current = editor
-        editorRef.current.layout();
-    }
-
     return(
-        <div ref={ref} style={{maxWidth:"100%", overflow: "hidden", maxHeight:"100%"}}>
-            <Editor
-                ref={ref}
-                defaultLanguage="yaml"
-                defaultValue={val}
-                onMount={handlerEditorDidMount}
+        <div style={{height:"100%", width:"100%"}}>
+            <CodeMirror
+                height="auto"
+                value={val}
                 options={{
-                    minimap: {
-                        enabled: false,
-                    },
-                    scrollBeyondLastLine: false,
-                    automaticLayout: false,
+                    mode: 'yaml',
+                    lineNumbers: true,
                 }}
-                loading=""
+                onChange={(editor, data, value)=>{
+
+                }}
             />
         </div>
 
