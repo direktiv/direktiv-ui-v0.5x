@@ -1,6 +1,4 @@
 import React from 'react'
-import {SizeMe} from 'react-sizeme'
-
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
@@ -12,7 +10,6 @@ import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { Circle } from 'react-bootstrap-icons'
 import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
 
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
@@ -36,20 +33,7 @@ export default function WorkflowPage() {
                         <TileTitle name="Editor" actionsDiv={playBtn}>
                             <PencilSquare />
                         </TileTitle>
-                        <div>
-                            <Editor/>
-                        </div>
-                        {/* <SizeMe monitorHeight>
-                            {({size})=> {
-                                console.log(size)
-                                return(
-                                    <div style={{maxHeight: size.height, maxWidth: size.width}}>
-                                        <Editor height={size.height} width={size.width}/>
-                                    </div>
-                                )
-                            }
-                            }
-                        </SizeMe> */}
+                        <Editor/>
                     </div>
                     <div className="item-0 neumorph" style={{ minWidth: "600px" }}>
                         <TileTitle name="Graph">

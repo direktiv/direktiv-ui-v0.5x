@@ -1,4 +1,10 @@
-import Editor from "@monaco-editor/react"
+import {Controlled as CodeMirror} from "react-codemirror2";
+
+// style editor
+import 'codemirror/lib/codemirror.css';
+// linting yaml
+import "codemirror/mode/yaml/yaml.js";
+import "codemirror/addon/lint/yaml-lint";
 
 const val = `id: noop
 description: "" 
@@ -7,21 +13,21 @@ states:
   type: noop
   transform: '{ result: "Hello World!" }'
 `
-export default function ReactEditor(props) {
-    const {height, width} = props
-    
+
+export default function ReactEditor() {
+
     return(
-        <Editor
-          defaultLanguage="yaml"
-          defaultValue={val}
-          height={height}
-          width={width}
-          options={{
-              minimap: {
-                  enabled: false,
-              },
-              automaticLayout: true
-          }}
-        />
+            <CodeMirror
+                height="auto"
+                value={val}
+                options={{
+                    mode: 'yaml',
+                    lineNumbers: true,
+                }}
+                onChange={(editor, data, value)=>{
+
+                }}
+            />
+
     )
 }
