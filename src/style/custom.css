@@ -1,0 +1,153 @@
+:root {
+    --primary-dark: #1e1a1a;
+    --primary-light: #ecf0f3;
+    --neumorph-shadow-dark: #d1d9e6FF;
+    --neumorph-shadow-light: #ffffffFF;
+    --neumorph-offset-dark: 10px;
+    --neumorph-offset-light: -10px;
+    --neumorph-blur: 10px;
+    /* --primary-light: #e0e5ec; */
+    /* --neumorph-shadow-dark: rgb(163, 177, 198, 0.6);
+    --neumorph-shadow-light: rgba(255,255,255,0.5); */
+    --dark-divider-color: rgba(255,255,255,0.1);
+    --nav-item-hover-color: #4497f5;
+    --font-dark: #4a4e4e;
+}
+
+#master {
+    flex: auto;
+    width: 100%;
+    display: flex;
+}
+#content {
+    /* margin: 10px; */
+    background-color: var(--primary-light);
+    flex: auto;
+    display: flex;
+}
+
+#main-panel {
+    flex: auto;
+    background-color: var(--primary-light);
+    /* padding: 20px; */
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6);
+}
+
+#nav-panel {
+    width: 180px;
+}
+
+#nav {
+    height: 100%;
+    background-color: var(--primary-dark);
+    color: var(--primary-light);
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-section {
+    flex: auto;
+    width: 100%;
+}
+
+.nav-section.divider {
+    border-top: solid 1px var(--dark-divider-color);
+}
+
+
+.neumorph {
+    border-radius: 4px;
+    background-color: var(--primary-light);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+    padding: 10px;
+    width: fit-content;
+    height: fit-content;
+
+    margin: 20px;
+    margin-right: 10px;
+}
+
+#nav-img-holder img {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    max-width: 80px;
+}
+
+#nav-ul-holder ul {
+    text-align: left;
+    font-size: 0.55em;
+    padding-left: 0px;
+}
+
+#nav-ul-holder ul li {
+    line-height: 32px;
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+#nav-ul-holder ul li:hover {
+    cursor: pointer;
+    color: var(--nav-item-hover-color);
+}
+
+/* #nav-ul-holder ul li:hover {
+    background-color: #2d7edc;
+    cursor: pointer;
+} */
+
+
+#nav-ul-holder ul li div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#nav-user-holder {
+    cursor: pointer;
+}
+
+/* .................................... */
+.flex-row {
+    display: flex;
+    /* flex: auto; */
+    width: 100%;
+    height: fit-content;
+}
+
+#breadcrumbs {
+    font-size: 0.6em;
+    color: var(--font-dark);
+    text-align: left;
+    /* width: 100%; */
+}
+
+#breadcrumbs span:not(:last-child)::after {
+    content: " > ";
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+/* -------------------------------- */
+#workflow-yaml-tile, #workflow-graph-tile {
+    max-width: 1080px;
+    width: 1080px;
+    height: 540px;
+}
+
+#workflow-graph-tile {
+    height: auto;
+}
+
+#workflow-row-1 {
+    display: flex;
+    height: fit-content;
+}
+
+.chart-box {
+    min-width: 240px;
+    height: 240px;
+}
