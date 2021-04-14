@@ -1,6 +1,4 @@
 import React from 'react'
-import {SizeMe} from 'react-sizeme'
-
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
@@ -20,22 +18,12 @@ export default function WorkflowPage() {
                 <Breadcrumbs />
             </div>
             <div id="workflows-page">
-                <div className="flex-child" style={{ minWidth: "700px" }}>
-                    <div className="neumorph" style={{  height: "auto", display:"flex", flexDirection:"column", alignSelf:"stretch", minHeight:"500px" }}>
+                <div className="flex-child" style={{ maxWidth: "800px" }}>
+                    <div className="neumorph" style={{  height: "auto", display:"flex", flexDirection:"column", alignSelf:"stretch" }}>
                         <TileTitle name="Editor">
                             <PencilSquare />
                         </TileTitle>
-                        <SizeMe monitorHeight>
-                            {({size})=> {
-                                console.log(size)
-                                return(
-                                    <div style={{maxHeight: size.height, maxWidth: size.width}}>
-                                        <Editor height={size.height} width={size.width}/>
-                                    </div>
-                                )
-                            }
-                            }
-                        </SizeMe>
+                        <Editor />
                     </div>
                 </div>
                 <div className="flex-child" style={{ minWidth: "300px", maxWidth: "300px", alignSelf: "stretch", flexDirection: "column" }}>
@@ -55,7 +43,7 @@ export default function WorkflowPage() {
                         </div>
                     </div>
                 </div>
-                <div className="flex-child" style={{ width: "600px"}}>
+                <div className="flex-child" style={{ width: "500px"}}>
                     <div className="neumorph" style={{ height: "auto", display:"flex", flexDirection:"column" }}>
                         <TileTitle name="Graph">
                             <PipFill />
