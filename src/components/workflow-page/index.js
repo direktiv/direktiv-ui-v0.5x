@@ -13,10 +13,17 @@ import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { Circle } from 'react-bootstrap-icons'
+import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
 
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 
 export default function WorkflowPage() {
+
+    let playBtn = (
+        <div>
+            <Play className="success" style={{ fontSize: "18pt" }} />
+        </div>
+    );
 
     return(
         <>
@@ -24,12 +31,15 @@ export default function WorkflowPage() {
                 <Breadcrumbs />
             </div>
             <div id="workflows-page">
-                <div className="flex-child" style={{ width: "550px", maxHeight: "520px" }}>
-                    <div className="neumorph" style={{  height: "auto", display:"flex", flexDirection:"column", alignSelf:"stretch", minHeight:"300px", maxHeight: "500px", maxWidth: "1080px" }}>
-                        <TileTitle name="Editor">
+                <div className="container" style={{ flexGrow: "2" }}>
+                    <div className="item-0 neumorph" style={{ minWidth: "600px" }}>
+                        <TileTitle name="Editor" actionsDiv={playBtn}>
                             <PencilSquare />
                         </TileTitle>
-                        <SizeMe monitorHeight>
+                        <div>
+                            <Editor/>
+                        </div>
+                        {/* <SizeMe monitorHeight>
                             {({size})=> {
                                 console.log(size)
                                 return(
@@ -39,20 +49,29 @@ export default function WorkflowPage() {
                                 )
                             }
                             }
-                        </SizeMe>
+                        </SizeMe> */}
+                    </div>
+                    <div className="item-0 neumorph" style={{ minWidth: "600px" }}>
+                        <TileTitle name="Graph">
+                            <PipFill />
+                        </TileTitle>
+                        <div style={{ display: "flex", width: "100%", height: "100%" }}>
+                            <div style={{ flex: "auto" }}>
+                                <Diagram />   
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div className="flex-child" style={{ minWidth: "300px", maxWidth: "300px", maxHeight: "520px", alignSelf: "stretch", flexDirection: "column" }}>
-                    <div className="chart-tile neumorph">
-                        <TileTitle name="Chart">
+                <div className="container" style={{ width: "300px" }}>
+                    <div className="item-1 neumorph" style={{ height: "280px" }}>
+                        <TileTitle name="Executed Workflows">
                             <PieChartFill />
                         </TileTitle>
                         <div className="tile-contents">
-                            <h2 style={{fontSize: "15pt", marginTop: "15px", marginBottom: "15px"}} >Executed Workflows</h2>
                             <PieChart lineWidth={40} data={MockData}/>
                         </div>
                     </div>
-                    <div className="chart-tile neumorph" style={{ display: "flex", flexDirection: "column" }}>
+                    <div className="item-0 neumorph">
                         <TileTitle name="Events">
                             <CardList />
                         </TileTitle>
@@ -60,16 +79,6 @@ export default function WorkflowPage() {
                             <div id="events-tile" className="tile-contents">
                                 <EventsList />
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-child" style={{ width: "600px", minHeight: "360px"}}>
-                    <div className="neumorph" style={{ height: "auto", display:"flex", flexDirection:"column" }}>
-                        <TileTitle name="Graph">
-                            <PipFill />
-                        </TileTitle>
-                        <div style={{ height: "100%", width:"100%" }}>
-                          <Diagram/>
                         </div>
                     </div>
                 </div>
@@ -83,12 +92,7 @@ function EventsList() {
     let lines = [
         "example message 1",
         "lorem ipsum",
-        "nu fone hu dis",
-        "how you doin",
-        "example message 1",
-        "lorem ipsum",
-        "nu fone hu dis",
-        "how you doin"
+        "nu fone hu dis"
     ];
 
     let listItems = [];

@@ -4,23 +4,17 @@ import ReactTooltip from "react-tooltip";
 import { PieChart } from "react-minimal-pie-chart";
 
 const colors = [
-  "#012a4a",
-  "#013a63",
-  "#01497c",
-  "#014f86",
-  "#2a6f97",
-  "#2c7da0",
-  "#468faf",
-  "#61a5c2",
-  "#89c2d9",
-  "#a9d6e5",
+  "#2fa64d",
+  "#db3447",
+  "#ffbf32",
+  "#014f86"
 ];
 
 export const MockData =[
     { title: "Completed", value: 50 },
     { title: "Cancelled", value: 5 },
-    { title: "Failed", value: 10},
-    { title: "Pending", value: 3 },
+    { title: "Failed", value: 10}
+    // { title: "Pending", value: 3 },
 ];
 
 const hoverColor = "#a4aba6";
@@ -69,7 +63,7 @@ export default function NuePieChart(props) {
   }, [data]);
 
   return (
-    <div className="Pie-Background-OuterCircle">
+    <div className="Pie-Background-OuterCircle" style={{ margin: "auto", marginTop: "22px" }}>
       <div className="Pie-Background-InnerCircle">
         {pieData === [] ? (
           <></>
@@ -78,7 +72,7 @@ export default function NuePieChart(props) {
             <PieChart
               label={({ dataEntry }) => `${dataEntry.label}`}
               labelStyle={(index) => ({
-                fontSize: "20px",
+                fontSize: "12pt",
                 fontFamily: "sans-serif",
               })}
               labelPosition={0}
