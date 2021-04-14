@@ -1,0 +1,21 @@
+.react-flow__handle {
+    background: transparent !important;
+    border: none !important;
+}
+
+.state{
+    padding: 10px;
+    background: #ecf0f3;
+    box-shadow:  20px 20px 60px #c9cccf,
+                -20px -20px 60px #ffffff;
+}
+
+.state h1 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.state p {
+    margin: 0;
+    font-size: 12px;
+}
