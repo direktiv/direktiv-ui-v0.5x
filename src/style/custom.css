@@ -132,7 +132,7 @@
 }
 
 /* -------------------------------- */
-#workflow-yaml-tile, #workflow-graph-tile {
+/* #workflow-yaml-tile, #workflow-graph-tile {
     max-width: 1080px;
     width: 1080px;
     height: 540px;
@@ -150,4 +150,34 @@
 .chart-box {
     min-width: 240px;
     height: 240px;
+} */
+
+/* ------------------ */
+
+#workflows-page {
+    flex: auto;
+    /* background-color: black; */
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#workflows-page .flex-child {
+    flex: auto;
+    display: flex;
+}
+
+#wf-yaml-tile {
+    flex-grow: 1;
+}
+
+#workflows-page .flex-child div {
+    flex: auto;
+    /* height: 100%; */
+}
+
+.chart-tile {
+    flex: auto;
+    width: 240px;
 }
