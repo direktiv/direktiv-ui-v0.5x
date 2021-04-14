@@ -3,11 +3,47 @@
     border: none !important;
 }
 
-.state{
+.react-flow__minimap {
+    border-radius: 4px;
+    background-color: var(--primary-light);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
     padding: 10px;
-    background: #ecf0f3;
-    box-shadow:  20px 20px 60px #c9cccf,
-                -20px -20px 60px #ffffff;
+}
+.react-flow__edge-path{
+    stroke: var(--nav-item-hover-color) !important;
+}
+
+.state{
+    border-radius: 4px;
+    background-color: var(--primary-light);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+    padding: 6px;
+}
+
+.normal {
+    height: 30px;
+    width: 30px;
+    border-radius: 35px;
+    background-color: var(--primary-light);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+    padding: 6px;
+    display: grid;
+    place-items: center;
+}
+
+.normal .start {
+    border-radius: 30px;
+    background: linear-gradient(151deg,rgba(115,204,118,1) 0%, rgba(100,201,104,1) 41%, rgba(0,177,49,1) 100%);
+    height: 30px;
+    width: 30px;
+}
+
+.normal .end {
+    background: rgb(204,115,115);
+    background: linear-gradient(151deg,rgba(204,115,115,1) 0%, rgba(201,100,100,1) 41%, rgba(177,0,0,1) 100%);
+    border-radius: 30px;
+    height: 30px;
+    width: 30px;
 }
 
 .state h1 {

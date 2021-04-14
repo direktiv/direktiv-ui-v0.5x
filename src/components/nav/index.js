@@ -48,7 +48,7 @@ export default function Navbar() {
             </div>
             <div id="nav-user-holder" style={{ paddingBottom: "40px" }}>
                 <img alt="user" style={{border: "solid 3px #0083B0", borderRadius: "50%", maxWidth: "48px"}} src="https://www.gravatar.com/avatar/47c1678268b1822f83dd6a11cb24765c" />
-                <span style={{ fontSize: "0.5em", display: "block" }}>
+                <span style={{ fontSize: "10pt", display: "block" }}>
                     GhoulJim
                 </span>
             </div>

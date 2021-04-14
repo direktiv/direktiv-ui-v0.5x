@@ -2,7 +2,7 @@
     --primary-dark: #1e1a1a;
     --primary-light: #ecf0f3;
     --neumorph-shadow-dark: #d1d9e6FF;
-    --neumorph-shadow-light: #ffffffFF;
+    --neumorph-shadow-light: rgb(223, 219, 219);
     --neumorph-offset-dark: 10px;
     --neumorph-offset-light: -10px;
     --neumorph-blur: 10px;
@@ -39,6 +39,7 @@
 
 #nav-panel {
     width: 180px;
+    min-width: 180px;
 }
 
 #nav {
@@ -79,7 +80,7 @@
 
 #nav-ul-holder ul {
     text-align: left;
-    font-size: 0.55em;
+    font-size: 11pt;
     padding-left: 0px;
 }
 
@@ -119,7 +120,7 @@
 }
 
 #breadcrumbs {
-    font-size: 0.6em;
+    font-size: 11pt;
     color: var(--font-dark);
     text-align: left;
     /* width: 100%; */
@@ -132,7 +133,7 @@
 }
 
 /* -------------------------------- */
-#workflow-yaml-tile, #workflow-graph-tile {
+/* #workflow-yaml-tile, #workflow-graph-tile {
     max-width: 1080px;
     width: 1080px;
     height: 540px;
@@ -150,4 +151,34 @@
 .chart-box {
     min-width: 240px;
     height: 240px;
+} */
+
+/* ------------------ */
+
+#workflows-page {
+    flex: auto;
+    /* background-color: black; */
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#workflows-page .flex-child {
+    flex: auto;
+    display: flex;
+}
+
+#wf-yaml-tile {
+    flex-grow: 1;
+}
+
+#workflows-page .flex-child div {
+    flex: auto;
+    /* height: 100%; */
+}
+
+.chart-tile {
+    flex: auto;
+    width: 240px;
 }
