@@ -7,6 +7,8 @@ import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 
+import PieChart, {MockData, NuePieLegend} from '../charts/pie'
+
 export default function WorkflowPage() {
     return(
         <>
@@ -26,6 +28,10 @@ export default function WorkflowPage() {
                         <TileTitle name="Chart">
                             <PieChartFill />
                         </TileTitle>
+                        <div className="tile-contents">
+                            <h2 style={{fontSize: "15pt", marginTop: "15px", marginBottom: "15px"}} >Executed Workflows</h2>
+                            <PieChart lineWidth={40} data={MockData}/>
+                        </div>
                     </div>
                     <div className="chart-tile neumorph">
                         <TileTitle name="Events">
