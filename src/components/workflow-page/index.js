@@ -10,7 +10,7 @@ export default function WorkflowPage() {
             </div>
             <div id="workflows-page">
                 <div className="flex-child" style={{ minWidth: "800px" }}>
-                    <div className="neumorph" style={{ height: "100%" }}>
+                    <div className="neumorph" style={{ height: "" }}>
 
                     </div>
                 </div>
