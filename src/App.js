@@ -1,4 +1,5 @@
 import './App.css';
+import './style/scrollbar.css';
 import './style/custom.css';
 import Navbar from './components/nav'
 import WorkflowPage from './components/workflow-page'
