@@ -29,24 +29,20 @@ export default function WorkflowPage() {
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
-                    <div className="item-0 neumorph" style={{ minWidth: "600px" }}>
+                    <div className="item-0 neumorph" >
                         <TileTitle name="Editor" actionsDiv={playBtn}>
                             <PencilSquare />
                         </TileTitle>
                         <Editor/>
                     </div>
-                    <div className="item-0 neumorph" style={{ minWidth: "600px" }}>
+                    <div className="item-0 neumorph">
                         <TileTitle name="Graph">
                             <PipFill />
                         </TileTitle>
-                        <div style={{ display: "flex", width: "100%", height: "100%" }}>
-                            <div style={{ flex: "auto" }}>
-                                <Diagram />   
-                            </div>
-                        </div>
+                        <Diagram />   
                     </div>
                 </div>
-                <div className="container" style={{ width: "300px" }}>
+                <div className="container graph-contents" style={{ width: "300px" }}>
                     <div className="item-1 neumorph" style={{ height: "280px" }}>
                         <TileTitle name="Executed Workflows">
                             <PieChartFill />

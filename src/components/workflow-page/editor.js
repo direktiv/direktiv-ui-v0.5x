@@ -17,6 +17,7 @@ states:
 export default function ReactEditor() {
 
     return(
+        <div style={{height:'100%', width:"100%"}}>
             <CodeMirror
                 height="auto"
                 value={val}
@@ -28,6 +29,6 @@ export default function ReactEditor() {
 
                 }}
             />
-
+        </div>
     )
 }

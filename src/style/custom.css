@@ -273,6 +273,13 @@ text {
     flex-wrap: wrap;
 }
 
+@media screen and (max-width: 1451px) {
+    .graph-contents {
+        flex-direction: row;
+        width: 100% !important;
+    }
+}
+
 .item-0 {
     flex-grow: 1;
     align-self: stretch;
