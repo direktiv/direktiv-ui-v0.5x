@@ -5,8 +5,15 @@ import Speedometer from 'react-bootstrap-icons/dist/icons/speedometer'
 import LightningFill from 'react-bootstrap-icons/dist/icons/lightning-fill'
 import TerminalFill from 'react-bootstrap-icons/dist/icons/terminal-fill'
 import GearFill from 'react-bootstrap-icons/dist/icons/gear-fill'
+import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 
 export default function Navbar() {
+
+    function toggleNamespaceSelector() {
+        let x = document.getElementById('namespaces-ul');
+        x.classList.toggle('active');
+    }
+
     return(
         <div id="nav">
             <div id="nav-img-holder">
@@ -15,8 +22,30 @@ export default function Navbar() {
                     direktiv
                 </span> */}
             </div>
-            <div>
-                
+            <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
+                <ul id="namespaces-ul" style={{ margin: "0px" }}>
+                    <li className="namespace-selector" onClick={() => toggleNamespaceSelector()}>
+                        <div>
+                            <ArrowRightFill id="namespace-arrow" style={{ marginRight: "10px", height: "18px" }} />
+                            <span><b>demo-fza6</b></span>
+                        </div>
+                    </li>
+                    <li id="namespace-list" style={{ paddingLeft: "0px" }}>
+                        <div style={{ width: "100%" }}>
+                            <ul>
+                                <li>
+                                    namespace-01
+                                </li>
+                                <li>
+                                    namespace-02
+                                </li>
+                                <li>
+                                    namespace-03
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
             </div>
             <div id="nav-ul-holder" className="nav-section divider">
                 <ul>

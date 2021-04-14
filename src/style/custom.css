@@ -6,10 +6,8 @@
     --neumorph-offset-dark: 7px;
     --neumorph-offset-light: -7px;
     --neumorph-blur: 14px;
-    /* --primary-light: #e0e5ec; */
-    /* --neumorph-shadow-dark: rgb(163, 177, 198, 0.6);
-    --neumorph-shadow-light: rgba(255,255,255,0.5); */
     --dark-divider-color: rgba(255,255,255,0.1);
+    --light-divider-color: rgba(0, 0, 0, 0.1);
     --nav-item-hover-color: #4497f5;
     --font-dark: #4a4e4e;
 }
@@ -20,7 +18,6 @@
     display: flex;
 }
 #content {
-    /* margin: 10px; */
     background-color: var(--primary-light);
     flex: auto;
     display: flex;
@@ -29,14 +26,13 @@
 #main-panel {
     flex: auto;
     background-color: var(--primary-light);
-    /* padding: 20px; */
 
     display: flex;
     flex-direction: column;
     max-height: 100vh;
     overflow-y: auto;
 
-    box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6);
+    /* box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6); */
 }
 
 #nav-panel {
@@ -57,7 +53,7 @@
     width: 100%;
 }
 
-.nav-section.divider {
+.divider {
     border-top: solid 1px var(--dark-divider-color);
 }
 
@@ -69,7 +65,7 @@
     padding: 10px;
     width: fit-content;
     height: fit-content;
-
+    color: var(--font-dark);
     margin: 20px;
     margin-right: 10px;
 }
@@ -80,13 +76,13 @@
     max-width: 80px;
 }
 
-#nav-ul-holder ul {
+ul {
     text-align: left;
     font-size: 11pt;
     padding-left: 0px;
 }
 
-#nav-ul-holder ul li {
+ul li {
     line-height: 32px;
     list-style-type: none;
     padding-left: 20px;
@@ -97,13 +93,7 @@
     color: var(--nav-item-hover-color);
 }
 
-/* #nav-ul-holder ul li:hover {
-    background-color: #2d7edc;
-    cursor: pointer;
-} */
-
-
-#nav-ul-holder ul li div {
+ul li div {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -113,10 +103,8 @@
     cursor: pointer;
 }
 
-/* .................................... */
 .flex-row {
     display: flex;
-    /* flex: auto; */
     width: 100%;
     height: fit-content;
 }
@@ -125,7 +113,6 @@
     font-size: 11pt;
     color: var(--font-dark);
     text-align: left;
-    /* width: 100%; */
 }
 
 #breadcrumbs span:hover {
@@ -135,38 +122,14 @@
 
 #breadcrumbs span:not(:last-child)::after {
     color: var(--font-dark);
+    cursor: auto;
     content: " > ";
     margin-left: 10px;
     margin-right: 10px;
 }
 
-/* -------------------------------- */
-/* #workflow-yaml-tile, #workflow-graph-tile {
-    max-width: 1080px;
-    width: 1080px;
-    height: 540px;
-}
-
-#workflow-graph-tile {
-    height: auto;
-}
-
-#workflow-row-1 {
-    display: flex;
-    height: fit-content;
-}
-
-.chart-box {
-    min-width: 240px;
-    height: 240px;
-} */
-
-/* ------------------ */
-
 #workflows-page {
-    flex: auto;
-    /* background-color: black; */
-    
+    flex: auto;    
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -183,10 +146,78 @@
 
 #workflows-page .flex-child div {
     flex: auto;
-    /* height: 100%; */
 }
 
 .chart-tile {
     flex: auto;
     width: 240px;
+}
+
+.namespace-selector {
+    line-height: 64px;
+}
+
+.namespace-selector:hover, .namespace-selector.active {
+    cursor: pointer;
+    color: white;
+    background-color: var(--nav-item-hover-color);
+}
+
+#namespace-list {
+    overflow: hidden;
+    height: 0px;
+    display: flex;
+    /* color: var(--primary-dark); */
+    transition: color 1s linear;
+    transition: height 0.3s ease-in-out;
+    
+}
+
+#namespaces-ul.active #namespace-list {
+    /* color: white; */
+    /* transition: color 1s linear; */
+    visibility: inherit;
+    border-top: solid 1px var(--dark-divider-color);
+    height: 150px;
+}
+
+#namespace-arrow {
+    transition: rotate 0.3s ease-in-out;
+}
+
+#namespaces-ul.active #namespace-arrow {
+    rotate: 90deg;
+}
+
+#namespaces-ul.active .namespace-selector {
+    color: white;
+    background-color: var(--nav-item-hover-color);
+}
+
+#namespace-list ul {
+    width: 100%;
+}
+
+#namespace-list ul li {
+    padding-left: 20px;
+}
+
+#namespaces-ul.active #namespace-list ul li:hover {
+    cursor: pointer;
+    color: var(--nav-item-hover-color);
+}
+
+.tile-title {
+    font-size: 10pt;
+    border-bottom: solid 1px var(--light-divider-color);
+    margin-bottom: 10px;
+    text-align: left;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tile-title svg {
+    margin-right: 5px;
 }
