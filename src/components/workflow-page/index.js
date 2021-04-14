@@ -26,7 +26,7 @@ export default function WorkflowPage() {
         <>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto" }}>
-                    <Breadcrumbs />
+                    <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
                 <WorkflowActions />
             </div>
@@ -36,13 +36,15 @@ export default function WorkflowPage() {
                         <TileTitle name="Editor" actionsDiv={playBtn}>
                             <PencilSquare />
                         </TileTitle>
-                        <Editor/>
+                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px"}}>
+                            <Editor/>
+                        </div>
                     </div>
                     <div className="item-0 neumorph" style={{ minWidth: "600px" }}>
                         <TileTitle name="Graph">
                             <PipFill />
                         </TileTitle>
-                        <div style={{ display: "flex", width: "100%", height: "100%" }}>
+                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
                                 <Diagram />   
                             </div>

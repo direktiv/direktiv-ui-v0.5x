@@ -231,6 +231,10 @@ ul li div {
     margin-bottom: 10px;
     text-align: left;
     
+    background-color: var(--primary-light);
+    position: relative;
+    z-index: 10;
+
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -256,7 +260,7 @@ ul li div {
     overflow-y: auto;
 }
 
-.success {
+.success, .completed {
     color: #2fa64d;
 }
 
@@ -289,4 +293,10 @@ text {
 .item-0 {
     flex-grow: 1;
     align-self: stretch;
+}
+
+.valign-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
 }
