@@ -39,6 +39,7 @@
 
 #nav-panel {
     width: 180px;
+    min-width: 180px;
 }
 
 #nav {
@@ -79,7 +80,7 @@
 
 #nav-ul-holder ul {
     text-align: left;
-    font-size: 0.55em;
+    font-size: 11pt;
     padding-left: 0px;
 }
 
@@ -119,7 +120,7 @@
 }
 
 #breadcrumbs {
-    font-size: 0.6em;
+    font-size: 11pt;
     color: var(--font-dark);
     text-align: left;
     /* width: 100%; */
