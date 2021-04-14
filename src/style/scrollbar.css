@@ -1,0 +1,19 @@
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #464646 #6c6c6c;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #6c6c6c;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #464646;
+  }
