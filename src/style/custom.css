@@ -128,7 +128,13 @@
     /* width: 100%; */
 }
 
+#breadcrumbs span:hover {
+    color: var(--nav-item-hover-color);
+    cursor: pointer;
+}
+
 #breadcrumbs span:not(:last-child)::after {
+    color: var(--font-dark);
     content: " > ";
     margin-left: 10px;
     margin-right: 10px;
