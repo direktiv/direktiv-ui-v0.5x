@@ -170,8 +170,11 @@ export default function Diagram() {
     },[setElements])
 
     return(
-        <ReactFlowProvider>
-            <WorkflowDiagram elements={elements} />
-        </ReactFlowProvider>
+        <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
+            <ReactFlowProvider>
+                <WorkflowDiagram elements={elements} />
+            </ReactFlowProvider>
+        </div>
+
     )   
 }
