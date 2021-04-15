@@ -42,8 +42,8 @@
     max-height: 100vh;
     overflow-y: auto;
 
-    padding: 10px;
-    padding-top: 20px;
+    /* padding: 10px; */
+    /* padding-top: 20px; */
 
     box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6);
 }
@@ -286,7 +286,7 @@ text {
     flex-wrap: wrap;
 }
 
-@media screen and (max-width: 1451px) {
+@media screen and (max-width: 1604px) {
     .graph-contents {
         flex-direction: row;
         width: 100% !important;

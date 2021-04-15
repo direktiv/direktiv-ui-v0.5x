@@ -15,11 +15,10 @@ states:
 `
 
 export default function ReactEditor() {
-
+    
     return(
-        <div style={{height:'100%', width:"100%"}}>
+        <div>
             <CodeMirror
-                height="auto"
                 value={val}
                 options={{
                     mode: 'yaml',
