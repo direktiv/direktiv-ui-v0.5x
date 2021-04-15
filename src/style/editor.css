@@ -5,3 +5,24 @@
 .monaco-editor .margin {
    background-color: var(--primary-light) !important;
 } */
+
+.CodeMirror {
+    background: transparent !important;
+    text-align: left !important;
+    font-size: 16px
+}
+
+.CodeMirror-gutters {
+    background: transparent !important;
+}
+
+.CodeMirror-linenumber {
+}
+
+.cm-atom{
+    color: var(--nav-item-hover-color) !important;
+}
+
+.cm-string{
+    color: #5fa052 !important;
+}
