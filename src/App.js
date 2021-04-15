@@ -22,6 +22,7 @@ import { useCallback } from 'react';
 function AuthenticatedContent() {
   const context = useContext(MainContext)
   const [namespace, setNamespace] = useState("")
+
   const {initialized} = useKeycloak();
 
   const authFetch = useCallback((path, opts)=>{
@@ -59,7 +60,9 @@ function AuthenticatedContent() {
       ...context,
       getJWT: getJWT,
       getUsername: getUsername,
-      fetch: authFetch
+      fetch: authFetch,
+      namespace: namespace,
+      setNamespace: setNamespace
     }}>
       <div id="content">
         <Router>

@@ -9,8 +9,19 @@ import TerminalFill from 'react-bootstrap-icons/dist/icons/terminal-fill'
 import GearFill from 'react-bootstrap-icons/dist/icons/gear-fill'
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 import { PlusCircle } from 'react-bootstrap-icons'
+import { useContext } from 'react'
+import MainContext from '../../context'
+import { useEffect, useState } from 'react'
+import { useRef } from 'react'
 
 export default function Navbar(props) {
+
+    const textInput = useRef()
+    const [namespaces, setNamespaces] = useState([])
+    const [projectVal, setProjectVal] = useState("")
+    const [acceptInput, setAcceptInput] = useState(false)
+
+    const {fetch, namespace, setNamespace} = useContext(MainContext)
 
     const {auth, name, email, logout} = props
 
@@ -22,6 +33,47 @@ export default function Navbar(props) {
         gravatarURL = "https://www.gravatar.com/avatar/" + gravatarHash
     }
     
+    async function fetchNamespaces(load) {
+        try {
+            let resp = await fetch('/namespaces/', {
+                method: 'GET',
+            })
+            if (resp.ok) {
+                let json = await resp.json()
+                if (load){
+                    setNamespace(json.data[0])
+                }
+                setNamespaces(json.data)
+            } else {
+                throw(new Error({message: await resp.text()}))
+            }
+        } catch(e) {
+            console.log('TODO handle err potentially running no auth i guess?')
+        }
+    }
+
+    async function createNamespace(val) {
+        try {
+            let resp = await fetch(`/namespaces/${val}`, {
+                method: 'POST'
+            })
+            if (resp.ok) {
+                await resp.json()
+                fetchNamespaces()
+                setNamespace(val)
+                setAcceptInput(!acceptInput)
+                toggleNamespaceSelector()
+            } else {
+                throw(new Error({message: await resp.text()}))
+            }
+        } catch(e) {
+            console.log('TODO handle err potentially running no auth i guess?')
+        }
+    }
+    
+    useEffect(()=>{
+        fetchNamespaces(true)
+    },[])
 
     function toggleNamespaceSelector() {
         let x = document.getElementById('namespaces-ul');
@@ -41,47 +93,44 @@ export default function Navbar(props) {
                     <li className="namespace-selector" onClick={() => toggleNamespaceSelector()}>
                         <div>
                             <ArrowRightFill id="namespace-arrow" style={{ marginRight: "10px", height: "18px" }} />
-                            <span><b>demo-fza6</b></span>
+                            <span><b>{namespace}</b></span>
                         </div>
                     </li>
                     <li id="namespace-list" style={{ paddingLeft: "0px", paddingTop: "0px", flexDirection: "column" }}>
-                        <div style={{ width: "100%" }}>
+                        <div style={{ width: "100%" }} >
                             <ul>
                                 <li>
-                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", paddingTop:"5px" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
-                                        <span>
-                                            New project
-                                        </span>
+                                        {acceptInput ? 
+                                            <input  onKeyPress={(e)=>{
+                                                if(e.code === "NumpadEnter" || e.code === "Enter") {
+                                                    // create namespace
+                                                    createNamespace(e.target.value)
+                                                } 
+                                            }} placeholder="Enter namespace" type="text" ref={textInput} style={{width:"110px", color:"white", height:"25px", background:"transparent", border:"none"}}/>
+                                            :
+                                            <span onClick={()=>{
+                                                setAcceptInput(!acceptInput)
+                                                setTimeout(()=>{
+                                                    textInput.current.focus()
+                                                },100)
+                                            }}>
+                                                New namespace
+                                            </span>
+                                        }
                                     </div>
                                 </li>
-                                <li>
-                                    namespace-01
-                                </li>
-                                <li>
-                                    namespace-02
-                                </li>
-                                <li>
-                                    namespace-03
-                                </li>
-                                <li>
-                                    namespace-04
-                                </li>
-                                <li>
-                                    namespace-05
-                                </li>
-                                <li>
-                                    namespace-06
-                                </li>
-                                <li>
-                                    namespace-07
-                                </li>
-                                <li>
-                                    namespace-08
-                                </li>
-                                <li>
-                                    namespace-09
-                                </li>
+                                {namespaces.map((obj)=>{
+                                    if(obj !== namespace){
+                                        return(
+                                            <li onClick={()=>{
+                                                setNamespace(obj)
+                                                toggleNamespaceSelector()
+                                            }}>{obj}</li>
+                                        )
+                                    }
+                                })}
                             </ul>
                         </div>
                     </li>
