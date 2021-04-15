@@ -25,7 +25,10 @@ export default function WorkflowPage() {
     return(
         <>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
-                <Breadcrumbs />
+                <div style={{ flex: "auto" }}>
+                    <Breadcrumbs elements={["Workflows", "Example"]} />
+                </div>
+                <WorkflowActions />
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -33,13 +36,19 @@ export default function WorkflowPage() {
                         <TileTitle name="Editor" actionsDiv={playBtn}>
                             <PencilSquare />
                         </TileTitle>
-                        <Editor/>
+                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px"}}>
+                            <Editor/>
+                        </div>
                     </div>
                     <div className="item-0 neumorph">
                         <TileTitle name="Graph">
                             <PipFill />
                         </TileTitle>
-                        <Diagram />   
+                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
+                            <div style={{ flex: "auto" }}>
+                                <Diagram />   
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="container graph-contents" style={{ width: "300px" }}>
@@ -112,6 +121,16 @@ function EventsList() {
             <ul style={{ margin: "0px" }}>
                 {listItems}
             </ul>
+        </div>
+    )
+}
+
+function WorkflowActions() {
+    return(
+        <div id="workflow-actions" className="neumorph fit-content" style={{ fontSize: "11pt" }}>
+            <span>
+                Actions (disable, trigger, etc.)
+            </span>
         </div>
     )
 }

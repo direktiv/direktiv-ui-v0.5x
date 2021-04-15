@@ -1,0 +1,33 @@
+:root {
+    --primary-dark: #1e1a1a;
+    --primary-light: #e0e0e0;
+    --neumorph-shadow-dark: #b5b5b5;
+    --neumorph-shadow-light: #fff;
+    --neumorph-offset-dark: 7px;
+    --neumorph-offset-light: -7px;
+    --neumorph-blur: 14px;
+    --dark-divider-color: rgba(255,255,255,0.1);
+    --light-divider-color: rgba(0, 0, 0, 0.1);
+    --nav-item-hover-color: #4497f5;
+    --font-dark: #4a4e4e;
+    --secondary-font-light: #8e8e8e;
+}
+
+
+#events-table {
+    font-size: 11pt;
+}
+
+#events-table table thead tr th {
+    border: solid 1px var(--light-divider-color);
+}
+
+ tr:hover {
+    padding: 4px;
+    border-radius: 8px;
+    background-color: var(--primary-light);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+    color: var(--font-dark);
+
+}
+
