@@ -308,15 +308,3 @@ text {
     flex-direction: row;
     align-items: end;
 }
-
-.CodeMirror {
-    text-align: left !important;
-    /* min-height: 100% !important; */
-    /* resize: vertical; */
-}
-
-.react-codemirror2 {
-    min-height: 100% !important;
-    min-width: 100%;
-    height: 100% !important;
-}
