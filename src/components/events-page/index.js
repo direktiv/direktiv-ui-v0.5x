@@ -65,25 +65,25 @@ function EventsPageBody() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr className="event-list-item">
                         <td style={{ textAlign: "center" }}><EventStatus status="Completed" /></td>
                         <td>2s ago</td>
                         <td>demo-fza6/test-wf/blahblah</td>
                         <td></td>
                     </tr>
-                    <tr>
+                    <tr className="event-list-item">
                         <td style={{ textAlign: "center" }}><EventStatus status="Pending" /></td>
                         <td>2s ago</td>
                         <td>demo-fza6/test-wf/blahblah</td>
                         <td></td>
                     </tr>
-                    <tr>
+                    <tr className="event-list-item">
                         <td style={{ textAlign: "center" }}><EventStatus status="Failed" /></td>
                         <td>2s ago</td>
                         <td>demo-fza6/test-wf/blahblah</td>
                         <td></td>
                     </tr>
-                    <tr>
+                    <tr className="event-list-item">
                         <td style={{ textAlign: "center" }}><EventStatus status="Completed" /></td>
                         <td>2s ago</td>
                         <td>demo-fza6/test-wf/blahblah</td>

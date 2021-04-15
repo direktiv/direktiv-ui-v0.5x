@@ -82,7 +82,6 @@ function AuthenticatedContent() {
   )
 }
 
-
 function Content() {
   const [namespace, setNamespace] = useState("")
 

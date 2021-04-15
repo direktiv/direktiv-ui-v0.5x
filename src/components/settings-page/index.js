@@ -22,7 +22,7 @@ export default function SettingsPage() {
                     <Secrets />
                 </div>
                 <div className="item-0 neumorph" style={{ flex: "auto", minWidth: "400px" }}>
-                    <TileTitle name="Registries">
+                    <TileTitle name="Container Registries">
                         <CloudDownloadFill />
                     </TileTitle>
                     <Registries />

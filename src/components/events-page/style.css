@@ -33,7 +33,7 @@ table {
     line-height: 24px;
 }
 
- tr:hover {
+tr.event-list-item:hover {
     box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
 }
 

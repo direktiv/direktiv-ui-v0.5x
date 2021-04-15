@@ -74,6 +74,12 @@
     border-top: solid 1px var(--dark-divider-color);
 }
 
+.divider-dark {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-top: solid 1px var(--light-divider-color);
+}
+
 
 .neumorph {
     border-radius: 8px;
@@ -340,4 +346,19 @@ text {
 
 .no-neumorph:hover {
     box-shadow: none !important;
+}
+
+pre {
+    font-size: 9pt;
+    white-space: pre-wrap;
+    word-break: keep-all; 
+    overflow-x: clip;
+    margin-bottom: 0px;
+    color: white;
+    margin-top: 0px;
+}
+
+.file-form {
+    font-size: 11pt;
+    border: dashed 2px var(--font-dark);
 }
