@@ -1,5 +1,5 @@
 import {Controlled as CodeMirror} from "react-codemirror2";
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 
 // style editor
 import 'codemirror/lib/codemirror.css';
@@ -19,8 +19,6 @@ export default function ReactEditor() {
     const [debugValue, setDebugValue] = useState(val);
 
     return(
-        <div className="codearea">
-
             <CodeMirror
                 value={debugValue}
                 options={{
@@ -32,6 +30,5 @@ export default function ReactEditor() {
                     setDebugValue(value)
                 }}
             />
-            </div>
     )
 }

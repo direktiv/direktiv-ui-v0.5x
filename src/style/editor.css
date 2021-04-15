@@ -6,28 +6,17 @@
    background-color: var(--primary-light) !important;
 } */
 
-.codearea{
-    flex:1 1 auto;
-    margin-top: 0;
-    height: 100%;
-    position:relative;
-    padding-top: 17px;
-    height: 100%;
-    /* overflow: hidden; */
-}
-
 .CodeMirror {
-    background: transparent !important;
+    /* background: transparent !important; */
     text-align: left !important;
     font-size: 16px;
+    word-break: break-word;
+    height: 100% !important;
     max-height:100% !important;
 }
 
 .CodeMirror-gutters {
     background: transparent !important;
-}
-
-.CodeMirror-linenumber {
 }
 
 .cm-atom{
