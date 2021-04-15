@@ -11,6 +11,10 @@
     --nav-item-hover-color: #4497f5;
     --font-dark: #4a4e4e;
     --secondary-font-light: #8e8e8e;
+    --success-color: #2fa64d;
+    --success-color-darker: #218838;
+    --danger-color: #db3447;
+    --danger-color-darker: #c52638;
 }
 
 #master {
@@ -308,4 +312,32 @@ text {
     display: flex;
     flex-direction: row;
     align-items: end;
+}
+
+.btn {
+    border-radius: 4px;
+    width: 48px;
+    height: 32px;
+    display: flex;
+    align-tracks: center;
+    cursor: pointer;
+}
+
+.btn.danger {
+    background-color: var(--danger-color);
+    /* transition: background-color; */
+}
+.btn.danger:hover {
+    background-color: var(--danger-color-darker);
+}
+
+.btn.happy {
+    background-color: var(--success-color);
+}
+.btn.happy:hover{
+    background-color: var(--success-color-darker);
+}
+
+.no-neumorph:hover {
+    box-shadow: none !important;
 }
