@@ -1,3 +1,19 @@
+:root {
+  --outer-shadow-inset-light: var(--neumorph-shadow-light);
+  --outer-shadow-inset-dark: #1e1a1a57;
+  --outer-shadow-light: var(--neumorph-shadow-light);
+  --outer-shadow-dark: #1e1a1a57;
+  --inner-shadow-inset: #1e1a1a;
+  --inner-shadow-light: rgba(255, 255, 255, 0.527);
+  --inner-shadow-dark: #1e1a1a57;
+  --inner-shadow-inset-dark: #1e1a1a9a;
+  --shadow-offset-light: -1px;
+  --shadow-offset-dark: 1px;
+  --outer-shadow-spread: 5px;
+  --outer-shadow-inset-spread: 5px;
+  --inner-shadow-spread: 8px;
+  --inner-shadow-inset-spread: 4px;
+}
 
   /* Circle */
   /* TODO: Fix height and width hack */
@@ -10,13 +26,40 @@
     box-shadow:  2px 2px 5px  var(--neumorph-shadow-dark),
                 -2px -2px 5px var(--neumorph-shadow-light);
   }
+
+  .Pie-Background-Highlight {
+    border-radius: 100%;
+    background: rgba(0, 255, 255, 0);
+    height: auto;
+    position: absolute;
+    inset: 0px;
+    z-index: 10000;
+    pointer-events: none;
+    box-shadow: var(--shadow-offset-light) var(--shadow-offset-light) var(--outer-shadow-spread) var(--outer-shadow-light),
+    var(--shadow-offset-dark) var(--shadow-offset-dark) var(--outer-shadow-spread) var(--outer-shadow-dark),
+    inset 0px 0px var(--outer-shadow-inset-spread) var(--outer-shadow-inset-dark)
+
+  }
+
+  .Pie-Background-Highlight-InnerCircle {
+    border-radius: 100%;
+    background: rgba(33, 223, 27, 0.041);
+    height: auto;
+    position: absolute;
+    inset: 20%;
+    pointer-events: none;
+    z-index: 10000;
+    box-shadow: var(--shadow-offset-light) var(--shadow-offset-light) var(--inner-shadow-spread) var(--inner-shadow-light),
+    var(--shadow-offset-dark) var(--shadow-offset-dark) var(--inner-shadow-spread) var(--inner-shadow-dark),
+    inset 0px 0px var(--inner-shadow-inset-spread) var(--inner-shadow-inset-dark)
+  }
   
   .Pie-Background-InnerCircle {
     border-radius: 100%;
     display: inline-block;
     background: #d1d9e6FF;
   }
-  
+
   /* Legend */
   .Pie-Legend-Background {
     width: max-content;
