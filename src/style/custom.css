@@ -184,7 +184,8 @@ ul li div {
     /* color: var(--primary-dark); */
     transition: color 1s linear;
     transition: height 0.3s ease-in-out;
-    
+
+    overflow-y: scroll;
 }
 
 #namespaces-ul.active #namespace-list {
@@ -193,7 +194,7 @@ ul li div {
     visibility: inherit;
     border-top: solid 1px var(--dark-divider-color);
     height: 150px;
-    max-height: 120px;
+    max-height: 150px;
     overflow-y: auto;
     padding-top: 80px;
     padding-bottom: 10px;

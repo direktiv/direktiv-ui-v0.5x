@@ -8,6 +8,7 @@ import LightningFill from 'react-bootstrap-icons/dist/icons/lightning-fill'
 import TerminalFill from 'react-bootstrap-icons/dist/icons/terminal-fill'
 import GearFill from 'react-bootstrap-icons/dist/icons/gear-fill'
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
+import { PlusCircle } from 'react-bootstrap-icons'
 
 export default function Navbar() {
 
@@ -32,9 +33,17 @@ export default function Navbar() {
                             <span><b>demo-fza6</b></span>
                         </div>
                     </li>
-                    <li id="namespace-list" style={{ paddingLeft: "0px" }}>
+                    <li id="namespace-list" style={{ paddingLeft: "0px", paddingTop: "0px", flexDirection: "column" }}>
                         <div style={{ width: "100%" }}>
                             <ul>
+                                <li>
+                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                                        <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
+                                        <span>
+                                            New project
+                                        </span>
+                                    </div>
+                                </li>
                                 <li>
                                     namespace-01
                                 </li>
