@@ -308,19 +308,3 @@ text {
     flex-direction: row;
     align-items: end;
 }
-
-.CodeMirror {
-    text-align: left !important;
-    min-height: 100% !important;
-    /* resize: vertical; */
-}
-
-.react-codemirror2 {
-    min-height: 100% !important;
-    height: 100% !important;
-}
-
-.dashboard-btn {
-    text-decoration: none;
-    color: var(--nav-item-hover-color);
-}
