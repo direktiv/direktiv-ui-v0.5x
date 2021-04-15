@@ -121,7 +121,7 @@ export default function WorkflowsPage() {
                         </table>
                     </div>
                 </div>
-                <div className="container">
+                <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
                     <div className="neumorph" style={{ minWidth: "350px" }}>
                         <TileTitle name="Upload workflow file">
                             <FileCode />
@@ -138,7 +138,7 @@ export default function WorkflowsPage() {
                         <TileTitle name="Send namespace event">
                             <PlusCircleFill />
                         </TileTitle>
-                        {/* <NewWorkflowForm /> */}
+                        <APIInteractionTile />
                     </div>
                 </div>
             </div>
@@ -193,6 +193,14 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
     } catch(e) {
         setErr(e.message)
     }
+}
+
+function APIInteractionTile() {
+    return (
+        <div>
+            
+        </div>
+    )
 }
 
 function UploadWorkflowForm() {
