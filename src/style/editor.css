@@ -7,9 +7,10 @@
 } */
 
 .CodeMirror {
-    background: transparent !important;
+    /* background: transparent !important; */
     text-align: left !important;
-    font-size: 16px
+    min-height: 100% !important;
+    font-size: 16px;
 }
 
 .CodeMirror-gutters {
@@ -25,4 +26,9 @@
 
 .cm-string{
     color: #5fa052 !important;
+}
+
+.react-codemirror2 {
+    min-height: 100% !important;
+    height: 100% !important;
 }

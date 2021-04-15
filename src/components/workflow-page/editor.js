@@ -25,6 +25,7 @@ export default function ReactEditor() {
                 options={{
                     mode: 'yaml',
                     lineNumbers: true,
+                    lineWrapping: true,
                 }}
                 onBeforeChange={(editor, data, value)=>{
                     setDebugValue(value)
