@@ -16,12 +16,14 @@ export default function WorkflowsPage() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                <div className="neumorph" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
-                    <TileTitle name="All workflows">
-                        <CardList />
-                    </TileTitle>
+                <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
+                    <div className="neumorph" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
+                        <TileTitle name="All workflows">
+                            <CardList />
+                        </TileTitle>
+                    </div>
                 </div>
-                <div className="container">
+                <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
                     <div className="neumorph" style={{ minWidth: "350px" }}>
                         <TileTitle name="Upload workflow file">
                             <FileCode />
@@ -38,11 +40,19 @@ export default function WorkflowsPage() {
                         <TileTitle name="Send namespace event">
                             <PlusCircleFill />
                         </TileTitle>
-                        {/* <NewWorkflowForm /> */}
+                        <APIInteractionTile />
                     </div>
                 </div>
             </div>
         </>
+    )
+}
+
+function APIInteractionTile() {
+    return (
+        <div>
+            
+        </div>
     )
 }
 
