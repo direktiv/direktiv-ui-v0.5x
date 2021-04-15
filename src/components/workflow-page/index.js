@@ -33,13 +33,11 @@ export default function WorkflowPage() {
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
                     <div className="item-0 neumorph">
-                        <TileTitle name="Editor" actionsDiv={playBtn}>
+                        <TileTitle name="Editor" actionsDiv={playBtn} >
                             <PencilSquare />
                         </TileTitle>
-                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px"}}>
-                            <div style={{width: "100%", paddingTop: "18px"}}>
-                            <Editor/>
-                            </div>
+                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top:"-28px", overflow:'hidden'}}>
+                                <Editor/>
                         </div>
                     </div>
                     <div className="item-0 neumorph">

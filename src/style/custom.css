@@ -311,7 +311,7 @@ text {
 
 .CodeMirror {
     text-align: left !important;
-    min-height: 100% !important;
+    /* min-height: 100% !important; */
     /* resize: vertical; */
 }
 

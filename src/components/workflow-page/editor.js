@@ -17,20 +17,21 @@ states:
 
 export default function ReactEditor() {
     const [debugValue, setDebugValue] = useState(val);
-    const codemirrorRef = React.useRef();
 
     return(
+        <div className="codearea">
+
             <CodeMirror
                 value={debugValue}
                 options={{
                     mode: 'yaml',
                     lineNumbers: true,
+                    lineWrapping: true
                 }}
                 onBeforeChange={(editor, data, value)=>{
                     setDebugValue(value)
                 }}
-                ref={codemirrorRef}
             />
-
+            </div>
     )
 }
