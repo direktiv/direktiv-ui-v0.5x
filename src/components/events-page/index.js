@@ -15,11 +15,37 @@ export default function EventsPage() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flex: "auto" }}>
-                <div className="neumorph">
+                <div className="neumorph" style={{ flex: "auto" }}>
                     <TileTitle name="Instances">
                         <CardList />
                     </TileTitle>
                     <EventsPageBody />
+                </div>
+                <div className="container" style={{ flex: "auto" }}>
+                    <div className="neumorph" style={{ flex: "auto" }}>
+                        <TileTitle name="Completed">
+                            <CardList />
+                        </TileTitle>
+                        <EventsPageBody />
+                    </div>
+                    <div className="neumorph" style={{ flex: "auto" }}>
+                        <TileTitle name="Pending">
+                            <CardList />
+                        </TileTitle>
+                        <EventsPageBody />
+                    </div>
+                    <div className="neumorph" style={{ flex: "auto" }}>
+                        <TileTitle name="Timed out">
+                            <CardList />
+                        </TileTitle>
+                        <EventsPageBody />
+                    </div>
+                    <div className="neumorph" style={{ flex: "auto" }}>
+                        <TileTitle name="Failed">
+                            <CardList />
+                        </TileTitle>
+                        <EventsPageBody />
+                    </div>
                 </div>
             </div>
         </>
@@ -29,13 +55,13 @@ export default function EventsPage() {
 function EventsPageBody() {
     return(
         <div id="events-table">
-            <table style={{ width: "" }}>
+            <table style={{ width: "100%" }}>
                 <thead>
                     <tr>
-                        <th style={{ width: "60px" }}>Status</th>
-                        <th style={{ width: "100px" }}>Time</th>
-                        <th style={{ width: "400px" }}>Instance ID</th>
-                        <th style={{ minWidth: "100px" }}>Actions</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th>Instance ID</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

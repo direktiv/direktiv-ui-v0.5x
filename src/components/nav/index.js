@@ -1,6 +1,6 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
-
+import md5 from 'md5'
 import { Link } from 'react-router-dom'
 
 import Speedometer from 'react-bootstrap-icons/dist/icons/speedometer'
@@ -8,8 +8,20 @@ import LightningFill from 'react-bootstrap-icons/dist/icons/lightning-fill'
 import TerminalFill from 'react-bootstrap-icons/dist/icons/terminal-fill'
 import GearFill from 'react-bootstrap-icons/dist/icons/gear-fill'
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
+import { PlusCircle } from 'react-bootstrap-icons'
 
-export default function Navbar() {
+export default function Navbar(props) {
+
+    const {auth, name, email, logout} = props
+
+    let gravatarHash = ""
+    let gravatarURL = ""
+
+    if(auth) {
+        gravatarHash = md5(email)
+        gravatarURL = "https://www.gravatar.com/avatar/" + gravatarHash
+    }
+    
 
     function toggleNamespaceSelector() {
         let x = document.getElementById('namespaces-ul');
@@ -32,9 +44,17 @@ export default function Navbar() {
                             <span><b>demo-fza6</b></span>
                         </div>
                     </li>
-                    <li id="namespace-list" style={{ paddingLeft: "0px" }}>
+                    <li id="namespace-list" style={{ paddingLeft: "0px", paddingTop: "0px", flexDirection: "column" }}>
                         <div style={{ width: "100%" }}>
                             <ul>
+                                <li>
+                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                                        <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
+                                        <span>
+                                            New project
+                                        </span>
+                                    </div>
+                                </li>
                                 <li>
                                     namespace-01
                                 </li>
@@ -86,7 +106,7 @@ export default function Navbar() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/e/" className="nav-link">
+                        <Link to="/i/" className="nav-link">
                             <div>
                                 <TerminalFill style={{ marginRight: "10px" }} />
                                 <span>Events / Logs</span>
@@ -103,12 +123,17 @@ export default function Navbar() {
                     </li>
                 </ul>
             </div>
-            <div id="nav-user-holder" style={{ paddingBottom: "40px" }}>
-                <img alt="user" style={{border: "solid 3px #0083B0", borderRadius: "50%", maxWidth: "48px"}} src="https://www.gravatar.com/avatar/47c1678268b1822f83dd6a11cb24765c" />
-                <span style={{ fontSize: "10pt", display: "block" }}>
-                    GhoulJim
-                </span>
-            </div>
+            {auth ?
+        <div onClick={()=>logout()} id="nav-user-holder" style={{ paddingBottom: "40px" }}>
+        <img alt="user" style={{border: "solid 3px #0083B0", borderRadius: "50%", maxWidth: "48px"}} src={gravatarURL} />
+        <span style={{ fontSize: "10pt", display: "block" }}>
+            {name}
+        </span>
+    </div>
+            :   
+                            ""
+            }
+
         </div>
     )
 }
