@@ -32,7 +32,7 @@ export default function WorkflowPage() {
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
-                    <div className="item-0 neumorph" >
+                    <div className="item-0 neumorph">
                         <TileTitle name="Editor" actionsDiv={playBtn}>
                             <PencilSquare />
                         </TileTitle>
