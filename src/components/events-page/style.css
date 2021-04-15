@@ -19,15 +19,21 @@
 }
 
 #events-table table thead tr th {
+    border-radius: 3px;
     border: solid 1px var(--light-divider-color);
 }
 
- tr:hover {
+tr {
+    margin-top: 5px;
     padding: 4px;
     border-radius: 8px;
-    background-color: var(--primary-light);
-    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
-    color: var(--font-dark);
+}
 
+table {
+    line-height: 24px;
+}
+
+ tr:hover {
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
 }
 
