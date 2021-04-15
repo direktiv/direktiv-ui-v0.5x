@@ -86,7 +86,7 @@ export default function Navbar() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/e/" className="nav-link">
+                        <Link to="/i/" className="nav-link">
                             <div>
                                 <TerminalFill style={{ marginRight: "10px" }} />
                                 <span>Events / Logs</span>

@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Navbar from './components/nav'
 import DashboardPage from './components/dashboard-page'
 import EventsPage from './components/events-page'
+import InstancePage from './components/instance-page'
 import SettingsPage from './components/settings-page'
 import WorkflowsPage from './components/workflows-page'
 import WorkflowPage from './components/workflow-page'
@@ -27,7 +28,8 @@ function App() {
                   <Route exact path="/" component={DashboardPage} />
                   <Route exact path="/w/" component={WorkflowsPage} />
                   <Route exact path="/w/:workflow" component={WorkflowPage} />
-                  <Route exact path="/e/" component={EventsPage} />
+                  <Route exact path="/i/" component={EventsPage} />
+                  <Route exact path="/i/:instance" component={InstancePage} />
                   <Route exact path="/s/" component={SettingsPage} />
                 </Switch>
               </div>

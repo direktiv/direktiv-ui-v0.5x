@@ -319,3 +319,8 @@ text {
     min-height: 100% !important;
     height: 100% !important;
 }
+
+.dashboard-btn {
+    text-decoration: none;
+    color: var(--nav-item-hover-color);
+}
