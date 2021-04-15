@@ -69,16 +69,20 @@ function AuthenticatedContent() {
           <div id="nav-panel">
             <Navbar auth={true} email={getEmail()} name={getUsername()} logout={logout} namespace={namespace} setNamespace={namespace} />
           </div>
-          <div id="main-panel">
-            <Switch>
-              <Route exact path="/" component={DashboardPage} />
-              <Route exact path="/w/" component={WorkflowsPage} />
-              <Route exact path="/w/:workflow" component={WorkflowPage} />
-              <Route exact path="/i/" component={EventsPage} />
-              <Route exact path="/i/:instance" component={InstancePage} />
-              <Route exact path="/s/" component={SettingsPage} />
-            </Switch>
-          </div>
+          {namespace !== "" ? 
+            <div id="main-panel">
+              <Switch>
+                <Route exact path="/" component={DashboardPage} />
+                <Route exact path="/w/" component={WorkflowsPage} />
+                <Route exact path="/w/:workflow" component={WorkflowPage} />
+                <Route exact path="/i/" component={EventsPage} />
+                <Route exact path="/i/:instance" component={InstancePage} />
+                <Route exact path="/s/" component={SettingsPage} />
+              </Switch>
+            </div>
+            :
+            ""
+          }
         </Router>
       </div>
     </MainContext.Provider>

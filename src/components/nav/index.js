@@ -18,7 +18,6 @@ export default function Navbar(props) {
 
     const textInput = useRef()
     const [namespaces, setNamespaces] = useState([])
-    const [projectVal, setProjectVal] = useState("")
     const [acceptInput, setAcceptInput] = useState(false)
 
     const {fetch, namespace, setNamespace} = useContext(MainContext)
