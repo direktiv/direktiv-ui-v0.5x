@@ -37,7 +37,7 @@ export default function WorkflowPage() {
                             <PencilSquare />
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px"}}>
-                            <div style={{width: "100%", paddingTop: "10px"}}>
+                            <div style={{width: "100%", paddingTop: "18px"}}>
                             <Editor/>
                             </div>
                         </div>
