@@ -11,6 +11,7 @@
     --nav-item-hover-color: #4497f5;
     --font-dark: #4a4e4e;
     --secondary-font-light: #8e8e8e;
+    --direktiv-blue: #4293c4;
 }
 
 
@@ -33,7 +34,7 @@ table {
     line-height: 24px;
 }
 
- tr:hover {
+tr.event-list-item:hover {
     box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
 }
 

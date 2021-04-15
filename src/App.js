@@ -74,7 +74,8 @@ function AuthenticatedContent() {
               <Route exact path="/" component={DashboardPage} />
               <Route exact path="/w/" component={WorkflowsPage} />
               <Route exact path="/w/:workflow" component={WorkflowPage} />
-              <Route exact path="/e/" component={EventsPage} />
+              <Route exact path="/i/" component={EventsPage} />
+              <Route exact path="/i/:instance" component={InstancePage} />
               <Route exact path="/s/" component={SettingsPage} />
             </Switch>
           </div>
@@ -83,7 +84,6 @@ function AuthenticatedContent() {
     </MainContext.Provider>
   )
 }
-
 
 function Content() {
   const [namespace, setNamespace] = useState("")
@@ -103,7 +103,8 @@ function Content() {
               <Route exact path="/" component={DashboardPage} />
               <Route exact path="/w/" component={WorkflowsPage} />
               <Route exact path="/w/:workflow" component={WorkflowPage} />
-              <Route exact path="/e/" component={EventsPage} />
+              <Route exact path="/i/" component={EventsPage} />
+              <Route exact path="/i/:instance" component={InstancePage} />
               <Route exact path="/s/" component={SettingsPage} />
             </Switch>
           </div>

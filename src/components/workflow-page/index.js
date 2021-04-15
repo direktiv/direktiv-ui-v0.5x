@@ -36,8 +36,12 @@ export default function WorkflowPage() {
                         <TileTitle name="Editor" actionsDiv={playBtn} >
                             <PencilSquare />
                         </TileTitle>
-                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top:"-28px", overflow:'hidden'}}>
-                                <Editor/>
+                        <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
+                            <div style={{width: "100%", height: "100%", position: "relative"}}>
+                                <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                                    <Editor/>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="item-0 neumorph">
