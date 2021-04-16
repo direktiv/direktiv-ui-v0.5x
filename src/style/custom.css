@@ -17,6 +17,21 @@
     --danger-color-darker: #c52638;
 }
 
+/* FORM INPUTS */
+input {
+    line-height: 32px;
+    border-radius: 8px;
+    border: solid 1px var(--font-dark);
+    padding-left: 10px;
+}
+
+input:focus {
+    /* outline: 1px solid var(--nav-item-hover-color); */
+    outline: none;
+    box-shadow: 0 0 1pt 1pt var(--nav-item-hover-color);
+}
+/* END FORM INPUTS */
+
 #master {
     flex: auto;
     width: 100%;

@@ -13,9 +13,11 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
 
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
+import { useParams } from 'react-router'
 
 export default function WorkflowPage() {
-
+    const params = useParams()
+    console.log(params)
     let playBtn = (
         <div>
             <Play className="success" style={{ fontSize: "18pt" }} />

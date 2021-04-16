@@ -22,6 +22,7 @@ import { useCallback } from 'react';
 function AuthenticatedContent() {
   const context = useContext(MainContext)
   const [namespace, setNamespace] = useState("")
+
   const {initialized} = useKeycloak();
 
   const authFetch = useCallback((path, opts)=>{
@@ -59,23 +60,29 @@ function AuthenticatedContent() {
       ...context,
       getJWT: getJWT,
       getUsername: getUsername,
-      fetch: authFetch
+      fetch: authFetch,
+      namespace: namespace,
+      setNamespace: setNamespace
     }}>
       <div id="content">
         <Router>
           <div id="nav-panel">
             <Navbar auth={true} email={getEmail()} name={getUsername()} logout={logout} namespace={namespace} setNamespace={namespace} />
           </div>
-          <div id="main-panel">
-            <Switch>
-              <Route exact path="/" component={DashboardPage} />
-              <Route exact path="/w/" component={WorkflowsPage} />
-              <Route exact path="/w/:workflow" component={WorkflowPage} />
-              <Route exact path="/i/" component={EventsPage} />
-              <Route exact path="/i/:instance" component={InstancePage} />
-              <Route exact path="/s/" component={SettingsPage} />
-            </Switch>
-          </div>
+          {namespace !== "" ? 
+            <div id="main-panel">
+              <Switch>
+                <Route exact path="/" component={DashboardPage} />
+                <Route exact path="/w/" component={WorkflowsPage} />
+                <Route exact path="/w/:workflow" component={WorkflowPage} />
+                <Route exact path="/i/" component={EventsPage} />
+                <Route exact path="/i/:instance" component={InstancePage} />
+                <Route exact path="/s/" component={SettingsPage} />
+              </Switch>
+            </div>
+            :
+            ""
+          }
         </Router>
       </div>
     </MainContext.Provider>
