@@ -3,6 +3,10 @@ import React, { useState} from "react";
 
 // style editor
 import 'codemirror/lib/codemirror.css';
+
+// theme
+import '../../style/editor-theme.css'
+
 // linting yaml
 import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
@@ -19,9 +23,11 @@ export default function ReactEditor() {
     const [debugValue, setDebugValue] = useState(val);
 
     return(
+        <>
             <CodeMirror
                 value={debugValue}
                 options={{
+                    theme:'editor-theme',
                     mode: 'yaml',
                     lineNumbers: true,
                     lineWrapping: true
@@ -30,5 +36,6 @@ export default function ReactEditor() {
                     setDebugValue(value)
                 }}
             />
+        </>
     )
 }
