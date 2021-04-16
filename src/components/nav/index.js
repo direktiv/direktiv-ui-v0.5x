@@ -40,7 +40,12 @@ export default function Navbar(props) {
             if (resp.ok) {
                 let json = await resp.json()
                 if (load){
-                    setNamespace(json.data[0])
+                    console.log(localStorage)
+                    if(localStorage.getItem("namespace") !== undefined) {
+                        setNamespace(localStorage.getItem("namespace"))
+                    } else {
+                        setNamespace(json.data[0])
+                    }
                 }
                 setNamespaces(json.data)
             } else {
@@ -60,6 +65,7 @@ export default function Navbar(props) {
                 await resp.json()
                 fetchNamespaces()
                 setNamespace(val)
+                localStorage.setItem("namespace", val)
                 setAcceptInput(!acceptInput)
                 toggleNamespaceSelector()
             } else {
@@ -124,6 +130,7 @@ export default function Navbar(props) {
                                     if(obj !== namespace){
                                         return(
                                             <li onClick={()=>{
+                                                localStorage.setItem("namespace", obj)
                                                 setNamespace(obj)
                                                 toggleNamespaceSelector()
                                             }}>{obj}</li>

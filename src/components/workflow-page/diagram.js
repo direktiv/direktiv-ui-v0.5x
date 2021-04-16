@@ -1,50 +1,110 @@
+import YAML from 'js-yaml'
 import { useEffect, useState } from 'react'
 import ReactFlow, { MiniMap, isNode, Handle, ReactFlowProvider, useZoomPanHelper } from 'react-flow-renderer';
 import dagre from 'dagre'
 
 export const position = { x: 0, y: 0}
 
-const generateElements = (getLayoutedElements) => {
+const generateElements = (getLayoutedElements, value) => {
+    console.log(value)
     let newElements = []
+   
+    try {
+        let v = YAML.load(value)
+        if(v.states) {
+            for(let i=0; i < v.states.length; i++) {
+                // check if starting element
+                if (i === 0) {
+                    // starting element so create an edge to the state
+                    newElements.push({
+                        id: `startNode-${v.states[i].id}`,
+                        source: 'startNode',
+                        target: v.states[i].id,
+                        type: 'bezier',
+                    })
+                }
 
-    newElements.push({
-        id: 'startNode',
-        position: position,
-        data: {label: ""},
-        type: 'start',
-        sourcePosition: 'right',
-    })
+                // push new state
+                newElements.push({
+                    id: v.states[i].id,
+                    position: position,
+                    data: {label: v.states[i].id, type: v.states[i].type, state: v.states[i].data},
+                    type: 'state'
+                })
 
-    newElements.push({
-        id: 'helloworld',
-        type: 'state',
-        data: {label: "helloworld", type:"noop"},
-        position: position,
-    })
 
-    newElements.push({
-        id: `startNode-helloworld`,
-        source: 'startNode',
-        target: "helloworld",
-        animated: false,
-        type: 'bezier',
-    })
+                // Check if the state has conditions
+                if(v.states[i].conditions) {
+                    for(let y=0; y < v.states[i].conditions.length; y++) {
+                        if(v.states[i].conditions[y].transition) {
+                            newElements.push({
+                                id: `${v.states[i].id}-${v.states[i].conditions[y].transition}`,
+                                source: v.states[i].id,
+                                target: v.states[i].conditions[y].transition,
+                                animated: false,
+                                type: 'bezier'
+                            })
+                        }
+                    }
+                }
 
-    newElements.push({
-        id: `helloworld-endNode`,
-        source: 'helloworld',
-        target: `endNode`,
-        animated: false,
-        type: 'bezier'
-    })
+                // Check if state is catching things to transition to
+                if(v.states[i].catch) {
+                    for(let x=0; x < v.states[i].catch.length; i++) {
+                        if(v.states[i].catch[x].transition) {
+                            newElements.push({
+                                id: `${v.states[i].id}-${v.states[i].catch[x].transition}`,
+                                source: v.states[i].id,
+                                target: v.states[i].catch[x].transition,
+                                animated: false,
+                                type: 'bezier'
+                            })
+                        }
+                    }
+                }
 
-    newElements.push({
-        id:'endNode',
-        type: 'end',
-        data: {label: ""},
-        position: position,
-    })
+                // check if transition and create edge to hit new state
+                if(v.states[i].transition) {
+                    newElements.push({
+                        id: `${v.states[i].id}-${v.states[i].transition}`,
+                        source: v.states[i].id,
+                        target: v.states[i].transition,
+                        animated: false,
+                        type: 'bezier'
+                    })
+                } else {
+                    // no transition add end state
+                    newElements.push({
+                        id: `${v.states[i].id}-endNode`,
+                        source: v.states[i].id,
+                        target: `endNode`,
+                        type: 'bezier'
+                    })
+                }
+            }
 
+            // push start node
+            newElements.push({
+                id: 'startNode',
+                position: position,
+                data: {label: ""},
+                type: 'start',
+                sourcePosition: 'right',
+            })
+
+            // push end node
+            newElements.push({
+                id:'endNode',
+                type: 'end',
+                data: {label: ""},
+                position: position,
+            })
+        }
+
+    } catch(e) {
+        // do nothing as yaml isn't valid todo
+        console.log(e, 'yaml is not valid')
+    }
     return getLayoutedElements(newElements)
 }
 
@@ -114,7 +174,9 @@ const WorkflowDiagram = (props) => {
     )
 }
 
-export default function Diagram() {
+export default function Diagram(props) {
+    const {value} = props
+
     const [elements, setElements] = useState([])
 
     useEffect(()=>{
@@ -161,13 +223,13 @@ export default function Diagram() {
             })
         }
 
-        let saveElements = generateElements(getLayoutedElements)
+        let saveElements = generateElements(getLayoutedElements, value)
 
         // Keep old elements until the yaml is parsable. Try and catch in func
         if(elements !== null) {
             setElements(saveElements)
         }
-    },[setElements])
+    },[setElements, value])
 
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
