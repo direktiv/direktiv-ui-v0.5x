@@ -100,7 +100,7 @@ export default function Logs(props) {
             fetchLogs()
             setInit(true)
         } else {
-            let timer = setInterval(fetchLogs, 2500)
+            let timer = setInterval(fetchLogs, 500)
             return function cleanup() {
                 clearInterval(timer)
             }

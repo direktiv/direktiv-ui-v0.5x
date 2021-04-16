@@ -10,6 +10,10 @@ const routes = [
     {
         path: '/i',
         breadcrumb: 'Instances'
+    },
+    {
+        path: '/s',
+        breadcrumb: 'Secrets'
     }
 ]
 
