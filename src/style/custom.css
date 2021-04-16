@@ -67,6 +67,12 @@ input:focus {
     box-shadow: -2px 0px 16px rgb(0, 0, 0, 0.6);
 }
 
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 #nav-panel {
     width: 180px;
     min-width: 180px;
