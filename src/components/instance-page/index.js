@@ -9,6 +9,7 @@ import CaretDownSquareFill from 'react-bootstrap-icons/dist/icons/caret-down-squ
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import { Link, useParams } from 'react-router-dom'
+import Logs from './logs'
 
 export default function InstancePage() {
     const params = useParams()
@@ -45,6 +46,7 @@ export default function InstancePage() {
                         <TileTitle name="Logs">
                             <CardList />
                         </TileTitle>
+                        <Logs />
                     </div>
                     <div className="neumorph" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Graph">
