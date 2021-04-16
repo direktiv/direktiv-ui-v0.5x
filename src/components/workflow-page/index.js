@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
@@ -13,12 +13,32 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
 
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
+import { useHistory, useParams } from 'react-router'
+import MainContext from '../../context'
 
 export default function WorkflowPage() {
-
+    const {fetch, namespace} = useContext(MainContext)
+    const history = useHistory()
+    const params = useParams()
+    console.log(params)
     let playBtn = (
         <div>
-            <Play className="success" style={{ fontSize: "18pt" }} />
+            <Play onClick={async ()=>{
+                try{
+                    let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
+                        method: "POST",
+                        body: JSON.stringify({"input":"todo"})
+                    })
+                    if(resp.ok) {
+                        let json = await resp.json()    
+                        history.push(`/i/${json.instanceId}`)
+                    } else {
+                        throw new Error(await resp.text())
+                    }
+                } catch(e) {
+                    console.log(e, "todo execute workflow")
+                }
+            }} className="success" style={{ fontSize: "18pt" }} />
         </div>
     );
 

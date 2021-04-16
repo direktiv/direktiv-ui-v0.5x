@@ -12,7 +12,7 @@ export default function DashboardPage() {
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
-                    <Breadcrumbs elements={["Dashboard"]} />
+                    <Breadcrumbs dashboard={true} elements={["Dashboard"]} />
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
