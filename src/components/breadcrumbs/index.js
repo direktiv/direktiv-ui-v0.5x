@@ -14,7 +14,7 @@ const routes = [
 ]
 
 export default function Breadcrumbs(props) {
-    const {dashboard} = props
+    const {dashboard, instanceId} = props
     
     const breadcrumbs = useBreadcrumbs(routes)
     const history = useHistory()
@@ -22,18 +22,29 @@ export default function Breadcrumbs(props) {
     return (
         <div id="breadcrumbs" className="neumorph fit-content">
             {breadcrumbs.map((obj)=>{
-                if(obj.key !== "/") {
-                    return(
-                        <span onClick={()=>history.push(obj.key)} key={obj.key}>{obj.breadcrumb}</span>
-                    )
-                }
-                // return home key if dashboard
-                if(dashboard){
-                    return(
-                        <span onClick={()=>history.push("/")} key={"/"}>Dashboard</span>
-                    )
+                // if no instance id use custom breadcrumbs
+                if (!instanceId) {
+                    if(obj.key !== "/") {
+                        return(
+                            <span onClick={()=>history.push(obj.key)} key={obj.key}>{obj.breadcrumb}</span>
+                        )
+                    }
+                    // return home key if dashboard
+                    if(dashboard){
+                        return(
+                            <span onClick={()=>history.push("/")} key={"/"}>Dashboard</span>
+                        )
+                    }
                 }
             })}
+            {instanceId ?
+                <>
+                    <span key={"/i"} onClick={()=>history.push("/i")}>Instances</span>
+                    <span key={`/i${instanceId}`} onClick={()=>history.push(`/i/${instanceId}`)}>{instanceId}</span>        
+                </>
+            :
+            ""
+            }
         </div>
     )
 }

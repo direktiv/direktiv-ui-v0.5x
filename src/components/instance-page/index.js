@@ -8,15 +8,18 @@ import Braces from 'react-bootstrap-icons/dist/icons/braces'
 import CaretDownSquareFill from 'react-bootstrap-icons/dist/icons/caret-down-square-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 export default function InstancePage() {
+    const params = useParams()
+    let instanceId = params[0]
+
     return(
         <>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto", display: "flex" }}>
                     <div style={{ flex: "auto" }}>
-                        <Breadcrumbs elements={["Instances", "InstanceName"]} />
+                        <Breadcrumbs instanceId={instanceId} />
                     </div>
                     <div id="" className="neumorph fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ alignItems: "center" }}>
