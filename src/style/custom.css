@@ -292,7 +292,7 @@ ul li div {
     overflow-y: auto;
 }
 
-.success, .completed {
+.success, .completed, .complete {
     color: #2fa64d;
 }
 

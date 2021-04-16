@@ -1,20 +1,45 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
 
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import Braces from 'react-bootstrap-icons/dist/icons/braces'
-import CaretDownSquareFill from 'react-bootstrap-icons/dist/icons/caret-down-square-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import { Link, useParams } from 'react-router-dom'
 import Logs from './logs'
+import InputOutput from './input-output'
+import MainContext from '../../context'
 
 export default function InstancePage() {
+    const {fetch} = useContext(MainContext)
+    
+    const [instanceDetails, setInstanceDetails] = useState({})
     const params = useParams()
     let instanceId = params[0]
 
+    console.log(instanceDetails)
+    useEffect(()=>{
+        async function fetchInstanceDetails() {
+            try{
+                let resp = await fetch(`/instances/${instanceId}`, {
+                    method: "GET",
+                })
+                if (resp.ok) {
+                    let json = await resp.json()
+                    setInstanceDetails(json)
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                console.log(e, 'err test')
+            }
+
+        }
+        fetchInstanceDetails()    
+    },[instanceId])
+    console.log(instanceDetails.status)
     return(
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -35,7 +60,9 @@ export default function InstancePage() {
                             <span style={{ marginRight: "10px" }}>
                                 Instance status: 
                             </span>
-                            <CircleFill style={{ fontSize: "12pt" }} className="completed"/>
+                            <span style={{display:"flex", alignItems:"center"}} title={instanceDetails.status}>
+                                <CircleFill  style={{ fontSize: "12pt" }} className={instanceDetails.status}/>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -55,10 +82,17 @@ export default function InstancePage() {
                     </div>
                 </div>
                 <div className="container" style={{ flexGrow: "inherit", maxWidth: "400px" }}>
-                    <div className="neumorph" style={{ flexGrow: "inherit" }}>
-                        <TileTitle name="Input / Output">
+                     <div className="neumorph" style={{ flexGrow: "inherit" }}>
+                        <TileTitle name="Input">
                             <Braces />
                         </TileTitle>
+                        <InputOutput data={instanceDetails.input} />
+                    </div>
+                    <div className="neumorph" style={{ flexGrow: "inherit" }}>
+                        <TileTitle name="Output">
+                            <Braces />
+                        </TileTitle>
+                        <InputOutput data={instanceDetails.output} />
                     </div>
                 </div>
             </div>
