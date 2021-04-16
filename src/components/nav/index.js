@@ -92,7 +92,7 @@ export default function Navbar(props) {
                     <li className="namespace-selector" onClick={() => toggleNamespaceSelector()}>
                         <div>
                             <ArrowRightFill id="namespace-arrow" style={{ marginRight: "10px", height: "18px" }} />
-                            <span><b>{namespace}</b></span>
+                            <span className="truncate" style={{ maxWidth: "120px" }}><b>{namespace}</b></span>
                         </div>
                     </li>
                     <li id="namespace-list" style={{ paddingLeft: "0px", paddingTop: "0px", flexDirection: "column" }}>

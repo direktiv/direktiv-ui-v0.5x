@@ -9,6 +9,7 @@ import CodeSlash from 'react-bootstrap-icons/dist/icons/code-slash'
 export default function DashboardPage() {
     return (
         <>
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs dashboard={true} elements={["Dashboard"]} />
@@ -33,6 +34,7 @@ export default function DashboardPage() {
                     </TileTitle>
                 </div>
             </div>
+        </div>
         </>
     )
 }
