@@ -159,7 +159,7 @@ export default function WorkflowPage() {
                                     :
                                     ""
                                 }
-                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

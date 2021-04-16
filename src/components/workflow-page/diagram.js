@@ -5,14 +5,15 @@ import dagre from 'dagre'
 
 export const position = { x: 0, y: 0}
 
-const generateElements = (getLayoutedElements, value) => {
-    console.log(value)
+const generateElements = (getLayoutedElements, value, flow, status) => {
+    console.log(value, flow)
     let newElements = []
    
     try {
         let v = YAML.load(value)
         if(v.states) {
             for(let i=0; i < v.states.length; i++) {
+
                 // check if starting element
                 if (i === 0) {
                     // starting element so create an edge to the state
@@ -28,7 +29,7 @@ const generateElements = (getLayoutedElements, value) => {
                 newElements.push({
                     id: v.states[i].id,
                     position: position,
-                    data: {label: v.states[i].id, type: v.states[i].type, state: v.states[i].data},
+                    data: {label: v.states[i].id, type: v.states[i].type, state: v.states[i]},
                     type: 'state'
                 })
 
@@ -99,6 +100,35 @@ const generateElements = (getLayoutedElements, value) => {
                 data: {label: ""},
                 position: position,
             })
+
+            // Check flow array change edges to green if it passed 
+            if(flow){
+                // check flow for transitions
+                for(let i=0; i < flow.length; i++) {
+                    let noTransition = false
+                    for(let j=0; j < newElements.length; j++) {
+                        
+                        if(newElements[j].target === flow[i]) {
+                            newElements[j].animated = true
+                        }
+
+                        // check if the flow is an end element
+                        if(newElements[j].id === flow[i]) {
+                            if(!newElements[j].data.state.transition || !newElements[j].data.state.default){
+                                noTransition = true
+                            }
+                        }
+                    }
+                    if(noTransition) {
+                        // transition to end state
+                        for(let j=0; j < newElements.length; j++) {
+                            if(newElements[j].source === flow[i] && newElements[j].target === "endNode" && status === "complete"){
+                                newElements[j].animated = true
+                            }
+                        }
+                    }
+                }
+            }
         }
 
     } catch(e) {
@@ -175,7 +205,7 @@ const WorkflowDiagram = (props) => {
 }
 
 export default function Diagram(props) {
-    const {value} = props
+    const {value, flow, status} = props
 
     const [elements, setElements] = useState([])
 
@@ -223,13 +253,13 @@ export default function Diagram(props) {
             })
         }
 
-        let saveElements = generateElements(getLayoutedElements, value)
+        let saveElements = generateElements(getLayoutedElements, value, flow, status)
 
         // Keep old elements until the yaml is parsable. Try and catch in func
         if(elements !== null) {
             setElements(saveElements)
         }
-    },[setElements, value])
+    },[setElements, value, flow, status])
 
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>

@@ -1,7 +1,7 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
 import md5 from 'md5'
-import { Link } from 'react-router-dom'
+import { Link, matchPath, useHistory, useLocation, useParams } from 'react-router-dom'
 
 import Speedometer from 'react-bootstrap-icons/dist/icons/speedometer'
 import LightningFill from 'react-bootstrap-icons/dist/icons/lightning-fill'
@@ -17,6 +17,9 @@ import { useRef } from 'react'
 export default function Navbar(props) {
 
     const textInput = useRef()
+    const history = useHistory()
+    const location = useLocation()
+
     const [namespaces, setNamespaces] = useState([])
     const [acceptInput, setAcceptInput] = useState(false)
 
@@ -26,7 +29,7 @@ export default function Navbar(props) {
 
     let gravatarHash = ""
     let gravatarURL = ""
-
+    console.log(window.location)
     if(auth) {
         gravatarHash = md5(email)
         gravatarURL = "https://www.gravatar.com/avatar/" + gravatarHash
@@ -133,6 +136,22 @@ export default function Navbar(props) {
                                                 localStorage.setItem("namespace", obj)
                                                 setNamespace(obj)
                                                 toggleNamespaceSelector()
+                                               
+                                                let matchWf = matchPath(location.pathname, {
+                                                    path: "/w/:workflow"
+                                                })
+
+                                                if(matchWf !== null) {
+                                                    history.push("/w")
+                                                }
+
+                                                let matchInstance = matchPath(location.pathname, {
+                                                    path: "/i/:namespace/:workflow/:instance"
+                                                })
+
+                                                if(matchInstance !== null) {
+                                                    history.push("/i")
+                                                }
                                             }}>{obj}</li>
                                         )
                                     }
@@ -164,7 +183,7 @@ export default function Navbar(props) {
                         <Link to="/i/" className="nav-link">
                             <div>
                                 <TerminalFill style={{ marginRight: "10px" }} />
-                                <span>Events / Logs</span>
+                                <span>Instances</span>
                             </div>
                         </Link>
                     </li>
@@ -180,11 +199,11 @@ export default function Navbar(props) {
             </div>
             {auth ?
         <div onClick={()=>logout()} id="nav-user-holder" style={{ paddingBottom: "40px" }}>
-        <img alt="user" style={{border: "solid 3px #0083B0", borderRadius: "50%", maxWidth: "48px"}} src={gravatarURL} />
-        <span style={{ fontSize: "10pt", display: "block" }}>
-            {name}
-        </span>
-    </div>
+            <img alt="user" style={{border: "solid 3px #0083B0", borderRadius: "50%", maxWidth: "48px"}} src={gravatarURL} />
+            <span style={{ fontSize: "10pt", display: "block" }}>
+                {name}
+            </span>
+        </div>
             :   
                             ""
             }

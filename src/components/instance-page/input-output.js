@@ -1,14 +1,15 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 function ReactSyntaxHighlighter(props) {
     const {code}=props
     const json = JSON.parse(code)
     const data = JSON.stringify(json, null, '\t')
-    console.log(code)
+
+
     return(
-        <SyntaxHighlighter language="json" style={dark}>
+        <SyntaxHighlighter language="json" style={tomorrow}>
             {data}
         </SyntaxHighlighter>
     )
