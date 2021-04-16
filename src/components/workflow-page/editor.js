@@ -11,29 +11,40 @@ import '../../style/editor-theme.css'
 import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
-const val = `id: noop
-description: "" 
-states:
-- id: hello
-  type: noop
-  transform: '{ result: "Hello World!" }'
-`
+export default function ReactEditor(props) {
+    const {value, setValue, saveCallback} = props;
 
-export default function ReactEditor() {
-    const [debugValue, setDebugValue] = useState(val);
+    function editorSave() {
+        if (saveCallback) {
+            saveCallback()
+            return
+        }
+
+        console.warn("Editor: saveCallback not set")
+    }
 
     return(
         <>
             <CodeMirror
-                value={debugValue}
+                value={value}
                 options={{
                     theme:'editor-theme',
                     mode: 'yaml',
                     lineNumbers: true,
-                    lineWrapping: true
+                    lineWrapping: true,
+                    extraKeys: {
+                        "Ctrl-S": editorSave,
+                        "Shift-Tab": "indentLess",
+                        Tab: function (cm) {
+                          var spaces = Array(cm.getOption("indentUnit") + 1).join(
+                            " "
+                          );
+                          cm.replaceSelection(spaces);
+                        },
+                    },
                 }}
                 onBeforeChange={(editor, data, value)=>{
-                    setDebugValue(value)
+                    setValue(value)
                 }}
             />
         </>
