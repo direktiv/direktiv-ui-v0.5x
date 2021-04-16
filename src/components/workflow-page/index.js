@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useCallback, useEffect } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
@@ -18,9 +18,92 @@ import MainContext from '../../context'
 
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
+    const [workflowValue, setWorkflowValue] = useState("")
+    const [workflowValueOld, setWorkflowValueOld] = useState("")
+    const [workflowInfo, setWorkflowInfo] = useState({uid: "", revision: 0, active: true, fetching: true,})
     const history = useHistory()
     const params = useParams()
-    console.log(params)
+
+    function setFetching(fetchState) {
+        setWorkflowInfo((wfI) => {
+            wfI.fetching = fetchState;
+            return wfI
+        })
+    }
+
+    const fetchWorkflow = useCallback(()=>{
+        setFetching(true)
+        async function fetchWf() {
+            try {
+                // todo pagination
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}?name`, {
+                    method: "get",
+                })
+                if (resp.ok) {
+                    let json = await resp.json()
+                    let wf = atob(json.workflow)
+                    setWorkflowValue(wf)
+                    setWorkflowValueOld(wf)
+                    setWorkflowInfo((wfI) => {
+                        wfI.uid = json.uid;
+                        return wfI
+                    })
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                console.log(e, "todo")
+            }
+        }
+        fetchWf().finally(()=>{setFetching(false)})
+    },[namespace])
+
+    const updateWorkflow = useCallback(()=>{
+        if (workflowInfo.fetching){
+            return // TODO - User Feedback
+        }
+        setFetching(true)
+
+        console.log("workflowValue =", workflowValue)
+
+        async function updateWf() {
+            try {
+                // todo pagination
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}`, {
+                    method: "put",
+                    headers: {
+                        "Content-type": "text/yaml",
+                        "Content-Length": workflowValue.length,
+                    },
+                    body: workflowValue
+                })
+                if (resp.ok) {
+                    let json = await resp.json()
+                    setWorkflowInfo((wfI) => {
+                        wfI.active = json.active;
+                        wfI.revision = json.revision;
+                        return wfI
+                    })
+                    setWorkflowValueOld(workflowValue)
+                    history.replace(`${json.id}`)
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                console.log(e, "todo")
+            }
+        }
+        updateWf().finally(()=>{setFetching(false)})
+    },[namespace, workflowValue])
+
+    useEffect(()=>{
+        fetchWorkflow()
+    },[namespace])
+
+    useEffect(()=>{
+        console.log("Workflow page has mounted")
+    },[])
+
     let playBtn = (
         <div>
             <Play onClick={async ()=>{
@@ -53,13 +136,13 @@ export default function WorkflowPage() {
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
                     <div className="item-0 neumorph">
-                        <TileTitle name="Editor" actionsDiv={playBtn} >
+                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={playBtn} >
                             <PencilSquare />
                         </TileTitle>
                         <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                             <div style={{width: "100%", height: "100%", position: "relative"}}>
                                 <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                                    <Editor/>
+                                    <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow}/>
                                 </div>
                             </div>
                         </div>
@@ -70,7 +153,7 @@ export default function WorkflowPage() {
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
-                                <Diagram />   
+                                <Diagram value={workflowValueOld}/>   
                             </div>
                         </div>
                     </div>
