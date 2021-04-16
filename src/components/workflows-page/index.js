@@ -10,6 +10,7 @@ import { FileCode } from 'react-bootstrap-icons'
 export default function WorkflowsPage() {
     return (
         <>
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows"]} />
@@ -44,6 +45,7 @@ export default function WorkflowsPage() {
                     </div>
                 </div>
             </div>
+        </div>
         </>
     )
 }

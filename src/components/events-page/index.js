@@ -9,6 +9,7 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 export default function EventsPage() {
     return (
         <>
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Events / Logs"]} />
@@ -48,6 +49,7 @@ export default function EventsPage() {
                     </div>
                 </div>
             </div>
+        </div>
         </>
     )
 }

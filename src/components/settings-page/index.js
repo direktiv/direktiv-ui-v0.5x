@@ -9,6 +9,7 @@ import { PlusCircleFill, XCircleFill } from 'react-bootstrap-icons'
 export default function SettingsPage() {
     return (
         <>
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Namespace Settings"]} />
@@ -28,6 +29,7 @@ export default function SettingsPage() {
                     <Registries />
                 </div>
             </div>
+        </div>
         </>
     )
 }

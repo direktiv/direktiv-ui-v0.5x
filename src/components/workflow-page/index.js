@@ -24,6 +24,7 @@ export default function WorkflowPage() {
 
     return(
         <>
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
@@ -76,6 +77,7 @@ export default function WorkflowPage() {
                     </div>
                 </div>
             </div>
+        </div>
         </>
     )
 }

@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 export default function InstancePage() {
     return(
         <>
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto", display: "flex" }}>
                     <div style={{ flex: "auto" }}>
@@ -56,7 +57,7 @@ export default function InstancePage() {
                     </div>
                 </div>
             </div>
-
+        </div>
         </>
     )
 }
