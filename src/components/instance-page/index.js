@@ -74,14 +74,14 @@ export default function InstancePage() {
                     <div style={{ flex: "auto" }}>
                         <Breadcrumbs instanceId={instanceId} />
                     </div>
-                    <div id="" className="neumorph fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
+                    <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ alignItems: "center" }}>
                             <Link className="dashboard-btn" to={`/w/${params.workflow}`}>
                                 View Workflow
                             </Link>
                         </div>
                     </div>
-                    <div id="" className="neumorph fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
+                    <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <span style={{ marginRight: "10px" }}>
                                 Instance status: 
@@ -95,13 +95,13 @@ export default function InstancePage() {
             </div>
             <div className="container" style={{ flexGrow: "1", flexDirection: "row" }}>
                 <div className="container" style={{ flexGrow: "inherit" }}>
-                    <div className="neumorph" style={{ flexGrow: "inherit" }}>
+                    <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Logs">
                             <CardList />
                         </TileTitle>
                         <Logs instanceId={instanceId} />
                     </div>
-                    <div className="neumorph" style={{ flexGrow: "inherit" }}>
+                    <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Graph">
                             <PipFill />
                         </TileTitle>
@@ -117,13 +117,13 @@ export default function InstancePage() {
                     </div>
                 </div>
                 <div className="container" style={{ flexGrow: "inherit", maxWidth: "400px" }}>
-                     <div className="neumorph" style={{ flexGrow: "inherit" }}>
+                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Input">
                             <Braces />
                         </TileTitle>
                         <InputOutput data={instanceDetails.input} />
                     </div>
-                    <div className="neumorph" style={{ flexGrow: "inherit" }}>
+                    <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Output">
                             <Braces />
                         </TileTitle>

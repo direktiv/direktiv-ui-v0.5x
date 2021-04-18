@@ -1,11 +1,10 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
-
+import MainContext from '../../context'
 import ShieldLockFill from 'react-bootstrap-icons/dist/icons/shield-lock-fill'
 import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-fill'
-import { PlusCircleFill, XCircleFill } from 'react-bootstrap-icons'
-import MainContext from '../../context'
+import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
 
 export default function SettingsPage() {
     return (
@@ -17,13 +16,13 @@ export default function SettingsPage() {
                 </div>
             </div>
             <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
-                <div className="item-0 neumorph" style={{ flex: "auto", minWidth: "400px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
                     <TileTitle name="Secrets">
                         <ShieldLockFill />
                     </TileTitle>
                     <Secrets />
                 </div>
-                <div className="item-0 neumorph" style={{ flex: "auto", minWidth: "400px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
                     <TileTitle name="Container Registries">
                         <CloudDownloadFill />
                     </TileTitle>
@@ -102,55 +101,55 @@ function Secrets() {
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-            <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
-                <thead>
-                    <tr className="no-neumorph">
-                        <th style={{ }}>
-                            Key
-                        </th>
-                        <th style={{  }}>
-                            Value
-                        </th>
-                        <th style={{ width: "50px" }}>
-                            
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {secrets.map((obj)=>{
-                        return(
-                            <tr>
-                <td style={{ paddingLeft: "10px" }}>
-                    <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
-                </td>
-                <td   style={{ paddingRight: "10px" }} colspan="2">
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
-                        <div title="Remove Secret" onClick={()=>deleteSecret()} className="btn danger" style={{ marginLeft: "10px" }}>
-                            <span style={{ flex: "auto" }}>
-                                <XCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
-                            </span>
-                        </div>    
-                    </div>
-                </td>
-            </tr>
+                        <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
+                            <thead>
+                                <tr className="no-neumorph">
+                                    <th style={{ }}>
+                                        Key
+                                    </th>
+                                    <th style={{  }}>
+                                        Value
+                                    </th>
+                                    <th style={{ width: "50px" }}>
+                                        
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {secrets.map((obj)=>{
+                                    return(
+                                        <tr>
+                            <td style={{ paddingLeft: "10px" }}>
+                                <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                            </td>
+                            <td   style={{ paddingRight: "10px" }} colspan="2">
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
+                                    <div className="circle button danger" style={{ marginLeft: "10px" }}>
+                                        <span style={{ flex: "auto" }}>
+                                            <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                        </span>
+                                    </div>    
+                                </div>
+                            </td>
+                        </tr>
                         )
                     })}
-                            <tr>
-            <td style={{ paddingLeft: "10px" }}>
-                <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e)=>setKey(e.target.value)}/>
-            </td>
-            <td style={{ paddingRight: "10px" }} colspan="2">
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input style={{ maxWidth: "150px" }} type="text" value={value} onChange={(e)=>setValue(e.target.value)} placeholder="Enter Value.."/>
-                    <div title="Create Secret" className="btn happy" style={{ marginLeft: "10px" }}>
-                        <span style={{ flex: "auto" }}>
-                            <PlusCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} onClick={(e)=>createSecret()} />
-                        </span>
-                    </div>    
-                </div>
-            </td>
-        </tr>
+                    <tr>
+                        <td style={{ paddingLeft: "10px" }}>
+                            <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e)=>setKey(e.target.value)}/>
+                        </td>
+                        <td style={{ paddingRight: "10px" }} colspan="2">
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <input style={{ maxWidth: "150px" }} type="password" placeholder="Enter Value.." value={value} onChange={(e)=>setValue(e.target.value)}/>
+                                <div className="circle button success" style={{ marginLeft: "10px" }}>
+                                    <span style={{ flex: "auto" }}>
+                                        <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                    </span>
+                                </div>    
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -244,28 +243,28 @@ function Registries() {
                     </tr>
                 </thead>
                 <tbody>
-                    {registries.map((obj)=>{
-                        return(
-                            <tr>
-                            <td style={{ paddingLeft: "10px" }}>
-                                <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
-                            </td>
-                            <td>
-                                <input style={{ maxWidth: "150px" }} type="text" disabled value={"*******"} />
-                            </td>
-                            <td  style={{ paddingRight: "10px" }} colspan="2">
-                                <div style={{ display: "flex", alignItems: "center" }}>
-                                    <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
-                                    <div id={"reg-"+obj.name} onClick={()=>deleteRegistry(obj.name)} title="Remove Registry" className="btn danger" style={{ marginLeft: "10px" }}>
-                                        <span style={{ flex: "auto" }}>
-                                            <XCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
-                                        </span>
-                                    </div>    
-                                </div>
-                            </td>
-                        </tr>
-                        )
-                    })}
+                            {registries.map((obj)=>{
+                                return(
+                                    <tr>
+                                    <td style={{ paddingLeft: "10px" }}>
+                                        <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                                    </td>
+                                    <td>
+                                        <input style={{ maxWidth: "150px" }} type="text" disabled value={"*******"} />
+                                    </td>
+                                    <td  style={{ paddingRight: "10px" }} colspan="2">
+                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                            <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
+                                            <div id={"reg-"+obj.name} onClick={()=>deleteRegistry(obj.name)} title="Remove Registry" className="circle button danger" style={{ marginLeft: "10px" }}>
+                                                <span style={{ flex: "auto" }}>
+                                                    <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                                </span>
+                                            </div>    
+                                        </div>
+                                    </td>
+                                </tr>
+                                )
+                            })}
                              <tr>
                                 <td style={{ paddingLeft: "10px" }}>
                                     <input style={{ maxWidth: "150px" }} type="text" onChange={(e)=>setName(e.target.value)} value={name} placeholder="Enter URL" />
@@ -276,9 +275,9 @@ function Registries() {
                                 <td  style={{ paddingRight: "10px" }} colspan="2">
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e)=>setToken(e.target.value)}/>
-                                        <div title="Create Registry" className="btn happy" style={{ marginLeft: "10px" }} onClick={()=>createRegistry()}>
+                                        <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={()=>createRegistry()}>
                                             <span style={{ flex: "auto" }}>
-                                                <PlusCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
+                                                <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }}/>
                                             </span>
                                         </div>    
                                     </div>

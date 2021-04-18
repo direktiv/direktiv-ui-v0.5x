@@ -81,7 +81,7 @@ export default function WorkflowsPage() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                <div className="neumorph" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
+                <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
                     <TileTitle name="All workflows">
                         <CardList />
                     </TileTitle>
@@ -123,19 +123,19 @@ export default function WorkflowsPage() {
                     </div>
                 </div>
                 <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
-                    <div className="neumorph" style={{ minWidth: "350px" }}>
+                    <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Upload workflow file">
                             <FileCode />
                         </TileTitle>
                         <UploadWorkflowForm />
                     </div>
-                    <div className="neumorph" style={{ minWidth: "350px" }}>
+                    <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Create new workflow">
                             <PlusCircleFill />
                         </TileTitle>
                         <NewWorkflowForm />
                     </div>
-                    <div className="neumorph" style={{ minWidth: "350px" }}>
+                    <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Send namespace event">
                             <PlusCircleFill />
                         </TileTitle>
