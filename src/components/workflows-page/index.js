@@ -198,9 +198,38 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
 }
 
 function APIInteractionTile() {
+
+    const {fetch, namespace} = useContext(MainContext)
+
+    const [val, setVal] = useState("")
+
+    async function sendEvent() {
+        try {
+            let resp = await fetch(`/namespaces/${namespace}/event`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: val
+            })        
+            if (resp.ok) {
+                setVal("")
+                // todo notify that event was sent
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log('send event', e)
+        }
+    }
+
+
     return (
         <div>
-            
+            <textarea value={val} onChange={(e)=>setVal(e.target.value)} rows={13} style={{width:"100%", height:"100%", resize: "none"}} />
+            <div style={{ textAlign: "right" }}>
+                <input onClick={()=>sendEvent()} type="submit" value="Submit" />
+            </div>
         </div>
     )
 }
