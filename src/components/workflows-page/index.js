@@ -8,7 +8,7 @@ import YAMLtoString from "yaml"
 
 import PlusCircleFill from 'react-bootstrap-icons/dist/icons/plus-circle-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import { FileCode, ToggleOn, XCircle } from 'react-bootstrap-icons'
+import { FileCode, ToggleOff, ToggleOn, XCircle } from 'react-bootstrap-icons'
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
@@ -97,7 +97,7 @@ export default function WorkflowsPage() {
                             <tbody>
                                 {workflows.map((obj)=>{
                                     return(
-                                        <tr className="" style={{ lineHeight: "40px" }} onClick={()=>history.push(`/w/${obj.id}`)}>
+                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/w/${obj.id}`)}>
                                             <td style={{textAlign:"left", paddingLeft:"5px"}}>
                                                 <b>{obj.id}</b>
                                             </td>
@@ -115,7 +115,11 @@ export default function WorkflowsPage() {
                                                             </span>
                                                         </div>
                                                         :
-                                                        <div className="button" onClick={()=>toggleWorkflow(obj.uid)}>enable</div>
+                                                        <div className="button circle" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                            <span>
+                                                                <ToggleOff />
+                                                            </span>
+                                                        </div>
                                                     }
                                                     <div className="button circle danger" onClick={()=>deleteWorkflow(obj.uid)}>
                                                         <span>

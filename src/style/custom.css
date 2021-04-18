@@ -410,7 +410,7 @@ text {
 
 .actions-button-div {
     display: flex;
-    align-items: center;
+    flex-direction: row-reverse;
 }
 
 .actions-button-div div {
@@ -419,6 +419,11 @@ text {
 }
 
 /* ...................... */
+
+.workflows-list-item:hover {
+    cursor: pointer;
+    box-shadow: 2px 2px 6px #bebebe, -2px -2px 6px #ffffff;
+}
 
 .fit-content {
     width: fit-content;
