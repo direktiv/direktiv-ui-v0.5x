@@ -170,7 +170,7 @@ export default function WorkflowPage() {
                             <PieChartFill />
                         </TileTitle>
                         <div className="tile-contents">
-                            <PieChart lineWidth={40} data={MockData}/>
+                            <PieComponent/>
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
@@ -187,6 +187,46 @@ export default function WorkflowPage() {
             </div>
         </div>
         </>
+    )
+}
+
+function PieComponent() {
+    const {fetch, namespace} = useContext(MainContext)
+    const params = useParams()
+    const [metrics, setMetrics] = useState([])
+
+    useEffect(()=>{
+        async function fetchMet() {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics`, {
+                    method: "GET"
+                })
+                if (resp.ok) {
+                    let json = await resp.json()
+                    console.log(json, json.totalInstancesRun - json.successfulExecutions)
+                    let met = [
+                        {
+                            title: "Completed",
+                            value: json.successfulExecutions
+                        },
+                        {
+                            title: "Failed",
+                            value: json.totalInstancesRun - json.successfulExecutions
+                        }
+                    ]
+                    setMetrics(met)
+                } else {
+                    throw new Error( await resp.text())
+                }
+            } catch(e) {
+                console.log('fetch metrics handle', e)
+            }
+        }
+        fetchMet()
+    },[])
+
+    return(
+        <PieChart lineWidth={40} data={metrics} />
     )
 }
 
