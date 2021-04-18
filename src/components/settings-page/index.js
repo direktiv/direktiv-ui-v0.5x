@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
-
+import MainContext from '../../context'
 import ShieldLockFill from 'react-bootstrap-icons/dist/icons/shield-lock-fill'
 import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-fill'
 import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
@@ -36,67 +36,120 @@ export default function SettingsPage() {
 
 function Secrets() {
 
-    let secretKeys = ["TOKEN", "MY_WORST_FEARS", "DAILY_SCHEDULE"]
-    let secretRows = [];
+    const {fetch, namespace} = useContext(MainContext)
+    const [secrets, setSecrets] = useState([])
+    const [key, setKey] = useState("")
+    const [value, setValue] = useState("")
 
-    for (let i = 0; i < secretKeys.length; i++) {
+    const fetchS = useCallback(()=>{
+        async function fetchData(){
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
+                    method: "GET"
+                })
+                if(resp.ok) {
+                    let json = await resp.json()
+                    setSecrets(json.secrets)
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                console.log('todo handle err', e)
+            }
+        }
+        fetchData()
+    },[])
 
-        secretRows.push(
-            <tr>
-                <td style={{ paddingLeft: "10px" }}>
-                    <input style={{ maxWidth: "150px" }} type="text" disabled value={secretKeys[i]} />
-                </td>
-                <td style={{ paddingRight: "10px" }} colspan="2">
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
-                        <div className="circle button danger" style={{ marginLeft: "10px" }}>
-                            <span style={{ flex: "auto" }}>
-                                <XCircle style={{ marginBottom: "6px" }} />
-                            </span>
-                        </div>    
-                    </div>
-                </td>
-            </tr>
-        )
+    useEffect(()=>{
+     fetchS()
+    },[])
 
+    async function createSecret() {
+        try{
+            let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
+                method:"POST",
+                body: JSON.stringify({name:key, data: value})
+            })
+            if (resp.ok) {
+                setKey("")
+                setValue("")
+                fetchS()
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log('todo handle err', e)
+        }
     }
 
-    secretRows.push(
-        <tr>
-            <td style={{ paddingLeft: "10px" }}>
-                <input style={{ maxWidth: "150px" }} type="text" />
-            </td>
-            <td style={{ paddingRight: "10px" }} colspan="2">
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input style={{ maxWidth: "150px" }} type="text" />
-                    <div className="circle button success" style={{ marginLeft: "10px" }}>
-                        <span style={{ flex: "auto" }}>
-                            <PlusCircle style={{ marginBottom: "6px" }} />
-                        </span>
-                    </div>    
-                </div>
-            </td>
-        </tr>
-    )
+    async function deleteSecret(val) {
+        try {
+            let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
+                method: "DELETE",
+                body: JSON.stringify({name: val})
+            })
+            if (resp.ok) {
+                // refetch secrets
+                fetchS()
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log('todo handle delete secret', e)
+        }
+    }
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-            <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
-                <thead>
-                    <tr className="no-neumorph">
-                        <th style={{ }}>
-                            Key
-                        </th>
-                        <th style={{  }}>
-                            Value
-                        </th>
-                        <th style={{ width: "50px" }}>
-                            
-                        </th>
+                        <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
+                            <thead>
+                                <tr className="no-neumorph">
+                                    <th style={{ }}>
+                                        Key
+                                    </th>
+                                    <th style={{  }}>
+                                        Value
+                                    </th>
+                                    <th style={{ width: "50px" }}>
+                                        
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {secrets.map((obj)=>{
+                                    return(
+                                        <tr>
+                            <td style={{ paddingLeft: "10px" }}>
+                                <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                            </td>
+                            <td   style={{ paddingRight: "10px" }} colspan="2">
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
+                                    <div className="circle button danger" style={{ marginLeft: "10px" }}>
+                                        <span style={{ flex: "auto" }}>
+                                            <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                        </span>
+                                    </div>    
+                                </div>
+                            </td>
+                        </tr>
+                        )
+                    })}
+                    <tr>
+                        <td style={{ paddingLeft: "10px" }}>
+                            <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e)=>setKey(e.target.value)}/>
+                        </td>
+                        <td style={{ paddingRight: "10px" }} colspan="2">
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <input style={{ maxWidth: "150px" }} type="password" placeholder="Enter Value.." value={value} onChange={(e)=>setValue(e.target.value)}/>
+                                <div className="circle button success" style={{ marginLeft: "10px" }}>
+                                    <span style={{ flex: "auto" }}>
+                                        <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                    </span>
+                                </div>    
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {secretRows}
                 </tbody>
             </table>
         </div>
@@ -105,54 +158,70 @@ function Secrets() {
 
 function Registries() {
 
-    let secretKeys = ["TOKEN", "MY_WORST_FEARS", "DAILY_SCHEDULE"]
-    let secretRows = [];
+    const {fetch, namespace} = useContext(MainContext)
+    const [name, setName] = useState("")
+    const [user, setUser] = useState("")
+    const [token, setToken] = useState("")
+    const [registries, setRegistries] = useState([])
 
-    for (let i = 0; i < secretKeys.length; i++) {
+    const fetchR = useCallback(()=>{
+        async function fetchData(){
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/registries/`, {
+                    method: "GET",
+                })
+                if (resp.ok) {
+                    let json = await resp.json()
+                    setRegistries(json.registries)
+                } else {
+                    throw new Error(await resp. text())
+                }
+            } catch(e) {
+                console.log(e, "todo handle fetch reg")
+            }
+        }
+        fetchData()
+    },[])
 
-        secretRows.push(
-            <tr>
-                <td style={{ paddingLeft: "10px" }}>
-                    <input style={{ maxWidth: "150px" }} type="text" disabled value={secretKeys[i]} />
-                </td>
-                <td>
-                    <input style={{ maxWidth: "150px" }} type="text" disabled value={secretKeys[i]} />
-                </td>
-                <td style={{ paddingRight: "10px" }} colspan="2">
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
-                        <div className="circle button danger" style={{ marginLeft: "10px" }}>
-                            <span style={{ flex: "auto" }}>
-                                <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
-                            </span>
-                        </div>    
-                    </div>
-                </td>
-            </tr>
-        )
+    useEffect(()=>{
+        fetchR()
+    },[])
 
+    async function createRegistry() {
+        try {
+            let resp = await fetch(`/namespaces/${namespace}/registries/`, {
+                method: "POST",
+                body: JSON.stringify({"name": name, "data": `${user}!${token}`})
+            })
+            if (resp.ok) {
+                setName("")
+                setToken("")
+                setUser("")
+                fetchR()
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log('todo handle create registry', e)
+        }
     }
 
-    secretRows.push(
-        <tr>
-            <td style={{ paddingLeft: "10px" }}>
-                <input style={{ maxWidth: "150px" }} type="text"/>
-            </td>
-            <td>
-                <input style={{ maxWidth: "150px" }} type="text"/>
-            </td>
-            <td style={{ paddingRight: "10px" }} colspan="2">
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <input style={{ maxWidth: "150px" }} type="password" />
-                    <div className="circle button success" style={{ marginLeft: "10px" }}>
-                        <span style={{ flex: "auto" }}>
-                            <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
-                        </span>
-                    </div>    
-                </div>
-            </td>
-        </tr>
-    )
+    async function deleteRegistry(val) {
+        try {
+            let resp = await fetch(`/namespaces/${namespace}/registries/`, {
+                method: "DELETE",
+                body: JSON.stringify({name:val})
+            })
+            if (resp.ok) {
+                // fetch registries
+                fetchR()
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log('delete registry', e)
+        }
+    }
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
@@ -174,7 +243,46 @@ function Registries() {
                     </tr>
                 </thead>
                 <tbody>
-                    {secretRows}
+                            {registries.map((obj)=>{
+                                return(
+                                    <tr>
+                                    <td style={{ paddingLeft: "10px" }}>
+                                        <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                                    </td>
+                                    <td>
+                                        <input style={{ maxWidth: "150px" }} type="text" disabled value={"*******"} />
+                                    </td>
+                                    <td  style={{ paddingRight: "10px" }} colspan="2">
+                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                            <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
+                                            <div id={"reg-"+obj.name} onClick={()=>deleteRegistry(obj.name)} title="Remove Registry" className="circle button danger" style={{ marginLeft: "10px" }}>
+                                                <span style={{ flex: "auto" }}>
+                                                    <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                                </span>
+                                            </div>    
+                                        </div>
+                                    </td>
+                                </tr>
+                                )
+                            })}
+                             <tr>
+                                <td style={{ paddingLeft: "10px" }}>
+                                    <input style={{ maxWidth: "150px" }} type="text" onChange={(e)=>setName(e.target.value)} value={name} placeholder="Enter URL" />
+                                </td>
+                                <td>
+                                    <input style={{ maxWidth: "150px" }} type="text" value={user} onChange={(e)=>setUser(e.target.value)} placeholder="Enter User" />
+                                </td>
+                                <td  style={{ paddingRight: "10px" }} colspan="2">
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e)=>setToken(e.target.value)}/>
+                                        <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={()=>createRegistry()}>
+                                            <span style={{ flex: "auto" }}>
+                                                <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }}/>
+                                            </span>
+                                        </div>    
+                                    </div>
+                                </td>
+                            </tr>
                 </tbody>
             </table>
         </div>

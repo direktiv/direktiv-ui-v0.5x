@@ -11,12 +11,12 @@ import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
+import { FileTextFill, Clipboard } from "react-bootstrap-icons"
+
 
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
-
-import {sendNotification} from '../notifications'
 
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
@@ -92,7 +92,6 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to ${e}`, 0)
                 console.log(e, "todo")
             }
         }
@@ -107,26 +106,29 @@ export default function WorkflowPage() {
         console.log("Workflow page has mounted")
     },[])
 
-    let playBtn = (
-        <div>
-            <Play onClick={async ()=>{
-                try{
-                    let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
-                        method: "POST",
-                        body: JSON.stringify({"input":"todo"})
-                    })
-                    if(resp.ok) {
-                        let json = await resp.json()    
-                        history.push(`/i/${json.instanceId}`)
-                    } else {
-                        throw new Error(await resp.text())
-                    }
-                } catch(e) {
-                    console.log(e, "todo execute workflow")
-                }
-            }} className="success" style={{ fontSize: "18pt" }} />
+    let saveBtn = (
+        <div className={workflowValueOld !== workflowValue ? "save-button" : "save-button-disable"} onClick={() => {updateWorkflow()}} >
+            <FileTextFill/>
+            <span>Save</span>
         </div>
     );
+
+    async function executeWorkflow() {
+        try{
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
+                method: "POST",
+                body: JSON.stringify({"input":"todo"})
+            })
+            if(resp.ok) {
+                let json = await resp.json()    
+                history.push(`/i/${json.instanceId}`)
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log(e, "todo execute workflow")
+        }
+    }
 
     return(
         <>
@@ -135,12 +137,12 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions />
+                <WorkflowActions executeCB={executeWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
                     <div className="item-0 shadow-soft rounded tile">
-                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={playBtn} >
+                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={saveBtn} >
                             <PencilSquare />
                         </TileTitle>
                         <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
@@ -157,11 +159,7 @@ export default function WorkflowPage() {
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
-                                {workflowValueOld ? 
-                                    <Diagram value={workflowValueOld}/>   
-                                    :
-                                    ""
-                                }
+                                <Diagram value={workflowValueOld}/>   
                             </div>
                         </div>
                     </div>
@@ -241,12 +239,52 @@ function EventsList() {
     )
 }
 
-function WorkflowActions() {
+// TODO: Add event listener to hide dropdown when clicking outside of dropdown
+function WorkflowActions(props) {
+    const [show, setShow] = useState(false)
+    const {executeCB} = props
+
+    useEffect(()=>{
+        // console.log("event listen added" ,show)
+        // const { isListOpen } = show;
+        // setTimeout(() => {
+        //     if(isListOpen){
+        //       window.addEventListener('click',  () => {setShow(false)})
+        //     }
+        //     else{
+        //       window.removeEventListener('click',  () => {setShow(false)})
+        //     }
+        //   }, 0)
+    },[show])
+
+
+
     return(
-        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt" }}>
-            <span>
-                Actions (disable, trigger, etc.)
-            </span>
+        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
+             <div class="dropdown">
+                <button onClick={(e)=>{
+                    // e.stopPropagation()
+                    setShow(!show)
+                    }} class="dropbtn">Actions</button>
+
+                {
+                    show ? <>
+                     <div class="dropdown-content-connector"></div>
+                     <div class="dropdown-content">
+                    <a onClick={()=>{
+                        if (!executeCB) {
+                            console.log("executeCB is not set")
+                            return
+                        }
+
+                        executeCB()
+                        setShow(true)
+                    }}>Execute</a>
+                    <a href="#">Disable</a>
+                </div>
+                </>:(<></>)
+                }
+            </div> 
         </div>
     )
 }
