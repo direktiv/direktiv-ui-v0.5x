@@ -109,7 +109,7 @@ export default function WorkflowsPage() {
                                             <td onClick={(ev)=>ev.stopPropagation()} style={{paddingLeft:"5px"}}>
                                                 <div className="actions-button-div">
                                                     {obj.active ?
-                                                        <div className="button circle" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                        <div className="button circle success" onClick={()=>toggleWorkflow(obj.uid)}>
                                                             <span>
                                                                 <ToggleOn />
                                                             </span>
