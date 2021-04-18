@@ -3,9 +3,8 @@ import { useParams } from "react-router"
 import MainContext from "../../context"
 import * as dayjs from "dayjs"
 
-export default function Logs() {
-    const params = useParams()
-    console.log(params)
+export default function Logs(props) {
+    const {instanceId} = props
     const {fetch} = useContext(MainContext)
     const [logs, setLogs] = useState([])
     const [logsOffset, setLogsOffset] = useState(0)
@@ -45,7 +44,7 @@ export default function Logs() {
     let fetchLogs = useCallback(() => {
         async function fetchl() {
             try {
-                let resp = await fetch(`/instances/${params[0]}/logs?offset=${logsOffset}&limit=${limit}`, {
+                let resp = await fetch(`/instances/${instanceId}/logs?offset=${logsOffset}&limit=${limit}`, {
                     method: "GET",
                 })
                 if (!resp.ok) {
@@ -94,14 +93,14 @@ export default function Logs() {
 
         return fetchl()
 
-    }, [params, fetch, scrolled, logs, logsOffset, limit])
+    }, [instanceId, fetch, scrolled, logs, logsOffset, limit])
 
     useEffect(() => {
         if (!init) {
             fetchLogs()
             setInit(true)
         } else {
-            let timer = setInterval(fetchLogs, 2500)
+            let timer = setInterval(fetchLogs, 500)
             return function cleanup() {
                 clearInterval(timer)
             }

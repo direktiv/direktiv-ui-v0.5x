@@ -1,10 +1,16 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import './style.css'
 
+import * as dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime";
+
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
+import MainContext from '../../context'
+import { useHistory } from 'react-router'
+dayjs.extend(relativeTime);
 
 export default function EventsPage() {
     return (
@@ -27,25 +33,25 @@ export default function EventsPage() {
                         <TileTitle name="Completed">
                             <CardList />
                         </TileTitle>
-                        <EventsPageBody />
+                        {/* <EventsPageBody /> */}
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
                         <TileTitle name="Pending">
                             <CardList />
                         </TileTitle>
-                        <EventsPageBody />
+                        {/* <EventsPageBody /> */}
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
                         <TileTitle name="Timed out">
                             <CardList />
                         </TileTitle>
-                        <EventsPageBody />
+                        {/* <EventsPageBody /> */}
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
                         <TileTitle name="Failed">
                             <CardList />
                         </TileTitle>
-                        <EventsPageBody />
+                        {/* <EventsPageBody /> */}
                     </div>
                 </div>
             </div>
@@ -55,6 +61,30 @@ export default function EventsPage() {
 }
 
 function EventsPageBody() {
+    const {fetch, namespace} = useContext(MainContext)
+    const history = useHistory()
+    const [instances, setInstances] = useState([])
+
+    useEffect(()=>{
+        async function fetchI() {
+            try{
+                // fetch instances list
+                let resp = await fetch(`/instances/${namespace}`, {
+                    method: "GET"
+                })
+                if(resp.ok) {
+                    let json = await resp.json()
+                    setInstances(json.workflowInstances)
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                console.log(e, 'fetch instances todo')
+            }
+        }
+        fetchI()
+    },[])
+
     return(
         <div id="events-table">
             <table style={{ width: "100%" }}>
@@ -67,30 +97,20 @@ function EventsPageBody() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr className="event-list-item">
-                        <td style={{ textAlign: "center" }}><EventStatus status="Completed" /></td>
-                        <td>2s ago</td>
-                        <td>demo-fza6/test-wf/blahblah</td>
-                        <td></td>
-                    </tr>
-                    <tr className="event-list-item">
-                        <td style={{ textAlign: "center" }}><EventStatus status="Pending" /></td>
-                        <td>2s ago</td>
-                        <td>demo-fza6/test-wf/blahblah</td>
-                        <td></td>
-                    </tr>
-                    <tr className="event-list-item">
-                        <td style={{ textAlign: "center" }}><EventStatus status="Failed" /></td>
-                        <td>2s ago</td>
-                        <td>demo-fza6/test-wf/blahblah</td>
-                        <td></td>
-                    </tr>
-                    <tr className="event-list-item">
-                        <td style={{ textAlign: "center" }}><EventStatus status="Completed" /></td>
-                        <td>2s ago</td>
-                        <td>demo-fza6/test-wf/blahblah</td>
-                        <td></td>
-                    </tr>
+                    {
+                        instances.map((obj)=>{
+                            return(
+                                <>
+                                    <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
+                                        <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
+                                        <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
+                                        <td>{obj.id}</td>
+                                        <td></td>
+                                    </tr>
+                                </>
+                            )
+                        })
+                    }
                 </tbody>
             </table>
         </div>
