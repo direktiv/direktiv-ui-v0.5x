@@ -4,7 +4,7 @@ import TileTitle from '../tile-title'
 
 import ShieldLockFill from 'react-bootstrap-icons/dist/icons/shield-lock-fill'
 import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-fill'
-import { PlusCircleFill, XCircleFill } from 'react-bootstrap-icons'
+import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
 
 export default function SettingsPage() {
     return (
@@ -16,13 +16,13 @@ export default function SettingsPage() {
                 </div>
             </div>
             <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
-                <div className="item-0 neumorph" style={{ flex: "auto", minWidth: "400px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
                     <TileTitle name="Secrets">
                         <ShieldLockFill />
                     </TileTitle>
                     <Secrets />
                 </div>
-                <div className="item-0 neumorph" style={{ flex: "auto", minWidth: "400px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
                     <TileTitle name="Container Registries">
                         <CloudDownloadFill />
                     </TileTitle>
@@ -49,9 +49,9 @@ function Secrets() {
                 <td style={{ paddingRight: "10px" }} colspan="2">
                     <div style={{ display: "flex", alignItems: "center" }}>
                         <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
-                        <div className="btn danger" style={{ marginLeft: "10px" }}>
+                        <div className="circle button danger" style={{ marginLeft: "10px" }}>
                             <span style={{ flex: "auto" }}>
-                                <XCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
+                                <XCircle style={{ marginBottom: "6px" }} />
                             </span>
                         </div>    
                     </div>
@@ -69,9 +69,9 @@ function Secrets() {
             <td style={{ paddingRight: "10px" }} colspan="2">
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <input style={{ maxWidth: "150px" }} type="text" />
-                    <div className="btn happy" style={{ marginLeft: "10px" }}>
+                    <div className="circle button success" style={{ marginLeft: "10px" }}>
                         <span style={{ flex: "auto" }}>
-                            <PlusCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
+                            <PlusCircle style={{ marginBottom: "6px" }} />
                         </span>
                     </div>    
                 </div>
@@ -121,9 +121,9 @@ function Registries() {
                 <td style={{ paddingRight: "10px" }} colspan="2">
                     <div style={{ display: "flex", alignItems: "center" }}>
                         <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
-                        <div className="btn danger" style={{ marginLeft: "10px" }}>
+                        <div className="circle button danger" style={{ marginLeft: "10px" }}>
                             <span style={{ flex: "auto" }}>
-                                <XCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
+                                <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
                             </span>
                         </div>    
                     </div>
@@ -144,9 +144,9 @@ function Registries() {
             <td style={{ paddingRight: "10px" }} colspan="2">
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <input style={{ maxWidth: "150px" }} type="password" />
-                    <div className="btn happy" style={{ marginLeft: "10px" }}>
+                    <div className="circle button success" style={{ marginLeft: "10px" }}>
                         <span style={{ flex: "auto" }}>
-                            <PlusCircleFill style={{ color: "white", fontSize: "12pt", marginBottom: "6px" }} />
+                            <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
                         </span>
                     </div>    
                 </div>
