@@ -8,7 +8,7 @@ import YAMLtoString from "yaml"
 
 import PlusCircleFill from 'react-bootstrap-icons/dist/icons/plus-circle-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import { FileCode } from 'react-bootstrap-icons'
+import { FileCode, ToggleOn, XCircle } from 'react-bootstrap-icons'
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
@@ -87,19 +87,19 @@ export default function WorkflowsPage() {
                     </TileTitle>
                     <div id="events-table">
                         <table style={{width: "100%"}}>
-                            <thead>
+                            {/* <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Actions</th>
                                 </tr>
-                            </thead>
+                            </thead> */}
                             <tbody>
                                 {workflows.map((obj)=>{
                                     return(
-                                        <tr className="event-list-item" onClick={()=>history.push(`/w/${obj.id}`)}>
+                                        <tr className="" style={{ lineHeight: "40px" }} onClick={()=>history.push(`/w/${obj.id}`)}>
                                             <td style={{textAlign:"left", paddingLeft:"5px"}}>
-                                                {obj.id}
+                                                <b>{obj.id}</b>
                                             </td>
                                             {obj.description === "" ?
                                                 <td style={{textAlign:"left", paddingLeft:"5px"}}>No description has been provided.</td>
@@ -107,12 +107,22 @@ export default function WorkflowsPage() {
                                                 <td style={{textAlign:"left", paddingLeft:"5px"}}>{obj.description}</td>
                                             }
                                             <td onClick={(ev)=>ev.stopPropagation()} style={{paddingLeft:"5px"}}>
-                                                <button onClick={()=>deleteWorkflow(obj.uid)}>delete</button>
-                                                {obj.active ?
-                                                    <button onClick={()=>toggleWorkflow(obj.uid)}>disable</button>
-                                                    :
-                                                    <button onClick={()=>toggleWorkflow(obj.uid)}>enable</button>
-                                                }
+                                                <div className="actions-button-div">
+                                                    {obj.active ?
+                                                        <div className="button circle" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                            <span>
+                                                                <ToggleOn />
+                                                            </span>
+                                                        </div>
+                                                        :
+                                                        <div className="button" onClick={()=>toggleWorkflow(obj.uid)}>enable</div>
+                                                    }
+                                                    <div className="button circle danger" onClick={()=>deleteWorkflow(obj.uid)}>
+                                                        <span>
+                                                            <XCircle />
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     )

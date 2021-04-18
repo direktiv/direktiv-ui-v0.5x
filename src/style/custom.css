@@ -406,6 +406,16 @@ text {
     fill: var(--font-dark);
 }
 
+.actions-button-div {
+    display: flex;
+    align-items: center;
+}
+
+.actions-button-div div {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
 /* ...................... */
 
 .fit-content {
