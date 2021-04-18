@@ -18,8 +18,6 @@ import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 
-import {sendNotification} from '../notifications'
-
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [workflowValue, setWorkflowValue] = useState("")
@@ -94,7 +92,6 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to ${e}`, 0)
                 console.log(e, "todo")
             }
         }
@@ -144,7 +141,7 @@ export default function WorkflowPage() {
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
-                    <div className="item-0 neumorph" >
+                    <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={saveBtn} >
                             <PencilSquare />
                         </TileTitle>
@@ -156,23 +153,19 @@ export default function WorkflowPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="item-0 neumorph">
+                    <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Graph">
                             <PipFill />
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
-                                {workflowValueOld ? 
-                                    <Diagram value={workflowValueOld}/>   
-                                    :
-                                    ""
-                                }
-                                </div>
+                                <Diagram value={workflowValueOld}/>   
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className="container graph-contents" style={{ width: "300px" }}>
-                    <div className="item-1 neumorph" style={{ height: "280px" }}>
+                    <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
                         <TileTitle name="Executed Workflows">
                             <PieChartFill />
                         </TileTitle>
@@ -180,7 +173,7 @@ export default function WorkflowPage() {
                             <PieChart lineWidth={40} data={MockData}/>
                         </div>
                     </div>
-                    <div className="item-0 neumorph">
+                    <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Events">
                             <CardList />
                         </TileTitle>
@@ -267,7 +260,7 @@ function WorkflowActions(props) {
 
 
     return(
-        <div id="workflow-actions" className="neumorph fit-content" style={{ fontSize: "11pt", padding: "0" }}>
+        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
              <div class="dropdown">
                 <button onClick={(e)=>{
                     // e.stopPropagation()

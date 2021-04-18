@@ -55,7 +55,7 @@ function AuthenticatedContent() {
   function logout() {
     keycloak.logout()
   }
-  console.log(keycloak)
+
   return(
     <MainContext.Provider value={{
       ...context,
@@ -77,7 +77,7 @@ function AuthenticatedContent() {
                 <Route exact path="/w/" component={WorkflowsPage} />
                 <Route exact path="/w/:workflow" component={WorkflowPage} />
                 <Route exact path="/i/" component={EventsPage} />
-                <Route exact path="/i/*" component={InstancePage} />
+                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                 <Route exact path="/s/" component={SettingsPage} />
               </Switch>
             </div>
@@ -110,7 +110,7 @@ function Content() {
               <Route exact path="/w/" component={WorkflowsPage} />
               <Route exact path="/w/:workflow" component={WorkflowPage} />
               <Route exact path="/i/" component={EventsPage} />
-              <Route exact path="/i/:instance" component={InstancePage} />
+              <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
               <Route exact path="/s/" component={SettingsPage} />
             </Switch>
           </div>

@@ -10,6 +10,10 @@ const routes = [
     {
         path: '/i',
         breadcrumb: 'Instances'
+    },
+    {
+        path: '/s',
+        breadcrumb: 'Secrets'
     }
 ]
 
@@ -20,7 +24,7 @@ export default function Breadcrumbs(props) {
     const history = useHistory()
 
     return (
-        <div id="breadcrumbs" className="neumorph fit-content">
+        <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
                 // if no instance id use custom breadcrumbs
                 if (!instanceId) {

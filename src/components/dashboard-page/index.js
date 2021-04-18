@@ -16,19 +16,19 @@ export default function DashboardPage() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                <div className="neumorph" style={{ flex: "auto", flexGrow: "2", minWidth: "400px" }}>
+                <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "2", minWidth: "400px" }}>
                     <TileTitle name="Top Workflows">
                         <BarChartFill />
                     </TileTitle>
                 </div>
-                <div className="neumorph" style={{ flex: "auto", flexGrow: "1", minWidth: "300px" }}>
+                <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1", minWidth: "300px" }}>
                     <TileTitle name="Total Executions">
                         <CodeSlash />
                     </TileTitle>
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }}>
-                <div className="neumorph" style={{ flex: "auto" }}>
+                <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
                     <TileTitle name="Events">
                         <CardList />
                     </TileTitle>
