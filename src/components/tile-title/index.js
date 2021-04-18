@@ -7,8 +7,8 @@ export default function TileTitle(props) {
     
     return(
         <div className="tile-title" style={{ display: "flex", flex: "none", height: "17px" }}>
-            {children} <span>{name}</span> 
-            <span style={{ flex: "auto", float: "right", textAlign: "right" }}>{actionsDiv}</span>
+            {children} <span style={{flex: "auto"}}>{name}</span> 
+            <span style={{float: "right", textAlign: "right"}}>{actionsDiv}</span>
         </div>
     )
 }

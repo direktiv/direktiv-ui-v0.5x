@@ -11,6 +11,8 @@ import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
+import { FileTextFill, Clipboard } from "react-bootstrap-icons"
+
 
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
@@ -107,24 +109,10 @@ export default function WorkflowPage() {
         console.log("Workflow page has mounted")
     },[])
 
-    let playBtn = (
-        <div>
-            <Play onClick={async ()=>{
-                try{
-                    let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
-                        method: "POST",
-                        body: JSON.stringify({"input":"todo"})
-                    })
-                    if(resp.ok) {
-                        let json = await resp.json()    
-                        history.push(`/i/${json.instanceId}`)
-                    } else {
-                        throw new Error(await resp.text())
-                    }
-                } catch(e) {
-                    console.log(e, "todo execute workflow")
-                }
-            }} className="success" style={{ fontSize: "18pt" }} />
+    let saveBtn = (
+        <div className={workflowValueOld !== workflowValue ? "save-button" : "save-button-disable"} onClick={() => {updateWorkflow()}} >
+            <FileTextFill/>
+            <span>Save</span>
         </div>
     );
 
@@ -156,8 +144,8 @@ export default function WorkflowPage() {
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
-                    <div className="item-0 neumorph">
-                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={playBtn} >
+                    <div className="item-0 neumorph" >
+                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={saveBtn} >
                             <PencilSquare />
                         </TileTitle>
                         <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>

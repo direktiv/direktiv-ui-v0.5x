@@ -443,3 +443,28 @@ pre {
   .dropdown-content a:hover {background-color: #ddd;}
   
   .dropdown:hover .dropdown-content {display: block;}
+
+  .save-button {
+    color: white;
+    cursor: pointer;
+    background-color: #2fa64d;
+    width: max-content;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    display: flex;
+    align-items: center;
+  }
+
+  .save-button-disable {
+    color: white;
+    background-color: #acacac;
+    width: max-content;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    display: flex;
+    align-items: center;
+  }
