@@ -128,6 +128,23 @@ export default function WorkflowPage() {
         </div>
     );
 
+    async function executeWorkflow() {
+        try{
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
+                method: "POST",
+                body: JSON.stringify({"input":"todo"})
+            })
+            if(resp.ok) {
+                let json = await resp.json()    
+                history.push(`/i/${json.instanceId}`)
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log(e, "todo execute workflow")
+        }
+    }
+
     return(
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -135,7 +152,7 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions />
+                <WorkflowActions executeCB={executeWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -241,12 +258,52 @@ function EventsList() {
     )
 }
 
-function WorkflowActions() {
+// TODO: Add event listener to hide dropdown when clicking outside of dropdown
+function WorkflowActions(props) {
+    const [show, setShow] = useState(false)
+    const {executeCB} = props
+
+    useEffect(()=>{
+        // console.log("event listen added" ,show)
+        // const { isListOpen } = show;
+        // setTimeout(() => {
+        //     if(isListOpen){
+        //       window.addEventListener('click',  () => {setShow(false)})
+        //     }
+        //     else{
+        //       window.removeEventListener('click',  () => {setShow(false)})
+        //     }
+        //   }, 0)
+    },[show])
+
+
+
     return(
-        <div id="workflow-actions" className="neumorph fit-content" style={{ fontSize: "11pt" }}>
-            <span>
-                Actions (disable, trigger, etc.)
-            </span>
+        <div id="workflow-actions" className="neumorph fit-content" style={{ fontSize: "11pt", padding: "0" }}>
+             <div class="dropdown">
+                <button onClick={(e)=>{
+                    // e.stopPropagation()
+                    setShow(!show)
+                    }} class="dropbtn">Actions</button>
+
+                {
+                    show ? <>
+                     <div class="dropdown-content-connector"></div>
+                     <div class="dropdown-content">
+                    <a onClick={()=>{
+                        if (!executeCB) {
+                            console.log("executeCB is not set")
+                            return
+                        }
+
+                        executeCB()
+                        setShow(true)
+                    }}>Execute</a>
+                    <a href="#">Disable</a>
+                </div>
+                </>:(<></>)
+                }
+            </div> 
         </div>
     )
 }
