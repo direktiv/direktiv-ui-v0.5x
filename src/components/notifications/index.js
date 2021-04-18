@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 function createNotification(msg, level){
     // Do Whatever you want here
     return ({ closeToast, toastProps }) => (
-        <div style={{fontSize: "20px", color: "black"}}>
+        <div style={{fontSize: "16px", color: "black"}}>
           {msg} {toastProps.position}
           <button onClick={closeToast}>Close</button>
         </div>
