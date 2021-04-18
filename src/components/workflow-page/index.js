@@ -16,8 +16,6 @@ import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 
-import {sendNotification} from '../notifications'
-
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [workflowValue, setWorkflowValue] = useState("")
@@ -92,7 +90,6 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to ${e}`, 0)
                 console.log(e, "todo")
             }
         }
@@ -157,11 +154,7 @@ export default function WorkflowPage() {
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
-                                {workflowValueOld ? 
-                                    <Diagram value={workflowValueOld}/>   
-                                    :
-                                    ""
-                                }
+                                <Diagram value={workflowValueOld}/>   
                             </div>
                         </div>
                     </div>
