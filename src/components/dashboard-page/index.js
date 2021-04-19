@@ -33,6 +33,7 @@ export default function DashboardPage() {
                     <TileTitle name="Events">
                         <IoList />
                     </TileTitle>
+                    <EventsPageBody />
                 </div>
             </div>
         </div>

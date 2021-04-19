@@ -36,7 +36,7 @@ export default function EventsPage() {
     )
 }
 
-function EventsPageBody() {
+export function EventsPageBody() {
     const {fetch, namespace} = useContext(MainContext)
     const history = useHistory()
     const [instances, setInstances] = useState([])
@@ -67,9 +67,10 @@ function EventsPageBody() {
                 <thead>
                     <tr>
                         <th>Status</th>
-                        <th>Time</th>
                         <th>Instance ID</th>
-                        <th>Actions</th>
+                        <th>Time</th>
+
+                        {/* <th>Actions</th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -79,9 +80,9 @@ function EventsPageBody() {
                                 <>
                                     <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
+                                        <td>{obj.id}</td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
-                                        <td style={{ textAlign: "left" }}>{obj.id}</td>
-                                        <td></td>
+                                        {/* <td></td> */}
                                     </tr>
                                 </>
                             )

@@ -181,10 +181,13 @@ option {
 }
 
 .save-btn {
-    width: 70px;
+    width: 36px;
     overflow: hidden;
     flex-direction: row;
-    padding-right: 4px;
+}
+
+.save-btn:hover {
+    width: 70px;
 }
 
 .save-btn span {
@@ -193,6 +196,10 @@ option {
 
 .save-btn .save-btn-icon {
     margin-bottom: 1px;
+    max-width: 36px;
+    min-width: 36px;
+    position: absolute;
+    right: 0;
 }
 
 .save-btn-label {
@@ -201,6 +208,8 @@ option {
     height: 0px;
     width: 0px;
     overflow-x: hidden;
+    position: absolute;
+    right: 36px;
 
     transition-delay: 200ms;
     transition: visibility 200ms ease-in,
@@ -393,7 +402,7 @@ ul li div {
 }
 
 #namespaces-ul.active #namespace-arrow {
-    rotate: 90deg;
+    transition: rotate 90deg;
 }
 
 #namespaces-ul.active .namespace-selector {
