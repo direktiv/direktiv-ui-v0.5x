@@ -23,7 +23,7 @@ export default function InputOutput(props) {
         return(
             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
                 <div style={{width: "100%", height: "100%", position: "relative"}}>
-                    <div className="input-output" style={{borderRadius:"8px", textAlign:"left", height: "af", color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                    <div className="input-output" style={{borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
                         <ReactSyntaxHighlighter code={atob(data)}/>
                     </div>
                 </div>
