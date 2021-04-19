@@ -14,6 +14,7 @@ import Diagram from '../workflow-page/diagram'
 
 import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
+import { sendNotification } from '../notifications'
 
 export default function InstancePage() {
     const {fetch} = useContext(MainContext)
@@ -38,7 +39,7 @@ export default function InstancePage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, "todo")
+                sendNotification(`Failed to fetch workflow: ${e.message}`, 0)
             }
         }
         fetchWorkflow()

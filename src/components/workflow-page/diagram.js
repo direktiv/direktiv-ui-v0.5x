@@ -131,8 +131,6 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
         }
 
     } catch(e) {
-        // do nothing as yaml isn't valid todo
-        console.log(e, 'yaml is not valid')
     }
     return getLayoutedElements(newElements)
 }

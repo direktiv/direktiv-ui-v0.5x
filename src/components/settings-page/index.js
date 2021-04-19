@@ -7,6 +7,7 @@ import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-f
 import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
 import { useHistory } from 'react-router'
 import { IoLockOpen, IoLogoDocker } from 'react-icons/io5'
+import { sendNotification } from '../notifications'
 
 
 function SettingsAction(props) {
@@ -113,7 +114,7 @@ function Secrets() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log('todo handle err', e)
+                sendNotification(`Failed to fetch secrets: ${e.message}`, 0)
             }
         }
         fetchData()
@@ -137,7 +138,7 @@ function Secrets() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log('todo handle err', e)
+            sendNotification(`Failed to create secret: ${e.message}`, 0)
         }
     }
 
@@ -154,7 +155,7 @@ function Secrets() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log('todo handle delete secret', e)
+            sendNotification(`Failed to delete secret: ${e.message}`, 0)
         }
     }
 
@@ -236,7 +237,7 @@ function Registries() {
                     throw new Error(await resp. text())
                 }
             } catch(e) {
-                console.log(e, "todo handle fetch reg")
+                sendNotification(`Failed to fetch registries: ${e.message}`, 0)
             }
         }
         fetchData()
@@ -261,7 +262,7 @@ function Registries() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log('todo handle create registry', e)
+            sendNotification(`Failed to create registry: ${e.message}`,0)
         }
     }
 

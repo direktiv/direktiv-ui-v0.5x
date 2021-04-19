@@ -11,7 +11,7 @@ import InstancePage from './components/instance-page'
 import SettingsPage from './components/settings-page'
 import WorkflowsPage from './components/workflows-page'
 import WorkflowPage from './components/workflow-page'
-import NotificationSystem from './components/notifications/index.js'
+import NotificationSystem, { sendNotification } from './components/notifications/index.js'
 import { useState } from 'react';
 import {  ReactKeycloakProvider, useKeycloak } from '@react-keycloak/web';
 import keycloak from './keycloak'
@@ -63,7 +63,7 @@ function AuthenticatedContent() {
               throw(new Error({message: await resp.text()}))
           }
       } catch(e) {
-          console.log('TODO handle err potentially running no auth i guess?')
+          sendNotification(`Failed to fetch namespaces: ${e.message}`, 0)
       }
   }
 

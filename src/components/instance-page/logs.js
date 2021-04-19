@@ -2,6 +2,7 @@ import { useCallback, useEffect, useContext, useState } from "react"
 import { useParams } from "react-router"
 import MainContext from "../../context"
 import * as dayjs from "dayjs"
+import { sendNotification } from "../notifications"
 
 export default function Logs(props) {
     const {instanceId} = props
@@ -9,15 +10,9 @@ export default function Logs(props) {
     const [logs, setLogs] = useState([])
     const [logsOffset, setLogsOffset] = useState(0)
 
-    // todo handle error here
-    const [err, setErr] = useState("")
     const [scrolled, setScrolled] = useState(false)
     const [init, setInit] = useState(false)
     const [limit, setLimit] = useState(300)
-
-    const clearError = () => {
-        setErr("")
-    }
 
     function checkIfScrollAtBottom(event) {
         if (event.target.offsetHeight + event.target.scrollTop === event.target.scrollHeight) {
@@ -49,7 +44,7 @@ export default function Logs(props) {
                 })
                 if (!resp.ok) {
                     let text = await resp.text()
-                    throw (new Error(`Error fetching logs: ${text}`))
+                    throw (new Error(text))
                 } else {
                     let json = await resp.json()
                     if (json.workflowInstanceLogs && json.workflowInstanceLogs.length > 0) {
@@ -84,10 +79,8 @@ export default function Logs(props) {
                         }
                     }
                 }
-                setErr("")
             } catch (e) {
-                console.log("e =", e)
-                setErr(e.message)
+                sendNotification(`Failed to fetch logs: ${e.message}`, 0)
             }
         }
 
