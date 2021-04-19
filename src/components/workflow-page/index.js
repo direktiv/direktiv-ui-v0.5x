@@ -200,7 +200,7 @@ export default function WorkflowPage() {
                                         <div id="editor-actions">
                                             <div className={workflowInfo.active ? "button success save-btn": "button disabled"} onClick={() => {executeWorkflow()}}>
                                                 <span className="save-btn-label">
-                                                    Execute
+                                                    Run
                                                 </span>
                                                 <span className="save-btn-icon">
                                                     <IoPlaySharp/>
@@ -284,7 +284,7 @@ function PieComponent() {
                     throw new Error( await resp.text())
                 }
             } catch(e) {
-                console.log('fetch metrics handle', e)
+                sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
             }
         }
         fetchMet()
