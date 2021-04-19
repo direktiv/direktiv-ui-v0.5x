@@ -18,9 +18,12 @@ import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
+import Sankey from './sankey'
 
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
+    const [viewSankey, setViewSankey] = useState("")
+
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
@@ -163,7 +166,7 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
+                <WorkflowActions viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -213,6 +216,18 @@ export default function WorkflowPage() {
                             </div>
                         </div>
                     </div>
+                    {viewSankey ?
+                    <div className="item-0 shadow-soft rounded tile">
+                        <TileTitle name="Sankey">
+                            <IoEaselOutline />
+                        </TileTitle>
+                        <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
+                            <div style={{ flex: "auto" }}>
+                                <Sankey/>
+                            </div>
+                        </div>
+                    </div>
+                    :
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Graph">
                             <IoEaselOutline />
@@ -228,6 +243,7 @@ export default function WorkflowPage() {
                             </div>
                         </div>
                     </div>
+                    }
                 </div>
                 <div className="container graph-contents" style={{ width: "300px" }}>
                     <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
@@ -345,22 +361,50 @@ function EventsList() {
 }
 
 function WorkflowActions(props) {
-    const {active, toggleWorkflow} = props
+    const {active, toggleWorkflow, setViewSankey, viewSankey} = props
+
+    const [show, setShow] = useState(false)
+
     return(
-        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }} onClick={()=>toggleWorkflow()}>
-               {active ?
-                    <div className="button success" >
-                        <span>
-                            <ToggleOn />
-                        </span>
-                    </div>
-                    :
-                    <div className="button ">
-                        <span>
-                            <ToggleOff />
-                        </span>
-                    </div>
+        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
+            <div class="dropdown">
+                <button onClick={(e)=>{
+                    // e.stopPropagation()
+                    setShow(!show)
+                    }} class="dropbtn">Actions</button>
+
+                {
+                    show ? <>
+                        <div class="dropdown-content-connector"></div>
+                        <div class="dropdown-content">
+                            {active ? 
+                            <a onClick={()=>{
+                                toggleWorkflow()
+                                setShow(!show)
+                            }}>Disable</a>
+                            :
+                            <a onClick={()=>{
+                                toggleWorkflow()
+                                setShow(!show)
+                            }}>Enable</a>
+                            }
+                            {viewSankey ?
+                            <a onClick={()=>{
+                                setViewSankey(!viewSankey)
+                                setShow(!show)
+                            }}>Show Diagram</a>
+                            :
+                            <a onClick={()=>{
+                                setViewSankey(!viewSankey)
+                                setShow(!show)
+                            }}>Show Sankey</a>
+                            }
+                        </div>
+                    </>
+                :
+                (<></>)
                 }
+            </div> 
         </div>
     )
 }

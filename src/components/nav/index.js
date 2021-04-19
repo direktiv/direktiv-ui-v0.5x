@@ -22,6 +22,11 @@ export default function Navbar(props) {
     const history = useHistory()
     const location = useLocation()
 
+    function toggleNamespaceSelector() {
+        let x = document.getElementById('namespaces-ul');
+        x.classList.toggle('active');
+    }
+
     // const [namespaces, setNamespaces] = useState([])
     const [acceptInput, setAcceptInput] = useState(false)
 
@@ -78,10 +83,6 @@ export default function Navbar(props) {
         fetchNamespaces(true)
     },[])
 
-    function toggleNamespaceSelector() {
-        let x = document.getElementById('namespaces-ul');
-        x.classList.toggle('active');
-    }
 
     return(
         <div id="nav">
@@ -133,7 +134,7 @@ export default function Navbar(props) {
                                             <li onClick={()=>{
                                                 localStorage.setItem("namespace", obj)
                                                 setNamespace(obj)
-                                                // toggleNamespaceSelector()
+                                                toggleNamespaceSelector()
                                                
                                                 let matchWf = matchPath(location.pathname, {
                                                     path: "/w/:workflow"

@@ -33,14 +33,13 @@
 
 .normal .start {
     border-radius: 30px;
-    background: linear-gradient(151deg,rgba(115,204,118,1) 0%, rgba(100,201,104,1) 41%, rgba(0,177,49,1) 100%);
+    background: rgba(115,204,118,1);
     height: 30px;
     width: 30px;
 }
 
 .normal .end {
     background: rgb(204,115,115);
-    background: linear-gradient(151deg,rgba(204,115,115,1) 0%, rgba(201,100,100,1) 41%, rgba(177,0,0,1) 100%);
     border-radius: 30px;
     height: 30px;
     width: 30px;
@@ -55,3 +54,5 @@
     margin: 0;
     font-size: 12px;
 }
+
+

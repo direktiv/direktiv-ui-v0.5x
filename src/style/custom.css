@@ -405,7 +405,10 @@ ul li div {
 }
 
 #namespaces-ul.active #namespace-arrow {
-    transition: rotate 90deg;
+    -ms-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -webkit-transform:rotate(90deg);
+    -o-transform:rotate(90deg);
 }
 
 #namespaces-ul.active .namespace-selector {
@@ -547,7 +550,7 @@ text {
 .valign-wrapper {
     display: flex;
     flex-direction: row;
-    align-items: end;
+    align-items: flex-end;
 }
 
 .btn {
