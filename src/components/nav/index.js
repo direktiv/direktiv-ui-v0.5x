@@ -21,7 +21,7 @@ export default function Navbar(props) {
     const textInput = useRef()
     const history = useHistory()
     const location = useLocation()
-    
+
     function toggleNamespaceSelector() {
         let x = document.getElementById('namespaces-ul');
         x.classList.toggle('active');
@@ -134,7 +134,7 @@ export default function Navbar(props) {
                                             <li onClick={()=>{
                                                 localStorage.setItem("namespace", obj)
                                                 setNamespace(obj)
-                                                // toggleNamespaceSelector()
+                                                toggleNamespaceSelector()
                                                
                                                 let matchWf = matchPath(location.pathname, {
                                                     path: "/w/:workflow"
