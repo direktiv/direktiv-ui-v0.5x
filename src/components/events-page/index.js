@@ -10,6 +10,7 @@ import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
+
 dayjs.extend(relativeTime);
 
 export default function EventsPage() {
@@ -27,32 +28,6 @@ export default function EventsPage() {
                         <CardList />
                     </TileTitle>
                     <EventsPageBody />
-                </div>
-                <div className="container" style={{ flex: "auto" }}>
-                    <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
-                        <TileTitle name="Completed">
-                            <CardList />
-                        </TileTitle>
-                        {/* <EventsPageBody /> */}
-                    </div>
-                    <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
-                        <TileTitle name="Pending">
-                            <CardList />
-                        </TileTitle>
-                        {/* <EventsPageBody /> */}
-                    </div>
-                    <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
-                        <TileTitle name="Timed out">
-                            <CardList />
-                        </TileTitle>
-                        {/* <EventsPageBody /> */}
-                    </div>
-                    <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
-                        <TileTitle name="Failed">
-                            <CardList />
-                        </TileTitle>
-                        {/* <EventsPageBody /> */}
-                    </div>
                 </div>
             </div>
         </div>

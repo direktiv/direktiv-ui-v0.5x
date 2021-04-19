@@ -5,15 +5,73 @@ import MainContext from '../../context'
 import ShieldLockFill from 'react-bootstrap-icons/dist/icons/shield-lock-fill'
 import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-fill'
 import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
+import { useHistory } from 'react-router'
+
+
+function SettingsAction(props) {
+    const {namespace, fetch, namespaces, fetchNamespaces, setNamespace} = useContext(MainContext)
+    const history = useHistory()
+    const [show, setShow] = useState(false)
+    console.log(namespaces)
+
+    async function deleteNamespace() {
+        try {
+            let resp = await fetch(`/namespaces/${namespace}`, {
+                method: "DELETE"
+            })
+            if (resp.ok) {
+                for(let i=0; i < namespaces.length; i++) {
+                    if(namespaces[i] !== namespace) {
+                        console.log(namespaces[i], "ns-reload")
+                        localStorage.setItem("namespace", namespaces[i])
+                        setNamespace(namespaces[i])
+                        history.push("/s/reload")
+
+                        await fetchNamespaces()
+                        break                      
+                    }
+                }
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            console.log(e, 'err deleting namespace')
+        }
+    }
+
+
+    return(
+        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
+            <div class="dropdown">
+                <button onClick={(e)=>{
+                    // e.stopPropagation()
+                    setShow(!show)
+                    }} class="dropbtn">Actions</button>
+
+                {
+                    show ? <>
+                        <div class="dropdown-content-connector"></div>
+                        <div class="dropdown-content">
+                            <a onClick={()=>{deleteNamespace()}}>Delete Namespace</a>
+                        </div>
+                    </>
+                :
+                (<></>)
+                }
+            </div> 
+        </div>
+    )
+}
 
 export default function SettingsPage() {
     return (
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
-            <div className="container">
+            <div className="flex-row">
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Namespace Settings"]} />
                 </div>
+                <SettingsAction />
             </div>
             <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
                 <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
@@ -125,7 +183,7 @@ function Secrets() {
                             <td   style={{ paddingRight: "10px" }} colspan="2">
                                 <div style={{ display: "flex", alignItems: "center" }}>
                                     <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
-                                    <div className="circle button danger" style={{ marginLeft: "10px" }}>
+                                    <div className="circle button danger" style={{ marginLeft: "10px" }} onClick={()=>deleteSecret(obj.name)}>
                                         <span style={{ flex: "auto" }}>
                                             <XCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
                                         </span>
@@ -288,3 +346,5 @@ function Registries() {
         </div>
     )
 }
+
+

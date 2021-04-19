@@ -13,7 +13,7 @@ const routes = [
     },
     {
         path: '/s',
-        breadcrumb: 'Secrets'
+        breadcrumb: 'Settings'
     }
 ]
 

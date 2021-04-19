@@ -31,7 +31,7 @@ export default function NuePieChart(props) {
       let title = "No title";
       let color = colors[i];
       let value = -1;
-      if (item.value) {
+      if (item.value !== undefined) {
         value = item.value;
       }
 

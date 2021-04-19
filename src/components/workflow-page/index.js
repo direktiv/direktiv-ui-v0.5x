@@ -10,11 +10,11 @@ import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
 import { FileTextFill, Clipboard, Save } from "react-bootstrap-icons"
 
 import { IoSave, IoSaveOutline } from 'react-icons/io5'
 
+import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
@@ -55,7 +55,7 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, "todo")
+                sendNotification(e)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
@@ -93,7 +93,7 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, "todo")
+                sendNotification(`Update Workflow Failed: ${e}`, 0)
             }
         }
         updateWf().finally(()=>{setFetching(false)})
@@ -127,7 +127,22 @@ export default function WorkflowPage() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log(e, "todo execute workflow")
+            sendNotification(`Execute Workflow Failed: ${e}`, 0)
+        }
+    }
+
+    async function disableWorkflow() {
+        try{
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}/toggle`, {
+                method: "PUT",
+            })
+            if(resp.ok) {
+                // TODO
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            sendNotification(`Disable Workflow Failed: ${e}`, 0)
         }
     }
 
@@ -138,7 +153,7 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions executeCB={executeWorkflow}/>
+                <WorkflowActions executeCB={executeWorkflow} disableCB={disableWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -189,7 +204,7 @@ export default function WorkflowPage() {
                             <PieChartFill />
                         </TileTitle>
                         <div className="tile-contents">
-                            <PieChart lineWidth={40} data={MockData}/>
+                            <PieComponent/>
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
@@ -206,6 +221,46 @@ export default function WorkflowPage() {
             </div>
         </div>
         </>
+    )
+}
+
+function PieComponent() {
+    const {fetch, namespace} = useContext(MainContext)
+    const params = useParams()
+    const [metrics, setMetrics] = useState([])
+
+    useEffect(()=>{
+        async function fetchMet() {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics`, {
+                    method: "GET"
+                })
+                if (resp.ok) {
+                    let json = await resp.json()
+                    console.log(json, json.totalInstancesRun - json.successfulExecutions)
+                    let met = [
+                        {
+                            title: "Completed",
+                            value: json.successfulExecutions
+                        },
+                        {
+                            title: "Failed",
+                            value: json.totalInstancesRun - json.successfulExecutions
+                        }
+                    ]
+                    setMetrics(met)
+                } else {
+                    throw new Error( await resp.text())
+                }
+            } catch(e) {
+                console.log('fetch metrics handle', e)
+            }
+        }
+        fetchMet()
+    },[])
+
+    return(
+        <PieChart lineWidth={40} data={metrics} />
     )
 }
 
@@ -261,7 +316,7 @@ function EventsList() {
 // TODO: Add event listener to hide dropdown when clicking outside of dropdown
 function WorkflowActions(props) {
     const [show, setShow] = useState(false)
-    const {executeCB} = props
+    const {executeCB, disableCB} = props
 
     useEffect(()=>{
         // console.log("event listen added" ,show)
@@ -291,15 +346,11 @@ function WorkflowActions(props) {
                      <div class="dropdown-content-connector"></div>
                      <div class="dropdown-content">
                     <a onClick={()=>{
-                        if (!executeCB) {
-                            console.log("executeCB is not set")
-                            return
-                        }
-
-                        executeCB()
-                        setShow(true)
+                        executeCB().finally(() => {setShow(false)})
                     }}>Execute</a>
-                    <a href="#">Disable</a>
+                    <a onClick={()=>{
+                        disableCB().finally(() => {setShow(false)})
+                    }}href="#">Disable</a>
                 </div>
                 </>:(<></>)
                 }
