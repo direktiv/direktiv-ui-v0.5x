@@ -402,7 +402,6 @@ ul li div {
 
 #namespace-arrow {
     transition: rotate 0.3s ease-in-out;
-    transition: transform 0.3s ease-in-out;
 }
 
 #namespaces-ul.active #namespace-arrow {
@@ -510,7 +509,7 @@ text {
 #editor-actions div.button {
     position: relative;
     background-color: #dbdbdb4d;
-    margin-right: 4pt;
+    margin-right: 8pt;
     box-shadow: inherit;
     z-index: 10;
 }
@@ -518,7 +517,7 @@ text {
 #editor-actions div.enable {
     position: relative;
     background-color: var(--primary-light);
-    margin-right: 4pt;
+    margin-right: 8pt;
     box-shadow: inherit;
     z-index: 10;
 }
@@ -551,7 +550,7 @@ text {
 .valign-wrapper {
     display: flex;
     flex-direction: row;
-    align-items: end;
+    align-items: flex-end;
 }
 
 .btn {
@@ -713,4 +712,71 @@ pre {
 
   .toast span {
       color: var(--secondary-font-light);
+  }
+
+  #jq-page {    
+    display: flex;
+    flex-direction: column;
+  }
+
+  .jq-button {
+      background: linear-gradient(145deg, #dadada, #f0f0f0);
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      justify-content: center;
+      font-size: 10pt;
+      margin: 0 0 0 10px;
+      min-width: 100px;
+  }
+
+  .jq-button:hover {
+      background: linear-gradient(145deg, #e4e4e4, #f9f9f9);
+    }
+
+  .jq-help{
+    font-size: 10pt;
+    color: var(--font-dark);
+    text-align: left;
+  }
+
+  .cheatsheet{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .cheatsheet-entry{
+    flex-grow: 1;
+    flex-basis: 0;
+    min-width: 400px;
+    font-size: 10pt;
+    color: var(--font-dark);
+    display: flex;
+    flex-direction: row;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #6c6c6c6b;
+  }
+
+  .cheatsheet-example{
+    flex-grow: 2;
+    flex-basis: 0;
+    text-align: left;
+    padding-left: 30px;
+    color: #e83e8c
+
+  }
+  .cheatsheet-tip{
+    flex-grow: 2;
+    flex-basis: 0;
+    text-align: left;
+    padding-left: 30px;
+  }
+
+  .cheatsheet-btn{
+    flex-grow: 1;
+    flex-basis: 0;
+    text-align: left;
+    padding-left: 30px;
   }
