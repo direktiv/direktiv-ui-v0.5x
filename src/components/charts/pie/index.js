@@ -3,30 +3,26 @@ import "./style.css";
 import ReactTooltip from "react-tooltip";
 import { PieChart } from "react-minimal-pie-chart";
 
-const colors = [
-  "#2fa64d",
-  "#db3447",
-  "#ffbf32",
-  "#014f86"
-];
+const colors = ["#2fa64d", "#db3447", "#ffbf32", "#014f86"];
 
 export const MockData = [
-  { title: "Completed", value: 50, },
-  { title: "Cancelled", value: 5, color:"#7e7e7e"  },
-  { title: "Failed", value: 10, color:"#e03b24" },
+  { title: "Completed", value: 50 },
+  { title: "Cancelled", value: 5, color: "#7e7e7e" },
+  { title: "Failed", value: 10, color: "#e03b24" },
   { title: "Pending", value: 3, color: "#ffcc00" },
 ];
 
-const hoverColor = "#a4aba6";
+const hoverColor = "#ADB3AE";
 
 export default function NuePieChart(props) {
   const { radius, lineWidth, rounded, data } = props;
   const [pieData, setPieData] = useState([]);
+  const [total, setTotal] = useState(0);
   const [tooltip, setTooltip] = useState(null);
 
   useEffect(() => {
     let dataList = [];
-    let total = 0;
+    let t = 0;
     data.forEach(function (item, i) {
       let title = "No title";
       let color = colors[i];
@@ -43,7 +39,7 @@ export default function NuePieChart(props) {
         color = item.color;
       }
 
-      total += value;
+      t += value;
       dataList.push({
         title: title,
         value: value,
@@ -53,24 +49,20 @@ export default function NuePieChart(props) {
       });
     });
 
-    console.log("dataList =", dataList);
-
-    if (dataList.length > 0) {
-      dataList[0].label = `${total}`;
-    }
-
+    setTotal(t)
     setPieData(dataList);
   }, [data]);
 
   return (
     <div
-      className="Pie-Background-OuterCircle"
+      className="pie-outer-background"
       style={{ margin: "auto", marginTop: "22px", position: "relative" }}
     >
-      <div className="Pie-Background-Highlight">
-        <div className="Pie-Background-Highlight-InnerCircle"></div>
+      <div className="pie-outer-highlight">
+        <div className="pie-inner-circle" >
+          {total}
+        </div>
       </div>
-      <div className="Pie-Background-InnerCircle">
         {pieData === [] ? (
           <></>
         ) : (
@@ -104,6 +96,7 @@ export default function NuePieChart(props) {
               }}
             />
             <ReactTooltip
+            style={{zIndex: 100}}
               id="chart"
               getContent={() => {
                 return tooltip;
@@ -111,7 +104,6 @@ export default function NuePieChart(props) {
             />
           </div>
         )}
-      </div>
     </div>
   );
 }
