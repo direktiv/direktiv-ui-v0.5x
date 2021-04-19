@@ -284,7 +284,7 @@ function PieComponent() {
                     throw new Error( await resp.text())
                 }
             } catch(e) {
-                console.log('fetch metrics handle', e)
+                sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
             }
         }
         fetchMet()
