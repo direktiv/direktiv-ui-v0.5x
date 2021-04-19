@@ -13,6 +13,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useEffect, useState } from 'react'
 import { useRef } from 'react'
+import { IoExtensionPuzzle, IoExtensionPuzzleOutline, IoFileTray, IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 
 export default function Navbar(props) {
@@ -163,7 +164,7 @@ export default function Navbar(props) {
                     <li>
                         <Link to="/" className="nav-link">
                             <div>
-                                <Speedometer style={{ marginRight: "10px" }} />
+                                <IoGrid style={{ marginRight: "10px" }} />
                                 <span>Dashboard</span>
                             </div>
                         </Link>
@@ -171,7 +172,7 @@ export default function Navbar(props) {
                     <li>
                         <Link to="/w/" className="nav-link">
                             <div>
-                                <LightningFill style={{ marginRight: "10px" }} />
+                                <IoShapesSharp style={{ marginRight: "10px" }} />
                                 <span>Workflows</span>
                             </div>
                         </Link>
@@ -179,15 +180,23 @@ export default function Navbar(props) {
                     <li>
                         <Link to="/i/" className="nav-link">
                             <div>
-                                <TerminalFill style={{ marginRight: "10px" }} />
+                                <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
+                            </div>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/jq/" className="nav-link">
+                            <div>
+                                <IoExtensionPuzzle style={{ marginRight: "10px" }} />
+                                <span>jq Playground</span>
                             </div>
                         </Link>
                     </li>
                     <li>
                         <Link to="/s/" className="nav-link">
                             <div>
-                                <GearFill style={{ marginRight: "10px" }} />
+                                <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>
                             </div>
                         </Link>

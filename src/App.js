@@ -8,6 +8,7 @@ import Navbar from './components/nav'
 import DashboardPage from './components/dashboard-page'
 import EventsPage from './components/events-page'
 import InstancePage from './components/instance-page'
+import JQPlaygroundPage from './components/jqplayground'
 import SettingsPage from './components/settings-page'
 import WorkflowsPage from './components/workflows-page'
 import WorkflowPage from './components/workflow-page'
@@ -120,6 +121,7 @@ function AuthenticatedContent() {
                 <Route exact path="/w/:workflow" component={WorkflowPage} />
                 <Route exact path="/i/" component={EventsPage} />
                 <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+                <Route exact path="/jq/" component={JQPlaygroundPage} />
                 <Route exact path="/s/" component={SettingsPage} />
                 <Redirect exact from="/s/reload" to="/s/"/>
               </Switch>
