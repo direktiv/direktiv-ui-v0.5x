@@ -120,7 +120,7 @@ export default function WorkflowPage() {
         try{
             let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
                 method: "POST",
-                body: JSON.stringify({"input":"todo"})
+                body: jsonInput
             })
             if(resp.ok) {
                 let json = await resp.json()    
@@ -198,7 +198,7 @@ export default function WorkflowPage() {
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
                                         <div id="editor-actions">
-                                            <div className={"button success save-btn"} onClick={() => {executeWorkflow()}}>
+                                            <div className={workflowInfo.active ? "button success save-btn": "button disabled"} onClick={() => {executeWorkflow()}}>
                                                 <span className="save-btn-label">
                                                     Execute
                                                 </span>
