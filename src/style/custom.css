@@ -402,10 +402,15 @@ ul li div {
 
 #namespace-arrow {
     transition: rotate 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out;
 }
 
 #namespaces-ul.active #namespace-arrow {
     rotate: 90deg;
+    -ms-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -webkit-transform:rotate(90deg);
+    -o-transform:rotate(90deg);
 }
 
 #namespaces-ul.active .namespace-selector {
