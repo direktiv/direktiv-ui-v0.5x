@@ -64,7 +64,7 @@ function AuthenticatedContent() {
               throw(new Error({message: await resp.text()}))
           }
       } catch(e) {
-          sendNotification(`Failed to fetch namespaces: ${e.message}`, 0)
+          sendNotification("Failed to fetch namespaces", e.message, 0)
       }
   }
 

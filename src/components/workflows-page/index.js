@@ -36,7 +36,7 @@ export default function WorkflowsPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch workflows: ${e.message}`, 0)
+                sendNotification("Failed to fetch workflows", e.message, 0)
             }
         }
         fetchWfs()
@@ -52,7 +52,7 @@ export default function WorkflowsPage() {
             }
             fetchWorkflows()
         } catch(e) {
-            sendNotification(`Failed to delete workflow: ${e.message}`, 0)
+            sendNotification("Failed to delete workflow", e.message, 0)
         }
     }
 
@@ -66,7 +66,7 @@ export default function WorkflowsPage() {
             } 
             fetchWorkflows()
         } catch(e) {
-            sendNotification(`Failed to toggle workflow: ${e.message}`, 0)
+            sendNotification("Failed to toggle workflow", e.message, 0)
         }
     }
 
@@ -293,7 +293,7 @@ function NewWorkflowForm() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification(`Failed to fetch template data: ${e.message}`, 0)
+            sendNotification("Failed to fetch template data", e.message, 0)
         }
     }
 
@@ -314,7 +314,7 @@ function NewWorkflowForm() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch a list of templates: ${e.message}`, 0)
+                sendNotification("Failed to fetch a list of templates", e.message, 0)
             }
         }
         fetchTemplates()

@@ -80,7 +80,7 @@ export default function Logs(props) {
                     }
                 }
             } catch (e) {
-                sendNotification(`Failed to fetch logs: ${e.message}`, 0)
+                sendNotification("Failed to fetch logs", e.message, 0)
             }
         }
 

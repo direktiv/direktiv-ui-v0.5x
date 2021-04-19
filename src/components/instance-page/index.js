@@ -39,7 +39,7 @@ export default function InstancePage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch workflow: ${e.message}`, 0)
+                sendNotification("Failed to fetch workflow", e.message, 0)
             }
         }
         fetchWorkflow()
