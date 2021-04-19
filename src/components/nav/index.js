@@ -57,11 +57,11 @@ export default function Navbar(props) {
                 toggleNamespaceSelector()
 
                 let matchWf = matchPath(location.pathname, {
-                    path: "/w/:workflow"
+                    path: `/${namespace}/w/:workflow`
                 })
 
                 if(matchWf !== null) {
-                    history.push("/w")
+                    history.push(`/${namespace}/w`)
                 }
 
                 let matchInstance = matchPath(location.pathname, {
@@ -69,7 +69,7 @@ export default function Navbar(props) {
                 })
 
                 if(matchInstance !== null) {
-                    history.push("/i")
+                    history.push(`/${namespace}/i`)
                 }
             } else {
                 throw(new Error({message: await resp.text()}))
@@ -137,11 +137,12 @@ export default function Navbar(props) {
                                                 toggleNamespaceSelector()
                                                
                                                 let matchWf = matchPath(location.pathname, {
-                                                    path: "/w/:workflow"
+                                                    path: `/${namespace}/w/:workflow`
                                                 })
 
                                                 if(matchWf !== null) {
-                                                    history.push("/w")
+                                                    history.push(`/${namespace}/w`)
+                                                    return
                                                 }
 
                                                 let matchInstance = matchPath(location.pathname, {
@@ -149,8 +150,12 @@ export default function Navbar(props) {
                                                 })
 
                                                 if(matchInstance !== null) {
-                                                    history.push("/i")
+                                                    history.push(`/${namespace}/i`)
+                                                    return
                                                 }
+
+
+                                                history.push(`/${obj}`)
                                             }}>{obj}</li>
                                         )
                                     }
@@ -163,7 +168,7 @@ export default function Navbar(props) {
             <div id="nav-ul-holder" className="nav-section divider">
                 <ul>
                     <li>
-                        <Link to="/" className="nav-link">
+                        <Link to={`/${namespace}`} className="nav-link">
                             <div>
                                 <IoGrid style={{ marginRight: "10px" }} />
                                 <span>Dashboard</span>
@@ -171,7 +176,7 @@ export default function Navbar(props) {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/w/" className="nav-link">
+                        <Link to={`/${namespace}/w/`} className="nav-link">
                             <div>
                                 <IoShapesSharp style={{ marginRight: "10px" }} />
                                 <span>Workflows</span>
@@ -179,7 +184,7 @@ export default function Navbar(props) {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/i/" className="nav-link">
+                        <Link to={`/${namespace}/i/`} className="nav-link">
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
@@ -195,7 +200,7 @@ export default function Navbar(props) {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/s/" className="nav-link">
+                        <Link to={`/${namespace}/s/`} className="nav-link">
                             <div>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>

@@ -9,6 +9,7 @@ import YAMLtoString from "yaml"
 import PlusCircleFill from 'react-bootstrap-icons/dist/icons/plus-circle-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import { FileCode, ToggleOff, ToggleOn, XCircle } from 'react-bootstrap-icons'
+
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
@@ -92,7 +93,7 @@ export default function WorkflowsPage() {
                             <tbody>
                                 {workflows.map((obj)=>{
                                     return(
-                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/w/${obj.id}`)}>
+                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
                                             <td style={{textAlign:"left", paddingLeft:"5px"}}>
                                                 <b>{obj.id}</b>
                                             </td>
@@ -101,22 +102,31 @@ export default function WorkflowsPage() {
                                                 :
                                                 <td style={{textAlign:"left", paddingLeft:"5px"}}>{obj.description}</td>
                                             }
-                                            <td onClick={(ev)=>ev.stopPropagation()} style={{paddingLeft:"5px"}}>
+                                            <td  style={{paddingLeft:"5px"}}>
                                                 <div className="actions-button-div">
                                                     {obj.active ?
-                                                        <div className="button circle success" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                        <div className="button circle success" onClick={(ev)=>{
+                                                            toggleWorkflow(obj.uid)
+                                                            ev.stopPropagation()
+                                                        }}>
                                                             <span>
                                                                 <IoToggle />
                                                             </span>
                                                         </div>
                                                         :
-                                                        <div className="button circle" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                        <div className="button circle" onClick={(ev)=>{
+                                                            toggleWorkflow(obj.uid)
+                                                            ev.stopPropagation()
+                                                        }}>
                                                             <span>
                                                                 <IoToggleOutline style={{ rotate: "180deg" }} />
                                                             </span>
                                                         </div>
                                                     }
-                                                    <div className="button circle danger" onClick={()=>deleteWorkflow(obj.uid)}>
+                                                    <div className="button circle danger" onClick={(ev)=>{
+                                                        deleteWorkflow(obj.uid)
+                                                        ev.stopPropagation()
+}}>
                                                         <span>
                                                             <IoTrash />
                                                         </span>
@@ -196,7 +206,7 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
                 setFiles([])
             }
             setErr("")
-            history.push(`/w/${json.id}`)
+            history.push(`/${namespace}/w/${json.id}`)
         } else {
             throw new Error(await resp.text())
         }
