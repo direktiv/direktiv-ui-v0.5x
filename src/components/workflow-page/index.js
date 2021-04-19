@@ -30,7 +30,7 @@ export default function WorkflowPage() {
     function setFetching(fetchState) {
         setWorkflowInfo((wfI) => {
             wfI.fetching = fetchState;
-            return wfI
+            return {...wfI}
         })
     }
 
@@ -50,7 +50,7 @@ export default function WorkflowPage() {
                     setWorkflowInfo((wfI) => {
                         wfI.uid = json.uid;
                         wfI.active = json.active
-                        return wfI
+                        return {...wfI}
                     })
                 } else {
                     throw new Error(await resp.text())
@@ -86,7 +86,7 @@ export default function WorkflowPage() {
                     setWorkflowInfo((wfI) => {
                         wfI.active = json.active;
                         wfI.revision = json.revision;
-                        return wfI
+                        return {...wfI}
                     })
                     setWorkflowValueOld(workflowValue)
                     history.replace(`${json.id}`)
@@ -141,10 +141,9 @@ export default function WorkflowPage() {
                 // fetch workflow
                 // fetchWorkflow()
                 let json = await resp.json()
-                console.log(json)
-                setWorkflowInfo((i) => {
-                    i.active = json.active;
-                    return i
+                setWorkflowInfo((wfI) => {
+                    wfI.active = json.active;
+                    return {...wfI}
                 })
             } else {
                 throw new Error(await resp.text())
@@ -325,7 +324,6 @@ function EventsList() {
 
 function WorkflowActions(props) {
     const {active, toggleWorkflow} = props
-    console.log("props changed\n\n\n")
     return(
         <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }} onClick={()=>toggleWorkflow()}>
                {active ?
