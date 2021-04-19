@@ -91,7 +91,10 @@ export default function Navbar(props) {
             </div>
             <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
                 <ul id="namespaces-ul" style={{ margin: "0px" }}>
-                    <li className="namespace-selector" onClick={() => toggleNamespaceSelector()}>
+                    <li className="namespace-selector" onClick={() => {
+                        console.log("namespace select")
+                        toggleNamespaceSelector()
+                    }}>
                         <div>
                             <ArrowRightFill id="namespace-arrow" style={{ marginRight: "10px", height: "18px" }} />
                             <span className="truncate" style={{ maxWidth: "120px" }}><b>{namespace}</b></span>
@@ -128,7 +131,7 @@ export default function Navbar(props) {
                                             <li onClick={()=>{
                                                 localStorage.setItem("namespace", obj)
                                                 setNamespace(obj)
-                                                toggleNamespaceSelector()
+                                                // toggleNamespaceSelector()
                                                
                                                 let matchWf = matchPath(location.pathname, {
                                                     path: "/w/:workflow"
