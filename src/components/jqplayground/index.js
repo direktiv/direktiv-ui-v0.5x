@@ -1,6 +1,8 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "../workflow-page/editor"
+import MainContext from '../../context'
+
 
 
 import TileTitle from '../tile-title'
@@ -88,6 +90,7 @@ const cheatSheetMap = [
 ];
 
 export default function JQPlaygroundPage() {
+    const {fetch} = useContext(MainContext)
     const [jqInput, setJQInput] = useState("{\n  \n}")
     const [jqFilter, setJQFilter] = useState(".")
     const [jqOutput, setJQOutput] = useState("")
@@ -108,7 +111,7 @@ export default function JQPlaygroundPage() {
 
             try {
                 // todo pagination
-                let resp = await fetch(`/api/jq-playground`, {
+                let resp = await fetch(`/jq-playground`, {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json",
@@ -116,9 +119,6 @@ export default function JQPlaygroundPage() {
                     },
                     body: rBody
                 })
-                // DEBUG
-                setJQOutput(input)
-                return
 
                 if (!resp.ok) {
                     throw await resp.text()
