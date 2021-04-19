@@ -10,7 +10,7 @@ import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { FileTextFill, Clipboard, Save } from "react-bootstrap-icons"
+import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
 
 
 import {sendNotification} from '../notifications/index.js'
@@ -48,6 +48,7 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(wf)
                     setWorkflowInfo((wfI) => {
                         wfI.uid = json.uid;
+                        wfI.active = json.active
                         return wfI
                     })
                 } else {
@@ -130,13 +131,20 @@ export default function WorkflowPage() {
         }
     }
 
-    async function disableWorkflow() {
+    async function toggleWorkflow() {
         try{
             let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}/toggle`, {
                 method: "PUT",
             })
             if(resp.ok) {
-                // TODO
+                // fetch workflow
+                // fetchWorkflow()
+                let json = await resp.json()
+                console.log(json)
+                setWorkflowInfo((i) => {
+                    i.active = json.active;
+                    return i
+                })
             } else {
                 throw new Error(await resp.text())
             }
@@ -145,6 +153,8 @@ export default function WorkflowPage() {
         }
     }
 
+    console.log(workflowInfo)
+
     return(
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -152,7 +162,7 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions executeCB={executeWorkflow} disableCB={disableWorkflow}/>
+                <WorkflowActions fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -304,48 +314,24 @@ function EventsList() {
     )
 }
 
-// TODO: Add event listener to hide dropdown when clicking outside of dropdown
 function WorkflowActions(props) {
-    const [show, setShow] = useState(false)
-    const {executeCB, disableCB} = props
-
-    useEffect(()=>{
-        // console.log("event listen added" ,show)
-        // const { isListOpen } = show;
-        // setTimeout(() => {
-        //     if(isListOpen){
-        //       window.addEventListener('click',  () => {setShow(false)})
-        //     }
-        //     else{
-        //       window.removeEventListener('click',  () => {setShow(false)})
-        //     }
-        //   }, 0)
-    },[show])
-
-
-
+    const {active, toggleWorkflow} = props
+    console.log("props changed\n\n\n")
     return(
-        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-             <div class="dropdown">
-                <button onClick={(e)=>{
-                    // e.stopPropagation()
-                    setShow(!show)
-                    }} class="dropbtn">Actions</button>
-
-                {
-                    show ? <>
-                     <div class="dropdown-content-connector"></div>
-                     <div class="dropdown-content">
-                    <a onClick={()=>{
-                        executeCB().finally(() => {setShow(false)})
-                    }}>Execute</a>
-                    <a onClick={()=>{
-                        disableCB().finally(() => {setShow(false)})
-                    }}href="#">Disable</a>
-                </div>
-                </>:(<></>)
+        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }} onClick={()=>toggleWorkflow()}>
+               {active ?
+                    <div className="button success" >
+                        <span>
+                            <ToggleOn />
+                        </span>
+                    </div>
+                    :
+                    <div className="button ">
+                        <span>
+                            <ToggleOff />
+                        </span>
+                    </div>
                 }
-            </div> 
         </div>
     )
 }
