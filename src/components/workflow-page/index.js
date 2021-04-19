@@ -12,7 +12,7 @@ import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
 
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline, IoPlaySharp } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline, IoPlaySharp, IoChevronForwardOutline } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
@@ -192,7 +192,7 @@ export default function WorkflowPage() {
                         </div>
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1" }}>
                             <TileTitle name="Execute Workflow">
-                                <IoPencil />
+                                <IoChevronForwardOutline />
                             </TileTitle>
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
