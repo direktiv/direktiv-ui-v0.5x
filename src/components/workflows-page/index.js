@@ -363,7 +363,7 @@ function NewWorkflowForm() {
                 </div>
                 <div style={{ marginTop: "10px", backgroundColor: "#252525", borderRadius: "4px", padding: "10px" }}>
                     <code style={{ textAlign: "left", maxWidth:"300px" }}>
-                       <pre>
+                       <pre style={{maxWidth:"300px"}}>
                            {templateData}
                        </pre>
                     </code>
