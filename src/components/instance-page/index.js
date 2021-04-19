@@ -62,8 +62,18 @@ export default function InstancePage() {
             }
 
         }
+        let timer = setInterval(()=>{
+            fetchInstanceDetails()
+        }, 2000)
+        if (instanceDetails.status === "complete" || instanceDetails.status === "cancelled") {
+            clearInterval(timer)
+        }
         fetchInstanceDetails()    
         fetchWf()
+
+        return function cleanup() {
+            clearInterval(timer)
+        }
     },[instanceId])
 
     console.log(instanceDetails.status)

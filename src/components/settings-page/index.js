@@ -251,7 +251,7 @@ function Registries() {
         try {
             let resp = await fetch(`/namespaces/${namespace}/registries/`, {
                 method: "POST",
-                body: JSON.stringify({"name": name, "data": `${user}!${token}`})
+                body: JSON.stringify({"name": name, "data": `${user}:${token}`})
             })
             if (resp.ok) {
                 setName("")
