@@ -589,3 +589,13 @@ pre {
     display: flex;
     align-items: center;
   }
+
+  .btn-prompt {
+    z-index: -5;
+    padding: 5px;
+    border-radius: 10px;
+    position: relative;
+    height: fit-content;
+    background: linear-gradient(145deg, #dadada, #f0f0f0);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+  }

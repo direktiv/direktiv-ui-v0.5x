@@ -87,13 +87,6 @@ export default function WorkflowsPage() {
                     </TileTitle>
                     <div id="events-table">
                         <table style={{width: "100%"}}>
-                            {/* <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead> */}
                             <tbody>
                                 {workflows.map((obj)=>{
                                     return(

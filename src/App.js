@@ -2,7 +2,7 @@ import './App.css';
 import './style/scrollbar.css';
 import './style/custom.css';
 
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
 import Navbar from './components/nav'
 import DashboardPage from './components/dashboard-page'
@@ -23,7 +23,7 @@ import { useCallback } from 'react';
 function AuthenticatedContent() {
   const context = useContext(MainContext)
   const [namespace, setNamespace] = useState("")
-
+  const [namespaces, setNamespaces] = useState([])
   const {initialized} = useKeycloak();
 
   const authFetch = useCallback((path, opts)=>{
@@ -38,6 +38,33 @@ function AuthenticatedContent() {
 
   if (!initialized) {
     return ""
+  }
+
+  async function fetchNamespaces(load) {
+      try {
+          let resp = await authFetch('/namespaces/', {
+              method: 'GET',
+          })
+          if (resp.ok) {
+              let json = await resp.json()
+              if (load){
+                  if(localStorage.getItem("namespace") !== undefined) {
+                      if(localStorage.getItem("namespace") === "") {
+                          setNamespace(json.data[0])
+                      } else {
+                          setNamespace(localStorage.getItem("namespace"))
+                      }
+                  } else {
+                      setNamespace(json.data[0])
+                  }
+              }
+              setNamespaces(json.data)
+          } else {
+              throw(new Error({message: await resp.text()}))
+          }
+      } catch(e) {
+          console.log('TODO handle err potentially running no auth i guess?')
+      }
   }
 
   function getJWT() {
@@ -63,12 +90,15 @@ function AuthenticatedContent() {
       getUsername: getUsername,
       fetch: authFetch,
       namespace: namespace,
-      setNamespace: setNamespace
+      setNamespace: setNamespace,
+      namespaces: namespaces,
+      setNamespaces: setNamespaces,
+      fetchNamespaces: fetchNamespaces,
     }}>
       <div id="content">
         <Router>
           <div id="nav-panel">
-            <Navbar auth={true} email={getEmail()} name={getUsername()} logout={logout} namespace={namespace} setNamespace={namespace} />
+            <Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
           </div>
           {namespace !== "" ? 
             <div id="main-panel">
@@ -79,6 +109,7 @@ function AuthenticatedContent() {
                 <Route exact path="/i/" component={EventsPage} />
                 <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                 <Route exact path="/s/" component={SettingsPage} />
+                <Redirect exact from="/s/reload" to="/s/"/>
               </Switch>
             </div>
             :

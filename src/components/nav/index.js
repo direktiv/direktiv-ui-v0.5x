@@ -20,44 +20,21 @@ export default function Navbar(props) {
     const history = useHistory()
     const location = useLocation()
 
-    const [namespaces, setNamespaces] = useState([])
+    // const [namespaces, setNamespaces] = useState([])
     const [acceptInput, setAcceptInput] = useState(false)
 
-    const {fetch, namespace, setNamespace} = useContext(MainContext)
+    const {fetch, namespace, setNamespace, namespaces, fetchNamespaces} = useContext(MainContext)
 
     const {auth, name, email, logout} = props
 
     let gravatarHash = ""
     let gravatarURL = ""
-    console.log(window.location)
+
     if(auth) {
         gravatarHash = md5(email)
         gravatarURL = "https://www.gravatar.com/avatar/" + gravatarHash
     }
     
-    async function fetchNamespaces(load) {
-        try {
-            let resp = await fetch('/namespaces/', {
-                method: 'GET',
-            })
-            if (resp.ok) {
-                let json = await resp.json()
-                if (load){
-                    console.log(localStorage)
-                    if(localStorage.getItem("namespace") !== undefined) {
-                        setNamespace(localStorage.getItem("namespace"))
-                    } else {
-                        setNamespace(json.data[0])
-                    }
-                }
-                setNamespaces(json.data)
-            } else {
-                throw(new Error({message: await resp.text()}))
-            }
-        } catch(e) {
-            console.log('TODO handle err potentially running no auth i guess?')
-        }
-    }
 
     async function createNamespace(val) {
         try {
@@ -71,6 +48,22 @@ export default function Navbar(props) {
                 localStorage.setItem("namespace", val)
                 setAcceptInput(!acceptInput)
                 toggleNamespaceSelector()
+
+                let matchWf = matchPath(location.pathname, {
+                    path: "/w/:workflow"
+                })
+
+                if(matchWf !== null) {
+                    history.push("/w")
+                }
+
+                let matchInstance = matchPath(location.pathname, {
+                    path: "/i/:namespace/:workflow/:instance"
+                })
+
+                if(matchInstance !== null) {
+                    history.push("/i")
+                }
             } else {
                 throw(new Error({message: await resp.text()}))
             }
