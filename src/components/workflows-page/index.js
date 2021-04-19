@@ -281,9 +281,8 @@ function NewWorkflowForm() {
 
     async function fetchTempData(temp, setData) {
         try {
-            let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
-                method: "POST",
-                body: JSON.stringify({id: temp})
+            let resp = await fetch(`/workflow-templates/${temp}`, {
+                method: "GET"
             })
             if(resp.ok) {
                 let text = await resp.text()
@@ -299,7 +298,7 @@ function NewWorkflowForm() {
     const fetchTemps = useCallback((load)=>{
         async function fetchTemplates(){
             try {
-                let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
+                let resp = await fetch(`/workflow-templates/`, {
                     method: "GET"
                 })
                 if(resp.ok) {
