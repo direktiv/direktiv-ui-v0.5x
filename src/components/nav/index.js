@@ -127,10 +127,10 @@ export default function Navbar(props) {
                                         }
                                     </div>
                                 </li>
-                                {namespaces.map((obj)=>{
+                                {namespaces.map((obj, i)=>{
                                     if(obj !== namespace){
                                         return(
-                                            <li onClick={()=>{
+                                            <li key={i} onClick={()=>{
                                                 localStorage.setItem("namespace", obj)
                                                 setNamespace(obj)
                                                 // toggleNamespaceSelector()
