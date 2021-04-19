@@ -12,7 +12,7 @@ import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
 export default function ReactEditor(props) {
-    const {value, setValue, saveCallback} = props;
+    const {value, setValue, saveCallback, readOnly} = props;
 
     function editorSave() {
         if (saveCallback) {
@@ -32,6 +32,7 @@ export default function ReactEditor(props) {
                     mode: 'yaml',
                     lineNumbers: true,
                     lineWrapping: true,
+                    readOnly: readOnly ? "nocursor": false,
                     extraKeys: {
                         "Ctrl-S": editorSave,
                         "Shift-Tab": "indentLess",
