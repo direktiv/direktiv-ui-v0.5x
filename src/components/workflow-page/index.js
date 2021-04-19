@@ -12,6 +12,7 @@ import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
 
+import { IoSave, IoSaveOutline } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
@@ -166,26 +167,34 @@ export default function WorkflowPage() {
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
-                    <div className="item-0 shadow-soft rounded tile">
-                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
-                            <PencilSquare />
-                        </TileTitle>
-                        <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
-                            <div style={{width: "100%", height: "100%", position: "relative"}}>
-                                <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                                    <div id="editor-actions">
-                                        <div className={workflowValueOld !== workflowValue ? "button success save-btn" : "button disabled"} onClick={() => {updateWorkflow()}}>
-                                            <span className="save-btn-label">
-                                                Save
-                                            </span>
-                                            <span className="save-btn-icon">
-                                                <Save/>
-                                            </span>
+                    <div className="container" style={{ flexDirection: "row" }}>
+                        <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2" }}>
+                            <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
+                                <PencilSquare />
+                            </TileTitle>
+                            <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
+                                <div style={{width: "100%", height: "100%", position: "relative"}}>
+                                    <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                                        <div id="editor-actions">
+                                            <div className={workflowValueOld !== workflowValue ? "button success save-btn" : "button disabled"} onClick={() => {updateWorkflow()}}>
+                                                <span className="save-btn-label">
+                                                    Save
+                                                </span>
+                                                <span className="save-btn-icon">
+                                                    <IoSave/>
+                                                </span>
+                                            </div>
                                         </div>
+                                        <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow}/>
                                     </div>
-                                    <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow}/>
                                 </div>
                             </div>
+                        </div>
+                        <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1" }}>
+                            <TileTitle name="Execute Workflow">
+                                <PencilSquare />
+                            </TileTitle>
+
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
