@@ -5,6 +5,7 @@ import Breadcrumbs from '../breadcrumbs'
 import BarChartFill from 'react-bootstrap-icons/dist/icons/bar-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import CodeSlash from 'react-bootstrap-icons/dist/icons/code-slash'
+import { EventsPageBody } from '../events-page'
 
 export default function DashboardPage() {
     return (
@@ -29,9 +30,10 @@ export default function DashboardPage() {
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }}>
                 <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
-                    <TileTitle name="Events">
+                    <TileTitle name="Instances">
                         <CardList />
                     </TileTitle>
+                    <EventsPageBody />
                 </div>
             </div>
         </div>

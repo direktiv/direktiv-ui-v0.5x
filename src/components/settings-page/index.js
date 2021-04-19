@@ -200,7 +200,7 @@ function Secrets() {
                         <td style={{ paddingRight: "10px" }} colspan="2">
                             <div style={{ display: "flex", alignItems: "center" }}>
                                 <input style={{ maxWidth: "150px" }} type="password" placeholder="Enter Value.." value={value} onChange={(e)=>setValue(e.target.value)}/>
-                                <div className="circle button success" style={{ marginLeft: "10px" }}>
+                                <div className="circle button success" style={{ marginLeft: "10px" }} onClick={()=>createSecret()}>
                                     <span style={{ flex: "auto" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
                                     </span>
