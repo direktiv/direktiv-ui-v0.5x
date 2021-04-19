@@ -21,6 +21,11 @@ export default function Navbar(props) {
     const textInput = useRef()
     const history = useHistory()
     const location = useLocation()
+    
+    function toggleNamespaceSelector() {
+        let x = document.getElementById('namespaces-ul');
+        x.classList.toggle('active');
+    }
 
     // const [namespaces, setNamespaces] = useState([])
     const [acceptInput, setAcceptInput] = useState(false)
@@ -78,10 +83,6 @@ export default function Navbar(props) {
         fetchNamespaces(true)
     },[])
 
-    function toggleNamespaceSelector() {
-        let x = document.getElementById('namespaces-ul');
-        x.classList.toggle('active');
-    }
 
     return(
         <div id="nav">
