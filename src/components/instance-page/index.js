@@ -13,6 +13,7 @@ import InputOutput from './input-output'
 import Diagram from '../workflow-page/diagram'
 
 import MainContext from '../../context'
+import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
 
 export default function InstancePage() {
     const {fetch} = useContext(MainContext)
@@ -97,13 +98,13 @@ export default function InstancePage() {
                 <div className="container" style={{ flexGrow: "inherit" }}>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Logs">
-                            <CardList />
+                            <IoTerminal />
                         </TileTitle>
                         <Logs instanceId={instanceId} />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Graph">
-                            <PipFill />
+                            <IoEaselOutline />
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
@@ -119,13 +120,13 @@ export default function InstancePage() {
                 <div className="container" style={{ flexGrow: "inherit", maxWidth: "400px" }}>
                      <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Input">
-                            <Braces />
+                            <IoCode />
                         </TileTitle>
                         <InputOutput data={instanceDetails.input} />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Output">
-                            <Braces />
+                            <IoCode />
                         </TileTitle>
                         <InputOutput data={instanceDetails.output} />
                     </div>

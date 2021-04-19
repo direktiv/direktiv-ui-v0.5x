@@ -12,7 +12,7 @@ import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { FileTextFill, Clipboard, Save } from "react-bootstrap-icons"
 
-import { IoSave, IoSaveOutline } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
@@ -160,7 +160,7 @@ export default function WorkflowPage() {
                     <div className="container" style={{ flexDirection: "row" }}>
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2" }}>
                             <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
-                                <PencilSquare />
+                                <IoPencil />
                             </TileTitle>
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
@@ -182,14 +182,14 @@ export default function WorkflowPage() {
                         </div>
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1" }}>
                             <TileTitle name="Execute Workflow">
-                                <PencilSquare />
+                                <IoPencil />
                             </TileTitle>
 
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Graph">
-                            <PipFill />
+                            <IoEaselOutline />
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
@@ -201,7 +201,7 @@ export default function WorkflowPage() {
                 <div className="container graph-contents" style={{ width: "300px" }}>
                     <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
                         <TileTitle name="Executed Workflows">
-                            <PieChartFill />
+                            <IoPieChartSharp />
                         </TileTitle>
                         <div className="tile-contents">
                             <PieComponent/>
@@ -209,7 +209,7 @@ export default function WorkflowPage() {
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Events">
-                            <CardList />
+                            <IoList />
                         </TileTitle>
                         <div style={{ maxHeight: "80%", overflowY: "auto"}}>
                             <div id="events-tile" className="tile-contents">

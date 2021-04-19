@@ -10,6 +10,7 @@ import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
+import { IoList } from 'react-icons/io5'
 
 dayjs.extend(relativeTime);
 
@@ -25,7 +26,7 @@ export default function EventsPage() {
             <div className="container" style={{ flexDirection: "row", flex: "auto" }}>
                 <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
                     <TileTitle name="Instances">
-                        <CardList />
+                        <IoList />
                     </TileTitle>
                     <EventsPageBody />
                 </div>
@@ -79,7 +80,7 @@ function EventsPageBody() {
                                     <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
-                                        <td>{obj.id}</td>
+                                        <td style={{ textAlign: "left" }}>{obj.id}</td>
                                         <td></td>
                                     </tr>
                                 </>
