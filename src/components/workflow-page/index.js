@@ -12,7 +12,7 @@ import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
 
-import { IoSave, IoSaveOutline } from 'react-icons/io5'
+import { IoSave, IoSaveOutline, IoPlaySharp } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
@@ -23,6 +23,7 @@ export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
+    const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [workflowInfo, setWorkflowInfo] = useState({uid: "", revision: 0, active: true, fetching: true,})
     const history = useHistory()
     const params = useParams()
@@ -194,7 +195,23 @@ export default function WorkflowPage() {
                             <TileTitle name="Execute Workflow">
                                 <PencilSquare />
                             </TileTitle>
-
+                            <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
+                                <div style={{width: "100%", height: "100%", position: "relative"}}>
+                                    <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                                        <div id="editor-actions">
+                                            <div className={"button success save-btn"} onClick={() => {executeWorkflow()}}>
+                                                <span className="save-btn-label">
+                                                    Execute
+                                                </span>
+                                                <span className="save-btn-icon">
+                                                    <IoPlaySharp/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <Editor value={jsonInput} setValue={setJsonInput} />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
