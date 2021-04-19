@@ -175,21 +175,21 @@ option {
     transition: width 200ms ease-in !important;
 }
 
-.save-btn {
+.editor-action-btn {
     width: 36px;
     overflow: hidden;
     flex-direction: row;
 }
 
-.save-btn:hover {
-    width: 70px;
+.editor-action-btn:hover {
+    width: 90px;
 }
 
-.save-btn span {
+.editor-action-btn span {
     flex: auto;
 }
 
-.save-btn .save-btn-icon {
+.editor-action-btn .editor-action-btn-icon {
     margin-bottom: 1px;
     max-width: 36px;
     min-width: 36px;
@@ -197,7 +197,7 @@ option {
     right: 0;
 }
 
-.save-btn-label {
+.editor-action-btn-label {
     color: var(--font-dark);
     visibility: hidden;
     height: 0px;
@@ -205,19 +205,22 @@ option {
     overflow-x: hidden;
     position: absolute;
     right: 36px;
+    min-width: 51px;
+    /* width: 90px; */
+    /* min-width: 90px; */
 
     transition-delay: 200ms;
     transition: visibility 200ms ease-in,
                 width 200ms ease-in;
 }
 
-.save-btn .save-btn-label {
+.editor-action-btn .editor-action-btn-label {
     height: auto;
     width: auto;
     visibility: inherit; 
 }
 
-/* .save-btn span::before {
+/* .editor-action-btn span::before {
     font-size: 10pt;
     content: "Save";
     padding: 0 5px 0 0;
@@ -231,7 +234,7 @@ option {
 
 .button.disabled {
     /* cursor: cursor; */
-    color: var(--secondary-font-light)
+    color: var(--secondary-font-light);
 }
 
 .button.success {
@@ -497,7 +500,16 @@ text {
 
 #editor-actions div.button {
     position: relative;
+    background-color: #dbdbdb4d;
+    margin-right: 4pt;
+    box-shadow: inherit;
+    z-index: 10;
+}
+
+#editor-actions div.enable {
+    position: relative;
     background-color: var(--primary-light);
+    margin-right: 4pt;
     box-shadow: inherit;
     z-index: 10;
 }
