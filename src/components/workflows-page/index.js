@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
+import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoTrashOutline } from 'react-icons/io5'
 
 export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
@@ -83,7 +84,7 @@ export default function WorkflowsPage() {
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
                 <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
                     <TileTitle name="All workflows">
-                        <CardList />
+                        <IoList />
                     </TileTitle>
                     <div id="events-table">
                         <table style={{width: "100%"}}>
@@ -104,19 +105,19 @@ export default function WorkflowsPage() {
                                                     {obj.active ?
                                                         <div className="button circle success" onClick={()=>toggleWorkflow(obj.uid)}>
                                                             <span>
-                                                                <ToggleOn />
+                                                                <IoToggle />
                                                             </span>
                                                         </div>
                                                         :
                                                         <div className="button circle" onClick={()=>toggleWorkflow(obj.uid)}>
                                                             <span>
-                                                                <ToggleOff />
+                                                                <IoToggleOutline style={{ rotate: "180deg" }} />
                                                             </span>
                                                         </div>
                                                     }
                                                     <div className="button circle danger" onClick={()=>deleteWorkflow(obj.uid)}>
                                                         <span>
-                                                            <XCircle />
+                                                            <IoTrash />
                                                         </span>
                                                     </div>
                                                 </div>
@@ -132,19 +133,19 @@ export default function WorkflowsPage() {
                 <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Upload workflow file">
-                            <FileCode />
+                            <IoCloudUploadSharp />
                         </TileTitle>
                         <UploadWorkflowForm />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Create new workflow">
-                            <PlusCircleFill />
+                            <IoAddSharp />
                         </TileTitle>
                         <NewWorkflowForm />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Send namespace event">
-                            <PlusCircleFill />
+                            <IoAddSharp />
                         </TileTitle>
                         <APIInteractionTile />
                     </div>

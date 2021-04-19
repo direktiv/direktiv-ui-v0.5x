@@ -6,6 +6,7 @@ import ShieldLockFill from 'react-bootstrap-icons/dist/icons/shield-lock-fill'
 import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-fill'
 import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
 import { useHistory } from 'react-router'
+import { IoLockOpen, IoLogoDocker } from 'react-icons/io5'
 
 
 function SettingsAction(props) {
@@ -76,13 +77,13 @@ export default function SettingsPage() {
             <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
                 <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
                     <TileTitle name="Secrets">
-                        <ShieldLockFill />
+                        <IoLockOpen />
                     </TileTitle>
                     <Secrets />
                 </div>
                 <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
                     <TileTitle name="Container Registries">
-                        <CloudDownloadFill />
+                        <IoLogoDocker />
                     </TileTitle>
                     <Registries />
                 </div>
