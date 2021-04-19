@@ -70,7 +70,7 @@ export default function Navbar(props) {
                 throw(new Error({message: await resp.text()}))
             }
         } catch(e) {
-            sendNotification(`Failed to create namespace: ${e.message}`, 0)
+            sendNotification("Failed to fetch namespaces", e.message, 0)
         }
     }
     

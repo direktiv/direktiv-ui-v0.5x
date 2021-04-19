@@ -56,7 +56,7 @@ export function EventsPageBody() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch instances: ${e.message}`, 0)
+                sendNotification("Failed to fetch instances", e.message, 0)
             }
         }
         fetchI()

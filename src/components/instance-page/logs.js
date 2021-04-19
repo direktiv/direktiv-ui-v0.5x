@@ -80,7 +80,7 @@ export default function Logs(props) {
                     }
                 }
             } catch (e) {
-                sendNotification(`Failed to fetch logs: ${e.message}`, 0)
+                sendNotification("Failed to fetch logs", e.message, 0)
             }
         }
 
@@ -93,7 +93,7 @@ export default function Logs(props) {
             fetchLogs()
             setInit(true)
         } else {
-            let timer = setInterval(fetchLogs, 500)
+            let timer = setInterval(fetchLogs, 800)
             return function cleanup() {
                 clearInterval(timer)
             }

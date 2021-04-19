@@ -693,3 +693,20 @@ pre {
     background: linear-gradient(145deg, #dadada, #f0f0f0);
     box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
   }
+
+  /* Toasts */
+  .Toastify__toast-body div {
+    font-size: 8pt !important;
+  }
+
+  .Toastify__progress-bar--default {
+      background: var(--nav-item-hover-color) !important;
+  }
+
+  .toast {
+      color: var(--font-dark) !important;
+  }
+
+  .toast span {
+      color: var(--secondary-font-light);
+  }

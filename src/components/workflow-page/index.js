@@ -57,7 +57,7 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(e)
+                sendNotification("Failed to fetch workflow", e, 0)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
@@ -95,7 +95,7 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Update Workflow Failed: ${e}`, 0)
+                sendNotification("Failed to update workflow", e.message, 0)
             }
         }
         updateWf().finally(()=>{setFetching(false)})
@@ -129,7 +129,7 @@ export default function WorkflowPage() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification(`Execute Workflow Failed: ${e}`, 0)
+            sendNotification("Failed to execute workflow", e.message, 0)
         }
     }
 
@@ -150,7 +150,7 @@ export default function WorkflowPage() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification(`Disable Workflow Failed: ${e}`, 0)
+            sendNotification("Failed to disable workflow", e.message, 0)
         }
     }
 
