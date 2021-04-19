@@ -176,7 +176,7 @@ export default function WorkflowPage() {
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
                                         <div id="editor-actions">
-                                            <div className={workflowValueOld !== workflowValue ? "button success save-btn" : "button disabled"} onClick={() => {updateWorkflow()}}>
+                                            <div className={workflowValueOld !== workflowValue ? "button success save-btn" : "button disabled"} style={{marginRight: "4pt"}}onClick={() => {updateWorkflow()}}>
                                                 <span className="save-btn-label">
                                                     Save
                                                 </span>
