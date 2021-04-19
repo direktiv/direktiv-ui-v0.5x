@@ -8,10 +8,11 @@ import Navbar from './components/nav'
 import DashboardPage from './components/dashboard-page'
 import EventsPage from './components/events-page'
 import InstancePage from './components/instance-page'
+import JQPlaygroundPage from './components/jqplayground'
 import SettingsPage from './components/settings-page'
 import WorkflowsPage from './components/workflows-page'
 import WorkflowPage from './components/workflow-page'
-import NotificationSystem from './components/notifications/index.js'
+import NotificationSystem, { sendNotification } from './components/notifications/index.js'
 import { useState } from 'react';
 import {  ReactKeycloakProvider, useKeycloak } from '@react-keycloak/web';
 import keycloak from './keycloak'
@@ -63,7 +64,7 @@ function AuthenticatedContent() {
               throw(new Error({message: await resp.text()}))
           }
       } catch(e) {
-          console.log('TODO handle err potentially running no auth i guess?')
+          sendNotification(`Failed to fetch namespaces: ${e.message}`, 0)
       }
   }
 
@@ -108,6 +109,7 @@ function AuthenticatedContent() {
                 <Route exact path="/w/:workflow" component={WorkflowPage} />
                 <Route exact path="/i/" component={EventsPage} />
                 <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+                <Route exact path="/jq/" component={JQPlaygroundPage} />
                 <Route exact path="/s/" component={SettingsPage} />
                 <Redirect exact from="/s/reload" to="/s/"/>
               </Switch>

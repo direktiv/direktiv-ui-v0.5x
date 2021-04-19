@@ -175,6 +175,11 @@ option {
     transition: width 200ms ease-in !important;
 }
 
+.dashboard-btn {
+    text-decoration: none;
+    color: var(--font-dark)
+}
+
 .editor-action-btn {
     width: 36px;
     overflow: hidden;

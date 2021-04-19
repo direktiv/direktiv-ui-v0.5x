@@ -11,6 +11,7 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoList } from 'react-icons/io5'
+import { sendNotification } from '../notifications'
 
 dayjs.extend(relativeTime);
 
@@ -55,7 +56,7 @@ export function EventsPageBody() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, 'fetch instances todo')
+                sendNotification(`Failed to fetch instances: ${e.message}`, 0)
             }
         }
         fetchI()

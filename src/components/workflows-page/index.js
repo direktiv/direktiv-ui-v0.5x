@@ -15,6 +15,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoTrashOutline } from 'react-icons/io5'
+import { sendNotification } from '../notifications'
 
 export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
@@ -35,7 +36,7 @@ export default function WorkflowsPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, "todo")
+                sendNotification(`Failed to fetch workflows: ${e.message}`, 0)
             }
         }
         fetchWfs()
@@ -51,7 +52,7 @@ export default function WorkflowsPage() {
             }
             fetchWorkflows()
         } catch(e) {
-            console.log(e, "todo delete handle err")
+            sendNotification(`Failed to delete workflow: ${e.message}`, 0)
         }
     }
 
@@ -65,7 +66,7 @@ export default function WorkflowsPage() {
             } 
             fetchWorkflows()
         } catch(e) {
-            console.log(e, "todo action")
+            sendNotification(`Failed to toggle workflow: ${e.message}`, 0)
         }
     }
 
@@ -195,7 +196,6 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
                 setFiles([])
             }
             setErr("")
-            console.log('todo show message or notification it was created')
             history.push(`/w/${json.id}`)
         } else {
             throw new Error(await resp.text())
@@ -293,7 +293,7 @@ function NewWorkflowForm() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log("todo", e)
+            sendNotification(`Failed to fetch template data: ${e.message}`, 0)
         }
     }
 
@@ -314,8 +314,7 @@ function NewWorkflowForm() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e)
-                console.log('todo handle error')
+                sendNotification(`Failed to fetch a list of templates: ${e.message}`, 0)
             }
         }
         fetchTemplates()
@@ -363,7 +362,7 @@ function NewWorkflowForm() {
                 </div>
                 <div style={{ marginTop: "10px", backgroundColor: "#252525", borderRadius: "4px", padding: "10px" }}>
                     <code style={{ textAlign: "left", maxWidth:"300px" }}>
-                       <pre>
+                       <pre style={{maxWidth:"300px"}}>
                            {templateData}
                        </pre>
                     </code>
