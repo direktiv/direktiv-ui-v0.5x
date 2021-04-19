@@ -509,7 +509,7 @@ text {
 #editor-actions div.button {
     position: relative;
     background-color: #dbdbdb4d;
-    margin-right: 4pt;
+    margin-right: 8pt;
     box-shadow: inherit;
     z-index: 10;
 }
@@ -517,7 +517,7 @@ text {
 #editor-actions div.enable {
     position: relative;
     background-color: var(--primary-light);
-    margin-right: 4pt;
+    margin-right: 8pt;
     box-shadow: inherit;
     z-index: 10;
 }
