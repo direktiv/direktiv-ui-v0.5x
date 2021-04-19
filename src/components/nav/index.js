@@ -14,6 +14,7 @@ import MainContext from '../../context'
 import { useEffect, useState } from 'react'
 import { useRef } from 'react'
 import { IoExtensionPuzzle, IoExtensionPuzzleOutline, IoFileTray, IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { sendNotification } from '../notifications'
 
 export default function Navbar(props) {
 
@@ -69,7 +70,7 @@ export default function Navbar(props) {
                 throw(new Error({message: await resp.text()}))
             }
         } catch(e) {
-            console.log('TODO handle err potentially running no auth i guess?')
+            sendNotification(`Failed to create namespace: ${e.message}`, 0)
         }
     }
     

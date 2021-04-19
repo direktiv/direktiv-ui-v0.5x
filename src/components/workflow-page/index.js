@@ -219,7 +219,12 @@ export default function WorkflowPage() {
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                             <div style={{ flex: "auto" }}>
-                                <Diagram value={workflowValueOld}/>   
+                                {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
+                                    {workflowValueOld !== "" ?
+                                        <Diagram value={workflowValueOld}/>   
+                                        :
+                                        ""
+                                    }
                             </div>
                         </div>
                     </div>
