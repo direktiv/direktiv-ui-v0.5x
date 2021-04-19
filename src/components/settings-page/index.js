@@ -76,13 +76,13 @@ export default function SettingsPage() {
                 <SettingsAction />
             </div>
             <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
-                <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
                     <TileTitle name="Secrets">
                         <IoLockOpen />
                     </TileTitle>
                     <Secrets />
                 </div>
-                <div className="item-0 shadow-soft rounded tile" style={{ flex: "auto", minWidth: "400px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
                     <TileTitle name="Container Registries">
                         <IoLogoDocker />
                     </TileTitle>
@@ -114,7 +114,7 @@ function Secrets() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch secrets: ${e.message}`, 0)
+                sendNotification("Failed to fetch secrets", e.message, 0)
             }
         }
         fetchData()
@@ -138,7 +138,7 @@ function Secrets() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification(`Failed to create secret: ${e.message}`, 0)
+            sendNotification("Failed to create secret", e.message, 0)
         }
     }
 
@@ -155,7 +155,7 @@ function Secrets() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification(`Failed to delete secret: ${e.message}`, 0)
+            sendNotification("Failed to delete secret", e.message, 0)
         }
     }
 
@@ -237,7 +237,7 @@ function Registries() {
                     throw new Error(await resp. text())
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch registries: ${e.message}`, 0)
+                sendNotification("Failed to fetch registries", e.message, 0)
             }
         }
         fetchData()
@@ -262,7 +262,7 @@ function Registries() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification(`Failed to create registry: ${e.message}`,0)
+            sendNotification("Failed to create registry", e.message, 0)
         }
     }
 

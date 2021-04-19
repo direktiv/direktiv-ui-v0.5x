@@ -1,22 +1,28 @@
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function createNotification(msg, level){
+function createNotification(title, msg, level){
     // Do Whatever you want here
     return ({ closeToast, toastProps }) => (
-        <div style={{fontSize: "16px", color: "black"}}>
-          {msg} {toastProps.position}
-          <button onClick={closeToast}>Close</button>
+        <div className="toast" style={{fontSize: "16px", color: "black", textAlign: "left"}}>
+            <b>{title}</b>
+            <br/>
+            <span>
+                {msg}
+            </span>
         </div>
     )    
 }
 
 
-export function sendNotification(msg, level) {
-    const notification = createNotification(msg)
+export function sendNotification(title, msg, level) {
+    const notification = createNotification(title, msg, level)
     toast(notification)
 }
 
 export default function NotificationSystem() {
-    return(<><ToastContainer position="bottom-right"/></>)
+    return(
+    <>
+        <ToastContainer autoClose={30000} position="bottom-right"/>
+    </>)
 }
