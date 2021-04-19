@@ -10,9 +10,9 @@ import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { FileTextFill, Clipboard, Save } from "react-bootstrap-icons"
+import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
 
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline, IoPlaySharp } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
@@ -23,6 +23,7 @@ export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
+    const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [workflowInfo, setWorkflowInfo] = useState({uid: "", revision: 0, active: true, fetching: true,})
     const history = useHistory()
     const params = useParams()
@@ -30,7 +31,7 @@ export default function WorkflowPage() {
     function setFetching(fetchState) {
         setWorkflowInfo((wfI) => {
             wfI.fetching = fetchState;
-            return wfI
+            return {...wfI}
         })
     }
 
@@ -49,7 +50,8 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(wf)
                     setWorkflowInfo((wfI) => {
                         wfI.uid = json.uid;
-                        return wfI
+                        wfI.active = json.active
+                        return {...wfI}
                     })
                 } else {
                     throw new Error(await resp.text())
@@ -85,7 +87,7 @@ export default function WorkflowPage() {
                     setWorkflowInfo((wfI) => {
                         wfI.active = json.active;
                         wfI.revision = json.revision;
-                        return wfI
+                        return {...wfI}
                     })
                     setWorkflowValueOld(workflowValue)
                     history.replace(`${json.id}`)
@@ -118,7 +120,7 @@ export default function WorkflowPage() {
         try{
             let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
                 method: "POST",
-                body: JSON.stringify({"input":"todo"})
+                body: jsonInput
             })
             if(resp.ok) {
                 let json = await resp.json()    
@@ -131,13 +133,19 @@ export default function WorkflowPage() {
         }
     }
 
-    async function disableWorkflow() {
+    async function toggleWorkflow() {
         try{
             let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}/toggle`, {
                 method: "PUT",
             })
             if(resp.ok) {
-                // TODO
+                // fetch workflow
+                // fetchWorkflow()
+                let json = await resp.json()
+                setWorkflowInfo((wfI) => {
+                    wfI.active = json.active;
+                    return {...wfI}
+                })
             } else {
                 throw new Error(await resp.text())
             }
@@ -146,6 +154,8 @@ export default function WorkflowPage() {
         }
     }
 
+    console.log(workflowInfo)
+
     return(
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -153,7 +163,7 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions executeCB={executeWorkflow} disableCB={disableWorkflow}/>
+                <WorkflowActions fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -184,7 +194,23 @@ export default function WorkflowPage() {
                             <TileTitle name="Execute Workflow">
                                 <IoPencil />
                             </TileTitle>
-
+                            <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
+                                <div style={{width: "100%", height: "100%", position: "relative"}}>
+                                    <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                                        <div id="editor-actions">
+                                            <div className={workflowInfo.active ? "button success save-btn": "button disabled"} onClick={() => {executeWorkflow()}}>
+                                                <span className="save-btn-label">
+                                                    Execute
+                                                </span>
+                                                <span className="save-btn-icon">
+                                                    <IoPlaySharp/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <Editor value={jsonInput} setValue={setJsonInput} />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
@@ -313,48 +339,23 @@ function EventsList() {
     )
 }
 
-// TODO: Add event listener to hide dropdown when clicking outside of dropdown
 function WorkflowActions(props) {
-    const [show, setShow] = useState(false)
-    const {executeCB, disableCB} = props
-
-    useEffect(()=>{
-        // console.log("event listen added" ,show)
-        // const { isListOpen } = show;
-        // setTimeout(() => {
-        //     if(isListOpen){
-        //       window.addEventListener('click',  () => {setShow(false)})
-        //     }
-        //     else{
-        //       window.removeEventListener('click',  () => {setShow(false)})
-        //     }
-        //   }, 0)
-    },[show])
-
-
-
+    const {active, toggleWorkflow} = props
     return(
-        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-             <div class="dropdown">
-                <button onClick={(e)=>{
-                    // e.stopPropagation()
-                    setShow(!show)
-                    }} class="dropbtn">Actions</button>
-
-                {
-                    show ? <>
-                     <div class="dropdown-content-connector"></div>
-                     <div class="dropdown-content">
-                    <a onClick={()=>{
-                        executeCB().finally(() => {setShow(false)})
-                    }}>Execute</a>
-                    <a onClick={()=>{
-                        disableCB().finally(() => {setShow(false)})
-                    }}href="#">Disable</a>
-                </div>
-                </>:(<></>)
+        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }} onClick={()=>toggleWorkflow()}>
+               {active ?
+                    <div className="button success" >
+                        <span>
+                            <ToggleOn />
+                        </span>
+                    </div>
+                    :
+                    <div className="button ">
+                        <span>
+                            <ToggleOff />
+                        </span>
+                    </div>
                 }
-            </div> 
         </div>
     )
 }

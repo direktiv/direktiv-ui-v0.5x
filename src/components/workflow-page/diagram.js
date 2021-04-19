@@ -6,7 +6,6 @@ import dagre from 'dagre'
 export const position = { x: 0, y: 0}
 
 const generateElements = (getLayoutedElements, value, flow, status) => {
-    console.log(value, flow)
     let newElements = []
    
     try {
