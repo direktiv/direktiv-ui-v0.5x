@@ -10,10 +10,10 @@ import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
 import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import Play from 'react-bootstrap-icons/dist/icons/play-btn-fill'
-import { FileTextFill, Clipboard } from "react-bootstrap-icons"
+import { FileTextFill, Clipboard, Save } from "react-bootstrap-icons"
 
 
+import {sendNotification} from '../notifications/index.js'
 import PieChart, {MockData, NuePieLegend} from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
@@ -54,7 +54,7 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, "todo")
+                sendNotification(e)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
@@ -92,7 +92,7 @@ export default function WorkflowPage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, "todo")
+                sendNotification(`Update Workflow Failed: ${e}`, 0)
             }
         }
         updateWf().finally(()=>{setFetching(false)})
@@ -126,7 +126,22 @@ export default function WorkflowPage() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log(e, "todo execute workflow")
+            sendNotification(`Execute Workflow Failed: ${e}`, 0)
+        }
+    }
+
+    async function disableWorkflow() {
+        try{
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}/toggle`, {
+                method: "PUT",
+            })
+            if(resp.ok) {
+                // TODO
+            } else {
+                throw new Error(await resp.text())
+            }
+        } catch(e) {
+            sendNotification(`Disable Workflow Failed: ${e}`, 0)
         }
     }
 
@@ -137,17 +152,27 @@ export default function WorkflowPage() {
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
-                <WorkflowActions executeCB={executeWorkflow}/>
+                <WorkflowActions executeCB={executeWorkflow} disableCB={disableWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
                     <div className="item-0 shadow-soft rounded tile">
-                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} actionsDiv={saveBtn} >
+                        <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
                             <PencilSquare />
                         </TileTitle>
                         <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                             <div style={{width: "100%", height: "100%", position: "relative"}}>
                                 <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                                    <div id="editor-actions">
+                                        <div className={workflowValueOld !== workflowValue ? "button success save-btn" : "button disabled"} onClick={() => {updateWorkflow()}}>
+                                            <span className="save-btn-label">
+                                                Save
+                                            </span>
+                                            <span className="save-btn-icon">
+                                                <Save/>
+                                            </span>
+                                        </div>
+                                    </div>
                                     <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow}/>
                                 </div>
                             </div>
@@ -282,7 +307,7 @@ function EventsList() {
 // TODO: Add event listener to hide dropdown when clicking outside of dropdown
 function WorkflowActions(props) {
     const [show, setShow] = useState(false)
-    const {executeCB} = props
+    const {executeCB, disableCB} = props
 
     useEffect(()=>{
         // console.log("event listen added" ,show)
@@ -312,15 +337,11 @@ function WorkflowActions(props) {
                      <div class="dropdown-content-connector"></div>
                      <div class="dropdown-content">
                     <a onClick={()=>{
-                        if (!executeCB) {
-                            console.log("executeCB is not set")
-                            return
-                        }
-
-                        executeCB()
-                        setShow(true)
+                        executeCB().finally(() => {setShow(false)})
                     }}>Execute</a>
-                    <a href="#">Disable</a>
+                    <a onClick={()=>{
+                        disableCB().finally(() => {setShow(false)})
+                    }}href="#">Disable</a>
                 </div>
                 </>:(<></>)
                 }
