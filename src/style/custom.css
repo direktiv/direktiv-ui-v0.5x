@@ -405,7 +405,7 @@ ul li div {
 }
 
 #namespaces-ul.active #namespace-arrow {
-    transition: rotate 90deg;
+    rotate: 90deg;
 }
 
 #namespaces-ul.active .namespace-selector {
