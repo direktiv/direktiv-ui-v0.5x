@@ -67,6 +67,7 @@ export default function WorkflowPage() {
     },[namespace])
 
     const updateWorkflow = useCallback(()=>{
+        console.log("workflowInfo.fetching =", workflowInfo.fetching)
         if (workflowInfo.fetching){
             return // TODO - User Feedback
         }
@@ -100,9 +101,14 @@ export default function WorkflowPage() {
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
             }
+            return
         }
-        updateWf().finally(()=>{setFetching(false)})
-    },[namespace, workflowValue])
+        console.log("test1")
+        updateWf().finally(()=>{
+            console.log("test2")
+            setFetching(false)
+        })
+    },[namespace, workflowValue, workflowInfo.fetching])
 
     useEffect(()=>{
         fetchWorkflow()

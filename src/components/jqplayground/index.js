@@ -110,7 +110,6 @@ export default function JQPlaygroundPage() {
             });
 
             try {
-                // todo pagination
                 let resp = await fetch(`/jq-playground`, {
                     method: "POST",
                     headers: {
