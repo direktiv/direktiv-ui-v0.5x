@@ -6,7 +6,7 @@ import MainContext from '../../context'
 
 
 import TileTitle from '../tile-title'
-import { IoEaselOutline,  IoPencil, IoChevronForwardOutline } from 'react-icons/io5'
+import { IoInformationCircleSharp,  IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
 
 import { sendNotification } from '../notifications/index.js'
 
@@ -172,7 +172,7 @@ export default function JQPlaygroundPage() {
                     <div className="container" style={{}}>
                         <div className="item-0 shadow-soft rounded tile">
                             <TileTitle name="JQ Filter">
-                                <IoEaselOutline />
+                                <IoCode />
                             </TileTitle>
                             <div style={{ display: "flex" }}>
                                 <input style={{ flexGrow: 7 }} type="text" placeholder="Enter JQ Filter Command" value={jqFilter} onChange={(e) => setJQFilter(e.target.value)} />
@@ -210,7 +210,7 @@ export default function JQPlaygroundPage() {
                         <div className="container" style={{ flexDirection: "row"}}>
                             <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", flexBasis: 0, maxHeight: "380px", minWidth: "200px" }}>
                                 <TileTitle name={`How it Works`} >
-                                    <IoPencil />
+                                    <IoInformationCircleSharp />
                                 </TileTitle>
                                 <div className="jq-help">
                                     <p>JQ Playground is an envrioment where you can quickly test your jq commands against JSON.</p>
@@ -221,14 +221,14 @@ export default function JQPlaygroundPage() {
                                     <p>For information on the JQ syntax, please refer to the offical JQ manual online.</p>
                                 </div>
                                 <div style={{ display: "flex", width: "100%", justifyContent: "center"}}>
-                                    <div className="button jq-button" onClick={() => { console.log("load Example") }}>
+                                    <div className="button jq-button" onClick={() => { window.open("https://stedolan.github.io/jq/manual/", "_blank")} }>
                                         View JQ Manual
                                     </div>
                                 </div>
                             </div>
                             <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "3", flexBasis: 0 }}>
                                 <TileTitle name="Cheatsheet">
-                                    <IoChevronForwardOutline />
+                                    <IoInformationCircleSharp />
                                 </TileTitle>
                                 <div className="cheatsheet">
                                     <CheatSheetTable />
@@ -240,20 +240,4 @@ export default function JQPlaygroundPage() {
             </div>
         </>
     )
-    // return(
-    //     <>
-    //         <div className="container" style={{ flex: "auto", padding: "10px" }}>
-    //             <div className="container">
-    //                 <Breadcrumbs />
-    //             </div>
-    //             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }}>
-    //                 <div className="shadow-soft rounded tile" style={{ flex: "auto" }}>
-    //                     <p>
-    //                         World
-    //                     </p>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </>
-    // )
 }
