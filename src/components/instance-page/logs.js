@@ -94,10 +94,9 @@ export default function Logs(props) {
         } else {
             if(timer === null ) {
                 let timerz = setInterval(fetchLogs, 800)
-                setTimer(timerz)
-            
+                setTimer(timerz)            
             } else {
-                if (status === "complete" || status === "cancelled" || status === "crashed") {
+                if (status !== "pending") {
                     setTimeout(()=>{
                         clearInterval(timer)
                     },4000)

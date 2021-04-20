@@ -62,7 +62,7 @@ export default function ReactEditor(props) {
                     }}
                 />
             </div>
-            {showFooter != undefined && showFooter ? (<>
+            {showFooter !== undefined && showFooter ? (<>
                 <div id="test" className="editor-footer">
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">

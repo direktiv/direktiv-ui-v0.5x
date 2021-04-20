@@ -62,7 +62,7 @@ export default function InstancePage() {
         let timer = setInterval(()=>{
             fetchInstanceDetails()
         }, 2000)
-        if (instanceDetails.status === "complete" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed") {
+        if (instanceDetails.status !== "pending") {
             clearInterval(timer)
         }
         fetchInstanceDetails()    
