@@ -77,7 +77,7 @@ export default function Navbar(props) {
                 }
 
 
-                // history.push(`/${val}`)
+                history.push(`/${val}`)
             } else {
                 throw new Error(await resp.text())
             }
@@ -167,7 +167,7 @@ export default function Navbar(props) {
                                                 }
 
 
-                                                // history.push(`/${obj}`)
+                                                history.push(`/${obj}`)
                                             }}>{obj}</li>
                                         )
                                     }
@@ -205,7 +205,7 @@ export default function Navbar(props) {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/jq/" className="nav-link">
+                        <Link to="/jq/playground" className="nav-link">
                             <div>
                                 <IoExtensionPuzzle style={{ marginRight: "10px" }} />
                                 <span>jq Playground</span>

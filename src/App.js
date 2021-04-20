@@ -137,19 +137,18 @@ function AuthenticatedContent() {
         <Router>
           <div id="nav-panel">
             {namespaces === null ? ""
-:
-<Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
-  }
+            :
+            <Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
+            }
             </div>
           {namespace !== "" ? 
             <div id="main-panel">
               <Switch>
+                <Route exact path="/jq/playground" component={JQPlaygroundPage} />
+                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                 <Route exact path="/">
                   <Redirect to={`/${namespace}`} from="/" />
                 </Route>
-                <Route exact path="/jq/" component={JQPlaygroundPage} />
-                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
-
                 <Route exact path="/:namespace" component={DashboardPage} />
                 <Route exact path="/:namespace/w/" component={WorkflowsPage} />
                 <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
@@ -268,17 +267,16 @@ function Content() {
             <Switch>
             {namespace !== "" ? 
                  <>
-                <Route exact path="/">
-                  <Redirect to={`/${namespace}`} from="/" />
-                </Route>
-                <Route exact path="/jq/" component={JQPlaygroundPage} />
-                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
-
-                <Route exact path="/:namespace" component={DashboardPage} />
-                <Route exact path="/:namespace/w/" component={WorkflowsPage} />
-                <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
-                <Route exact path="/:namespace/i/" component={EventsPage} />
-                <Route exact path="/:namespace/s/" component={SettingsPage} />
+                  <Route exact path="/jq/playground" component={JQPlaygroundPage} />
+                  <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+                  <Route exact path="/">
+                    <Redirect to={`/${namespace}`} from="/" />
+                  </Route>
+                  <Route exact path="/:namespace" component={DashboardPage} />
+                  <Route exact path="/:namespace/w/" component={WorkflowsPage} />
+                  <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
+                  <Route exact path="/:namespace/i/" component={EventsPage} />
+                  <Route exact path="/:namespace/s/" component={SettingsPage} />
                 </>
                 :""}
             </Switch>
