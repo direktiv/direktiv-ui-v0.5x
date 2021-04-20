@@ -77,7 +77,7 @@ export default function Navbar(props) {
                 }
 
 
-                history.push(`/${val}`)
+                // history.push(`/${val}`)
             } else {
                 throw new Error(await resp.text())
             }
@@ -156,7 +156,7 @@ export default function Navbar(props) {
                                                 let matchInstance = matchPath(location.pathname, {
                                                     path: "/i/:namespace/:workflow/:instance"
                                                 })
-
+                                                
                                                 let matchInstanceN = matchPath(location.pathname, {
                                                     path: `/${namespace}/i`
                                                 })
@@ -167,7 +167,7 @@ export default function Navbar(props) {
                                                 }
 
 
-                                                history.push(`/${obj}`)
+                                                // history.push(`/${obj}`)
                                             }}>{obj}</li>
                                         )
                                     }

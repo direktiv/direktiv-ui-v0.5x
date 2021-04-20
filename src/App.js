@@ -47,7 +47,12 @@ function AuthenticatedContent() {
             if (load){
               // if being linked to it from someone
               if (window.location.pathname.split("/")[1] !== "") {
-                setNamespace(window.location.pathname.split("/")[1])
+                // handle instance page as namespace is listed elsewhere
+                if(window.location.pathname.split("/")[1] === "i"){
+                  setNamespace(window.location.pathname.split("/")[2])
+                } else {
+                  setNamespace(window.location.pathname.split("/")[1])
+                }
               } else {
                 if(localStorage.getItem("namespace") !== undefined) {
                     if(localStorage.getItem("namespace") === "") {
@@ -139,17 +144,17 @@ function AuthenticatedContent() {
           {namespace !== "" ? 
             <div id="main-panel">
               <Switch>
+                <Route exact path="/">
+                  <Redirect to={`/${namespace}`} from="/" />
+                </Route>
                 <Route exact path="/jq/" component={JQPlaygroundPage} />
+                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+
                 <Route exact path="/:namespace" component={DashboardPage} />
                 <Route exact path="/:namespace/w/" component={WorkflowsPage} />
                 <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
                 <Route exact path="/:namespace/i/" component={EventsPage} />
-                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                 <Route exact path="/:namespace/s/" component={SettingsPage} />
-                {/* refresh on same route */}
-                <Redirect exact from="/s/reload" to="/s/"/>
-                {/* redirect back to handle namespace */}
-                <Redirect to={`/${namespace}`} from="/" /> 
               </Switch>
             </div>
             :
@@ -182,10 +187,16 @@ function Content() {
         if (resp.ok) {
             let json = await resp.json()
             if (load){
+
               // if being linked to it from someone
               if (window.location.pathname.split("/")[1] !== "") {
-                setNamespace(window.location.pathname.split("/")[1])
-              } else {
+                // handle instance page as namespace is listed elsewhere
+                if(window.location.pathname.split("/")[1] === "i"){
+                  setNamespace(window.location.pathname.split("/")[2])
+                } else {
+                  setNamespace(window.location.pathname.split("/")[1])
+                }
+              }  else {
                 if(localStorage.getItem("namespace") !== undefined) {
                     if(localStorage.getItem("namespace") === "") {
                         setNamespace(json.namespaces[0].name)
@@ -257,17 +268,17 @@ function Content() {
             <Switch>
             {namespace !== "" ? 
                  <>
-                 <Route exact path="/jq/" component={JQPlaygroundPage} />
+                <Route exact path="/">
+                  <Redirect to={`/${namespace}`} from="/" />
+                </Route>
+                <Route exact path="/jq/" component={JQPlaygroundPage} />
+                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+
                 <Route exact path="/:namespace" component={DashboardPage} />
                 <Route exact path="/:namespace/w/" component={WorkflowsPage} />
                 <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
                 <Route exact path="/:namespace/i/" component={EventsPage} />
-                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                 <Route exact path="/:namespace/s/" component={SettingsPage} />
-                {/* refresh on same route */}
-                <Redirect exact from="/s/reload" to="/s/"/>
-                {/* redirect back to handle namespace */}
-                <Redirect to={`/${namespace}`} from="/" /> 
                 </>
                 :""}
             </Switch>
