@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect} from 'react'
 import AutoSizer from "react-virtualized-auto-sizer"
 import * as d3 from 'd3' 
 import { sankeyCircular, sankeyJustify } from 'd3-sankey-circular'
@@ -19,6 +19,9 @@ export default function Sankey(props) {
 
     const params = useParams()
 
+
+    useEffect(()=>{
+
     async function fetchMet() {
         try {
             let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics`, {
@@ -34,8 +37,6 @@ export default function Sankey(props) {
             sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
         }
     }
-
-    useEffect(()=>{
         async function gatherMetrics(){
             setLoad(true)
 
@@ -53,7 +54,7 @@ export default function Sankey(props) {
         var failure = 0
         var success = 0
         // Write the links
-        for(var i=0; i < states.length; i++) {
+        for(i=0; i < states.length; i++) {
             let outcomes = states[i].outcomes
             let source = states[i].name
             let invokers = states[i].invokers
@@ -103,7 +104,7 @@ export default function Sankey(props) {
         }
         gatherMetrics()
 
-    },[])
+    },[fetch, namespace, params.workflow])
     // useEffect(()=>{
     //     setLoad(true)
     //     let n = []
@@ -131,7 +132,6 @@ export default function Sankey(props) {
 function SankeyDiagram(props) {
 
     const {height, width, nodes, links} = props
-    console.log(props)
     const margin = { top: 30, right: 30, bottom: 30, left: 30}
 
     useEffect(()=>{
@@ -162,7 +162,6 @@ function SankeyDiagram(props) {
                     .attr("font-size", 10)
                     .selectAll("g");
 
-                    console.log(nodes, links)
         let sankeyData = sankey({nodes: nodes, links: links});
         let sankeyNodes = sankeyData.nodes;
         let sankeyLinks = sankeyData.links;
@@ -213,7 +212,7 @@ function SankeyDiagram(props) {
           .text(function(d) { return d.source.name + " → " + d.target.name + "\n" + d.value; });
     
 
-    },[height, width, nodes, links])
+    },[height, width, nodes, links, margin.bottom, margin.left, margin.right, margin.top])
 
     return <div id="sankey-graph" style={{height: height, width:width}}/>
 }

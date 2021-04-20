@@ -2,6 +2,7 @@ import YAML from 'js-yaml'
 import { useEffect, useState } from 'react'
 import ReactFlow, { MiniMap, isNode, Handle, ReactFlowProvider, useZoomPanHelper } from 'react-flow-renderer';
 import dagre from 'dagre'
+import { IoChevronForwardSharp } from 'react-icons/io5';
 
 export const position = { x: 0, y: 0}
 
@@ -161,14 +162,17 @@ const End = ( {data} ) => {
 
 const State = ( { data } ) => {
     return(
-        <div className="state">
+        <div title={`${data.label}-${data.type}`} className="state" style={{width:"80px", height:"30px"}}>
                <Handle
                     type="target"
                     position="left"
                     id="default"
                 />
-                    <h1>{data.label}</h1>
-                    <p>{data.type}</p>
+                <div style={{display:"flex", padding:"1px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
+                    <IoChevronForwardSharp/>
+                    {data.type}
+                </div>
+                <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.label}</h1>
                 <Handle
                     type="source"
                     position="right"
@@ -253,7 +257,7 @@ export default function Diagram(props) {
         let saveElements = generateElements(getLayoutedElements, value, flow, status)
 
         // Keep old elements until the yaml is parsable. Try and catch in func
-        if(elements !== null) {
+        if(saveElements !== null) {
             setElements(saveElements)
         }
     },[setElements, value, flow, status])

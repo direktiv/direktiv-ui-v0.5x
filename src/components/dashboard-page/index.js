@@ -2,9 +2,6 @@ import React from 'react'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
 
-import BarChartFill from 'react-bootstrap-icons/dist/icons/bar-chart-fill'
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import CodeSlash from 'react-bootstrap-icons/dist/icons/code-slash'
 import { IoBarChartSharp, IoCodeSlashOutline, IoList } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
 

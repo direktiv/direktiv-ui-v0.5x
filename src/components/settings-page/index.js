@@ -2,9 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import MainContext from '../../context'
-import ShieldLockFill from 'react-bootstrap-icons/dist/icons/shield-lock-fill'
-import CloudDownloadFill from 'react-bootstrap-icons/dist/icons/cloud-download-fill'
-import { PlusCircle, PlusCircleFill, XCircle, XCircleFill } from 'react-bootstrap-icons'
+import { PlusCircle, XCircle } from 'react-bootstrap-icons'
 import { useHistory } from 'react-router'
 import { IoLockOpen, IoLogoDocker } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
@@ -14,7 +12,6 @@ function SettingsAction(props) {
     const {namespace, fetch, namespaces, fetchNamespaces, setNamespace} = useContext(MainContext)
     const history = useHistory()
     const [show, setShow] = useState(false)
-    console.log(namespaces)
 
     async function deleteNamespace() {
         try {
@@ -24,12 +21,12 @@ function SettingsAction(props) {
             if (resp.ok) {
                 for(let i=0; i < namespaces.length; i++) {
                     if(namespaces[i] !== namespace) {
-                        console.log(namespaces[i], "ns-reload")
                         localStorage.setItem("namespace", namespaces[i])
                         setNamespace(namespaces[i])
-                        history.push("/s/reload")
+                        history.push(`/${namespaces[i]}/s/`)
 
                         await fetchNamespaces()
+                        setShow(false)
                         break                      
                     }
                 }
@@ -37,7 +34,7 @@ function SettingsAction(props) {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log(e, 'err deleting namespace')
+            sendNotification("Failed to delete namespace", e.message, 0)
         }
     }
 
@@ -54,7 +51,7 @@ function SettingsAction(props) {
                     show ? <>
                         <div class="dropdown-content-connector"></div>
                         <div class="dropdown-content">
-                            <a onClick={()=>{deleteNamespace()}}>Delete Namespace</a>
+                            <a href="#!" onClick={()=>{deleteNamespace()}}>Delete Namespace</a>
                         </div>
                     </>
                 :
@@ -118,11 +115,11 @@ function Secrets() {
             }
         }
         fetchData()
-    },[])
+    },[fetch, namespace])
 
     useEffect(()=>{
      fetchS()
-    },[])
+    },[fetchS] )
 
     async function createSecret() {
         try{
@@ -234,18 +231,18 @@ function Registries() {
                     let json = await resp.json()
                     setRegistries(json.registries)
                 } else {
-                    throw new Error(await resp. text())
+                    throw new Error(await resp.text())
                 }
             } catch(e) {
                 sendNotification("Failed to fetch registries", e.message, 0)
             }
         }
         fetchData()
-    },[])
+    },[fetch, namespace])
 
     useEffect(()=>{
         fetchR()
-    },[])
+    },[fetchR])
 
     async function createRegistry() {
         try {
@@ -279,7 +276,7 @@ function Registries() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log('delete registry', e)
+            sendNotification("Failed to delete registry", e.message, 0)
         }
     }
 

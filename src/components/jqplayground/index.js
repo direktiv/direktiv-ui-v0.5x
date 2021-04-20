@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react'
+import React, { useContext, useState, useCallback } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "../workflow-page/editor"
 import MainContext from '../../context'
@@ -6,10 +6,9 @@ import MainContext from '../../context'
 
 
 import TileTitle from '../tile-title'
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline, IoPlaySharp, IoChevronForwardOutline } from 'react-icons/io5'
+import { IoEaselOutline,  IoPencil, IoChevronForwardOutline } from 'react-icons/io5'
 
 import { sendNotification } from '../notifications/index.js'
-import { ArrowLeft } from 'react-bootstrap-icons'
 
 const cheatSheetMap = [
     {
@@ -126,11 +125,11 @@ export default function JQPlaygroundPage() {
                     setJQOutput(jqOut)
                 }
             } catch (e) {
-                sendNotification(`Invalid JQ Command ${e}`, 0)
+                sendNotification(`Invalid JQ Command`, e.message, 0)
             }
         }
         execJQ().finally(() => { setFetching(false) })
-    }, [fetching])
+    }, [fetching, fetch])
 
 
 

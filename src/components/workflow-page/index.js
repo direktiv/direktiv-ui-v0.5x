@@ -5,21 +5,15 @@ import Diagram from './diagram'
 
 
 import TileTitle from '../tile-title'
-import PencilSquare from 'react-bootstrap-icons/dist/icons/pencil-square'
-import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
-
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
-import PieChart, {MockData, NuePieLegend} from '../charts/pie'
+import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 import Sankey from './sankey'
-
+import * as dayjs from "dayjs"
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
@@ -68,7 +62,7 @@ export default function WorkflowPage() {
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
-    },[namespace])
+    },[namespace, fetch, params.workflow])
 
     const updateWorkflow = useCallback(()=>{
         console.log("workflowInfo.fetching =", workflowInfo.fetching)
@@ -76,8 +70,6 @@ export default function WorkflowPage() {
             return // TODO - User Feedback
         }
         setFetching(true)
-
-        console.log("workflowValue =", workflowValue)
 
         async function updateWf() {
             try {
@@ -107,20 +99,19 @@ export default function WorkflowPage() {
             }
             return
         }
-        console.log("test1")
-        updateWf().finally(()=>{
-            console.log("test2")
-            setFetching(false)
-        })
-    },[namespace, workflowValue, workflowInfo.fetching])
+        updateWf().finally(()=>{setFetching(false)})
+    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.uid])
 
     useEffect(()=>{
-        fetchWorkflow()
-    },[namespace])
+        if (workflowValue === ""){
+            console.log('hello')
+            fetchWorkflow()
+        }
+    },[fetchWorkflow, workflowValue])
 
-    useEffect(()=>{
-        console.log("Workflow page has mounted")
-    },[])
+    // useEffect(()=>{
+    //     console.log("Workflow page has mounted")
+    // },[])
 
     let saveButton = (
         <div style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", color: `${workflowValueOld !== workflowValue ? "#2fa64d" : "white"}` }} onClick={() => { updateWorkflow() }}>
@@ -187,8 +178,6 @@ export default function WorkflowPage() {
     }
 
     const Actions = [logButton, saveButton]
-
-    console.log(workflowInfo)
 
     return(
         <>
@@ -276,12 +265,12 @@ export default function WorkflowPage() {
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
-                        <TileTitle name="Events">
+                        <TileTitle name="Instances">
                             <IoList />
                         </TileTitle>
                         <div style={{ maxHeight: "80%", overflowY: "auto"}}>
                             <div id="events-tile" className="tile-contents">
-                                <EventsList />
+                                <EventsList/>
                             </div>
                         </div>
                     </div>
@@ -295,7 +284,7 @@ export default function WorkflowPage() {
 function PieComponent() {
     const {fetch, namespace} = useContext(MainContext)
     const params = useParams()
-    const [metrics, setMetrics] = useState([])
+    const [metrics, setMetrics] = useState(null)
 
     useEffect(()=>{
         async function fetchMet() {
@@ -305,7 +294,6 @@ function PieComponent() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    console.log(json, json.totalInstancesRun - json.successfulExecutions)
                     let met = [
                         {
                             title: "Completed",
@@ -324,58 +312,66 @@ function PieComponent() {
                 sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
             }
         }
-        fetchMet()
-    },[])
+        if(metrics === null) {
+            fetchMet()
+        }
+    },[fetch, namespace, params.workflow, metrics])
 
+    if (metrics === null) {
+        return ""
+    }
+    
     return(
         <PieChart lineWidth={40} data={metrics} />
     )
 }
 
-function EventsList() {
+function EventsList(props) {
+    const {fetch, namespace} = useContext(MainContext)
+    const params = useParams()
+    const history = useHistory()
+    const [instances, setInstances] = useState(null)
 
-    let lines = [
-        "example message 1",
-        "lorem ipsum",
-        "nu fone hu dis"
-    ];
-
-    let listItems = [];
-    for (let i = 0; i < lines.length; i++) {
-
-        let colorClass = "failed";
-        let z = i % 3;
-        switch (z) {
-            case 0:
-                colorClass = "failed";
-                break;
-            case 1:
-                colorClass = "pending";
-                break;
-            case 2:
-                colorClass = "success";
-                break;
+    useEffect(()=>{
+        async function fetchd() {
+            try{
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/instances/`)
+                if (resp.ok) {
+                    let json = await resp.json()
+                    setInstances(json.workflowInstances)
+                } else {
+                    throw new Error(await resp.text())
+                }
+            }catch(e){
+                sendNotification("Unable to fetch workflow instances", e.message, 0)
+            }
         }
-
-        listItems.push(
-            <li className="event-list-item">
-                <div>
-                    <span><CircleFill className={colorClass} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                    <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
-                        10m ago
-                    </span>
-                    <span>    
-                        {lines[i]}
-                    </span>
-                </div>
-            </li>
-        )
-    }
+        if(instances === null){
+            fetchd()
+        }
+    },[fetch, namespace, params.workflow, instances])    
 
     return(
         <div>
             <ul style={{ margin: "0px" }}>
-                {listItems}
+                {instances !== null ?
+                <>
+                {instances.map((obj)=>{
+                    return(
+                        <li style={{cursor:"pointer"}} onClick={()=>history.push(`/i/${obj.id}`)} className="event-list-item">
+                        <div>
+                            <span><CircleFill className={obj.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                            <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
+                                {dayjs.unix(obj.beginTime.seconds).fromNow()}
+                            </span>
+                            <span>    
+                                {obj.id}
+                            </span>
+                        </div>
+                    </li>
+                    )
+                })}
+</>:""}
             </ul>
         </div>
     )
@@ -399,23 +395,23 @@ function WorkflowActions(props) {
                         <div class="dropdown-content-connector"></div>
                         <div class="dropdown-content">
                             {active ? 
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 toggleWorkflow()
                                 setShow(!show)
                             }}>Disable</a>
                             :
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 toggleWorkflow()
                                 setShow(!show)
                             }}>Enable</a>
                             }
                             {viewSankey ?
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 setViewSankey(!viewSankey)
                                 setShow(!show)
                             }}>Show Diagram</a>
                             :
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 setViewSankey(!viewSankey)
                                 setShow(!show)
                             }}>Show Sankey</a>

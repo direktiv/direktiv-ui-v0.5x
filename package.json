@@ -34,8 +34,8 @@
     "yaml": "^1.10.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start-with-auth": "REACT_APP_API=http://192.168.1.30:32112/api REACT_APP_KEYCLOAK_URL=https://192.168.1.30:32111 react-scripts start",
+    "start": "REACT_APP_API=http://192.168.1.30:8080/api react-scripts start",
+    "start-with-auth": "REACT_APP_API=http://192.168.1.30:8080/api REACT_APP_KEYCLOAK_URL=https://192.168.1.30:32111 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -6,7 +6,6 @@ import './style.css'
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
@@ -46,7 +45,7 @@ export function EventsPageBody() {
         async function fetchI() {
             try{
                 // fetch instances list
-                let resp = await fetch(`/instances/${namespace}`, {
+                let resp = await fetch(`/instances/${namespace}?limit=100`, {
                     method: "GET"
                 })
                 if(resp.ok) {
@@ -60,7 +59,7 @@ export function EventsPageBody() {
             }
         }
         fetchI()
-    },[])
+    },[namespace, fetch])
 
     return(
         <div id="events-table">
@@ -81,7 +80,7 @@ export function EventsPageBody() {
                                 <>
                                     <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
-                                        <td>{obj.id}</td>
+                                        <td style={{textAlign:"left"}}>{obj.id}</td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
                                         {/* <td></td> */}
                                     </tr>

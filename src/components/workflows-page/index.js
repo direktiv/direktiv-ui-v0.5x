@@ -6,16 +6,22 @@ import { useDropzone } from 'react-dropzone'
 import YAML from "js-yaml"
 import YAMLtoString from "yaml"
 
-import PlusCircleFill from 'react-bootstrap-icons/dist/icons/plus-circle-fill'
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import { FileCode, ToggleOff, ToggleOn, XCircle } from 'react-bootstrap-icons'
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
-import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoTrashOutline } from 'react-icons/io5'
+import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash} from 'react-icons/io5'
 import { sendNotification } from '../notifications'
+
+
+const noopState = `id: noop
+description: ""
+states:
+    - id: helloworld
+      type: noop
+      transform: '{ result: "Hello world!" }'
+`
 
 export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
@@ -40,7 +46,7 @@ export default function WorkflowsPage() {
             }
         }
         fetchWfs()
-    },[namespace])
+    },[namespace, fetch])
 
     const deleteWorkflow = async (id) => {
         try {
@@ -72,7 +78,7 @@ export default function WorkflowsPage() {
 
     useEffect(()=>{
         fetchWorkflows()
-    },[namespace])
+    },[fetchWorkflows])
 
     return (
         <>
@@ -92,31 +98,40 @@ export default function WorkflowsPage() {
                             <tbody>
                                 {workflows.map((obj)=>{
                                     return(
-                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/w/${obj.id}`)}>
+                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
                                             <td style={{textAlign:"left", paddingLeft:"5px"}}>
                                                 <b>{obj.id}</b>
                                             </td>
                                             {obj.description === "" ?
-                                                <td style={{textAlign:"left", paddingLeft:"5px"}}>No description has been provided.</td>
+                                                <td style={{textAlign:"left", paddingLeft:"5px", maxWidth:"300px", textOverflow:"ellipsis", overflow:"hidden"}}>No description has been provided.</td>
                                                 :
-                                                <td style={{textAlign:"left", paddingLeft:"5px"}}>{obj.description}</td>
+                                                <td title={obj.description} style={{textAlign:"left", paddingLeft:"5px", maxWidth:"300px", textOverflow:"ellipsis", overflow:"hidden"}}>{obj.description}</td>
                                             }
-                                            <td onClick={(ev)=>ev.stopPropagation()} style={{paddingLeft:"5px"}}>
+                                            <td  style={{paddingLeft:"5px"}}>
                                                 <div className="actions-button-div">
                                                     {obj.active ?
-                                                        <div className="button circle success" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                        <div className="button circle success" onClick={(ev)=>{
+                                                            toggleWorkflow(obj.uid)
+                                                            ev.stopPropagation()
+                                                        }}>
                                                             <span>
                                                                 <IoToggle />
                                                             </span>
                                                         </div>
                                                         :
-                                                        <div className="button circle" onClick={()=>toggleWorkflow(obj.uid)}>
+                                                        <div className="button circle" onClick={(ev)=>{
+                                                            toggleWorkflow(obj.uid)
+                                                            ev.stopPropagation()
+                                                        }}>
                                                             <span>
                                                                 <IoToggleOutline style={{ rotate: "180deg" }} />
                                                             </span>
                                                         </div>
                                                     }
-                                                    <div className="button circle danger" onClick={()=>deleteWorkflow(obj.uid)}>
+                                                    <div className="button circle danger" onClick={(ev)=>{
+                                                        deleteWorkflow(obj.uid)
+                                                        ev.stopPropagation()
+}}>
                                                         <span>
                                                             <IoTrash />
                                                         </span>
@@ -196,7 +211,7 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
                 setFiles([])
             }
             setErr("")
-            history.push(`/w/${json.id}`)
+            history.push(`/${namespace}/w/${json.id}`)
         } else {
             throw new Error(await resp.text())
         }
@@ -226,7 +241,7 @@ function APIInteractionTile() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log('send event', e)
+            sendNotification("Failed to send cloud event", e.message, 0)
         }
     }
 
@@ -279,34 +294,37 @@ function NewWorkflowForm() {
     const [templateData, setTemplateData] = useState("")
     const [err, setErr] = useState("")
 
-    async function fetchTempData(temp, setData) {
-        try {
-            let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
-                method: "POST",
-                body: JSON.stringify({id: temp})
-            })
-            if(resp.ok) {
-                let text = await resp.text()
-                setData(text)       
-            } else {
-                throw new Error(await resp.text())
+    const fetchTempData = useCallback((temp, setData) => {
+        async function fetchd() {
+            try {
+                let resp = await fetch(`/workflow-templates/default/${temp}`, {
+                    method: "GET"
+                })
+                if(resp.ok) {
+                    let text = await resp.text()
+                    setData(text)       
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                sendNotification("Failed to fetch template data", e.message, 0)
             }
-        } catch(e) {
-            sendNotification("Failed to fetch template data", e.message, 0)
         }
-    }
+        fetchd()
+    },[fetch])
 
     const fetchTemps = useCallback((load)=>{
         async function fetchTemplates(){
             try {
-                let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
+                let resp = await fetch(`/workflow-templates/default/`, {
                     method: "GET"
                 })
                 if(resp.ok) {
                     let json = await resp.json()
                     if(load){
                         setTemplate("noop")
-                        fetchTempData("noop", setTemplateData)
+                        setTemplateData(noopState)
+                        // fetchTempData("noop", setTemplateData)
                         setTemplates(json)
                     }
                 } else {
@@ -317,11 +335,11 @@ function NewWorkflowForm() {
             }
         }
         fetchTemplates()
-    },[])
+    },[fetch])
 
     useEffect(()=>{
         fetchTemps(true)
-    },[])
+    },[fetchTemps])
 
     return(
         <div style={{ fontSize: "12pt" }}>
@@ -344,6 +362,7 @@ function NewWorkflowForm() {
                                 setTemplate(e.target.value)
                                 fetchTempData(e.target.value, setTemplateData)
                             }}>
+                                <option key="noop">noop</option>
                                 {
                                     templates.map((obj) => <option key={obj} value={obj}>{obj}</option>)
                                 }
@@ -360,8 +379,8 @@ function NewWorkflowForm() {
                     </span>
                 </div>
                 <div style={{ marginTop: "10px", backgroundColor: "#252525", borderRadius: "4px", padding: "10px" }}>
-                    <code style={{ textAlign: "left", maxWidth:"300px" }}>
-                       <pre style={{maxWidth:"300px", minWidth:"300px"}}>
+                    <code style={{ textAlign: "left", maxWidth:"400px" }}>
+                       <pre style={{maxWidth:"400px", minWidth:"400px"}}>
                            {templateData}
                        </pre>
                     </code>
@@ -389,7 +408,7 @@ function Basic(props) {
     const onDrop = useCallback(async(f) => {
         setData(await readFile(f[0]))
         setFiles(f)
-    },[])
+    },[setData, setFiles])
 
     const {getRootProps, getInputProps} = useDropzone({onDrop});
     

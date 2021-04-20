@@ -1,18 +1,22 @@
 import React from 'react'
-import { useHistory } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import useBreadcrumbs from 'use-react-router-breadcrumbs'
 
 const routes = [
     {
-        path: '/w',
+        path: '/:namespace',
+        breadcrumb: "",
+    },
+    {
+        path: '/:namespace/w',
         breadcrumb: 'Workflows'
     },
     {
-        path: '/i',
+        path: '/:namespace/i',
         breadcrumb: 'Instances'
     },
     {
-        path: '/s',
+        path: '/:namespace/s',
         breadcrumb: 'Settings'
     }
 ]
@@ -22,10 +26,15 @@ export default function Breadcrumbs(props) {
     
     const breadcrumbs = useBreadcrumbs(routes)
     const history = useHistory()
+    const params = useParams()
 
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
+                // if namespace exists dont show it
+                if(obj.key === `/${params.namespace}`) {
+                    return ""
+                }
                 // if no instance id use custom breadcrumbs
                 if (!instanceId) {
                     if(obj.key !== "/") {
@@ -40,10 +49,11 @@ export default function Breadcrumbs(props) {
                         )
                     }
                 }
+                return ""
             })}
             {instanceId ?
                 <>
-                    <span key={"/i"} onClick={()=>history.push("/i")}>Instances</span>
+                    <span key={"/i"} onClick={()=>history.push(`/${params.namespace}/i`)}>Instances</span>
                     <span key={`/i${instanceId}`} onClick={()=>history.push(`/i/${instanceId}`)}>{instanceId}</span>        
                 </>
             :

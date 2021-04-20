@@ -2,9 +2,6 @@ import React, { useContext, useEffect, useState, useCallback } from 'react'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
 
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
-import Braces from 'react-bootstrap-icons/dist/icons/braces'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import { Link, useParams } from 'react-router-dom'
@@ -43,7 +40,7 @@ export default function InstancePage() {
             }
         }
         fetchWorkflow()
-    },[])
+    },[fetch, params.namespace, params.workflow])
 
     useEffect(()=>{
         async function fetchInstanceDetails() {
@@ -58,7 +55,7 @@ export default function InstancePage() {
                     throw new Error(await resp.text())
                 }
             } catch(e) {
-                console.log(e, 'err test')
+                sendNotification("Fetch Instance details failed ", e.message, 0)
             }
 
         }
@@ -74,9 +71,8 @@ export default function InstancePage() {
         return function cleanup() {
             clearInterval(timer)
         }
-    },[instanceId])
+    },[instanceId, fetch, fetchWf, instanceDetails.status])
 
-    console.log(instanceDetails.status)
     
     return(
         <>
@@ -88,7 +84,7 @@ export default function InstancePage() {
                     </div>
                     <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ alignItems: "center" }}>
-                            <Link className="dashboard-btn" to={`/w/${params.workflow}`}>
+                            <Link className="dashboard-btn" to={`/${params.namespace}/w/${params.workflow}`}>
                                 View Workflow
                             </Link>
                         </div>
