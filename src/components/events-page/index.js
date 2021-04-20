@@ -46,7 +46,7 @@ export function EventsPageBody() {
         async function fetchI() {
             try{
                 // fetch instances list
-                let resp = await fetch(`/instances/${namespace}`, {
+                let resp = await fetch(`/instances/${namespace}?limit=100`, {
                     method: "GET"
                 })
                 if(resp.ok) {
