@@ -80,7 +80,7 @@ export function EventsPageBody() {
                                 <>
                                     <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
-                                        <td>{obj.id}</td>
+                                        <td style={{textAlign:"left"}}>{obj.id}</td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
                                         {/* <td></td> */}
                                     </tr>

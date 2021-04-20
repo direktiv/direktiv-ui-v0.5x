@@ -6,7 +6,6 @@ import Diagram from './diagram'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-
 import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
@@ -14,7 +13,7 @@ import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 import Sankey from './sankey'
-
+import * as dayjs from "dayjs"
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
@@ -250,12 +249,12 @@ export default function WorkflowPage() {
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
-                        <TileTitle name="Events">
+                        <TileTitle name="Instances">
                             <IoList />
                         </TileTitle>
                         <div style={{ maxHeight: "80%", overflowY: "auto"}}>
                             <div id="events-tile" className="tile-contents">
-                                <EventsList />
+                                <EventsList/>
                             </div>
                         </div>
                     </div>
@@ -311,52 +310,52 @@ function PieComponent() {
     )
 }
 
-function EventsList() {
+function EventsList(props) {
+    const {fetch, namespace} = useContext(MainContext)
+    const params = useParams()
+    const history = useHistory()
+    const [instances, setInstances] = useState(null)
 
-    let lines = [
-        "example message 1",
-        "lorem ipsum",
-        "nu fone hu dis"
-    ];
-
-    let listItems = [];
-    for (let i = 0; i < lines.length; i++) {
-
-        let colorClass = "failed";
-        let z = i % 3;
-        switch (z) {
-            case 0:
-                colorClass = "failed";
-                break;
-            case 1:
-                colorClass = "pending";
-                break;
-            case 2:
-                colorClass = "success";
-                break;
-            default:
-                colorClass = "pending";
+    useEffect(()=>{
+        async function fetchd() {
+            try{
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/instances/`)
+                if (resp.ok) {
+                    let json = await resp.json()
+                    setInstances(json.workflowInstances)
+                } else {
+                    throw new Error(await resp.text())
+                }
+            }catch(e){
+                sendNotification("Unable to fetch workflow instances", e.message, 0)
+            }
         }
-
-        listItems.push(
-            <li className="event-list-item">
-                <div>
-                    <span><CircleFill className={colorClass} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                    <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
-                        10m ago
-                    </span>
-                    <span>    
-                        {lines[i]}
-                    </span>
-                </div>
-            </li>
-        )
-    }
+        if(instances === null){
+            fetchd()
+        }
+    },[fetch, namespace, params.workflow, instances])    
 
     return(
         <div>
             <ul style={{ margin: "0px" }}>
-                {listItems}
+                {instances !== null ?
+                <>
+                {instances.map((obj)=>{
+                    return(
+                        <li style={{cursor:"pointer"}} onClick={()=>history.push(`/i/${obj.id}`)} className="event-list-item">
+                        <div>
+                            <span><CircleFill className={obj.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                            <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
+                                {dayjs.unix(obj.beginTime.seconds).fromNow()}
+                            </span>
+                            <span>    
+                                {obj.id}
+                            </span>
+                        </div>
+                    </li>
+                    )
+                })}
+</>:""}
             </ul>
         </div>
     )

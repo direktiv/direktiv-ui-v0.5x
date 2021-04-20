@@ -162,7 +162,7 @@ const End = ( {data} ) => {
 
 const State = ( { data } ) => {
     return(
-        <div title={`${data.label}-${data.type}`} className="state">
+        <div title={`${data.label}-${data.type}`} className="state" style={{width:"80px", height:"30px"}}>
                <Handle
                     type="target"
                     position="left"
