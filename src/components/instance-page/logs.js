@@ -85,7 +85,9 @@ export default function Logs(props) {
         }
 
         if (status === "complete" || status === "cancelled" || status === "crashed") {
-            clearInterval(timer)
+            setTimeout(()=>{
+                clearInterval(timer)
+            },4000)
         } else {
             return fetchl()
         }
