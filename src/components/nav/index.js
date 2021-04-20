@@ -27,7 +27,7 @@ export default function Navbar(props) {
     const [acceptInput, setAcceptInput] = useState(false)
 
     const {fetch, namespace, setNamespace, namespaces, fetchNamespaces} = useContext(MainContext)
-
+console.log(namespaces)
     const {auth, name, email, logout} = props
 
     let gravatarHash = ""
@@ -134,6 +134,7 @@ export default function Navbar(props) {
                                     </div>
                                 </li>
                                 {namespaces.map((obj, i)=>{
+                                    console.log(obj)
                                     if(obj !== namespace){
                                         return(
                                             <li key={i} onClick={()=>{
