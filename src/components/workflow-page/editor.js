@@ -63,9 +63,7 @@ export default function ReactEditor(props) {
                 />
             </div>
             {showFooter != undefined && showFooter ? (<>
-                <div style={{ minHeight: `10%` }}>
-                </div>
-                <div id="test" className="editor-footer" style={{ display: "flex", flexDirection: "column" }}>
+                <div id="test" className="editor-footer">
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">
                         {actions !== undefined ? (
@@ -80,7 +78,8 @@ export default function ReactEditor(props) {
                             })
                         ) : (<></>)}
                     </div>
-                </div></>) : (<></>)}
+                </div>
+                </>) : (<></>)}
 
         </div>
     )

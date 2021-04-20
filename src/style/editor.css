@@ -1,11 +1,3 @@
-/* .monaco-editor, .monaco-editor-background, .monaco-editor .inputarea.ime-input{
-    background-color: var(--primary-light) !important;
-}
-
-.monaco-editor .margin {
-   background-color: var(--primary-light) !important;
-} */
-
 .CodeMirror {
     text-align: left !important;
     font-size: 16px !important;
@@ -13,7 +5,7 @@
     height: 100% !important;
     max-height:100% !important;
      color: #555555;
-     border: 1px solid #ccc;
+     /* border: 1px solid #ccc; */
      /* -webkit-border-radius: 3px; */
      /* -moz-border-radius: 3px; */
      /* border-radius: 8px; */
@@ -59,21 +51,22 @@
 
 .editor-footer-buffer {
     flex-grow: 2;
+    flex-basis: 0;
     z-index: 10;
     box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.5);
 }
 
 .editor-footer {
-    border-color: rgba(82, 168, 236, 0.5);
-    border: 1px solid rgb(247, 240, 240);
-    box-sizing:border-box;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
     position: absolute;
+    bottom: 0;
+    height: 10%;
     bottom: 0pt;
     width: 100%;
-    height: var(--editor-footer-height);
     border-top: 0px solid !important;
 }
 
@@ -99,7 +92,6 @@
     display: flex;
     width: 100%;
     border: 1px solid #ccc;
-    box-sizing:border-box;
     flex-direction: column;
     border-radius: 8px;
     overflow: hidden;
