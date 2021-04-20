@@ -100,7 +100,6 @@ function AuthenticatedContent() {
     return ""
   }
 
-
   function getJWT() {
     return keycloak.idToken
   }
@@ -116,8 +115,6 @@ function AuthenticatedContent() {
   function logout() {
     keycloak.logout()
   }
-
-  
 
   return(
     <MainContext.Provider value={{
