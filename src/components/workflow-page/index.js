@@ -319,7 +319,9 @@ function EventsList(props) {
     useEffect(()=>{
         async function fetchd() {
             try{
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/instances/`)
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/instances/`, {
+                    method: "GET"
+                })
                 if (resp.ok) {
                     let json = await resp.json()
                     setInstances(json.workflowInstances)
