@@ -70,18 +70,29 @@
     border-top: 0px solid !important;
 }
 
-.editor-footer-button {
+.editor-footer-button-disabled {
     font-size: 12pt;
-    color: rgb(255, 255, 255);
+    color: rgb(120, 120, 120);
     background-color: #303030;
-    cursor: pointer;
-    /* padding: 0 10px 0 10px; */
+    cursor: default;
     height: 100%;
     border-left: 1px solid #6c6c6c;
     display: flex;
     align-items: center;
     box-shadow: -1px 0px 3px 0px rgba(0, 0, 0, 0.301);
-}
+} 
+
+.editor-footer-button {
+    font-size: 12pt;
+    color: rgb(255, 255, 255);
+    background-color: #303030;
+    cursor: pointer;
+    height: 100%;
+    border-left: 1px solid #6c6c6c;
+    display: flex;
+    align-items: center;
+    box-shadow: -1px 0px 3px 0px rgba(0, 0, 0, 0.301);
+} 
 
 .editor-footer-button:hover {
     background-color: #16161669;
