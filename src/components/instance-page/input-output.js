@@ -32,7 +32,7 @@ export default function InputOutput(props) {
         )
     }
 
-    if (status === "cancelled" || status === "crashed") {
+    if (status !== "pending") {
         return(
             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
             <div style={{width: "100%", height: "100%", position: "relative"}}>
