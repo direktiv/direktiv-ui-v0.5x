@@ -17,7 +17,8 @@ function ReactSyntaxHighlighter(props) {
 }
 
 export default function InputOutput(props) {
-    const {data} = props
+    const {data, status} = props
+
 
     if (data !== undefined && data !== "") {
         return(
@@ -29,6 +30,19 @@ export default function InputOutput(props) {
                 </div>
             </div>
         )
+    }
+
+    if (status === "cancelled" || status === "crashed") {
+        return(
+            <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
+            <div style={{width: "100%", height: "100%", position: "relative"}}>
+                <div style={{borderRadius:"8px", padding:"5px", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+                    Unable to fetch output workflow was cancelled or has crased.
+                </div>
+            </div>
+        </div>
+        )
+ 
     }
 
     return(

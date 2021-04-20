@@ -98,7 +98,6 @@ export default function WorkflowPage() {
 
     useEffect(()=>{
         if (workflowValue === ""){
-            console.log('hello')
             fetchWorkflow()
         }
     },[fetchWorkflow, workflowValue])
