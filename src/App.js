@@ -176,12 +176,11 @@ function Content() {
 
 
 function App() {
-
   return (
     <div className="App">
       <header className="App-header">
         <div id="master">
-          {process.env.REACT_APP_KEYCLOAK_URL !== undefined ? 
+          {process.env.REACT_APP_KEYCLOAK_URL !== undefined || window.__PUBLIC_KEYCLOAK_URL__ !== "KEYCLOAK-URL" ? 
             <ReactKeycloakProvider initOptions={{onLoad: "login-required", checkLoginIframe: false}}  authClient={keycloak}>
               <AuthenticatedContent/> 
             </ReactKeycloakProvider> 
