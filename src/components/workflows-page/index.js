@@ -14,6 +14,16 @@ import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash} from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 
+
+const noopState = `
+id: noop
+description: ""
+states:
+    - id: helloworld
+      type: noop
+      transform: '{ result: "Hello world!" }'
+`
+
 export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
     const history = useHistory()
@@ -314,7 +324,8 @@ function NewWorkflowForm() {
                     let json = await resp.json()
                     if(load){
                         setTemplate("noop")
-                        fetchTempData("noop", setTemplateData)
+                        setTemplateData(noopState)
+                        // fetchTempData("noop", setTemplateData)
                         setTemplates(json)
                     }
                 } else {
@@ -352,6 +363,7 @@ function NewWorkflowForm() {
                                 setTemplate(e.target.value)
                                 fetchTempData(e.target.value, setTemplateData)
                             }}>
+                                <option key="noop">noop</option>
                                 {
                                     templates.map((obj) => <option key={obj} value={obj}>{obj}</option>)
                                 }
