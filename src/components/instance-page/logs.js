@@ -83,16 +83,9 @@ export default function Logs(props) {
                 sendNotification("Failed to fetch logs", e.message, 0)
             }
         }
-
-        if (status === "complete" || status === "cancelled" || status === "crashed") {
-            setTimeout(()=>{
-                clearInterval(timer)
-            },4000)
-        } else {
             return fetchl()
-        }
 
-    }, [instanceId, fetch, scrolled, logs, logsOffset, limit, status, timer])
+    }, [instanceId, fetch, scrolled, logs, logsOffset, limit,])
 
     useEffect(() => {
         if (!init) {
@@ -100,16 +93,19 @@ export default function Logs(props) {
             setInit(true)
         } else {
             if(timer === null ) {
-                let timer = setInterval(fetchLogs, 800)
-                setTimer(timer)
-                return function cleanup() {
-                    clearInterval(timer)
+                let timerz = setInterval(fetchLogs, 800)
+                setTimer(timerz)
+            
+            } else {
+                if (status === "complete" || status === "cancelled" || status === "crashed") {
+                    setTimeout(()=>{
+                        clearInterval(timer)
+                    },4000)
+                    return
                 }
             }
-  
         }
-
-    }, [fetchLogs, init, timer])
+    }, [fetchLogs, init, timer, status])
 
     useEffect(() => {
         let scrollableElement = document.getElementById('logs')
