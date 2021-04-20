@@ -126,7 +126,7 @@ export default function JQPlaygroundPage() {
                     setJQOutput(jqOut)
                 }
             } catch (e) {
-                sendNotification(`Invalid JQ Command ${e}`, 0)
+                sendNotification(`Invalid JQ Command`, e.message, 0)
             }
         }
         execJQ().finally(() => { setFetching(false) })
