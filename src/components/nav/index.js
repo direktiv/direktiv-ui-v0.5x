@@ -55,22 +55,32 @@ export default function Navbar(props) {
                 localStorage.setItem("namespace", val)
                 setAcceptInput(!acceptInput)
                 toggleNamespaceSelector()
-
                 let matchWf = matchPath(location.pathname, {
                     path: `/${namespace}/w/:workflow`
                 })
 
-                if(matchWf !== null) {
-                    history.push(`/${namespace}/w`)
+                let matchNWF = matchPath(location.pathname, {
+                    path: `/${namespace}/w`
+                })
+
+                if(matchWf !== null || matchNWF !== null) {
+                    history.push(`/${val}/w`)
+                    return
                 }
 
                 let matchInstance = matchPath(location.pathname, {
                     path: "/i/:namespace/:workflow/:instance"
                 })
 
-                if(matchInstance !== null) {
-                    history.push(`/${namespace}/i`)
+                let matchInstanceN = matchPath(location.pathname, {
+                    path: `/${namespace}/i`
+                })
+
+                if(matchInstance !== null || matchInstanceN !== null) {
+                    history.push(`/${val}/i`)
+                    return
                 }
+
 
                 history.push(`/${val}`)
             } else {
@@ -143,8 +153,12 @@ export default function Navbar(props) {
                                                     path: `/${namespace}/w/:workflow`
                                                 })
 
-                                                if(matchWf !== null) {
-                                                    history.push(`/${namespace}/w`)
+                                                let matchNWF = matchPath(location.pathname, {
+                                                    path: `/${namespace}/w`
+                                                })
+
+                                                if(matchWf !== null || matchNWF !== null) {
+                                                    history.push(`/${obj}/w`)
                                                     return
                                                 }
 
@@ -152,8 +166,12 @@ export default function Navbar(props) {
                                                     path: "/i/:namespace/:workflow/:instance"
                                                 })
 
-                                                if(matchInstance !== null) {
-                                                    history.push(`/${namespace}/i`)
+                                                let matchInstanceN = matchPath(location.pathname, {
+                                                    path: `/${namespace}/i`
+                                                })
+
+                                                if(matchInstance !== null || matchInstanceN !== null) {
+                                                    history.push(`/${obj}/i`)
                                                     return
                                                 }
 
