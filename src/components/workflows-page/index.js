@@ -288,8 +288,8 @@ function NewWorkflowForm() {
     const fetchTempData = useCallback((temp, setData) => {
         async function fetchd() {
             try {
-                let resp = await fetch(`/workflow-templates/${temp}`, {
-                    method: "POST"
+                let resp = await fetch(`/workflow-templates/default/${temp}`, {
+                    method: "GET"
                 })
                 if(resp.ok) {
                     let text = await resp.text()
@@ -307,7 +307,7 @@ function NewWorkflowForm() {
     const fetchTemps = useCallback((load)=>{
         async function fetchTemplates(){
             try {
-                let resp = await fetch(`/workflow-templates/`, {
+                let resp = await fetch(`/workflow-templates/default/`, {
                     method: "GET"
                 })
                 if(resp.ok) {
