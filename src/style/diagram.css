@@ -47,7 +47,9 @@
 
 .state h1 {
     margin: 0;
-    font-size: 16px;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .state p {
