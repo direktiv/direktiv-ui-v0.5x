@@ -13,6 +13,7 @@ import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash} from 'react-icons/io5'
 import { sendNotification } from '../notifications'
+import NoResults from '../../noresults'
 
 
 const noopState = `id: noop
@@ -94,11 +95,12 @@ export default function WorkflowsPage() {
                         <IoList />
                     </TileTitle>
                     <div id="events-table">
+                        {workflows.length > 0 ?
                         <table style={{width: "100%"}}>
                             <tbody>
                                 {workflows.map((obj)=>{
                                     return(
-                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
+                                        <tr style={{maxHeight:"60px", height:"60px"}} className="workflows-list-item"  onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
                                             <td style={{textAlign:"left", paddingLeft:"5px"}}>
                                                 <b>{obj.id}</b>
                                             </td>
@@ -144,6 +146,9 @@ export default function WorkflowsPage() {
                                 })}
                             </tbody>
                         </table>
+                        :
+                            <NoResults />
+                        }
                     </div>
                 </div>
                 <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>

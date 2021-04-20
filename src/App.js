@@ -184,48 +184,65 @@ function Content() {
             method: 'GET',
         })
         if (resp.ok) {
-            let json = await resp.json()
+          let newNamespace = ""
+          let json = await resp.json()
             if (load){
-
-              // if being linked to it from someone
-              if (window.location.pathname.split("/")[1] !== "") {
-                // handle instance page as namespace is listed elsewhere
-                if(window.location.pathname.split("/")[1] === "i"){
-                  setNamespace(window.location.pathname.split("/")[2])
+              // 1st. check if namespace is in the pathname 
+              if(window.location.pathname.split("/")[1] !== "") {
+                // handle if pathname is /i as its a different route
+                if(window.location.pathname.split("/")[1] === "i") {
+                  newNamespace = window.location.pathname.split("/")[2]
                 } else {
-                  setNamespace(window.location.pathname.split("/")[1])
+                  newNamespace = window.location.pathname.split("/")[1]
                 }
-              }  else {
-                if(localStorage.getItem("namespace") !== undefined) {
-                    if(localStorage.getItem("namespace") === "") {
-                        setNamespace(json.namespaces[0].name)
-                    } else {
-                      let found = false
-                      for(let i =0; i < json.namespaces.length; i++) {
-                        if(json.namespaces[i].name === localStorage.getItem("namespace")) {
-                          found = true
-                        }
-                      }
-                      if(!found){
-                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0].name}'`,0)
-                        setNamespace(json.namespaces[0].name)
-                        localStorage.setItem("namespace", json.namespaces[0].name)
-                      } else {
-                        setNamespace(localStorage.getItem("namespace"))
+              }
+
+              // if newNamespace isn't found yet try other options
+              if (newNamespace === "") {
+                // if its in storage
+                if (localStorage.getItem("namespace") !== undefined ) {
+                  // if the value in storage is an empty string
+                  if(localStorage.getItem("namespace") === "") {
+                    // if the json namespaces array is greater than 0 set it to the first
+                    if(json.namespaces.length > 0) {
+                      newNamespace = json.namespaces[0].name
+                    }
+                  } else {
+                    let found = false
+                    // check if the namespace previously stored in localstorage exists in the list
+                    for(let i=0; i < json.namespaces.length; i++) {
+                      if(json.namespaces[i].name === localStorage.getItem("namespace")) {
+                        found = true
+                        newNamespace = localStorage.getItem("namespace")
+                        break
                       }
                     }
+
+                    if(!found) {
+                      // check if json array is greater than 0 to set to the first
+                      if(json.namespaces.length > 0) {
+                        newNamespace = json.namespaces[0].name
+                        localStorage.setItem("namespace", json.namespaces[0].name)
+                        sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
+                      } 
+                    }
+                  }
                 } else {
-                    setNamespace(json.namespaces[0].name)
-                }
+                  // if the json namespace array is greater than 0 set it to the first as no other options is valid
+                  if(json.namespaces.length > 0) {
+                    newNamespace = json.namespaces[0].name
+                  }
+                }                
               }
             }
 
-            let namespaces = [];
+            let namespacesn = [];
             for (let i = 0; i < json.namespaces.length; i++) {
-              namespaces.push(json.namespaces[i].name)
+              namespacesn.push(json.namespacesn[i].name)
             }
-            
-            setNamespaces(namespaces)
+
+            setNamespace(newNamespace)
+            setNamespaces(namespacesn)
         } else {
             throw new Error(await resp.text())
         }
@@ -243,6 +260,7 @@ function Content() {
       }
   },[namespaces, fetchNamespaces])
   
+  console.log(namespaces)
   return(
 
     <MainContext.Provider value={{
@@ -260,17 +278,23 @@ function Content() {
             {namespaces !== null ?
               <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace}/>
               :
-              ""
+             <div>h1</div>
             }
             </div>
           <div id="main-panel">
             <Switch>
-            {namespace !== "" ? 
                  <>
                   <Route exact path="/jq/playground" component={JQPlaygroundPage} />
                   <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                   <Route exact path="/">
-                    <Redirect to={`/${namespace}`} from="/" />
+                    {
+                      namespace !== "" ? 
+                      <Redirect to={`/${namespace}`} from="/" />
+                      :
+                      <Route exact path="/">
+                        <div>hello</div>  
+                      </Route>
+                    }
                   </Route>
                   <Route exact path="/:namespace" component={DashboardPage} />
                   <Route exact path="/:namespace/w/" component={WorkflowsPage} />
@@ -278,7 +302,6 @@ function Content() {
                   <Route exact path="/:namespace/i/" component={EventsPage} />
                   <Route exact path="/:namespace/s/" component={SettingsPage} />
                 </>
-                :""}
             </Switch>
           </div>
         </Router>
