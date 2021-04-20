@@ -27,9 +27,10 @@ function SettingsAction(props) {
                         console.log(namespaces[i], "ns-reload")
                         localStorage.setItem("namespace", namespaces[i])
                         setNamespace(namespaces[i])
-                        history.push("/s/reload")
+                        history.push(`/${namespaces[i]}/s/`)
 
                         await fetchNamespaces()
+                        setShow(false)
                         break                      
                     }
                 }

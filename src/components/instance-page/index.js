@@ -88,7 +88,7 @@ export default function InstancePage() {
                     </div>
                     <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ alignItems: "center" }}>
-                            <Link className="dashboard-btn" to={`/w/${params.workflow}`}>
+                            <Link className="dashboard-btn" to={`/${params.namespace}/w/${params.workflow}`}>
                                 View Workflow
                             </Link>
                         </div>

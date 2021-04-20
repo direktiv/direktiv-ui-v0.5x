@@ -3,7 +3,6 @@ import './style/scrollbar.css';
 import './style/custom.css';
 
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
-
 import Navbar from './components/nav'
 import DashboardPage from './components/dashboard-page'
 import EventsPage from './components/events-page'
@@ -35,7 +34,7 @@ function AuthenticatedContent() {
         opts.headers = { ...opts.headers, Authorization: `Bearer ${jwt}` };
       }
       return fetch(`${context.SERVER_BIND}${path}`, opts);
-  },[])
+  },[context.SERVER_BIND])
 
   if (!initialized) {
     return ""
@@ -78,7 +77,7 @@ function AuthenticatedContent() {
               }
               setNamespaces(json.data)
           } else {
-              throw(new Error({message: await resp.text()}))
+              throw new Error(await resp.text())
           }
       } catch(e) {
           sendNotification("Failed to fetch namespaces", e.message, 0)
@@ -121,12 +120,12 @@ function AuthenticatedContent() {
           {namespace !== "" ? 
             <div id="main-panel">
               <Switch>
+                <Route exact path="/jq/" component={JQPlaygroundPage} />
                 <Route exact path="/:namespace" component={DashboardPage} />
                 <Route exact path="/:namespace/w/" component={WorkflowsPage} />
                 <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
                 <Route exact path="/:namespace/i/" component={EventsPage} />
                 <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
-                <Route exact path="/jq/" component={JQPlaygroundPage} />
                 <Route exact path="/:namespace/s/" component={SettingsPage} />
                 {/* refresh on same route */}
                 <Redirect exact from="/s/reload" to="/s/"/>

@@ -3,7 +3,7 @@ import "./style.css";
 import ReactTooltip from "react-tooltip";
 import { PieChart } from "react-minimal-pie-chart";
 
-const colors = ["#2fa64d", "#db3447", "#ffbf32", "#014f86"];
+const colors = ["rgba(115,204,118,1)", "rgb(204,115,115)"];
 
 export const MockData = [
   { title: "Completed", value: 50 },

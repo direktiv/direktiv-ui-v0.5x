@@ -60,7 +60,7 @@ export function EventsPageBody() {
             }
         }
         fetchI()
-    },[])
+    },[namespace])
 
     return(
         <div id="events-table">

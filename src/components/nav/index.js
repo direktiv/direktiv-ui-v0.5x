@@ -71,11 +71,14 @@ export default function Navbar(props) {
                 if(matchInstance !== null) {
                     history.push(`/${namespace}/i`)
                 }
+
+                history.push(`/${val}`)
             } else {
-                throw(new Error({message: await resp.text()}))
+                throw new Error(await resp.text())
             }
         } catch(e) {
-            sendNotification("Failed to fetch namespaces", e.message, 0)
+            console.log(e)
+            sendNotification("Failed to create namespace", e.message, 0)
         }
     }
     
