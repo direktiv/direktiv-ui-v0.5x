@@ -253,10 +253,10 @@ export default function Diagram(props) {
         let saveElements = generateElements(getLayoutedElements, value, flow, status)
 
         // Keep old elements until the yaml is parsable. Try and catch in func
-        if(elements !== null) {
+        if(saveElements !== null) {
             setElements(saveElements)
         }
-    },[elements, setElements, value, flow, status])
+    },[setElements, value, flow, status])
 
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>

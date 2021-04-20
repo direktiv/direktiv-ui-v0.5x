@@ -67,7 +67,6 @@ export default function WorkflowPage() {
         }
         setFetching(true)
 
-
         async function updateWf() {
             try {
                 // todo pagination
@@ -99,8 +98,11 @@ export default function WorkflowPage() {
     },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.uid])
 
     useEffect(()=>{
-        fetchWorkflow()
-    },[fetchWorkflow])
+        if (workflowValue === ""){
+            console.log('hello')
+            fetchWorkflow()
+        }
+    },[fetchWorkflow, workflowValue])
 
     // useEffect(()=>{
     //     console.log("Workflow page has mounted")
@@ -267,7 +269,7 @@ export default function WorkflowPage() {
 function PieComponent() {
     const {fetch, namespace} = useContext(MainContext)
     const params = useParams()
-    const [metrics, setMetrics] = useState([])
+    const [metrics, setMetrics] = useState(null)
 
     useEffect(()=>{
         async function fetchMet() {
@@ -295,9 +297,15 @@ function PieComponent() {
                 sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
             }
         }
-        fetchMet()
-    },[fetch, namespace, params.workflow])
+        if(metrics === null) {
+            fetchMet()
+        }
+    },[fetch, namespace, params.workflow, metrics])
 
+    if (metrics === null) {
+        return ""
+    }
+    
     return(
         <PieChart lineWidth={40} data={metrics} />
     )
