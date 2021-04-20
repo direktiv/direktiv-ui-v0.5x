@@ -157,7 +157,7 @@ export default function Navbar(props) {
                                                 let matchInstance = matchPath(location.pathname, {
                                                     path: "/i/:namespace/:workflow/:instance"
                                                 })
-
+                                                
                                                 let matchInstanceN = matchPath(location.pathname, {
                                                     path: `/${namespace}/i`
                                                 })
@@ -206,7 +206,7 @@ export default function Navbar(props) {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/jq/" className="nav-link">
+                        <Link to="/jq/playground" className="nav-link">
                             <div>
                                 <IoExtensionPuzzle style={{ marginRight: "10px" }} />
                                 <span>jq Playground</span>

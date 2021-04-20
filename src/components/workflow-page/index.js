@@ -18,9 +18,9 @@ export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
+    // TODO: Hook up log events
     const [showLogEvent, setShowLogEvent] = useState(false)
     const [logEvent, setLogEvent] = useState("hello-world")
-
 
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
@@ -113,7 +113,7 @@ export default function WorkflowPage() {
     // },[])
 
     let saveButton = (
-        <div style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", color: `${workflowValueOld !== workflowValue ? "#2fa64d" : "white"}` }} onClick={() => { updateWorkflow() }}>
+        <div className={workflowValueOld !== workflowValue ? "editor-footer-button": "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { updateWorkflow() }}>
             <span style={{}} >Save</span>
             <IoSave style={{ marginLeft: "5px" }} />
         </div>
@@ -122,13 +122,13 @@ export default function WorkflowPage() {
     let logButton = (
         <>
             {!showLogEvent ?
-                <div style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
+                <div className="editor-footer-button" style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
                     setTimeout(function () { document.getElementById('yoyoyo').focus(); }, 100);
                     setShowLogEvent(true)
                 }}>
                     Log To Event
             </div> :
-                <div style={{ display: "flex", alignItems: "center", padding: "0 0 0 0" }}>
+                <div className="editor-footer-button" style={{ display: "flex", alignItems: "center", padding: "0 0 0 0" }}>
                     <input id="yoyoyo" style={{ height: "20px", border: "none", borderRadius: "0px", backgroundColor: "#303030", color: "white", margin: "0px", fontSize: "12pt" }} placeholder={`Target Log Event`} value={logEvent} onChange={(e) => setLogEvent(e.target.value)} />
                     <div style={{ padding: "0 10px 0 10px", height: "100%", display: "flex", alignItems: "center" }} onClick={() => { setShowLogEvent(false) }}>
                         <IoCheckmarkSharp />
@@ -136,6 +136,17 @@ export default function WorkflowPage() {
                 </div>
             }
         </>
+    );
+
+    let executeButton = (
+        <div className={workflowInfo.active ? "editor-footer-button": "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => {
+            if (workflowInfo.active) {
+                executeWorkflow()
+            }
+            }}>
+            <span style={{}} >Execute</span>
+            <IoPlaySharp style={{ marginLeft: "5px" }} />
+        </div>
     );
 
     async function executeWorkflow() {
@@ -209,17 +220,7 @@ export default function WorkflowPage() {
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                                        <div id="editor-actions">
-                                            <div className={workflowInfo.active ? "button success editor-action-btn": "button disabled"} onClick={() => {executeWorkflow()}}>
-                                                <span className="editor-action-btn-label" style={{color: "white"}}>
-                                                    Execute
-                                                </span>
-                                                <span className="editor-action-btn-icon">
-                                                    <IoPlaySharp/>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <Editor value={jsonInput} setValue={setJsonInput} />
+                                        <Editor value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]}/>
                                     </div>
                                 </div>
                             </div>

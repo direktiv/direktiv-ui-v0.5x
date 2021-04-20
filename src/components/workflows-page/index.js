@@ -124,7 +124,7 @@ export default function WorkflowsPage() {
                                                             ev.stopPropagation()
                                                         }}>
                                                             <span>
-                                                                <IoToggleOutline style={{ rotate: "180deg" }} />
+                                                                <IoToggleOutline style={{ rotate: "180deg", WebkitTransform: "rotate(180deg)" }} />
                                                             </span>
                                                         </div>
                                                     }

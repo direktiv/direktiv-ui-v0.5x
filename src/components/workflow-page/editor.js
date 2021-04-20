@@ -69,10 +69,10 @@ export default function ReactEditor(props) {
                         {actions !== undefined ? (
                             actions.map(function (Action, i) {
                                 return (
-                                    <div className="editor-footer-button">
-                                        <div>
+                                    <div>
+                                        {/* <div> */}
                                             {Action}
-                                        </div>
+                                        {/* </div> */}
                                     </div>
                                 );
                             })

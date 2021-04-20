@@ -18,6 +18,14 @@ const routes = [
     {
         path: '/:namespace/s',
         breadcrumb: 'Settings'
+    },
+    {
+        path: "/jq",
+        breadcrumb: "",
+    },
+    {
+        path: "/jq/playground",
+        breadcrumb: "JQ Playground"
     }
 ]
 
@@ -32,7 +40,7 @@ export default function Breadcrumbs(props) {
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
                 // if namespace exists dont show it
-                if(obj.key === `/${params.namespace}`) {
+                if(obj.key === `/${params.namespace}` || obj.key === '/jq') {
                     return ""
                 }
                 // if no instance id use custom breadcrumbs
