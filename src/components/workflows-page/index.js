@@ -6,8 +6,6 @@ import { useDropzone } from 'react-dropzone'
 import YAML from "js-yaml"
 import YAMLtoString from "yaml"
 
-
-
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
@@ -290,9 +288,8 @@ function NewWorkflowForm() {
     const fetchTempData = useCallback((temp, setData) => {
         async function fetchd() {
             try {
-                let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
-                    method: "POST",
-                    body: JSON.stringify({id: temp})
+                let resp = await fetch(`/workflow-templates/${temp}`, {
+                    method: "POST"
                 })
                 if(resp.ok) {
                     let text = await resp.text()
@@ -310,7 +307,7 @@ function NewWorkflowForm() {
     const fetchTemps = useCallback((load)=>{
         async function fetchTemplates(){
             try {
-                let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
+                let resp = await fetch(`/workflow-templates/`, {
                     method: "GET"
                 })
                 if(resp.ok) {

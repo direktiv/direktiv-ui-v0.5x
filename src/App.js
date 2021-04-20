@@ -50,28 +50,34 @@ function AuthenticatedContent() {
               } else {
                 if(localStorage.getItem("namespace") !== undefined) {
                     if(localStorage.getItem("namespace") === "") {
-                        setNamespace(json.data[0])
+                        setNamespace(json.namespaces[0].name)
                     } else {
                       let found = false
-                      for(let i =0; i < json.data.length; i++) {
-                        if(json.data[i] === localStorage.getItem("namespace")) {
+                      for(let i =0; i < json.namespaces.length; i++) {
+                        if(json.namespaces[i].name === localStorage.getItem("namespace")) {
                           found = true
                         }
                       }
                       if(!found){
-                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0]}'`,0)
-                        setNamespace(json.data[0])
-                        localStorage.setItem("namespace", json.data[0])
+                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0].name}'`,0)
+                        setNamespace(json.namespaces[0].name)
+                        localStorage.setItem("namespace", json.namespaces[0].name)
                       } else {
                         setNamespace(localStorage.getItem("namespace"))
                       }
                     }
                 } else {
-                    setNamespace(json.data[0])
+                    setNamespace(json.namespaces[0].name)
                 }
               }
             }
-            setNamespaces(json.data)
+
+            let namespaces = [];
+            for (let i = 0; i < json.namespaces; i++) {
+              namespaces.push(json.namespaces[i].name)
+            }
+
+            setNamespaces(namespaces)
         } else {
             throw new Error(await resp.text())
         }
