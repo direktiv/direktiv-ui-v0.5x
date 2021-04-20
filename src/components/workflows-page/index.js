@@ -96,9 +96,9 @@ export default function WorkflowsPage() {
                                                 <b>{obj.id}</b>
                                             </td>
                                             {obj.description === "" ?
-                                                <td style={{textAlign:"left", paddingLeft:"5px"}}>No description has been provided.</td>
+                                                <td style={{textAlign:"left", paddingLeft:"5px", maxWidth:"300px", textOverflow:"ellipsis", overflow:"hidden"}}>No description has been provided.</td>
                                                 :
-                                                <td style={{textAlign:"left", paddingLeft:"5px"}}>{obj.description}</td>
+                                                <td title={obj.description} style={{textAlign:"left", paddingLeft:"5px", maxWidth:"300px", textOverflow:"ellipsis", overflow:"hidden"}}>{obj.description}</td>
                                             }
                                             <td  style={{paddingLeft:"5px"}}>
                                                 <div className="actions-button-div">
