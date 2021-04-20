@@ -62,7 +62,7 @@ export default function InstancePage() {
         let timer = setInterval(()=>{
             fetchInstanceDetails()
         }, 2000)
-        if (instanceDetails.status === "complete" || instanceDetails.status === "cancelled") {
+        if (instanceDetails.status === "complete" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed") {
             clearInterval(timer)
         }
         fetchInstanceDetails()    
@@ -107,7 +107,7 @@ export default function InstancePage() {
                         <TileTitle name="Logs">
                             <IoTerminal />
                         </TileTitle>
-                        <Logs instanceId={instanceId} />
+                        <Logs instanceId={instanceId} status={instanceDetails.status} />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Graph">
@@ -129,13 +129,13 @@ export default function InstancePage() {
                         <TileTitle name="Input">
                             <IoCode />
                         </TileTitle>
-                        <InputOutput data={instanceDetails.input} />
+                        <InputOutput data={instanceDetails.input} status={instanceDetails.status} />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Output">
                             <IoCode />
                         </TileTitle>
-                        <InputOutput data={instanceDetails.output} />
+                        <InputOutput data={instanceDetails.output} status={instanceDetails.status}/>
                     </div>
                 </div>
             </div>

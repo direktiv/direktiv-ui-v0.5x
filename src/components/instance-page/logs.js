@@ -4,10 +4,11 @@ import * as dayjs from "dayjs"
 import { sendNotification } from "../notifications"
 
 export default function Logs(props) {
-    const {instanceId} = props
+    const {instanceId, status} = props
     const {fetch} = useContext(MainContext)
     const [logs, setLogs] = useState([])
     const [logsOffset, setLogsOffset] = useState(0)
+    const [timer, setTimer] = useState(null)
 
     const [scrolled, setScrolled] = useState(false)
     const [init, setInit] = useState(false)
@@ -83,22 +84,32 @@ export default function Logs(props) {
             }
         }
 
-        return fetchl()
+        if (status === "complete" || status === "cancelled" || status === "crashed") {
+            setTimeout(()=>{
+                clearInterval(timer)
+            },4000)
+        } else {
+            return fetchl()
+        }
 
-    }, [instanceId, fetch, scrolled, logs, logsOffset, limit])
+    }, [instanceId, fetch, scrolled, logs, logsOffset, limit, status, timer])
 
     useEffect(() => {
         if (!init) {
             fetchLogs()
             setInit(true)
         } else {
-            let timer = setInterval(fetchLogs, 800)
-            return function cleanup() {
-                clearInterval(timer)
+            if(timer === null ) {
+                let timer = setInterval(fetchLogs, 800)
+                setTimer(timer)
+                return function cleanup() {
+                    clearInterval(timer)
+                }
             }
+  
         }
 
-    }, [fetchLogs, init])
+    }, [fetchLogs, init, timer])
 
     useEffect(() => {
         let scrollableElement = document.getElementById('logs')
