@@ -6,7 +6,7 @@ import Diagram from './diagram'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart from '../charts/pie'
@@ -18,10 +18,14 @@ export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
+    const [showLogEvent, setShowLogEvent] = useState(false)
+    const [logEvent, setLogEvent] = useState("hello-world")
+
+
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
-    const [workflowInfo, setWorkflowInfo] = useState({uid: "", revision: 0, active: true, fetching: true,})
+    const [workflowInfo, setWorkflowInfo] = useState({uid: "", revision: 0, active: true, fetching: true})
     const history = useHistory()
     const params = useParams()
 
@@ -61,6 +65,7 @@ export default function WorkflowPage() {
     },[namespace, fetch, params.workflow])
 
     const updateWorkflow = useCallback(()=>{
+        console.log("workflowInfo.fetching =", workflowInfo.fetching)
         if (workflowInfo.fetching){
             return // TODO - User Feedback
         }
@@ -92,6 +97,7 @@ export default function WorkflowPage() {
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
             }
+            return
         }
         updateWf().finally(()=>{setFetching(false)})
     },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.uid])
@@ -106,12 +112,31 @@ export default function WorkflowPage() {
     //     console.log("Workflow page has mounted")
     // },[])
 
-    // let saveBtn = (
-    //     <div className={workflowValueOld !== workflowValue ? "save-button" : "save-button-disable"} onClick={() => {updateWorkflow()}} >
-    //         <FileTextFill/>
-    //         <span>Save</span>
-    //     </div>
-    // );
+    let saveButton = (
+        <div style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", color: `${workflowValueOld !== workflowValue ? "#2fa64d" : "white"}` }} onClick={() => { updateWorkflow() }}>
+            <span style={{}} >Save</span>
+            <IoSave style={{ marginLeft: "5px" }} />
+        </div>
+    );
+
+    let logButton = (
+        <>
+            {!showLogEvent ?
+                <div style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
+                    setTimeout(function () { document.getElementById('yoyoyo').focus(); }, 100);
+                    setShowLogEvent(true)
+                }}>
+                    Log To Event
+            </div> :
+                <div style={{ display: "flex", alignItems: "center", padding: "0 0 0 0" }}>
+                    <input id="yoyoyo" style={{ height: "20px", border: "none", borderRadius: "0px", backgroundColor: "#303030", color: "white", margin: "0px", fontSize: "12pt" }} placeholder={`Target Log Event`} value={logEvent} onChange={(e) => setLogEvent(e.target.value)} />
+                    <div style={{ padding: "0 10px 0 10px", height: "100%", display: "flex", alignItems: "center" }} onClick={() => { setShowLogEvent(false) }}>
+                        <IoCheckmarkSharp />
+                    </div>
+                </div>
+            }
+        </>
+    );
 
     async function executeWorkflow() {
         try{
@@ -151,6 +176,7 @@ export default function WorkflowPage() {
         }
     }
 
+    const Actions = [logButton, saveButton]
 
     return(
         <>
@@ -171,17 +197,7 @@ export default function WorkflowPage() {
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                                        <div id="editor-actions">
-                                            <div className={workflowValueOld !== workflowValue ? "button success editor-action-btn enable" : "button disabled"} onClick={() => {updateWorkflow()}}>
-                                                <span className="editor-action-btn-label">
-                                                    Save
-                                                </span>
-                                                <span className="editor-action-btn-icon">
-                                                    <IoSave/>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow}/>
+                                        <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={Actions}/>
                                     </div>
                                 </div>
                             </div>
