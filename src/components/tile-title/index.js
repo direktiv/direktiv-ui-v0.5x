@@ -3,7 +3,6 @@ import React from 'react'
 export default function TileTitle(props) {
     
     let {name, children, actionsDiv} = props;
-    console.log(props);
     
     return(
         <div className="tile-title" style={{ display: "flex", flex: "none", height: "17px" }}>

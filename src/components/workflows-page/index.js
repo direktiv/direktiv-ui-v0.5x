@@ -6,16 +6,14 @@ import { useDropzone } from 'react-dropzone'
 import YAML from "js-yaml"
 import YAMLtoString from "yaml"
 
-import PlusCircleFill from 'react-bootstrap-icons/dist/icons/plus-circle-fill'
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import { FileCode, ToggleOff, ToggleOn, XCircle } from 'react-bootstrap-icons'
+
 
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
-import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoTrashOutline } from 'react-icons/io5'
+import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash} from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 
 export default function WorkflowsPage() {
@@ -41,7 +39,7 @@ export default function WorkflowsPage() {
             }
         }
         fetchWfs()
-    },[namespace])
+    },[namespace, fetch])
 
     const deleteWorkflow = async (id) => {
         try {
@@ -73,7 +71,7 @@ export default function WorkflowsPage() {
 
     useEffect(()=>{
         fetchWorkflows()
-    },[namespace])
+    },[fetchWorkflows])
 
     return (
         <>
@@ -236,7 +234,7 @@ function APIInteractionTile() {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log('send event', e)
+            sendNotification("Failed to send cloud event", e.message, 0)
         }
     }
 
@@ -289,22 +287,25 @@ function NewWorkflowForm() {
     const [templateData, setTemplateData] = useState("")
     const [err, setErr] = useState("")
 
-    async function fetchTempData(temp, setData) {
-        try {
-            let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
-                method: "POST",
-                body: JSON.stringify({id: temp})
-            })
-            if(resp.ok) {
-                let text = await resp.text()
-                setData(text)       
-            } else {
-                throw new Error(await resp.text())
+    const fetchTempData = useCallback((temp, setData) => {
+        async function fetchd() {
+            try {
+                let resp = await fetch(`/github/templates/vorteil/direktiv-apps`, {
+                    method: "POST",
+                    body: JSON.stringify({id: temp})
+                })
+                if(resp.ok) {
+                    let text = await resp.text()
+                    setData(text)       
+                } else {
+                    throw new Error(await resp.text())
+                }
+            } catch(e) {
+                sendNotification("Failed to fetch template data", e.message, 0)
             }
-        } catch(e) {
-            sendNotification("Failed to fetch template data", e.message, 0)
         }
-    }
+        fetchd()
+    },[fetch])
 
     const fetchTemps = useCallback((load)=>{
         async function fetchTemplates(){
@@ -327,11 +328,11 @@ function NewWorkflowForm() {
             }
         }
         fetchTemplates()
-    },[])
+    },[fetch, fetchTempData])
 
     useEffect(()=>{
         fetchTemps(true)
-    },[])
+    },[fetchTemps])
 
     return(
         <div style={{ fontSize: "12pt" }}>
@@ -399,7 +400,7 @@ function Basic(props) {
     const onDrop = useCallback(async(f) => {
         setData(await readFile(f[0]))
         setFiles(f)
-    },[])
+    },[setData, setFiles])
 
     const {getRootProps, getInputProps} = useDropzone({onDrop});
     

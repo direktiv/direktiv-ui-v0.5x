@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useContext, useState } from "react"
-import { useParams } from "react-router"
 import MainContext from "../../context"
 import * as dayjs from "dayjs"
 import { sendNotification } from "../notifications"
@@ -60,7 +59,7 @@ export default function Logs(props) {
                         setLogs([...logs, ...json.workflowInstanceLogs])
                     } else if (limit < 300){
                         setLimit((l) => {
-                            if (l == 10) {
+                            if (l === 10) {
                                 return l
                             }
 

@@ -256,7 +256,7 @@ export default function Diagram(props) {
         if(elements !== null) {
             setElements(saveElements)
         }
-    },[setElements, value, flow, status])
+    },[elements, setElements, value, flow, status])
 
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>

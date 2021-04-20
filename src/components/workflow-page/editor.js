@@ -1,5 +1,5 @@
 import {Controlled as CodeMirror} from "react-codemirror2";
-import React, { useState} from "react";
+import React from "react";
 
 // style editor
 import 'codemirror/lib/codemirror.css';

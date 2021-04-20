@@ -17,13 +17,13 @@ import {  ReactKeycloakProvider, useKeycloak } from '@react-keycloak/web';
 import keycloak from './keycloak'
 import MainContext from './context'
 import { useContext } from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 
 function AuthenticatedContent() {
   const context = useContext(MainContext)
   const [namespace, setNamespace] = useState("")
-  const [namespaces, setNamespaces] = useState([])
+  const [namespaces, setNamespaces] = useState(null)
   const {initialized} = useKeycloak();
 
   const authFetch = useCallback((path, opts)=>{
@@ -35,54 +35,64 @@ function AuthenticatedContent() {
       }
       return fetch(`${context.SERVER_BIND}${path}`, opts);
   },[context.SERVER_BIND])
+  const fetchNamespaces = useCallback((load) => {
+    async function fd() {
+      try {
+        let resp = await authFetch('/namespaces/', {
+            method: 'GET',
+        })
+        if (resp.ok) {
+            let json = await resp.json()
+            if (load){
+              // if being linked to it from someone
+              if (window.location.pathname.split("/")[1] !== "") {
+                setNamespace(window.location.pathname.split("/")[1])
+              } else {
+                if(localStorage.getItem("namespace") !== undefined) {
+                    if(localStorage.getItem("namespace") === "") {
+                        setNamespace(json.data[0])
+                    } else {
+                      let found = false
+                      for(let i =0; i < json.data.length; i++) {
+                        if(json.data[i] === localStorage.getItem("namespace")) {
+                          found = true
+                        }
+                      }
+                      if(!found){
+                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0]}'`,0)
+                        setNamespace(json.data[0])
+                        localStorage.setItem("namespace", json.data[0])
+                      } else {
+                        setNamespace(localStorage.getItem("namespace"))
+                      }
+                    }
+                } else {
+                    setNamespace(json.data[0])
+                }
+              }
+            }
+            setNamespaces(json.data)
+        } else {
+            throw new Error(await resp.text())
+        }
+    } catch(e) {
+        sendNotification("Failed to fetch namespaces", e.message, 0)
+    }
+    }
+    fd()
+  },[authFetch])
+
+  // if namespaces is empty and keycloak has been initialized do things
+  useEffect(()=>{
+      if(namespaces === null && initialized) {
+          fetchNamespaces(true)
+      }
+  },[namespaces, fetchNamespaces, initialized])
 
   if (!initialized) {
     return ""
   }
 
-  async function fetchNamespaces(load) {
-      try {
-          let resp = await authFetch('/namespaces/', {
-              method: 'GET',
-          })
-          if (resp.ok) {
-              let json = await resp.json()
-              if (load){
-                // if being linked to it from someone
-                if (window.location.pathname.split("/")[1] !== "") {
-                  setNamespace(window.location.pathname.split("/")[1])
-                } else {
-                  if(localStorage.getItem("namespace") !== undefined) {
-                      if(localStorage.getItem("namespace") === "") {
-                          setNamespace(json.data[0])
-                      } else {
-                        let found = false
-                        for(let i =0; i < json.data.length; i++) {
-                          if(json.data[i] === localStorage.getItem("namespace")) {
-                            found = true
-                          }
-                        }
-                        if(!found){
-                          sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0]}'`,0)
-                          setNamespace(json.data[0])
-                          localStorage.setItem("namespace", json.data[0])
-                        } else {
-                          setNamespace(localStorage.getItem("namespace"))
-                        }
-                      }
-                  } else {
-                      setNamespace(json.data[0])
-                  }
-                }
-              }
-              setNamespaces(json.data)
-          } else {
-              throw new Error(await resp.text())
-          }
-      } catch(e) {
-          sendNotification("Failed to fetch namespaces", e.message, 0)
-      }
-  }
 
   function getJWT() {
     return keycloak.idToken
@@ -100,6 +110,8 @@ function AuthenticatedContent() {
     keycloak.logout()
   }
 
+  
+
   return(
     <MainContext.Provider value={{
       ...context,
@@ -115,8 +127,11 @@ function AuthenticatedContent() {
       <div id="content">
         <Router>
           <div id="nav-panel">
-            <Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
-          </div>
+            {namespaces === null ? ""
+:
+<Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
+  }
+            </div>
           {namespace !== "" ? 
             <div id="main-panel">
               <Switch>
@@ -145,7 +160,7 @@ function AuthenticatedContent() {
 
 function Content() {
   const [namespace, setNamespace] = useState("")
-
+  console.log(setNamespace, 'TODO handle no auth properly')
   return(
 
     <MainContext.Provider value={{

@@ -6,7 +6,6 @@ import './style.css'
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
@@ -60,7 +59,7 @@ export function EventsPageBody() {
             }
         }
         fetchI()
-    },[namespace])
+    },[namespace, fetch])
 
     return(
         <div id="events-table">

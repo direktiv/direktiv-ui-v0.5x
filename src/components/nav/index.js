@@ -1,19 +1,15 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
 import md5 from 'md5'
-import { Link, matchPath, useHistory, useLocation, useParams } from 'react-router-dom'
+import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
-import Speedometer from 'react-bootstrap-icons/dist/icons/speedometer'
-import LightningFill from 'react-bootstrap-icons/dist/icons/lightning-fill'
-import TerminalFill from 'react-bootstrap-icons/dist/icons/terminal-fill'
-import GearFill from 'react-bootstrap-icons/dist/icons/gear-fill'
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 import { PlusCircle } from 'react-bootstrap-icons'
 import { useContext } from 'react'
 import MainContext from '../../context'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRef } from 'react'
-import { IoExtensionPuzzle, IoExtensionPuzzleOutline, IoFileTray, IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 
 export default function Navbar(props) {
@@ -87,20 +83,17 @@ export default function Navbar(props) {
                 throw new Error(await resp.text())
             }
         } catch(e) {
-            console.log(e)
             sendNotification("Failed to create namespace", e.message, 0)
         }
     }
     
-    useEffect(()=>{
-        fetchNamespaces(true)
-    },[])
+
 
 
     return(
         <div id="nav">
             <div id="nav-img-holder">
-                <img src={Logo} />
+                <img src={Logo} alt="main-logo"/>
                 {/* <span style={{ display: "block", marginTop: "-20px", marginBottom: "40px", fontSize: "0.75em" }}>
                     direktiv
                 </span> */}
@@ -108,7 +101,6 @@ export default function Navbar(props) {
             <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
                 <ul id="namespaces-ul" style={{ margin: "0px" }}>
                     <li className="namespace-selector" onClick={() => {
-                        console.log("namespace select")
                         toggleNamespaceSelector()
                     }}>
                         <div>
@@ -180,6 +172,7 @@ export default function Navbar(props) {
                                             }}>{obj}</li>
                                         )
                                     }
+                                    return ""
                                 })}
                             </ul>
                         </div>

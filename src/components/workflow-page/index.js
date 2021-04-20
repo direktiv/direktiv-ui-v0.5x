@@ -5,17 +5,12 @@ import Diagram from './diagram'
 
 
 import TileTitle from '../tile-title'
-import PencilSquare from 'react-bootstrap-icons/dist/icons/pencil-square'
-import PieChartFill from 'react-bootstrap-icons/dist/icons/pie-chart-fill'
-import CardList from 'react-bootstrap-icons/dist/icons/card-list'
-import PipFill from 'react-bootstrap-icons/dist/icons/pip-fill'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { FileTextFill, Clipboard, Save, ToggleOn, ToggleOff } from "react-bootstrap-icons"
 
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoSaveOutline, IoPlaySharp, IoChevronForwardOutline } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
-import PieChart, {MockData, NuePieLegend} from '../charts/pie'
+import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 import Sankey from './sankey'
@@ -64,7 +59,7 @@ export default function WorkflowPage() {
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
-    },[namespace])
+    },[namespace, fetch, params.workflow])
 
     const updateWorkflow = useCallback(()=>{
         if (workflowInfo.fetching){
@@ -72,7 +67,6 @@ export default function WorkflowPage() {
         }
         setFetching(true)
 
-        console.log("workflowValue =", workflowValue)
 
         async function updateWf() {
             try {
@@ -102,22 +96,22 @@ export default function WorkflowPage() {
             }
         }
         updateWf().finally(()=>{setFetching(false)})
-    },[namespace, workflowValue])
+    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.uid])
 
     useEffect(()=>{
         fetchWorkflow()
-    },[namespace])
+    },[fetchWorkflow])
 
-    useEffect(()=>{
-        console.log("Workflow page has mounted")
-    },[])
+    // useEffect(()=>{
+    //     console.log("Workflow page has mounted")
+    // },[])
 
-    let saveBtn = (
-        <div className={workflowValueOld !== workflowValue ? "save-button" : "save-button-disable"} onClick={() => {updateWorkflow()}} >
-            <FileTextFill/>
-            <span>Save</span>
-        </div>
-    );
+    // let saveBtn = (
+    //     <div className={workflowValueOld !== workflowValue ? "save-button" : "save-button-disable"} onClick={() => {updateWorkflow()}} >
+    //         <FileTextFill/>
+    //         <span>Save</span>
+    //     </div>
+    // );
 
     async function executeWorkflow() {
         try{
@@ -157,7 +151,6 @@ export default function WorkflowPage() {
         }
     }
 
-    console.log(workflowInfo)
 
     return(
         <>
@@ -284,7 +277,6 @@ function PieComponent() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    console.log(json, json.totalInstancesRun - json.successfulExecutions)
                     let met = [
                         {
                             title: "Completed",
@@ -304,7 +296,7 @@ function PieComponent() {
             }
         }
         fetchMet()
-    },[])
+    },[fetch, namespace, params.workflow])
 
     return(
         <PieChart lineWidth={40} data={metrics} />
@@ -334,6 +326,8 @@ function EventsList() {
             case 2:
                 colorClass = "success";
                 break;
+            default:
+                colorClass = "pending";
         }
 
         listItems.push(
@@ -378,23 +372,23 @@ function WorkflowActions(props) {
                         <div class="dropdown-content-connector"></div>
                         <div class="dropdown-content">
                             {active ? 
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 toggleWorkflow()
                                 setShow(!show)
                             }}>Disable</a>
                             :
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 toggleWorkflow()
                                 setShow(!show)
                             }}>Enable</a>
                             }
                             {viewSankey ?
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 setViewSankey(!viewSankey)
                                 setShow(!show)
                             }}>Show Diagram</a>
                             :
-                            <a onClick={()=>{
+                            <a href="#!" onClick={()=>{
                                 setViewSankey(!viewSankey)
                                 setShow(!show)
                             }}>Show Sankey</a>

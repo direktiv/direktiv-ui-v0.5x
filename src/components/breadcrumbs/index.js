@@ -31,10 +31,9 @@ export default function Breadcrumbs(props) {
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
-                console.log(obj)
                 // if namespace exists dont show it
                 if(obj.key === `/${params.namespace}`) {
-                    return
+                    return ""
                 }
                 // if no instance id use custom breadcrumbs
                 if (!instanceId) {
@@ -50,6 +49,7 @@ export default function Breadcrumbs(props) {
                         )
                     }
                 }
+                return ""
             })}
             {instanceId ?
                 <>
