@@ -50,7 +50,7 @@ function AuthenticatedContent() {
                 setNamespace(window.location.pathname.split("/")[1])
               } else {
                 if(localStorage.getItem("namespace") !== undefined) {
-                    if(localStorage.getItem("namespace") === "") {
+                    if(localStorage.getItem("namespace") === "" && json.namespaces.length != 0) {
                         setNamespace(json.namespaces[0].name)
                     } else {
                       let found = false
@@ -60,9 +60,15 @@ function AuthenticatedContent() {
                         }
                       }
                       if(!found){
-                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0].name}'`,0)
-                        setNamespace(json.namespaces[0].name)
-                        localStorage.setItem("namespace", json.namespaces[0].name)
+                        if (json.namespaces.length == 0) {
+                          sendNotification(`You are not a part of any namespaces! Create a namespace to continue using Direktiv.`)
+                          setNamespace("")
+                          localStorage.setItem("namespace", "")
+                        } else {
+                          sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.namespaces[0].name}'`,0)
+                          setNamespace(json.namespaces[0].name)
+                          localStorage.setItem("namespace", json.namespaces[0].name)
+                        }
                       } else {
                         setNamespace(localStorage.getItem("namespace"))
                       }
@@ -197,7 +203,7 @@ function Content() {
                         }
                       }
                       if(!found){
-                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0].name}'`,0)
+                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.namespaces[0].name}'`,0)
                         setNamespace(json.namespaces[0].name)
                         localStorage.setItem("namespace", json.namespaces[0].name)
                       } else {

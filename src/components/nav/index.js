@@ -77,6 +77,7 @@ export default function Navbar(props) {
                 }
 
 
+                sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
                 history.push(`/${val}`)
             } else {
                 throw new Error(await resp.text())
