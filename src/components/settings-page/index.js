@@ -4,8 +4,9 @@ import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { PlusCircle, XCircle } from 'react-bootstrap-icons'
 import { useHistory } from 'react-router'
-import { IoLockOpen, IoLogoDocker } from 'react-icons/io5'
+import { IoLockOpen, IoLogoDocker, IoTrash } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
+import { ConfirmButton } from '../confirm-button'
 
 
 function SettingsAction(props) {
@@ -26,13 +27,11 @@ function SettingsAction(props) {
                         break
                     }
                 }
-
-                console.log(goto)
                 if (goto==="") {
                     // if not found push to / as no namespaces probably exist
                     localStorage.setItem("namespace", "")
                     setShow(false)
-                    // await fetchNamespaces(false, "")
+                    await fetchNamespaces(false, "")
                     setNamespace("")
                     // window.location.pathname = "/"
                     history.push("/")
@@ -62,7 +61,7 @@ function SettingsAction(props) {
 
     return(
         <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-            <div className="dropdown">
+            {/* <div className="dropdown">
                 <button onClick={(e)=>{
                     // e.stopPropagation()
                     setShow(!show)
@@ -78,7 +77,12 @@ function SettingsAction(props) {
                 :
                 (<></>)
                 }
-            </div> 
+            </div>  */}
+            <ConfirmButton  Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                            deleteNamespace()
+                            ev.stopPropagation()
+              }}/>
+      
         </div>
     )
 }

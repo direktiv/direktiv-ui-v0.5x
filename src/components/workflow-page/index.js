@@ -115,11 +115,10 @@ export default function WorkflowPage() {
     },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
 
     useEffect(()=>{
-        if (workflowValue === "" && namespace !== ""){
+        if (namespace !== "") {
             fetchWorkflow()
         }
-    },[namespace, fetchWorkflow, workflowValue])
-
+    },[fetchWorkflow, namespace])
     // useEffect(()=>{
     //     console.log("Workflow page has mounted")
     // },[])
@@ -445,16 +444,16 @@ function WorkflowActions(props) {
 
     return(
         <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-            <div class="dropdown">
+            <div className="dropdown">
                 <button onClick={(e)=>{
                     // e.stopPropagation()
                     setShow(!show)
-                    }} class="dropbtn">Actions</button>
+                    }} className="dropbtn">Actions</button>
 
                 {
                     show ? <>
-                        <div class="dropdown-content-connector"></div>
-                        <div class="dropdown-content">
+                        <div className="dropdown-content-connector"></div>
+                        <div className="dropdown-content">
                             {active ? 
                             <a href="#!" onClick={()=>{
                                 toggleWorkflow()

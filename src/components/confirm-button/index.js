@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../style/custom.css";
 import { IoCheckmarkSharp, IoCloseSharp } from "react-icons/io5"
 
-export function ConfirmButton(props) {
+export  function ConfirmButton(props) {
     const { Icon, IconColor, OnConfirm, ConfirmationText } = props;
     const [showConfirmation, setShowConfirmation] = useState(false);
 
