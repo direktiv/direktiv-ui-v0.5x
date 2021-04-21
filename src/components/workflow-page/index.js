@@ -6,7 +6,7 @@ import Diagram from './diagram'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle } from 'react-icons/io5'
 
 import {sendNotification} from '../notifications/index.js'
 import PieChart from '../charts/pie'
@@ -226,7 +226,7 @@ export default function WorkflowPage() {
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
                     <div className="container" style={{ flexDirection: "row" }}>
-                        <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2" }}>
+                        <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2", minWidth: "350px" }}>
                             <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
                                 <IoPencil />
                             </TileTitle>
@@ -238,7 +238,7 @@ export default function WorkflowPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1" }}>
+                        <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", minWidth: "350px" }}>
                             <TileTitle name="Execute Workflow">
                                 <IoChevronForwardOutline />
                             </TileTitle>
@@ -257,6 +257,13 @@ export default function WorkflowPage() {
                             <IoEaselOutline />
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
+                        <div style={{width: "100%", position: "absolute", display: "flex", flexDirection: "row-reverse"}}>
+                                <div onClick={()=>setViewSankey(false)} title="Swap to Sankey View" className="circle button toggled-switch shadow-soft-inverse" style={{ marginLeft: "10px", position: "relative", top: "30px", zIndex: "5" }}>
+                                    <span style={{ flex: "auto" }}>
+                                        <IoToggle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                    </span>
+                                </div>
+                            </div>
                             <div style={{ flex: "auto" }}>
                                 <Sankey/>
                             </div>
@@ -268,6 +275,13 @@ export default function WorkflowPage() {
                             <IoEaselOutline />
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
+                            <div style={{width: "100%", position: "absolute", display: "flex", flexDirection: "row-reverse"}}>
+                                <div onClick={()=>setViewSankey(true)} title="Swap to Sankey View" className="circle button" style={{ marginLeft: "10px", position: "relative", top: "30px", zIndex: "5" }}>
+                                    <span style={{ flex: "auto" }}>
+                                        <IoToggleOutline style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                    </span>
+                                </div>
+                            </div>
                             <div style={{ flex: "auto" }}>
                                 {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
                                     {workflowValueOld !== "" ?
@@ -285,7 +299,7 @@ export default function WorkflowPage() {
                         <TileTitle name="Executed Workflows">
                             <IoPieChartSharp />
                         </TileTitle>
-                        <div className="tile-contents">
+                        <div id="pie-dish" className="tile-contents">
                             <PieComponent/>
                         </div>
                     </div>
