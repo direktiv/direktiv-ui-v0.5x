@@ -9,7 +9,7 @@ import { sendNotification } from '../notifications'
 
 
 function SettingsAction(props) {
-    const {namespace, fetch, namespaces, fetchNamespaces} = useContext(MainContext)
+    const {namespace, fetch, namespaces, fetchNamespaces, setNamespace} = useContext(MainContext)
     const history = useHistory()
     const [show, setShow] = useState(false)
 
@@ -32,8 +32,10 @@ function SettingsAction(props) {
                     // if not found push to / as no namespaces probably exist
                     localStorage.setItem("namespace", "")
                     setShow(false)
-                    // await fetchNamespaces(false)
-                    window.location.pathname = "/"
+                    // await fetchNamespaces(false, "")
+                    setNamespace("")
+                    // window.location.pathname = "/"
+                    history.push("/")
                 } else {
                     localStorage.setItem("namespace", goto)
                     setShow(false)

@@ -65,6 +65,7 @@ function AuthenticatedContent() {
                 }
               }
               if (!f) {
+                // need a better solution as keycloak forces reload of the page again.
                 window.location.pathname = "/"
                 return
               }
@@ -95,7 +96,7 @@ function AuthenticatedContent() {
                   }
 
                   if (!found) {
-
+                    console.log("not found")
                     // check if json array is greater than 0 to set to the first
                     if (json.namespaces.length > 0) {
 
@@ -114,15 +115,16 @@ function AuthenticatedContent() {
               }
             }
           }
-          if (newNamespace === "" && val) {
 
+          if (newNamespace === "" && val) {
             newNamespace = val
           }
+          
           let namespacesn = [];
           for (let i = 0; i < json.namespaces.length; i++) {
-
             namespacesn.push(json.namespaces[i].name)
           }
+
           setLoad(false)
           setNamespace(newNamespace)
           setNamespaces(namespacesn)
@@ -181,12 +183,12 @@ function AuthenticatedContent() {
       setNamespaces: setNamespaces,
       fetchNamespaces: fetchNamespaces,
     }}>
+      {!load ?
       <div id="content">
         <Router>
           <div id="nav-panel">
               <Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
           </div>
-          {namespace !== "" ?
             <div id="main-panel">
               <Switch>
               <Route exact path="/jq/playground" component={JQPlaygroundPage} />
@@ -198,7 +200,7 @@ function AuthenticatedContent() {
                         :
                         <Route exact path="/">
                           <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12pt"}}>
-                          You are not a part of any namespaces! Create a namespace to continue using Direktiv.
+                            You are not a part of any namespaces! Create a namespace to continue using Direktiv.
                           </div>
                         </Route>
                     }
@@ -210,11 +212,10 @@ function AuthenticatedContent() {
                   <Route exact path="/:namespace/s/" component={SettingsPage} />
               </Switch>
             </div>
-            :
-            ""
-          }
         </Router>
       </div>
+      :
+      ""}
       <NotificationSystem />
     </MainContext.Provider>
   )
@@ -260,6 +261,8 @@ function Content() {
                 }
               }
               if (!f) {
+                // need a better solution as keycloak forces reload of the page again.
+
                 window.location.pathname = "/"
                 return
               }
