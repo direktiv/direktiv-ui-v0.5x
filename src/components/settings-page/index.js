@@ -19,25 +19,26 @@ function SettingsAction(props) {
                 method: "DELETE"
             })
             if (resp.ok) {
-                let found = 0
+                let goto = ""
                 for(let i=0; i < namespaces.length; i++) {
                     if(namespaces[i] !== namespace) {
-                        found = i
+                        goto = namespaces[i]
                         break
                     }
                 }
 
-                if (found===0) {
+                console.log(goto)
+                if (goto==="") {
                     // if not found push to / as no namespaces probably exist
                     localStorage.setItem("namespace", "")
                     setShow(false)
-                    await fetchNamespaces(false, "")
-                    history.push(`/`)
+                    // await fetchNamespaces(false)
+                    window.location.pathname = "/"
                 } else {
-                    localStorage.setItem("namespace", namespaces[found])
+                    localStorage.setItem("namespace", goto)
                     setShow(false)
-                    await fetchNamespaces(false, namespaces[found])
-                    history.push(`/`)
+                    await fetchNamespaces(false, goto)
+                    history.push(`/${goto}`)
                 }
  
 
