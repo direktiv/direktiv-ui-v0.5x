@@ -185,7 +185,7 @@ export default function WorkflowPage() {
 
     async function toggleWorkflow() {
         try{
-            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.id}/toggle`, {
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/toggle`, {
                 method: "PUT",
             })
             if(resp.ok) {
@@ -257,7 +257,7 @@ export default function WorkflowPage() {
                         </TileTitle>
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
                         <div style={{width: "100%", position: "absolute", display: "flex", flexDirection: "row-reverse"}}>
-                                <div onClick={()=>setViewSankey(false)} title="Swap to Sankey View" className="circle button toggled-switch shadow-soft-inverse" style={{ marginLeft: "10px", position: "relative", top: "30px", zIndex: "5" }}>
+                                <div onClick={()=>setViewSankey(false)} title="Swap to Graph View" className="circle button toggled-switch shadow-soft-inverse" style={{ marginLeft: "10px", position: "relative", top: "30px", zIndex: "5" }}>
                                     <span style={{ flex: "auto" }}>
                                         <IoToggle style={{ fontSize: "12pt", marginBottom: "6px" }} />
                                     </span>
@@ -438,50 +438,19 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const {active, toggleWorkflow, setViewSankey, viewSankey} = props
-
-    const [show, setShow] = useState(false)
+    const {active, toggleWorkflow} = props
 
     return(
-        <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-            <div className="dropdown">
-                <button onClick={(e)=>{
-                    // e.stopPropagation()
-                    setShow(!show)
-                    }} className="dropbtn">Actions</button>
-
-                {
-                    show ? <>
-                        <div className="dropdown-content-connector"></div>
-                        <div className="dropdown-content">
-                            {active ? 
-                            <a href="#!" onClick={()=>{
-                                toggleWorkflow()
-                                setShow(!show)
-                            }}>Disable</a>
-                            :
-                            <a href="#!" onClick={()=>{
-                                toggleWorkflow()
-                                setShow(!show)
-                            }}>Enable</a>
-                            }
-                            {viewSankey ?
-                            <a href="#!" onClick={()=>{
-                                setViewSankey(!viewSankey)
-                                setShow(!show)
-                            }}>Show Diagram</a>
-                            :
-                            <a href="#!" onClick={()=>{
-                                setViewSankey(!viewSankey)
-                                setShow(!show)
-                            }}>Show Sankey</a>
-                            }
-                        </div>
-                    </>
-                :
-                (<></>)
+        <div title={active? "Disable": "Enable"} id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", height:"28px", padding: "5px", display:"flex", alignItems:"center" }}>
+               {active ? 
+                    <span title="Disable" onClick={()=>toggleWorkflow()} style={{ cursor:"pointer", flex: "auto", display:"flex", alignItems:"center", color:"green" }}>
+                       <IoToggleOutline style={{ fontSize: "12pt" }} />
+                   </span>
+               :
+                    <span title="Enable" onClick={()=>toggleWorkflow()} style={{ rotate: "180deg", WebkitTransform: "rotate(180deg)", cursor:"pointer", transform:"180deg", flex: "auto", display:"flex", alignItems:"center" }}>
+                        <IoToggleOutline style={{ fontSize: "12pt" }} />
+                    </span>
                 }
-            </div> 
         </div>
     )
 }
