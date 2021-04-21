@@ -75,7 +75,7 @@ export default function WorkflowPage() {
         async function updateWf() {
             try {
                 // todo pagination
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}`, {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.id}`, {
                     method: "put",
                     headers: {
                         "Content-type": "text/yaml",
@@ -101,7 +101,7 @@ export default function WorkflowPage() {
             return
         }
         updateWf().finally(()=>{setFetching(false)})
-    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.uid])
+    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
 
     useEffect(()=>{
         if (workflowValue === ""){
@@ -169,7 +169,7 @@ export default function WorkflowPage() {
 
     async function toggleWorkflow() {
         try{
-            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}/toggle`, {
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.id}/toggle`, {
                 method: "PUT",
             })
             if(resp.ok) {

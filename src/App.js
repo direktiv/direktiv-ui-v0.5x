@@ -267,7 +267,6 @@ function Content() {
                 return
               }
             }
-            console.log(newNamespace)
             // if newNamespace isn't found yet try other options
             if (newNamespace === "") {
               // if its in storage

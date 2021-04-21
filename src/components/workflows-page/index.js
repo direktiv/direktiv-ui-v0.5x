@@ -115,7 +115,7 @@ export default function WorkflowsPage() {
                                                     <div className="actions-button-div">
                                                         {obj.active ?
                                                             <div className="button circle success" onClick={(ev) => {
-                                                                toggleWorkflow(obj.uid)
+                                                                toggleWorkflow(obj.id)
                                                                 ev.stopPropagation()
                                                             }}>
                                                                 <span>
@@ -124,7 +124,7 @@ export default function WorkflowsPage() {
                                                             </div>
                                                             :
                                                             <div className="button circle" onClick={(ev) => {
-                                                                toggleWorkflow(obj.uid)
+                                                                toggleWorkflow(obj.id)
                                                                 ev.stopPropagation()
                                                             }}>
                                                                 <span>
