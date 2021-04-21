@@ -28,7 +28,7 @@ export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
-    
+    console.log(namespace)
     const fetchWorkflows = useCallback(()=>{
         async function fetchWfs() {
             try {
@@ -87,6 +87,7 @@ export default function WorkflowsPage() {
 
     return (
         <>
+        {namespace !== ""?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -171,6 +172,7 @@ export default function WorkflowsPage() {
                 </div>
             </div>
         </div>
+        :""}
         </>
     )
 }

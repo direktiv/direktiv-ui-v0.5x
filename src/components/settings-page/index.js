@@ -9,7 +9,7 @@ import { sendNotification } from '../notifications'
 
 
 function SettingsAction(props) {
-    const {namespace, fetch, namespaces, fetchNamespaces, setNamespace} = useContext(MainContext)
+    const {namespace, fetch, namespaces, fetchNamespaces} = useContext(MainContext)
     const history = useHistory()
     const [show, setShow] = useState(false)
 
@@ -19,18 +19,28 @@ function SettingsAction(props) {
                 method: "DELETE"
             })
             if (resp.ok) {
+                let found = 0
                 for(let i=0; i < namespaces.length; i++) {
                     if(namespaces[i] !== namespace) {
-                        localStorage.setItem("namespace", namespaces[i])
-                        // setNamespace(namespaces[i])
-
-                        await fetchNamespaces(false, namespaces[i])
-
-                        setShow(false)
-                        history.push(`/`)
-
+                        found = i
+                        break
                     }
                 }
+
+                if (found===0) {
+                    // if not found push to / as no namespaces probably exist
+                    localStorage.setItem("namespace", "")
+                    setShow(false)
+                    await fetchNamespaces(false, "")
+                    history.push(`/`)
+                } else {
+                    localStorage.setItem("namespace", namespaces[found])
+                    setShow(false)
+                    await fetchNamespaces(false, namespaces[found])
+                    history.push(`/`)
+                }
+ 
+
             } else {
                 throw new Error(await resp.text())
             }
@@ -65,8 +75,10 @@ function SettingsAction(props) {
 }
 
 export default function SettingsPage() {
+    const {namespace} = useContext(MainContext)
     return (
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row">
                 <div style={{ flex: "auto" }}>
@@ -89,6 +101,7 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
+        :""}
         </>
     )
 }

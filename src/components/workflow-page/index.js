@@ -192,6 +192,7 @@ export default function WorkflowPage() {
 
     return(
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto" }}>
@@ -277,7 +278,7 @@ export default function WorkflowPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>:""}
         </>
     )
 }

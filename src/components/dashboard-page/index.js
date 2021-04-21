@@ -1,13 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
 
 import { IoBarChartSharp, IoCodeSlashOutline, IoList } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
+import MainContext from '../../context'
 
 export default function DashboardPage() {
+    // used to hide loading
+    const {namespace} = useContext(MainContext)
+    
     return (
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -35,6 +40,9 @@ export default function DashboardPage() {
                 </div>
             </div>
         </div>
+        :
+    
+    ""}
         </>
     )
 }
