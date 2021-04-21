@@ -93,59 +93,57 @@ export default function WorkflowsPage() {
                     <TileTitle name="All workflows">
                         <IoList />
                     </TileTitle>
-                    <div id="events-table">
-                        <table style={{width: "100%"}}>
-                            <tbody>
-                                {workflows.map((obj)=>{
-                                    return(
-                                        <tr className="workflows-list-item" style={{ lineHeight: "50px" }} onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
-                                            <td style={{textAlign:"left", paddingLeft:"5px"}}>
-                                                <b>{obj.id}</b>
-                                            </td>
-                                            {obj.description === "" ?
-                                                <td style={{textAlign:"left", paddingLeft:"5px", maxWidth:"300px", textOverflow:"ellipsis", overflow:"hidden"}}>No description has been provided.</td>
-                                                :
-                                                <td title={obj.description} style={{textAlign:"left", paddingLeft:"5px", maxWidth:"300px", textOverflow:"ellipsis", overflow:"hidden"}}>{obj.description}</td>
-                                            }
-                                            <td  style={{paddingLeft:"5px"}}>
-                                                <div className="actions-button-div">
-                                                    {obj.active ?
-                                                        <div className="button circle success" onClick={(ev)=>{
-                                                            toggleWorkflow(obj.uid)
+                        <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
+                            {workflows.length > 0 ?
+                                <>
+                                    {workflows.map((obj) => {
+                                        return (
+                                            <div className="workflows-list-item"  onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
+                                                <div className="workflows-list-name">
+                                                    {obj.id}
+                                                </div>
+                                                <div className="workflows-list-description">
+                                                    {obj.description}
+                                                </div>
+                                                <div style={{ flexGrow: "1", flexBasis: "0" }}>
+                                                    <div className="actions-button-div">
+                                                        {obj.active ?
+                                                            <div className="button circle success" onClick={(ev) => {
+                                                                toggleWorkflow(obj.uid)
+                                                                ev.stopPropagation()
+                                                            }}>
+                                                                <span>
+                                                                    <IoToggle />
+                                                                </span>
+                                                            </div>
+                                                            :
+                                                            <div className="button circle" onClick={(ev) => {
+                                                                toggleWorkflow(obj.uid)
+                                                                ev.stopPropagation()
+                                                            }}>
+                                                                <span>
+                                                                    <IoToggleOutline style={{ rotate: "180deg", WebkitTransform: "rotate(180deg)" }} />
+                                                                </span>
+                                                            </div>
+                                                        }
+                                                        <div className="button circle danger" onClick={(ev) => {
+                                                            deleteWorkflow(obj.uid)
                                                             ev.stopPropagation()
                                                         }}>
                                                             <span>
-                                                                <IoToggle />
+                                                                <IoTrash />
                                                             </span>
                                                         </div>
-                                                        :
-                                                        <div className="button circle" onClick={(ev)=>{
-                                                            toggleWorkflow(obj.uid)
-                                                            ev.stopPropagation()
-                                                        }}>
-                                                            <span>
-                                                                <IoToggleOutline style={{ rotate: "180deg", WebkitTransform: "rotate(180deg)" }} />
-                                                            </span>
-                                                        </div>
-                                                    }
-                                                    <div className="button circle danger" onClick={(ev)=>{
-                                                        deleteWorkflow(obj.uid)
-                                                        ev.stopPropagation()
-}}>
-                                                        <span>
-                                                            <IoTrash />
-                                                        </span>
                                                     </div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                    
-                                })}
-                            </tbody>
-                        </table>
+                                            </div>
+                                        )
+                                    })}
+                                </> :
+                                <></>
+                            }
+                        </div>
                     </div>
-                </div>
                 <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                         <TileTitle name="Upload workflow file">
