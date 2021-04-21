@@ -14,6 +14,7 @@ import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 import Sankey from './sankey'
 import * as dayjs from "dayjs"
+import NoResults from '../../noresults'
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
@@ -358,6 +359,8 @@ function EventsList(props) {
             <ul style={{ margin: "0px" }}>
                 {instances !== null ?
                 <>
+                {instances.length > 0 ?
+                <>
                 {instances.map((obj)=>{
                     return(
                         <li style={{cursor:"pointer"}} onClick={()=>history.push(`/i/${obj.id}`)} className="event-list-item">
@@ -373,6 +376,8 @@ function EventsList(props) {
                     </li>
                     )
                 })}
+                </>
+                : <NoResults/>}
 </>:""}
             </ul>
         </div>

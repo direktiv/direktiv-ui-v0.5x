@@ -13,6 +13,7 @@ import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash} from 'react-icons/io5'
 import { sendNotification } from '../notifications'
+import NoResults from '../../noresults'
 
 
 const noopState = `id: noop
@@ -103,7 +104,7 @@ export default function WorkflowsPage() {
                                                     {obj.id}
                                                 </div>
                                                 <div className="workflows-list-description">
-                                                    {obj.description}
+                                                    {obj.description === "" ? "No description has been provided." : obj.description}
                                                 </div>
                                                 <div style={{ flexGrow: "1", flexBasis: "0" }}>
                                                     <div className="actions-button-div">
@@ -140,7 +141,7 @@ export default function WorkflowsPage() {
                                         )
                                     })}
                                 </> :
-                                <></>
+                                <NoResults />
                             }
                         </div>
                     </div>

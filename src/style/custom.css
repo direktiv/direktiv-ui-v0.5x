@@ -512,6 +512,8 @@ text {
     flex-basis: 0px;
     text-align: start;
     font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .workflows-list-description {
@@ -522,6 +524,7 @@ text {
     white-space: nowrap;
     max-width: 500pt;
     text-align: start;
+    padding-left: 10px;
 }
 
 #editor-actions {

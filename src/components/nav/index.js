@@ -1,7 +1,7 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
 import md5 from 'md5'
-import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
+import { Link, matchPath, useHistory, useLocation, useParams } from 'react-router-dom'
 
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 import { PlusCircle } from 'react-bootstrap-icons'
@@ -45,11 +45,8 @@ export default function Navbar(props) {
             })
             if (resp.ok) {
                 await resp.json()
-                fetchNamespaces()
-                setNamespace(val)
-                localStorage.setItem("namespace", val)
-                setAcceptInput(!acceptInput)
-                toggleNamespaceSelector()
+                // causing problems CHECKLATER
+
                 let matchWf = matchPath(location.pathname, {
                     path: `/${namespace}/w/:workflow`
                 })
@@ -76,9 +73,16 @@ export default function Navbar(props) {
                     return
                 }
 
-
+                // setNamespace(val)
+                localStorage.setItem("namespace", val)
+                setAcceptInput(!acceptInput)
+                toggleNamespaceSelector()
+                setNamespace(val)
                 sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
+                fetchNamespaces(false, val)
+
                 history.push(`/${val}`)
+
             } else {
                 throw new Error(await resp.text())
             }
@@ -87,8 +91,6 @@ export default function Navbar(props) {
         }
     }
     
-
-
 
     return(
         <div id="nav">
@@ -99,7 +101,7 @@ export default function Navbar(props) {
                 </span> */}
             </div>
             <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
-                <ul id="namespaces-ul" style={{ margin: "0px" }}>
+                <ul id={"namespaces-ul"} style={{ margin: "0px" }}>
                     <li className="namespace-selector" onClick={() => {
                         toggleNamespaceSelector()
                     }}>
@@ -138,6 +140,7 @@ export default function Navbar(props) {
                                         return(
                                             <li key={i} onClick={()=>{
                                                 localStorage.setItem("namespace", obj)
+                                                console.log('triggered?')
                                                 setNamespace(obj)
                                                 toggleNamespaceSelector()
                                                
@@ -182,28 +185,49 @@ export default function Navbar(props) {
             <div id="nav-ul-holder" className="nav-section divider">
                 <ul>
                     <li>
+                        {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                                <IoGrid style={{ marginRight: "10px" }} />
+                                <span>Dashboard</span>
+                            </div>
+                            :
                         <Link to={`/${namespace}`} className="nav-link">
                             <div>
                                 <IoGrid style={{ marginRight: "10px" }} />
                                 <span>Dashboard</span>
                             </div>
                         </Link>
+}
                     </li>
-                    <li>
+                    <li>  {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                                                              <IoShapesSharp style={{ marginRight: "10px" }} />
+
+                                <span>Workflows</span>
+                            </div>
+                            :
                         <Link to={`/${namespace}/w/`} className="nav-link">
                             <div>
                                 <IoShapesSharp style={{ marginRight: "10px" }} />
                                 <span>Workflows</span>
                             </div>
                         </Link>
+}
                     </li>
                     <li>
+                    {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                                                               <IoTerminalSharp style={{ marginRight: "10px" }} />
+
+                                <span>Instances</span>
+                            </div>
+                            :
                         <Link to={`/${namespace}/i/`} className="nav-link">
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
                             </div>
-                        </Link>
+                        </Link>}
                     </li>
                     <li>
                         <Link to="/jq/playground" className="nav-link">
@@ -214,12 +238,20 @@ export default function Navbar(props) {
                         </Link>
                     </li>
                     <li>
+                    {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                                                               <IoSettingsSharp style={{ marginRight: "10px" }} />
+
+                                <span>Settings</span>
+                            </div>
+                            :
                         <Link to={`/${namespace}/s/`} className="nav-link">
                             <div>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>
                             </div>
                         </Link>
+}
                     </li>
                 </ul>
             </div>

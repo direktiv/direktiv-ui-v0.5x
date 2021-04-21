@@ -11,6 +11,7 @@ import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoList } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
+import NoResults from '../../noresults'
 
 dayjs.extend(relativeTime);
 
@@ -63,6 +64,7 @@ export function EventsPageBody() {
 
     return(
         <div id="events-table">
+            {instances.length > 0 ?
             <table style={{ width: "100%" }}>
                 <thead>
                     <tr>
@@ -89,7 +91,8 @@ export function EventsPageBody() {
                         })
                     }
                 </tbody>
-            </table>
+            </table> :
+            <NoResults/>}
         </div>
     )
 }
