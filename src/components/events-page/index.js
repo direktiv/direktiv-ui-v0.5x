@@ -74,15 +74,13 @@ export function EventsPageBody() {
         <div id="events-table">
             {instances.length > 0 ?
             <table style={{ width: "100%" }}>
-                <thead>
+                {/* <thead>
                     <tr>
                         <th>Status</th>
                         <th>Instance ID</th>
                         <th>Time</th>
-
-                        {/* <th>Actions</th> */}
                     </tr>
-                </thead>
+                </thead> */}
                 <tbody>
                     {
                         instances.map((obj)=>{
