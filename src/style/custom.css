@@ -496,7 +496,7 @@ text {
 .workflows-list-item {
     display: flex;
     flex-direction: row;
-    height: 50px;
+    height: 64px;
     align-items: center;
     border-radius: 6px;
     padding: 0 10px 0 10px;
