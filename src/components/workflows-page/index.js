@@ -132,8 +132,8 @@ export default function WorkflowsPage() {
                                                                 </span>
                                                             </div>
                                                         }
-                                                        <ConfirmButton Icon={IoTrash} OnConfirm={(ev) => {
-                                                            deleteWorkflow(obj.uid)
+                                                        <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                                            deleteWorkflow(obj.id)
                                                             ev.stopPropagation()
                                                         }}/>
                                                         {/* <div className="button circle danger" onClick={(ev) => {
