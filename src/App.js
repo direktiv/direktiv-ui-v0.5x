@@ -2,7 +2,7 @@ import './App.css';
 import './style/scrollbar.css';
 import './style/custom.css';
 
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect, useHistory } from "react-router-dom";
 import Navbar from './components/nav'
 import DashboardPage from './components/dashboard-page'
 import EventsPage from './components/events-page'
@@ -176,6 +176,7 @@ function Content() {
   const context = useContext(MainContext)
 
   const [namespace, setNamespace] = useState("")
+  const [load, setLoad] = useState(false)
   const [namespaces, setNamespaces] = useState(null)
 
   const netch = useCallback((path, opts)=>{
@@ -185,6 +186,7 @@ function Content() {
 
   const fetchNamespaces = useCallback((load, val) => {
     async function fd() {
+      setLoad(true)
       try {
         let resp = await netch('/namespaces/', {
             method: 'GET',
@@ -203,18 +205,37 @@ function Content() {
                   console.log('hello2')
                   newNamespace = window.location.pathname.split("/")[1]
                 }
+
+                // check if namespace exists here if not redirect back to /
+                let f = false
+                for (let i=0; i < json.namespaces.length; i++) {
+                  if (json.namespaces[i].name === newNamespace) {
+                    f = true
+                  }
+                }
+                if (!f) {
+                  window.location.pathname = "/"
+                  return
+                }
               }
+
               // if newNamespace isn't found yet try other options
               if (newNamespace === "") {
                 // if its in storage
                 if (localStorage.getItem("namespace") !== undefined ) {
+                  console.log('hello3')
+
                   // if the value in storage is an empty string
                   if(localStorage.getItem("namespace") === "") {
+                  console.log('hello4')
+
                     // if the json namespaces array is greater than 0 set it to the first
                     if(json.namespaces.length > 0) {
                       newNamespace = json.namespaces[0].name
                     }
                   } else {
+                  console.log('hello5')
+
                     let found = false
                     // check if the namespace previously stored in localstorage exists in the list
                     for(let i=0; i < json.namespaces.length; i++) {
@@ -226,8 +247,12 @@ function Content() {
                     }
 
                     if(!found) {
+                  console.log('hello6')
+
                       // check if json array is greater than 0 to set to the first
                       if(json.namespaces.length > 0) {
+                  console.log('hello7')
+
                         newNamespace = json.namespaces[0].name
                         localStorage.setItem("namespace", json.namespaces[0].name)
                         sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
@@ -237,12 +262,16 @@ function Content() {
                 } else {
                   // if the json namespace array is greater than 0 set it to the first as no other options is valid
                   if(json.namespaces.length > 0) {
+                  console.log('hello8')
+
                     newNamespace = json.namespaces[0].name
                   }
                 }                
               }
             }
             if(newNamespace === "" && val) {
+              console.log('hello9')
+
               newNamespace = val
             }
             let namespacesn = [];
@@ -254,12 +283,16 @@ function Content() {
           
             setNamespace(newNamespace)
             setNamespaces(namespacesn)
+    setLoad(false)
+
         } else {
             throw new Error(await resp.text())
         }
     } catch(e) {
       console.log(e)
         sendNotification("Failed to fetch namespaces", e.message, 0)
+    setLoad(false)
+
     }
     }
     fd()
@@ -283,6 +316,8 @@ function Content() {
       setNamespaces: setNamespaces,
       fetchNamespaces: fetchNamespaces,
     }}>
+      {!load ?
+
       <div id="content">
         <Router>
           <div id="nav-panel">
@@ -313,6 +348,8 @@ function Content() {
           </div>
         </Router>
       </div>
+    :
+    <></>}
     </MainContext.Provider>
 
   )
