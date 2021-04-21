@@ -60,29 +60,11 @@ function SettingsAction(props) {
 
 
     return(
-        <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px"}}>
-            {/* <div className="dropdown">
-                <button onClick={(e)=>{
-                    // e.stopPropagation()
-                    setShow(!show)
-                    }} className="dropbtn">Actions</button>
-
-                {
-                    show ? <>
-                        <div className="dropdown-content-connector"></div>
-                        <div className="dropdown-content">
-                            <a href="#!" onClick={()=>{deleteNamespace()}}>Delete Namespace</a>
-                        </div>
-                    </>
-                :
-                (<></>)
-                }
-            </div>  */}
+        <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px" }}>
             <ConfirmButton ConfirmationText={"Delete Namespace Confirmation"} Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
-                            deleteNamespace()
-                            ev.stopPropagation()
-              }}/>
-      
+                deleteNamespace()
+                ev.stopPropagation()
+            }} />
         </div>
     )
 }
