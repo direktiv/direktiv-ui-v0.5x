@@ -71,7 +71,7 @@ export default function ReactEditor(props) {
                         {actions !== undefined ? (
                             actions.map(function (Action, i) {
                                 return (
-                                    <div>
+                                    <div key={`editor-action-${i}`}>
                                         {/* <div> */}
                                             {Action}
                                         {/* </div> */}
