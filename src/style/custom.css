@@ -493,9 +493,38 @@ text {
 
 /* ...................... */
 
+.workflows-list-item {
+    display: flex;
+    flex-direction: row;
+    height: 64px;
+    align-items: center;
+    border-radius: 6px;
+    padding: 0 10px 0 10px;
+}
+
 .workflows-list-item:hover {
     cursor: pointer;
     box-shadow: 2px 2px 6px #bebebe, -2px -2px 6px #ffffff;
+}
+
+.workflows-list-name {
+    flex-grow: 1;
+    flex-basis: 0px;
+    text-align: start;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.workflows-list-description {
+    flex-grow: 3;
+    flex-basis: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 500pt;
+    text-align: start;
+    padding-left: 10px;
 }
 
 #editor-actions {

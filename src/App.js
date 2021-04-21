@@ -55,7 +55,7 @@ function AuthenticatedContent() {
                 }
               } else {
                 if(localStorage.getItem("namespace") !== undefined) {
-                    if(localStorage.getItem("namespace") === "" && json.namespaces.length != 0) {
+                    if(localStorage.getItem("namespace") === "" && json.namespaces.length !== 0) {
                         setNamespace(json.namespaces[0].name)
                     } else {
                       let found = false
@@ -65,7 +65,7 @@ function AuthenticatedContent() {
                         }
                       }
                       if(!found){
-                        if (json.namespaces.length == 0) {
+                        if (json.namespaces.length === 0) {
                           sendNotification(`You are not a part of any namespaces! Create a namespace to continue using Direktiv.`)
                           setNamespace("")
                           localStorage.setItem("namespace", "")
