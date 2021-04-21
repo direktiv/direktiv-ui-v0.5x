@@ -33,8 +33,13 @@ export default function InstancePage() {
                     let wfn = atob(json.workflow)
                     setWf(wfn)
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+              // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflow", e.message, 0)
@@ -53,8 +58,13 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+              // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Fetch Instance details failed ", e.message, 0)

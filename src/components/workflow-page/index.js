@@ -56,11 +56,16 @@ export default function WorkflowPage() {
                         return {...wfI}
                     })
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
-                sendNotification("Failed to fetch workflow", e, 0)
+                sendNotification("Failed to fetch workflow", e.message, 0)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
@@ -94,8 +99,13 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(workflowValue)
                     history.replace(`${json.id}`)
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                  // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
@@ -106,10 +116,10 @@ export default function WorkflowPage() {
     },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
 
     useEffect(()=>{
-        if (workflowValue === ""){
+        if (workflowValue === "" && namespace !== ""){
             fetchWorkflow()
         }
-    },[fetchWorkflow, workflowValue])
+    },[namespace, fetchWorkflow, workflowValue])
 
     // useEffect(()=>{
     //     console.log("Workflow page has mounted")
@@ -162,8 +172,13 @@ export default function WorkflowPage() {
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-                let json = await resp.json()
-                throw new Error(json.Message)
+         // 400 should have json response
+         if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
             }
         } catch(e) {
             sendNotification("Failed to execute workflow", e.message, 0)
@@ -184,8 +199,13 @@ export default function WorkflowPage() {
                     return {...wfI}
                 })
             } else {
-                let json = await resp.json()
-                throw new Error(json.Message)
+                // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
             }
         } catch(e) {
             sendNotification("Failed to disable workflow", e.message, 0)
@@ -312,8 +332,13 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+              // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
@@ -353,8 +378,13 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                    // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             }catch(e){
                 sendNotification("Unable to fetch workflow instances", e.message, 0)
