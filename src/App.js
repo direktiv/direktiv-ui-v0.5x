@@ -55,7 +55,7 @@ function AuthenticatedContent() {
                 }
               } else {
                 if(localStorage.getItem("namespace") !== undefined) {
-                    if(localStorage.getItem("namespace") === "") {
+                    if(localStorage.getItem("namespace") === "" && json.namespaces.length != 0) {
                         setNamespace(json.namespaces[0].name)
                     } else {
                       let found = false
@@ -65,9 +65,15 @@ function AuthenticatedContent() {
                         }
                       }
                       if(!found){
-                        sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.data[0].name}'`,0)
-                        setNamespace(json.namespaces[0].name)
-                        localStorage.setItem("namespace", json.namespaces[0].name)
+                        if (json.namespaces.length == 0) {
+                          sendNotification(`You are not a part of any namespaces! Create a namespace to continue using Direktiv.`)
+                          setNamespace("")
+                          localStorage.setItem("namespace", "")
+                        } else {
+                          sendNotification(`'${localStorage.getItem("namespace")}' does not exist in list changing to '${json.namespaces[0].name}'`,0)
+                          setNamespace(json.namespaces[0].name)
+                          localStorage.setItem("namespace", json.namespaces[0].name)
+                        }
                       } else {
                         setNamespace(localStorage.getItem("namespace"))
                       }
@@ -177,7 +183,7 @@ function Content() {
   },[context.SERVER_BIND])
   
 
-  const fetchNamespaces = useCallback((load) => {
+  const fetchNamespaces = useCallback((load, val) => {
     async function fd() {
       try {
         let resp = await netch('/namespaces/', {
@@ -191,12 +197,13 @@ function Content() {
               if(window.location.pathname.split("/")[1] !== "") {
                 // handle if pathname is /i as its a different route
                 if(window.location.pathname.split("/")[1] === "i") {
+                  console.log('hello')
                   newNamespace = window.location.pathname.split("/")[2]
                 } else {
+                  console.log('hello2')
                   newNamespace = window.location.pathname.split("/")[1]
                 }
               }
-
               // if newNamespace isn't found yet try other options
               if (newNamespace === "") {
                 // if its in storage
@@ -235,18 +242,21 @@ function Content() {
                 }                
               }
             }
-
             let namespacesn = [];
             for (let i = 0; i < json.namespaces.length; i++) {
-              namespacesn.push(json.namespacesn[i].name)
+              namespacesn.push(json.namespaces[i].name)
             }
-
+            console.log(newNamespace, "NEW NAMESPACE :)")
+            if(newNamespace === "" && val) {
+              newNamespace = val
+            }
             setNamespace(newNamespace)
             setNamespaces(namespacesn)
         } else {
             throw new Error(await resp.text())
         }
     } catch(e) {
+      console.log(e)
         sendNotification("Failed to fetch namespaces", e.message, 0)
     }
     }
@@ -260,7 +270,6 @@ function Content() {
       }
   },[namespaces, fetchNamespaces])
   
-  console.log(namespaces)
   return(
 
     <MainContext.Provider value={{
@@ -278,7 +287,7 @@ function Content() {
             {namespaces !== null ?
               <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace}/>
               :
-             <div>h1</div>
+              ""
             }
             </div>
           <div id="main-panel">
