@@ -140,14 +140,6 @@ export default function WorkflowsPage() {
                                                             deleteWorkflow(obj.id)
                                                             ev.stopPropagation()
                                                         }}/>
-                                                        {/* <div className="button circle danger" onClick={(ev) => {
-                                                            deleteWorkflow(obj.uid)
-                                                            ev.stopPropagation()
-                                                        }}>
-                                                            <span>
-                                                                <IoTrash />
-                                                            </span>
-                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </div>
