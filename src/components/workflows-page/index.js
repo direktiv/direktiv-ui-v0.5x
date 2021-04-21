@@ -31,6 +31,14 @@ export default function WorkflowsPage() {
     const [workflows, setWorkflows] = useState([])
     console.log(namespace)
     const fetchWorkflows = useCallback(()=>{
+
+        // FIXME: This should stop bad fetches when namespace = <empty-string> before useContext 
+        // populates the namespace value.
+        // This is temp fix, this problem occurs on other componenets and can probably fixed globally
+        // with changes to App.js
+        if(!namespace){
+           return 
+        }
         async function fetchWfs() {
             try {
                 // todo pagination
@@ -121,9 +129,9 @@ export default function WorkflowsPage() {
                         <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
                             {workflows.length > 0 ?
                                 <>
-                                    {workflows.map((obj) => {
+                                    {workflows.map(function (obj, i) {
                                         return (
-                                            <div className="workflows-list-item"  onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
+                                            <div key={`workflow-item-${i}`} className="workflows-list-item"  onClick={()=>history.push(`/${namespace}/w/${obj.id}`)}>
                                                 <div className="workflows-list-name">
                                                     {obj.id}
                                                 </div>

@@ -26,7 +26,7 @@ export default function WorkflowPage() {
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
-    const [workflowInfo, setWorkflowInfo] = useState({uid: "", revision: 0, active: true, fetching: true})
+    const [workflowInfo, setWorkflowInfo] = useState({revision: 0, active: true, fetching: true})
     const history = useHistory()
     const params = useParams()
 
@@ -42,7 +42,7 @@ export default function WorkflowPage() {
         async function fetchWf() {
             try {
                 // todo pagination
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}?name`, {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}`, {
                     method: "get",
                 })
                 if (resp.ok) {
@@ -51,7 +51,6 @@ export default function WorkflowPage() {
                     setWorkflowValue(wf)
                     setWorkflowValueOld(wf)
                     setWorkflowInfo((wfI) => {
-                        wfI.uid = json.uid;
                         wfI.active = json.active
                         return {...wfI}
                     })
@@ -81,7 +80,7 @@ export default function WorkflowPage() {
         async function updateWf() {
             try {
                 // todo pagination
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.id}`, {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}`, {
                     method: "put",
                     headers: {
                         "Content-type": "text/yaml",
