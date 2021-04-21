@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react'
+import React, { useContext, useState,  useEffect } from 'react'
 import MainContext from '../../context'
 import { useParams } from 'react-router'
 import {sendNotification} from '../notifications/index.js'
@@ -6,24 +6,25 @@ import PieChart from '../charts/pie'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
 
-import { IoBarChartSharp, IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
+import { IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
 
 export default function DashboardPage() {
-    const [instances, setInstances] = useState(null)
+    // const [instances, setInstances] = useState(null)
     const [metrics, setMetrics] = useState(null)
     const {fetch, namespace} = useContext(MainContext)
     const params = useParams()
 
-    let pieColors = {
-        complete: "#2fa64d",
-        failed: "#db3447",
-        pending: "#ffbf32",
-        crashed: "#4a4e4e"
-    }
 
     useEffect(()=>{
         async function fetchMet() {
+            let pieColors = {
+                complete: "#2fa64d",
+                failed: "#db3447",
+                pending: "#ffbf32",
+                crashed: "#4a4e4e"
+            }
+        
             try {
                 let resp = await fetch(`/instances/${namespace}`, {
                     method: "GET"
@@ -51,10 +52,16 @@ export default function DashboardPage() {
                         })
                     })
 
-                    setInstances(json)
+                    // setInstances(json)
                     setMetrics(data)
                 } else {
-                    throw new Error( await resp.text())
+                   // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow`, e.message, 0)

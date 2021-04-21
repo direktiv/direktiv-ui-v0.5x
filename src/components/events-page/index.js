@@ -60,8 +60,13 @@ export function EventsPageBody() {
                         setInstances([])
                     }
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+               // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to fetch instances", e.message, 0)

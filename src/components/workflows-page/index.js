@@ -53,8 +53,13 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+              // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflows", e.message, 0)
@@ -69,8 +74,13 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if(!resp.ok){
-                let json = await resp.json()
-                throw new Error(json.Message)
+             // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
             }
             fetchWorkflows()
         } catch(e) {
@@ -84,8 +94,13 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                let json = await resp.json()
-                throw new Error(json.Message)
+           // 400 should have json response
+           if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
             } 
             fetchWorkflows()
         } catch(e) {
@@ -226,8 +241,13 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
             setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-            let json = await resp.json()
-            throw new Error(json.Message)
+            // 400 should have json response
+            if(resp.status === 400) {
+                let json = await resp.json()
+                throw new Error(json.Message)
+              } else {
+                throw new Error(`response code was ${resp.status}`)
+              }
         }
     } catch(e) {
         setErr(e.message)
@@ -252,8 +272,13 @@ function APIInteractionTile() {
             if (resp.ok) {
                 setVal("")
             } else {
-                let json = await resp.json()
-                throw new Error(json.Message)
+      // 400 should have json response
+      if(resp.status === 400) {
+        let json = await resp.json()
+        throw new Error(json.Message)
+      } else {
+        throw new Error(`response code was ${resp.status}`)
+      }
             }
         } catch(e) {
             sendNotification("Failed to send cloud event", e.message, 0)
@@ -319,8 +344,13 @@ function NewWorkflowForm() {
                     let text = await resp.text()
                     setData(text)       
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                  // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to fetch template data", e.message, 0)
@@ -344,8 +374,13 @@ function NewWorkflowForm() {
                         setTemplates(json)
                     }
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+        // 400 should have json response
+        if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to fetch a list of templates", e.message, 0)

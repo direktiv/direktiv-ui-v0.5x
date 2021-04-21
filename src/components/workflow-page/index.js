@@ -55,11 +55,16 @@ export default function WorkflowPage() {
                         return {...wfI}
                     })
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
-                sendNotification("Failed to fetch workflow", e, 0)
+                sendNotification("Failed to fetch workflow", e.message, 0)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
@@ -93,8 +98,13 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(workflowValue)
                     history.replace(`${json.id}`)
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                  // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
@@ -105,9 +115,10 @@ export default function WorkflowPage() {
     },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
 
     useEffect(()=>{
-        fetchWorkflow()
-    },[])
-
+        if (namespace !== "") {
+            fetchWorkflow()
+        }
+    },[fetchWorkflow, namespace])
     // useEffect(()=>{
     //     console.log("Workflow page has mounted")
     // },[])
@@ -159,8 +170,13 @@ export default function WorkflowPage() {
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-                let json = await resp.json()
-                throw new Error(json.Message)
+         // 400 should have json response
+         if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
             }
         } catch(e) {
             sendNotification("Failed to execute workflow", e.message, 0)
@@ -181,8 +197,13 @@ export default function WorkflowPage() {
                     return {...wfI}
                 })
             } else {
-                let json = await resp.json()
-                throw new Error(json.Message)
+                // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
             }
         } catch(e) {
             sendNotification("Failed to disable workflow", e.message, 0)
@@ -309,8 +330,13 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+              // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
@@ -350,8 +376,13 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+                    // 400 should have json response
+          if(resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
                 }
             }catch(e){
                 sendNotification("Unable to fetch workflow instances", e.message, 0)
@@ -399,16 +430,16 @@ function WorkflowActions(props) {
 
     return(
         <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-            <div class="dropdown">
+            <div className="dropdown">
                 <button onClick={(e)=>{
                     // e.stopPropagation()
                     setShow(!show)
-                    }} class="dropbtn">Actions</button>
+                    }} className="dropbtn">Actions</button>
 
                 {
                     show ? <>
-                        <div class="dropdown-content-connector"></div>
-                        <div class="dropdown-content">
+                        <div className="dropdown-content-connector"></div>
+                        <div className="dropdown-content">
                             {active ? 
                             <a href="#!" onClick={()=>{
                                 toggleWorkflow()
