@@ -119,34 +119,34 @@ export default function Logs(props) {
         <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
             <div style={{width: "100%", height: "100%", position: "relative"}}>
                 <div id="logs" style={{borderRadius:"8px", overflow:"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                    <pre >
-                    {logs.map((obj, i) => {
-                            let time = dayjs.unix(obj.timestamp.seconds).format("h:mm:ss")
-                            return (
-                                <div style={{fontFamily:"monospace"}} key={obj.timestamp.seconds +i}>
-                                    <span style={{ color: "#b5b5b5" }}>
-                                        [{time}]
-                                        </span>
-                                    {" "}
-                                    {obj.message}
-                                    { obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0 ?
+                    <pre>
+                        {logs.map((obj, i) => {
+                                let time = dayjs.unix(obj.timestamp.seconds).format("h:mm:ss")
+                                return (
+                                    <div style={{fontFamily:"monospace"}} key={obj.timestamp.seconds +i}>
                                         <span style={{ color: "#b5b5b5" }}>
-                                            {"  ( "}
-                                            <span style={{ color: "#b5b5b5" }}>
-                                                {Object.keys(obj.context).map((k) => {
-                                                    return (
-                                                        `${k}=${obj.context[k]} `
-                                                    )
-                                                })}
+                                            [{time}]
                                             </span>
-                                            {")"}
-                                        </span>
-                                        :
-                                        <></>
-                                    }
-                                </div>
-                            )
-                        })}
+                                        {" "}
+                                        {obj.message}
+                                        { obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0 ?
+                                            <span style={{ color: "#b5b5b5" }}>
+                                                {"  ( "}
+                                                <span style={{ color: "#b5b5b5" }}>
+                                                    {Object.keys(obj.context).map((k) => {
+                                                        return (
+                                                            `${k}=${obj.context[k]} `
+                                                        )
+                                                    })}
+                                                </span>
+                                                {")"}
+                                            </span>
+                                            :
+                                            <></>
+                                        }
+                                    </div>
+                                )
+                            })}
                     </pre>
                 </div>
             </div>
