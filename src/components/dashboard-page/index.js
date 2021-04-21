@@ -26,7 +26,7 @@ export default function DashboardPage() {
             }
         
             try {
-                let resp = await fetch(`/instances/${namespace}`, {
+                let resp = await fetch(`/instances/${params.namespace}`, {
                     method: "GET"
                 })
                 if (resp.ok) {
@@ -70,7 +70,7 @@ export default function DashboardPage() {
         if(metrics === null) {
             fetchMet()
         }
-    },[fetch, namespace, params.workflow, metrics])
+    },[fetch, params.workflow, metrics])
 
     return (
         <>

@@ -47,7 +47,12 @@ function AuthenticatedContent() {
         if (resp.ok) {
           let newNamespace = ""
           let json = await resp.json()
+        
           if (load) {
+            // Dont do anything if on jq playground
+            if(window.location.pathname === "/jq/playground") {
+
+            } else {
             // 1st. check if namespace is in the pathname 
             if (window.location.pathname.split("/")[1] !== "") {
               // handle if pathname is /i as its a different route
@@ -66,11 +71,13 @@ function AuthenticatedContent() {
               }
               if (!f) {
                 // need a better solution as keycloak forces reload of the page again.
+
                 window.location.pathname = "/"
                 return
               }
             }
-            console.log(newNamespace)
+            }
+
             // if newNamespace isn't found yet try other options
             if (newNamespace === "") {
               // if its in storage
@@ -96,7 +103,7 @@ function AuthenticatedContent() {
                   }
 
                   if (!found) {
-                    console.log("not found")
+
                     // check if json array is greater than 0 to set to the first
                     if (json.namespaces.length > 0) {
 
@@ -115,28 +122,27 @@ function AuthenticatedContent() {
               }
             }
           }
-
           if (newNamespace === "" && val) {
+
             newNamespace = val
           }
-          
           let namespacesn = [];
           for (let i = 0; i < json.namespaces.length; i++) {
+
             namespacesn.push(json.namespaces[i].name)
           }
-
           setLoad(false)
           setNamespace(newNamespace)
           setNamespaces(namespacesn)
 
         } else {
-          // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+  // 400 should have json response
+  if(resp.status === 400) {
+    let json = await resp.json()
+    throw new Error(json.Message)
+  } else {
+    throw new Error(`response code was ${resp.status}`)
+  }
         }
 
       } catch (e) {
@@ -249,7 +255,13 @@ function Content() {
         if (resp.ok) {
           let newNamespace = ""
           let json = await resp.json()
+          console.log(window.location.pathname)
+        
           if (load) {
+            // Dont do anything if on jq playground
+            if(window.location.pathname === "/jq/playground") {
+
+            } else {
             // 1st. check if namespace is in the pathname 
             if (window.location.pathname.split("/")[1] !== "") {
               // handle if pathname is /i as its a different route
@@ -273,6 +285,8 @@ function Content() {
                 return
               }
             }
+            }
+
             // if newNamespace isn't found yet try other options
             if (newNamespace === "") {
               // if its in storage
