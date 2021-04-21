@@ -19,7 +19,6 @@ export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
-    // TODO: Hook up log events
     const [showLogEvent, setShowLogEvent] = useState(false)
     const [logEvent, setLogEvent] = useState("hello-world")
 
@@ -54,6 +53,7 @@ export default function WorkflowPage() {
                         wfI.active = json.active
                         return {...wfI}
                     })
+                    setLogEvent(json.logToEvents)
                 } else {
                 // 400 should have json response
           if(resp.status === 400) {
@@ -98,13 +98,13 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(workflowValue)
                     history.replace(`${json.id}`)
                 } else {
-                  // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                    // 400 should have json response
+                    if(resp.status === 400) {
+                        let json = await resp.json()
+                        throw new Error(json.Message)
+                    } else {
+                        throw new Error(`response code was ${resp.status}`)
+                    }
                 }
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
@@ -112,7 +112,39 @@ export default function WorkflowPage() {
             return
         }
         updateWf().finally(()=>{setFetching(false)})
-    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
+    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, params.workflow])
+
+const updateLogEvent = useCallback(()=>{
+    if (workflowInfo.fetching){
+        return // TODO - User Feedback
+    }
+    setFetching(true)
+
+    async function postLogEvent() {
+        try {
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}?logEvent=${logEvent}`, {
+                method: "put",
+                headers: {
+                    "Content-type": "text/yaml",
+                    "Content-Length": workflowValueOld.length,
+                },
+                body: workflowValueOld
+            })
+            if (!resp.ok) {
+                if(resp.status === 400) {
+                    let json = await resp.json()
+                    throw new Error(json.Message)
+                } else {
+                    throw new Error(`response code was ${resp.status}`)
+                }
+            }
+        } catch(e) {
+            sendNotification("Failed to set log event", e.message, 0)
+        }
+        return
+    }
+    return postLogEvent().finally(()=>{setFetching(false)})
+},[namespace, workflowValueOld, fetch,  workflowInfo.fetching, logEvent, params.workflow])
 
     useEffect(()=>{
         if (namespace !== "") {
@@ -134,14 +166,18 @@ export default function WorkflowPage() {
         <>
             {!showLogEvent ?
                 <div className="editor-footer-button" style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
-                    setTimeout(function () { document.getElementById('yoyoyo').focus(); }, 100);
+                    setTimeout(function () { document.getElementById('log-input').focus(); }, 100);
                     setShowLogEvent(true)
                 }}>
                     Log To Event
             </div> :
                 <div className="editor-footer-button" style={{ display: "flex", alignItems: "center", padding: "0 0 0 0" }}>
-                    <input id="yoyoyo" style={{ height: "20px", border: "none", borderRadius: "0px", backgroundColor: "#303030", color: "white", margin: "0px", fontSize: "12pt" }} placeholder={`Target Log Event`} value={logEvent} onChange={(e) => setLogEvent(e.target.value)} />
-                    <div style={{ padding: "0 10px 0 10px", height: "100%", display: "flex", alignItems: "center" }} onClick={() => { setShowLogEvent(false) }}>
+                    <input id="log-input" style={{ height: "20px", border: "none", borderRadius: "0px", backgroundColor: "#303030", color: "white", margin: "0px", fontSize: "12pt" }} placeholder={`Target Log Event`} value={logEvent} onChange={(e) => setLogEvent(e.target.value)} />
+                    <div style={{ padding: "0 10px 0 10px", height: "100%", display: "flex", alignItems: "center" }} onClick={() => { 
+                        updateLogEvent().then(() => {
+                            setShowLogEvent(false)
+                        })
+                    }}>
                         <IoCheckmarkSharp />
                     </div>
                 </div>

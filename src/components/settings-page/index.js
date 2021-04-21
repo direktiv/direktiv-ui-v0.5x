@@ -12,7 +12,6 @@ import { ConfirmButton } from '../confirm-button'
 function SettingsAction(props) {
     const {namespace, fetch, namespaces, fetchNamespaces, setNamespace} = useContext(MainContext)
     const history = useHistory()
-    const [show, setShow] = useState(false)
 
     async function deleteNamespace() {
         try {
@@ -30,14 +29,12 @@ function SettingsAction(props) {
                 if (goto==="") {
                     // if not found push to / as no namespaces probably exist
                     localStorage.setItem("namespace", "")
-                    setShow(false)
                     await fetchNamespaces(false, "")
                     setNamespace("")
                     // window.location.pathname = "/"
                     history.push("/")
                 } else {
                     localStorage.setItem("namespace", goto)
-                    setShow(false)
                     await fetchNamespaces(false, goto)
                     history.push(`/${goto}`)
                 }
