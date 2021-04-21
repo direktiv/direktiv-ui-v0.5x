@@ -14,7 +14,7 @@ import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 
 export default function InstancePage() {
-    const {fetch} = useContext(MainContext)
+    const {fetch, namespace} = useContext(MainContext)
     
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -33,7 +33,8 @@ export default function InstancePage() {
                     let wfn = atob(json.workflow)
                     setWf(wfn)
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflow", e.message, 0)
@@ -52,7 +53,8 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Fetch Instance details failed ", e.message, 0)
@@ -76,6 +78,7 @@ export default function InstancePage() {
     
     return(
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto", display: "flex" }}>
@@ -140,6 +143,8 @@ export default function InstancePage() {
                 </div>
             </div>
         </div>
+        :
+                            ""}
         </>
     )
 }

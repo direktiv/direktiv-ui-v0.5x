@@ -472,6 +472,10 @@ ul li div {
     color: #db3447;
 }
 
+.crashed {
+    color: var(--font-dark);
+}
+
 .pending {
     color: #ffbf32;   
 }

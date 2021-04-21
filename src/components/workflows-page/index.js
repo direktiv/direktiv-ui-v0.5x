@@ -29,7 +29,7 @@ export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
-    
+    console.log(namespace)
     const fetchWorkflows = useCallback(()=>{
         async function fetchWfs() {
             try {
@@ -45,7 +45,8 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflows", e.message, 0)
@@ -60,7 +61,8 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if(!resp.ok){
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
             fetchWorkflows()
         } catch(e) {
@@ -74,7 +76,8 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             } 
             fetchWorkflows()
         } catch(e) {
@@ -88,6 +91,7 @@ export default function WorkflowsPage() {
 
     return (
         <>
+        {namespace !== ""?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -115,7 +119,7 @@ export default function WorkflowsPage() {
                                                     <div className="actions-button-div">
                                                         {obj.active ?
                                                             <div className="button circle success" onClick={(ev) => {
-                                                                toggleWorkflow(obj.uid)
+                                                                toggleWorkflow(obj.id)
                                                                 ev.stopPropagation()
                                                             }}>
                                                                 <span>
@@ -124,7 +128,7 @@ export default function WorkflowsPage() {
                                                             </div>
                                                             :
                                                             <div className="button circle" onClick={(ev) => {
-                                                                toggleWorkflow(obj.uid)
+                                                                toggleWorkflow(obj.id)
                                                                 ev.stopPropagation()
                                                             }}>
                                                                 <span>
@@ -176,6 +180,7 @@ export default function WorkflowsPage() {
                 </div>
             </div>
         </div>
+        :""}
         </>
     )
 }
@@ -221,7 +226,8 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
             setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-            throw new Error(await resp.text())
+            let json = await resp.json()
+            throw new Error(json.Message)
         }
     } catch(e) {
         setErr(e.message)
@@ -246,7 +252,8 @@ function APIInteractionTile() {
             if (resp.ok) {
                 setVal("")
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to send cloud event", e.message, 0)
@@ -312,7 +319,8 @@ function NewWorkflowForm() {
                     let text = await resp.text()
                     setData(text)       
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch template data", e.message, 0)
@@ -336,7 +344,8 @@ function NewWorkflowForm() {
                         setTemplates(json)
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch a list of templates", e.message, 0)

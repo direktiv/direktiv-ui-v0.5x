@@ -56,7 +56,8 @@ export default function WorkflowPage() {
                         return {...wfI}
                     })
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflow", e, 0)
@@ -75,7 +76,7 @@ export default function WorkflowPage() {
         async function updateWf() {
             try {
                 // todo pagination
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}`, {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.id}`, {
                     method: "put",
                     headers: {
                         "Content-type": "text/yaml",
@@ -93,7 +94,8 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(workflowValue)
                     history.replace(`${json.id}`)
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
@@ -101,7 +103,7 @@ export default function WorkflowPage() {
             return
         }
         updateWf().finally(()=>{setFetching(false)})
-    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.uid])
+    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
 
     useEffect(()=>{
         if (workflowValue === ""){
@@ -160,7 +162,8 @@ export default function WorkflowPage() {
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to execute workflow", e.message, 0)
@@ -169,7 +172,7 @@ export default function WorkflowPage() {
 
     async function toggleWorkflow() {
         try{
-            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.uid}/toggle`, {
+            let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowInfo.id}/toggle`, {
                 method: "PUT",
             })
             if(resp.ok) {
@@ -181,7 +184,8 @@ export default function WorkflowPage() {
                     return {...wfI}
                 })
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to disable workflow", e.message, 0)
@@ -192,6 +196,7 @@ export default function WorkflowPage() {
 
     return(
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto" }}>
@@ -277,7 +282,7 @@ export default function WorkflowPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>:""}
         </>
     )
 }
@@ -307,7 +312,8 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-                    throw new Error( await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
@@ -347,7 +353,8 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             }catch(e){
                 sendNotification("Unable to fetch workflow instances", e.message, 0)

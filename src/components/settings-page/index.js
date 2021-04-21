@@ -19,20 +19,34 @@ function SettingsAction(props) {
                 method: "DELETE"
             })
             if (resp.ok) {
+                let goto = ""
                 for(let i=0; i < namespaces.length; i++) {
                     if(namespaces[i] !== namespace) {
-                        localStorage.setItem("namespace", namespaces[i])
-                        // setNamespace(namespaces[i])
-
-                        await fetchNamespaces(false, namespaces[i])
-
-                        setShow(false)
-                        history.push(`/`)
-
+                        goto = namespaces[i]
+                        break
                     }
                 }
+
+                console.log(goto)
+                if (goto==="") {
+                    // if not found push to / as no namespaces probably exist
+                    localStorage.setItem("namespace", "")
+                    setShow(false)
+                    // await fetchNamespaces(false, "")
+                    setNamespace("")
+                    // window.location.pathname = "/"
+                    history.push("/")
+                } else {
+                    localStorage.setItem("namespace", goto)
+                    setShow(false)
+                    await fetchNamespaces(false, goto)
+                    history.push(`/${goto}`)
+                }
+ 
+
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             console.log(e)
@@ -65,8 +79,10 @@ function SettingsAction(props) {
 }
 
 export default function SettingsPage() {
+    const {namespace} = useContext(MainContext)
     return (
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row">
                 <div style={{ flex: "auto" }}>
@@ -89,6 +105,7 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
+        :""}
         </>
     )
 }
@@ -114,7 +131,8 @@ function Secrets() {
                         setSecrets([])
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch secrets", e.message, 0)
@@ -138,7 +156,8 @@ function Secrets() {
                 setValue("")
                 fetchS()
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to create secret", e.message, 0)
@@ -155,7 +174,8 @@ function Secrets() {
                 // refetch secrets
                 fetchS()
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to delete secret", e.message, 0)
@@ -241,7 +261,8 @@ function Registries() {
                         setRegistries([])
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch registries", e.message, 0)
@@ -266,7 +287,8 @@ function Registries() {
                 setUser("")
                 fetchR()
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to create registry", e.message, 0)
@@ -283,7 +305,8 @@ function Registries() {
                 // fetch registries
                 fetchR()
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to delete registry", e.message, 0)
