@@ -45,7 +45,7 @@ export default function Navbar(props) {
             })
             if (resp.ok) {
                 await resp.json()
-                // causing problems CHECKLATER
+                
 
                 let matchWf = matchPath(location.pathname, {
                     path: `/${namespace}/w/:workflow`
@@ -56,6 +56,13 @@ export default function Navbar(props) {
                 })
 
                 if(matchWf !== null || matchNWF !== null) {
+                           // setNamespace(val)
+                    localStorage.setItem("namespace", val)
+                    setAcceptInput(!acceptInput)
+                    toggleNamespaceSelector()
+                    setNamespace(val)
+                    sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
+                    fetchNamespaces(false, val)
                     history.push(`/${val}/w`)
                     return
                 }
@@ -69,6 +76,13 @@ export default function Navbar(props) {
                 })
 
                 if(matchInstance !== null || matchInstanceN !== null) {
+                    // setNamespace(val)
+                    localStorage.setItem("namespace", val)
+                    setAcceptInput(!acceptInput)
+                    toggleNamespaceSelector()
+                    setNamespace(val)
+                    sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
+                    fetchNamespaces(false, val)
                     history.push(`/${val}/i`)
                     return
                 }
@@ -107,12 +121,21 @@ export default function Navbar(props) {
                     }}>
                         <div>
                             <ArrowRightFill id="namespace-arrow" style={{ marginRight: "10px", height: "18px" }} />
-                            <span className="truncate" style={{ maxWidth: "120px" }}><b>{namespace}</b></span>
+                            {namespace !== "" ? 
+                                <span className="truncate" style={{ maxWidth: "120px" }}>
+                                    <b>{namespace}</b>
+                                </span>
+                                :
+                                <span className="truncate" style={{maxWidth:"120px"}}>
+                                    <b>Namespaces</b>
+                                </span>
+                            }
                         </div>
                     </li>
                     <li id="namespace-list" style={{ paddingLeft: "0px", paddingTop: "0px", flexDirection: "column" }}>
                         <div style={{ width: "100%" }} >
                             <ul>
+                                <>
                                 <li>
                                     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", paddingTop:"5px" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
@@ -135,48 +158,53 @@ export default function Navbar(props) {
                                         }
                                     </div>
                                 </li>
-                                {namespaces.map((obj, i)=>{
-                                    if(obj !== namespace){
-                                        return(
-                                            <li key={i} onClick={()=>{
-                                                localStorage.setItem("namespace", obj)
-                                                console.log('triggered?')
-                                                setNamespace(obj)
-                                                toggleNamespaceSelector()
-                                               
-                                                let matchWf = matchPath(location.pathname, {
-                                                    path: `/${namespace}/w/:workflow`
-                                                })
-
-                                                let matchNWF = matchPath(location.pathname, {
-                                                    path: `/${namespace}/w`
-                                                })
-
-                                                if(matchWf !== null || matchNWF !== null) {
-                                                    history.push(`/${obj}/w`)
-                                                    return
-                                                }
-
-                                                let matchInstance = matchPath(location.pathname, {
-                                                    path: "/i/:namespace/:workflow/:instance"
-                                                })
+                                {namespaces === null ? "":
+                                <>
+                                    {namespaces.map((obj, i)=>{
+                                        if(obj !== namespace){
+                                            return(
+                                                <li key={i} onClick={()=>{
+                                                    localStorage.setItem("namespace", obj)
+                                                    console.log('triggered?')
+                                                    setNamespace(obj)
+                                                    toggleNamespaceSelector()
                                                 
-                                                let matchInstanceN = matchPath(location.pathname, {
-                                                    path: `/${namespace}/i`
-                                                })
+                                                    let matchWf = matchPath(location.pathname, {
+                                                        path: `/${namespace}/w/:workflow`
+                                                    })
 
-                                                if(matchInstance !== null || matchInstanceN !== null) {
-                                                    history.push(`/${obj}/i`)
-                                                    return
-                                                }
+                                                    let matchNWF = matchPath(location.pathname, {
+                                                        path: `/${namespace}/w`
+                                                    })
+
+                                                    if(matchWf !== null || matchNWF !== null) {
+                                                        history.push(`/${obj}/w`)
+                                                        return
+                                                    }
+
+                                                    let matchInstance = matchPath(location.pathname, {
+                                                        path: "/i/:namespace/:workflow/:instance"
+                                                    })
+                                                    
+                                                    let matchInstanceN = matchPath(location.pathname, {
+                                                        path: `/${namespace}/i`
+                                                    })
+
+                                                    if(matchInstance !== null || matchInstanceN !== null) {
+                                                        history.push(`/${obj}/i`)
+                                                        return
+                                                    }
 
 
-                                                history.push(`/${obj}`)
-                                            }}>{obj}</li>
-                                        )
-                                    }
-                                    return ""
-                                })}
+                                                    history.push(`/${obj}`)
+                                                }}>{obj}</li>
+                                            )
+                                        }
+                                        return ""
+                                    })}
+                                </>
+}
+                                </>
                             </ul>
                         </div>
                     </li>

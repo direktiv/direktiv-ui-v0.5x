@@ -22,18 +22,20 @@ function SettingsAction(props) {
                 for(let i=0; i < namespaces.length; i++) {
                     if(namespaces[i] !== namespace) {
                         localStorage.setItem("namespace", namespaces[i])
-                        setNamespace(namespaces[i])
-                        history.push(`/${namespaces[i]}/s/`)
+                        // setNamespace(namespaces[i])
 
-                        await fetchNamespaces()
+                        await fetchNamespaces(false, namespaces[i])
+
                         setShow(false)
-                        break                      
+                        history.push(`/`)
+
                     }
                 }
             } else {
                 throw new Error(await resp.text())
             }
         } catch(e) {
+            console.log(e)
             sendNotification("Failed to delete namespace", e.message, 0)
         }
     }
@@ -106,7 +108,11 @@ function Secrets() {
                 })
                 if(resp.ok) {
                     let json = await resp.json()
-                    setSecrets(json.secrets)
+                    if(json.secrets) {
+                        setSecrets(json.secrets)
+                    } else {
+                        setSecrets([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }
@@ -229,7 +235,11 @@ function Registries() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    setRegistries(json.registries)
+                    if(json.registries) {
+                        setRegistries(json.registries)                        
+                    } else {
+                        setRegistries([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }

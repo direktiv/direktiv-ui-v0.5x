@@ -242,14 +242,16 @@ function Content() {
                 }                
               }
             }
-            let namespacesn = [];
-            for (let i = 0; i < json.namespaces.length; i++) {
-              namespacesn.push(json.namespaces[i].name)
-            }
-            console.log(newNamespace, "NEW NAMESPACE :)")
             if(newNamespace === "" && val) {
               newNamespace = val
             }
+            let namespacesn = [];
+            for (let i = 0; i < json.namespaces.length; i++) {
+              
+              namespacesn.push(json.namespaces[i].name)
+            }
+            console.log(newNamespace, "NEW NAMESPACE :)")
+          
             setNamespace(newNamespace)
             setNamespaces(namespacesn)
         } else {
@@ -284,11 +286,7 @@ function Content() {
       <div id="content">
         <Router>
           <div id="nav-panel">
-            {namespaces !== null ?
               <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace}/>
-              :
-              ""
-            }
             </div>
           <div id="main-panel">
             <Switch>
