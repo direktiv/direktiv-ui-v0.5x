@@ -14,6 +14,7 @@ import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash} from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 import NoResults from '../../noresults'
+import { ConfirmButton } from '../confirm-button'
 
 
 const noopState = `id: noop
@@ -127,14 +128,18 @@ export default function WorkflowsPage() {
                                                                 </span>
                                                             </div>
                                                         }
-                                                        <div className="button circle danger" onClick={(ev) => {
+                                                        <ConfirmButton Icon={IoTrash} OnConfirm={(ev) => {
+                                                            deleteWorkflow(obj.uid)
+                                                            ev.stopPropagation()
+                                                        }}/>
+                                                        {/* <div className="button circle danger" onClick={(ev) => {
                                                             deleteWorkflow(obj.uid)
                                                             ev.stopPropagation()
                                                         }}>
                                                             <span>
                                                                 <IoTrash />
                                                             </span>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </div>
