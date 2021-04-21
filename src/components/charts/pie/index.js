@@ -66,7 +66,7 @@ export default function NuePieChart(props) {
         {pieData === [] ? (
           <></>
         ) : (
-          <div data-tip="" data-for="chart">
+          <div data-tip="" data-for="chart" style={{flex: "auto"}}>
             <PieChart
               className="Pie-Chart"
               label={({ dataEntry }) => `${dataEntry.label}`}

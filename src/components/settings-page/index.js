@@ -27,13 +27,11 @@ function SettingsAction(props) {
                         break
                     }
                 }
-
-                console.log(goto)
                 if (goto==="") {
                     // if not found push to / as no namespaces probably exist
                     localStorage.setItem("namespace", "")
                     setShow(false)
-                    // await fetchNamespaces(false, "")
+                    await fetchNamespaces(false, "")
                     setNamespace("")
                     // window.location.pathname = "/"
                     history.push("/")

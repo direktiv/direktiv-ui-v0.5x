@@ -126,6 +126,11 @@ input:focus {
     box-shadow: 6px 6px 12px #b8b9be, -6px -6px 12px #fff !important;
 }
 
+.shadow-soft-inverse {
+    box-shadow: 6px 6px 12px #fff, -6px -6px 12px #b8b9be  !important; 
+}
+
+
 .rounded {
     border-radius: .55rem !important;
 }
@@ -863,4 +868,11 @@ pre {
 
 .confirm-btn.expand{
     max-width: 300px;
+}
+
+.toggled-switch {
+    -ms-transform:rotate(180deg);
+    -moz-transform:rotate(180deg);
+    -webkit-transform:rotate(180deg);
+    -o-transform:rotate(180deg);
 }

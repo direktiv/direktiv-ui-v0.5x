@@ -126,7 +126,7 @@ export default function Sankey(props) {
                 load ? "":
                 <AutoSizer>
                     {(dim)=> (
-                        <SankeyDiagram nodes={nodes} links={links} height={dim.height} width={dim.width} />
+                        <SankeyDiagram nodes={nodes} links={links} height={dim.height-20} width={dim.width} />
                     )}
                 </AutoSizer>
             }

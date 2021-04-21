@@ -74,7 +74,7 @@ export default function InstancePage() {
         let timer = setInterval(()=>{
             fetchInstanceDetails()
         }, 2000)
-        if (instanceDetails.status !== "pending") {
+        if (instanceDetails.status !== "pending" && instanceDetails.status !== undefined) {
             clearInterval(timer)
         }
         fetchInstanceDetails()    
