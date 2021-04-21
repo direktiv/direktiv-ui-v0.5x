@@ -105,10 +105,8 @@ export default function WorkflowPage() {
     },[namespace, workflowValue, fetch, history, workflowInfo.fetching, workflowInfo.id])
 
     useEffect(()=>{
-        if (workflowValue === ""){
-            fetchWorkflow()
-        }
-    },[fetchWorkflow, workflowValue])
+        fetchWorkflow()
+    },[])
 
     // useEffect(()=>{
     //     console.log("Workflow page has mounted")

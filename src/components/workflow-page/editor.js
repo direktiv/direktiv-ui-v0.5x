@@ -13,7 +13,7 @@ import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
 export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions } = props;
+    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading } = props;
     const [height, setHeight] = useState("93%")
 
     useEffect(() => {
@@ -37,6 +37,7 @@ export default function ReactEditor(props) {
 
     return (
         <div className="editor-wrapper">
+            {loading ? <div className="editor-loading"></div> : <></>}
             <div style={{ height: `${height}`, minHeight: `${height}` }}>
                 <CodeMirror
                     value={value}
@@ -58,6 +59,7 @@ export default function ReactEditor(props) {
                         },
                     }}
                     onBeforeChange={(editor, data, value) => {
+                        console.log("value =", value)
                         setValue(value)
                     }}
                 />
