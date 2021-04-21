@@ -130,7 +130,8 @@ function AuthenticatedContent() {
           setNamespaces(namespacesn)
 
         } else {
-          throw new Error(await resp.text())
+          let json = await resp.json()
+          throw new Error(json.Message)
         }
 
       } catch (e) {
@@ -325,7 +326,8 @@ function Content() {
           setNamespaces(namespacesn)
 
         } else {
-          throw new Error(await resp.text())
+          let json = await resp.json()
+          throw new Error(json.Message)
         }
 
       } catch (e) {
@@ -392,6 +394,8 @@ function Content() {
         </div>
         :
         <></>}
+      <NotificationSystem />
+
     </MainContext.Provider>
 
   )

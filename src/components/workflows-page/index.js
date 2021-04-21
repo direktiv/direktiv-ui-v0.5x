@@ -44,7 +44,8 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflows", e.message, 0)
@@ -59,7 +60,8 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if(!resp.ok){
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
             fetchWorkflows()
         } catch(e) {
@@ -73,7 +75,8 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             } 
             fetchWorkflows()
         } catch(e) {
@@ -218,7 +221,8 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
             setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-            throw new Error(await resp.text())
+            let json = await resp.json()
+            throw new Error(json.Message)
         }
     } catch(e) {
         setErr(e.message)
@@ -243,7 +247,8 @@ function APIInteractionTile() {
             if (resp.ok) {
                 setVal("")
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to send cloud event", e.message, 0)
@@ -309,7 +314,8 @@ function NewWorkflowForm() {
                     let text = await resp.text()
                     setData(text)       
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch template data", e.message, 0)
@@ -333,7 +339,8 @@ function NewWorkflowForm() {
                         setTemplates(json)
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch a list of templates", e.message, 0)

@@ -31,7 +31,8 @@ export default function Sankey(props) {
                 let json = await resp.json()
                 return json.states
             } else {
-                throw new Error( await resp.text())
+                let json = await resp.json()
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)

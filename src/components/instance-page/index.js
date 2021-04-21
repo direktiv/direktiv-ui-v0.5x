@@ -33,7 +33,8 @@ export default function InstancePage() {
                     let wfn = atob(json.workflow)
                     setWf(wfn)
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflow", e.message, 0)
@@ -52,7 +53,8 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Fetch Instance details failed ", e.message, 0)

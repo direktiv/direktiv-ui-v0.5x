@@ -98,7 +98,9 @@ export default function Navbar(props) {
                 history.push(`/${val}`)
 
             } else {
-                throw new Error(await resp.text())
+                let json = await resp.json()
+                console.log(json)
+                throw new Error(json.Message)
             }
         } catch(e) {
             sendNotification("Failed to create namespace", e.message, 0)

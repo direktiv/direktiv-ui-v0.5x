@@ -60,7 +60,8 @@ export function EventsPageBody() {
                         setInstances([])
                     }
                 } else {
-                    throw new Error(await resp.text())
+                    let json = await resp.json()
+                    throw new Error(json.Message)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch instances", e.message, 0)
