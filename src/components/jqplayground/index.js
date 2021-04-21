@@ -137,7 +137,7 @@ export default function JQPlaygroundPage() {
         let arr = [];
         for (let i = 0; i < cheatSheetMap.length; i++) {
             arr.push(
-                <div className="cheatsheet-entry">
+                <div key={`cheat[${i}]`} className="cheatsheet-entry">
                     <div className="cheatsheet-example">
                         {cheatSheetMap[i].example}
                     </div>

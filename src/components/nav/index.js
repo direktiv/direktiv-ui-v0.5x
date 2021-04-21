@@ -1,7 +1,7 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
 import md5 from 'md5'
-import { Link, matchPath, useHistory, useLocation, useParams } from 'react-router-dom'
+import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 import { PlusCircle } from 'react-bootstrap-icons'

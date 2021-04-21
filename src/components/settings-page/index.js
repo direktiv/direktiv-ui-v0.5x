@@ -57,16 +57,16 @@ function SettingsAction(props) {
 
     return(
         <div id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", padding: "0" }}>
-            <div class="dropdown">
+            <div className="dropdown">
                 <button onClick={(e)=>{
                     // e.stopPropagation()
                     setShow(!show)
-                    }} class="dropbtn">Actions</button>
+                    }} className="dropbtn">Actions</button>
 
                 {
                     show ? <>
-                        <div class="dropdown-content-connector"></div>
-                        <div class="dropdown-content">
+                        <div className="dropdown-content-connector"></div>
+                        <div className="dropdown-content">
                             <a href="#!" onClick={()=>{deleteNamespace()}}>Delete Namespace</a>
                         </div>
                     </>
@@ -205,7 +205,7 @@ function Secrets() {
                             <td style={{ paddingLeft: "10px" }}>
                                 <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
                             </td>
-                            <td   style={{ paddingRight: "10px" }} colspan="2">
+                            <td   style={{ paddingRight: "10px" }} colSpan="2">
                                 <div style={{ display: "flex", alignItems: "center" }}>
                                     <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
                                     <div className="circle button danger" style={{ marginLeft: "10px" }} onClick={()=>deleteSecret(obj.name)}>
@@ -222,7 +222,7 @@ function Secrets() {
                         <td style={{ paddingLeft: "10px" }}>
                             <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e)=>setKey(e.target.value)}/>
                         </td>
-                        <td style={{ paddingRight: "10px" }} colspan="2">
+                        <td style={{ paddingRight: "10px" }} colSpan="2">
                             <div style={{ display: "flex", alignItems: "center" }}>
                                 <input style={{ maxWidth: "150px" }} type="password" placeholder="Enter Value.." value={value} onChange={(e)=>setValue(e.target.value)}/>
                                 <div className="circle button success" style={{ marginLeft: "10px" }} onClick={()=>createSecret()}>
@@ -342,7 +342,7 @@ function Registries() {
                                     <td>
                                         <input style={{ maxWidth: "150px" }} type="text" disabled value={"*******"} />
                                     </td>
-                                    <td  style={{ paddingRight: "10px" }} colspan="2">
+                                    <td  style={{ paddingRight: "10px" }} colSpan="2">
                                         <div style={{ display: "flex", alignItems: "center" }}>
                                             <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
                                             <div id={"reg-"+obj.name} onClick={()=>deleteRegistry(obj.name)} title="Remove Registry" className="circle button danger" style={{ marginLeft: "10px" }}>
@@ -362,7 +362,7 @@ function Registries() {
                                 <td>
                                     <input style={{ maxWidth: "150px" }} type="text" value={user} onChange={(e)=>setUser(e.target.value)} placeholder="Enter User" />
                                 </td>
-                                <td  style={{ paddingRight: "10px" }} colspan="2">
+                                <td  style={{ paddingRight: "10px" }} colSpan="2">
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e)=>setToken(e.target.value)}/>
                                         <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={()=>createRegistry()}>
