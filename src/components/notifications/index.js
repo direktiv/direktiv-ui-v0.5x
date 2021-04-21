@@ -23,6 +23,6 @@ export function sendNotification(title, msg, level) {
 export default function NotificationSystem() {
     return(
     <>
-        <ToastContainer autoClose={30000} position="bottom-right" newestOnTop/>
+        <ToastContainer autoClose={10000} position="bottom-right" newestOnTop/>
     </>)
 }
