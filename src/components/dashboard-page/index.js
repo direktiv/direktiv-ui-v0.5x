@@ -8,7 +8,6 @@ import Breadcrumbs from '../breadcrumbs'
 
 import { IoBarChartSharp, IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
-import MainContext from '../../context'
 
 export default function DashboardPage() {
     const [instances, setInstances] = useState(null)
