@@ -19,21 +19,36 @@ function SettingsAction(props) {
                 method: "DELETE"
             })
             if (resp.ok) {
+                let goto = ""
                 for(let i=0; i < namespaces.length; i++) {
                     if(namespaces[i] !== namespace) {
-                        localStorage.setItem("namespace", namespaces[i])
-                        setNamespace(namespaces[i])
-                        history.push(`/${namespaces[i]}/s/`)
-
-                        await fetchNamespaces()
-                        setShow(false)
-                        break                      
+                        goto = namespaces[i]
+                        break
                     }
                 }
+
+                console.log(goto)
+                if (goto==="") {
+                    // if not found push to / as no namespaces probably exist
+                    localStorage.setItem("namespace", "")
+                    setShow(false)
+                    // await fetchNamespaces(false, "")
+                    setNamespace("")
+                    // window.location.pathname = "/"
+                    history.push("/")
+                } else {
+                    localStorage.setItem("namespace", goto)
+                    setShow(false)
+                    await fetchNamespaces(false, goto)
+                    history.push(`/${goto}`)
+                }
+ 
+
             } else {
                 throw new Error(await resp.text())
             }
         } catch(e) {
+            console.log(e)
             sendNotification("Failed to delete namespace", e.message, 0)
         }
     }
@@ -63,8 +78,10 @@ function SettingsAction(props) {
 }
 
 export default function SettingsPage() {
+    const {namespace} = useContext(MainContext)
     return (
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row">
                 <div style={{ flex: "auto" }}>
@@ -87,6 +104,7 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
+        :""}
         </>
     )
 }
@@ -106,7 +124,11 @@ function Secrets() {
                 })
                 if(resp.ok) {
                     let json = await resp.json()
-                    setSecrets(json.secrets)
+                    if(json.secrets) {
+                        setSecrets(json.secrets)
+                    } else {
+                        setSecrets([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }
@@ -229,7 +251,11 @@ function Registries() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    setRegistries(json.registries)
+                    if(json.registries) {
+                        setRegistries(json.registries)                        
+                    } else {
+                        setRegistries([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }

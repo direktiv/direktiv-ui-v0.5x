@@ -16,8 +16,11 @@ import NoResults from '../../noresults'
 dayjs.extend(relativeTime);
 
 export default function EventsPage() {
+    const {namespace} = useContext(MainContext)
     return (
+
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -32,7 +35,7 @@ export default function EventsPage() {
                     <EventsPageBody />
                 </div>
             </div>
-        </div>
+        </div>: ""}
         </>
     )
 }
@@ -51,7 +54,11 @@ export function EventsPageBody() {
                 })
                 if(resp.ok) {
                     let json = await resp.json()
-                    setInstances(json.workflowInstances)
+                    if(json.workflowInstances) {
+                        setInstances(json.workflowInstances)
+                    } else {
+                        setInstances([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }

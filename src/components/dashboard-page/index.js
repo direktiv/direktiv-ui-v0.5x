@@ -8,9 +8,9 @@ import Breadcrumbs from '../breadcrumbs'
 
 import { IoBarChartSharp, IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
+import MainContext from '../../context'
 
 export default function DashboardPage() {
-
     const [instances, setInstances] = useState(null)
     const [metrics, setMetrics] = useState(null)
     const {fetch, namespace} = useContext(MainContext)
@@ -68,6 +68,7 @@ export default function DashboardPage() {
 
     return (
         <>
+        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -97,6 +98,9 @@ export default function DashboardPage() {
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }}>
             </div>
         </div>
+        :
+    
+    ""}
         </>
     )
 }

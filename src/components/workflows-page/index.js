@@ -28,7 +28,7 @@ export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
-    
+    console.log(namespace)
     const fetchWorkflows = useCallback(()=>{
         async function fetchWfs() {
             try {
@@ -38,7 +38,11 @@ export default function WorkflowsPage() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    setWorkflows(json.workflows)
+                    if(json.workflows) {
+                        setWorkflows(json.workflows)
+                    } else {
+                        setWorkflows([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }
@@ -83,6 +87,7 @@ export default function WorkflowsPage() {
 
     return (
         <>
+        {namespace !== ""?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -110,7 +115,7 @@ export default function WorkflowsPage() {
                                                     <div className="actions-button-div">
                                                         {obj.active ?
                                                             <div className="button circle success" onClick={(ev) => {
-                                                                toggleWorkflow(obj.uid)
+                                                                toggleWorkflow(obj.id)
                                                                 ev.stopPropagation()
                                                             }}>
                                                                 <span>
@@ -119,7 +124,7 @@ export default function WorkflowsPage() {
                                                             </div>
                                                             :
                                                             <div className="button circle" onClick={(ev) => {
-                                                                toggleWorkflow(obj.uid)
+                                                                toggleWorkflow(obj.id)
                                                                 ev.stopPropagation()
                                                             }}>
                                                                 <span>
@@ -167,6 +172,7 @@ export default function WorkflowsPage() {
                 </div>
             </div>
         </div>
+        :""}
         </>
     )
 }
