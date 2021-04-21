@@ -335,8 +335,8 @@ function Content() {
                         <Redirect to={`/${namespace}`} from="/" />
                         :
                         <Route exact path="/">
-                          <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center"}}>
-                            
+                          <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12pt"}}>
+                          You are not a part of any namespaces! Create a namespace to continue using Direktiv.
                           </div>
                         </Route>
                     }
