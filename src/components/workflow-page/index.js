@@ -341,7 +341,11 @@ function EventsList(props) {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    setInstances(json.workflowInstances)
+                    if(json.workflowInstances){
+                        setInstances(json.workflowInstances)
+                    } else {
+                        setInstances([])                        
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }

@@ -39,7 +39,11 @@ export default function WorkflowsPage() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    setWorkflows(json.workflows)
+                    if(json.workflows) {
+                        setWorkflows(json.workflows)
+                    } else {
+                        setWorkflows([])
+                    }
                 } else {
                     throw new Error(await resp.text())
                 }
