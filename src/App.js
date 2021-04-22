@@ -47,38 +47,38 @@ function AuthenticatedContent() {
         if (resp.ok) {
           let newNamespace = ""
           let json = await resp.json()
-        
+
           if (load) {
             // Dont do anything if on jq playground
-            if(window.location.pathname === "/jq/playground") {
+            if (window.location.pathname === "/jq/playground") {
 
             } else {
-            // 1st. check if namespace is in the pathname 
-            if (window.location.pathname.split("/")[1] !== "") {
-              // handle if pathname is /i as its a different route
-              if (window.location.pathname.split("/")[1] === "i") {
-                newNamespace = window.location.pathname.split("/")[2]
-              } else {
-                newNamespace = window.location.pathname.split("/")[1]
-              }
+              // 1st. check if namespace is in the pathname 
+              if (window.location.pathname.split("/")[1] !== "") {
+                // handle if pathname is /i as its a different route
+                if (window.location.pathname.split("/")[1] === "i") {
+                  newNamespace = window.location.pathname.split("/")[2]
+                } else {
+                  newNamespace = window.location.pathname.split("/")[1]
+                }
 
-              // check if namespace exists here if not redirect back to /
-              let f = false
-              if(json.namespaces) {
-                for (let i = 0; i < json.namespaces.length; i++) {
-                  if (json.namespaces[i].name === newNamespace) {
-                    f = true
+                // check if namespace exists here if not redirect back to /
+                let f = false
+                if (json.namespaces) {
+                  for (let i = 0; i < json.namespaces.length; i++) {
+                    if (json.namespaces[i].name === newNamespace) {
+                      f = true
+                    }
                   }
                 }
-              }
-   
-              if (!f) {
-                // need a better solution as keycloak forces reload of the page again.
 
-                window.location.pathname = "/"
-                return
+                if (!f) {
+                  // need a better solution as keycloak forces reload of the page again.
+
+                  window.location.pathname = "/"
+                  return
+                }
               }
-            }
             }
 
             // if newNamespace isn't found yet try other options
@@ -139,13 +139,13 @@ function AuthenticatedContent() {
           setNamespaces(namespacesn)
 
         } else {
-  // 400 should have json response
-  if(resp.status === 400) {
-    let json = await resp.json()
-    throw new Error(json.Message)
-  } else {
-    throw new Error(`response code was ${resp.status}`)
-  }
+          // 400 should have json response
+          if (resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
         }
 
       } catch (e) {
@@ -199,38 +199,38 @@ function AuthenticatedContent() {
       fetchNamespaces: fetchNamespaces,
     }}>
       {!load ?
-      <div id="content">
-        <Router>
-          <div id="nav-panel">
+        <div id="content">
+          <Router>
+            <div id="nav-panel">
               <Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
-          </div>
+            </div>
             <div id="main-panel">
               <Switch>
-              <Route exact path="/jq/playground" component={JQPlaygroundPage} />
-                  <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
-                  <Route exact path="/">
-                    {
-                      namespace !== "" ?
-                        <Redirect to={`/${namespace}`} from="/" />
-                        :
-                        <Route exact path="/">
-                          <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12pt"}}>
-                            You are not a part of any namespaces! Create a namespace to continue using Direktiv.
+                <Route exact path="/jq/playground" component={JQPlaygroundPage} />
+                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+                <Route exact path="/">
+                  {
+                    namespace !== "" ?
+                      <Redirect to={`/${namespace}`} from="/" />
+                      :
+                      <Route exact path="/">
+                        <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
+                          You are not a part of any namespaces! Create a namespace to continue using Direktiv.
                           </div>
-                        </Route>
-                    }
-                  </Route>
-                  <Route exact path="/:namespace" component={DashboardPage} />
-                  <Route exact path="/:namespace/w/" component={WorkflowsPage} />
-                  <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
-                  <Route exact path="/:namespace/i/" component={EventsPage} />
-                  <Route exact path="/:namespace/s/" component={SettingsPage} />
+                      </Route>
+                  }
+                </Route>
+                <Route exact path="/:namespace" component={DashboardPage} />
+                <Route exact path="/:namespace/w/" component={WorkflowsPage} />
+                <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
+                <Route exact path="/:namespace/i/" component={EventsPage} />
+                <Route exact path="/:namespace/s/" component={SettingsPage} />
               </Switch>
             </div>
-        </Router>
-      </div>
-      :
-      ""}
+          </Router>
+        </div>
+        :
+        ""}
       <NotificationSystem />
     </MainContext.Provider>
   )
@@ -259,38 +259,38 @@ function Content() {
           let newNamespace = ""
           let json = await resp.json()
           console.log(window.location.pathname)
-        
+
           if (load) {
             // Dont do anything if on jq playground
-            if(window.location.pathname === "/jq/playground") {
+            if (window.location.pathname === "/jq/playground") {
 
             } else {
-            // 1st. check if namespace is in the pathname 
-            if (window.location.pathname.split("/")[1] !== "") {
-              // handle if pathname is /i as its a different route
-              if (window.location.pathname.split("/")[1] === "i") {
-                newNamespace = window.location.pathname.split("/")[2]
-              } else {
-                newNamespace = window.location.pathname.split("/")[1]
-              }
+              // 1st. check if namespace is in the pathname 
+              if (window.location.pathname.split("/")[1] !== "") {
+                // handle if pathname is /i as its a different route
+                if (window.location.pathname.split("/")[1] === "i") {
+                  newNamespace = window.location.pathname.split("/")[2]
+                } else {
+                  newNamespace = window.location.pathname.split("/")[1]
+                }
 
-              // check if namespace exists here if not redirect back to /
-              let f = false
-              if(json.namespaces) {
-                for (let i = 0; i < json.namespaces.length; i++) {
-                  if (json.namespaces[i].name === newNamespace) {
-                    f = true
+                // check if namespace exists here if not redirect back to /
+                let f = false
+                if (json.namespaces) {
+                  for (let i = 0; i < json.namespaces.length; i++) {
+                    if (json.namespaces[i].name === newNamespace) {
+                      f = true
+                    }
                   }
                 }
-              }
-           
-              if (!f) {
-                // need a better solution as keycloak forces reload of the page again.
 
-                window.location.pathname = "/"
-                return
+                if (!f) {
+                  // need a better solution as keycloak forces reload of the page again.
+
+                  window.location.pathname = "/"
+                  return
+                }
               }
-            }
             }
 
             // if newNamespace isn't found yet try other options
@@ -351,13 +351,13 @@ function Content() {
           setNamespaces(namespacesn)
 
         } else {
-  // 400 should have json response
-  if(resp.status === 400) {
-    let json = await resp.json()
-    throw new Error(json.Message)
-  } else {
-    throw new Error(`response code was ${resp.status}`)
-  }
+          // 400 should have json response
+          if (resp.status === 400) {
+            let json = await resp.json()
+            throw new Error(json.Message)
+          } else {
+            throw new Error(`response code was ${resp.status}`)
+          }
         }
 
       } catch (e) {
@@ -406,8 +406,8 @@ function Content() {
                         <Redirect to={`/${namespace}`} from="/" />
                         :
                         <Route exact path="/">
-                          <div style={{height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12pt"}}>
-                          You are not a part of any namespaces! Create a namespace to continue using Direktiv.
+                          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
+                            You are not a part of any namespaces! Create a namespace to continue using Direktiv.
                           </div>
                         </Route>
                     }
