@@ -41,6 +41,8 @@ function AuthenticatedContent() {
     async function fd() {
       setLoad(true)
       try {
+        let namespacesn = [];
+
         let resp = await authFetch('/namespaces/', {
           method: 'GET',
         })
@@ -48,9 +50,10 @@ function AuthenticatedContent() {
           let newNamespace = ""
           let json = await resp.json()
 
+          if (json.namespaces) {
+
           if (load) {
             // if namespaces exist only do this logic
-            if (json.namespaces) {
               // Dont do anything if on jq playground
               if (window.location.pathname === "/jq/playground") {
 
@@ -127,17 +130,16 @@ function AuthenticatedContent() {
                 }
               }
             }
+            if (newNamespace === "" && val) {
 
+              newNamespace = val
+            }
+            for (let i = 0; i < json.namespaces.length; i++) {
+  
+              namespacesn.push(json.namespaces[i].name)
+            }
           }
-          if (newNamespace === "" && val) {
-
-            newNamespace = val
-          }
-          let namespacesn = [];
-          for (let i = 0; i < json.namespaces.length; i++) {
-
-            namespacesn.push(json.namespaces[i].name)
-          }
+      
           setLoad(false)
           setNamespace(newNamespace)
           setNamespaces(namespacesn)
@@ -256,6 +258,8 @@ function Content() {
     async function fd() {
       setLoad(true)
       try {
+        let namespacesn = [];
+
         let resp = await netch('/namespaces/', {
           method: 'GET',
         })
@@ -263,9 +267,10 @@ function Content() {
           let newNamespace = ""
           let json = await resp.json()
 
+          if (json.namespaces) {
+
           if (load) {
             // if namespaces exist only do this logic
-            if (json.namespaces) {
               // Dont do anything if on jq playground
               if (window.location.pathname === "/jq/playground") {
 
@@ -342,17 +347,16 @@ function Content() {
                 }
               }
             }
+            if (newNamespace === "" && val) {
 
+              newNamespace = val
+            }
+            for (let i = 0; i < json.namespaces.length; i++) {
+  
+              namespacesn.push(json.namespaces[i].name)
+            }
           }
-          if (newNamespace === "" && val) {
-
-            newNamespace = val
-          }
-          let namespacesn = [];
-          for (let i = 0; i < json.namespaces.length; i++) {
-
-            namespacesn.push(json.namespaces[i].name)
-          }
+      
           setLoad(false)
           setNamespace(newNamespace)
           setNamespaces(namespacesn)
