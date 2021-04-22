@@ -4,7 +4,7 @@ import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { PlusCircle, XCircle } from 'react-bootstrap-icons'
 import { useHistory } from 'react-router'
-import { IoLockOpen, IoLogoDocker, IoTrash } from 'react-icons/io5'
+import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 
@@ -211,7 +211,7 @@ function Secrets() {
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
-                                            <MiniConfirmButton style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
+                                            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                 deleteSecret(obj.name)
                                                 ev.stopPropagation()
                                             }} />
@@ -364,7 +364,7 @@ function Registries() {
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
-                                            <MiniConfirmButton style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
+                                            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                 deleteRegistry(obj.name)
                                                 ev.stopPropagation()
                                             }} />

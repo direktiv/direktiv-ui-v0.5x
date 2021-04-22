@@ -7,24 +7,24 @@ export function ConfirmButton(props) {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [listen, setListen] = useState(false);
 
-    const setConfirm = useCallback(()=>{
+    const setConfirm = useCallback(() => {
         setShowConfirmation(!showConfirmation)
-    },[showConfirmation])
+    }, [showConfirmation])
 
     useEffect(() => {
         if (showConfirmation && !listen) {
             setListen(true)
-            document.addEventListener('click',setConfirm, false)
+            document.addEventListener('click', setConfirm, false)
         }
 
         return function cleanup() {
             if (listen && showConfirmation) {
                 setListen(false)
-                document.removeEventListener('click',setConfirm, false);
+                document.removeEventListener('click', setConfirm, false);
             }
         }
     }, [showConfirmation, listen, setConfirm])
-    
+
 
     return (
         <div className={`confirm-btn ${showConfirmation ? "expand" : ""}`} onClick={(ev) => {
@@ -57,20 +57,20 @@ export function ConfirmButton(props) {
 }
 
 export function MiniConfirmButton(props) {
-    const { Icon, IconColor, OnConfirm, style } = props;
+    const { Icon, IconColor, OnConfirm, IconConfirmColor, IconConfirm, style } = props;
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [listen, setListen] = useState(false);
 
-    const setConfirm = useCallback(()=>{
+    const setConfirm = useCallback(() => {
         setShowConfirmation(!showConfirmation)
-    },[showConfirmation])
+    }, [showConfirmation])
 
     useEffect(() => {
         let hideTimeout;
         if (showConfirmation && !listen) {
             setListen(true)
-            document.addEventListener('click',setConfirm, false);
-            hideTimeout = setTimeout(function(){ setShowConfirmation(false) }, 5000);
+            document.addEventListener('click', setConfirm, false);
+            hideTimeout = setTimeout(function () { setShowConfirmation(false) }, 5000);
         }
 
         return function cleanup() {
@@ -79,11 +79,11 @@ export function MiniConfirmButton(props) {
             }
             if (listen && showConfirmation) {
                 setListen(false)
-                document.removeEventListener('click',setConfirm, false);
+                document.removeEventListener('click', setConfirm, false);
             }
         }
     }, [showConfirmation, listen, setConfirm])
-    
+
 
     return (
         <div style={style} className={`confirm-btn`} onClick={(ev) => {
@@ -99,8 +99,11 @@ export function MiniConfirmButton(props) {
                     </div>
                     :
 
-                    <div className="confirm-btn-content confirm-btn-icon confirm" onClick={OnConfirm} style={{ padding: "0 10px 0px 10px" }} >                        
-                        <IoCheckmarkSharp  />
+                    <div className="confirm-btn-content confirm-btn-icon confirm" onClick={OnConfirm} style={{ padding: "0 10px 0px 10px" }} >
+                        {IconConfirm ? <IconConfirm style={IconConfirmColor ? { color: `${IconConfirmColor}` } : {}} />
+                            :
+                            <IoCheckmarkSharp style={IconConfirmColor ? { color: `${IconConfirmColor}` } : {}} />
+                        }
                     </div>
             }
         </div>
