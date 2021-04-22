@@ -64,11 +64,14 @@ function AuthenticatedContent() {
 
               // check if namespace exists here if not redirect back to /
               let f = false
-              for (let i = 0; i < json.namespaces.length; i++) {
-                if (json.namespaces[i].name === newNamespace) {
-                  f = true
+              if(json.namespaces) {
+                for (let i = 0; i < json.namespaces.length; i++) {
+                  if (json.namespaces[i].name === newNamespace) {
+                    f = true
+                  }
                 }
               }
+   
               if (!f) {
                 // need a better solution as keycloak forces reload of the page again.
 
@@ -273,11 +276,14 @@ function Content() {
 
               // check if namespace exists here if not redirect back to /
               let f = false
-              for (let i = 0; i < json.namespaces.length; i++) {
-                if (json.namespaces[i].name === newNamespace) {
-                  f = true
+              if(json.namespaces) {
+                for (let i = 0; i < json.namespaces.length; i++) {
+                  if (json.namespaces[i].name === newNamespace) {
+                    f = true
+                  }
                 }
               }
+           
               if (!f) {
                 // need a better solution as keycloak forces reload of the page again.
 

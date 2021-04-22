@@ -6,6 +6,7 @@ import {useParams} from 'react-router-dom'
 import {useContext} from 'react'
 import {sendNotification} from '../notifications'
 import MainContext from "../../context"
+import NoResults from '../../noresults'
 
 
 // TODO dont set states
@@ -103,9 +104,12 @@ export default function Sankey(props) {
         if(failure !== 0) {
             l.push({source:"failure", target: "end", value: failure})
         }
-    
-        setLinks(l)
-        setNodes(n)
+        console.log(states)
+        if(states.length > 0) {
+            setLinks(l)
+            setNodes(n)
+        }
+     
         setLoad(false)
         }
         gatherMetrics()
@@ -119,15 +123,25 @@ export default function Sankey(props) {
    
         
     // },[states])
-
+    console.log(links, nodes)
     return(
         <div style={{height:"80%", width:"80%", minHeight:"300px", margin:"auto", marginTop:"20px"}}>
             {
                 load ? "":
                 <AutoSizer>
-                    {(dim)=> (
-                        <SankeyDiagram nodes={nodes} links={links} height={dim.height-20} width={dim.width} />
-                    )}
+                    {(dim)=> {
+                        if(nodes.length > 0 && links.length > 0) {
+                            return(
+                                <SankeyDiagram nodes={nodes} links={links} height={dim.height-20} width={dim.width} />
+                            )
+                        }
+
+                        return(
+                            <div style={{textAlign:"center", paddingTop:"10px", fontSize:"11pt", width:"100%", height:dim.height-20, width: dim.width}}>
+                                No Metrics are found to draw the sankey have you tried executing the workflow?
+                            </div>
+                        )
+                    }}
                 </AutoSizer>
             }
         </div>

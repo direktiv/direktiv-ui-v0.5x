@@ -477,16 +477,22 @@ function WorkflowActions(props) {
     const {active, toggleWorkflow} = props
 
     return(
-        <div title={active? "Disable": "Enable"} id="workflow-actions" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", height:"28px", padding: "5px", display:"flex", alignItems:"center" }}>
-               {active ? 
-                    <span title="Disable" onClick={()=>toggleWorkflow()} style={{ cursor:"pointer", flex: "auto", display:"flex", alignItems:"center", color:"green" }}>
-                       <IoToggleOutline style={{ fontSize: "12pt" }} />
-                   </span>
-               :
-                    <span title="Enable" onClick={()=>toggleWorkflow()} style={{ rotate: "180deg", WebkitTransform: "rotate(180deg)", cursor:"pointer", transform:"180deg", flex: "auto", display:"flex", alignItems:"center" }}>
-                        <IoToggleOutline style={{ fontSize: "12pt" }} />
-                    </span>
-                }
+        <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center"}}>
+            <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
+           
+                    {
+                        active ?
+                        <span style={{ flex: "auto"}}>
+                        <IoToggle style={{ fontSize: "12pt", marginBottom: "6px", fill:"green" }} />
+                        </span>
+                        :
+                        <span style={{ flex: "auto",  rotate: "180deg", WebkitTransform: "rotate(180deg)"}}>
+                        <IoToggleOutline style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                </span>
+
+                    }
+            </div>
         </div>
+  
     )
 }
