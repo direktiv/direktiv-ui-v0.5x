@@ -24,7 +24,6 @@ export default function DashboardPage() {
                 pending: "#ffbf32",
                 crashed: "#4a4e4e"
             }
-        
             try {
                 let resp = await fetch(`/instances/${params.namespace}`, {
                     method: "GET"
@@ -55,21 +54,22 @@ export default function DashboardPage() {
                     setMetrics(data)
                 } else {
                    // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                    if(resp.status === 400) {
+                        let json = await resp.json()
+                        throw new Error(json.Message)
+                    } else {
+                        throw new Error(`response code was ${resp.status}`)
+                    }
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow`, e.message, 0)
             }
         }
-        if(metrics === null) {
+        if(metrics === null && namespace !== "") {
             fetchMet()
         }
-    },[fetch, params.workflow, metrics, params.namespace])
+    },[fetch, params.workflow, metrics, params.namespace, namespace])
+
 
     return (
         <>

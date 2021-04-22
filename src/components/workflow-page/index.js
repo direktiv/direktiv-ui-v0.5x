@@ -448,7 +448,7 @@ function EventsList(props) {
                 <>
                 {instances.map((obj)=>{
                     return(
-                        <li style={{cursor:"pointer"}} onClick={()=>history.push(`/i/${obj.id}`)} className="event-list-item">
+                        <li key={obj.id} style={{cursor:"pointer"}} onClick={()=>history.push(`/i/${obj.id}`)} className="event-list-item">
                         <div>
                             <span><CircleFill className={obj.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                             <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>

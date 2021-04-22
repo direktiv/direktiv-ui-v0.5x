@@ -76,7 +76,7 @@ export function EventsPageBody() {
     },[namespace, fetch])
 
     return(
-        <div id="events-table">
+        <div id="events-table" style={{height:"90%", overflow:"auto"}}>
             {instances.length > 0 ?
             <table style={{ width: "100%" }}>
                 {/* <thead>
@@ -90,14 +90,12 @@ export function EventsPageBody() {
                     {
                         instances.map((obj)=>{
                             return(
-                                <>
-                                    <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
+                                    <tr key={obj.id} onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
                                         <td style={{textAlign:"left"}}>{obj.id}</td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
                                         {/* <td></td> */}
                                     </tr>
-                                </>
                             )
                         })
                     }

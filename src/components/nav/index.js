@@ -114,12 +114,11 @@ export default function Navbar(props) {
 
     return(
         <div id="nav">
+            <Link to="/">
             <div id="nav-img-holder">
                 <img src={Logo} alt="main-logo"/>
-                {/* <span style={{ display: "block", marginTop: "-20px", marginBottom: "40px", fontSize: "0.75em" }}>
-                    direktiv
-                </span> */}
             </div>
+            </Link>
             <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
                 <ul id={"namespaces-ul"} style={{ margin: "0px" }}>
                     <li className="namespace-selector" onClick={() => {
@@ -171,7 +170,6 @@ export default function Navbar(props) {
                                             return(
                                                 <li key={i} onClick={()=>{
                                                     localStorage.setItem("namespace", obj)
-                                                    console.log('triggered?')
                                                     setNamespace(obj)
                                                     toggleNamespaceSelector()
                                                 
@@ -240,7 +238,7 @@ export default function Navbar(props) {
                                 <span>Workflows</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/w/`} className="nav-link">
+                        <Link to={`/${namespace}/w`} className="nav-link">
                             <div>
                                 <IoShapesSharp style={{ marginRight: "10px" }} />
                                 <span>Workflows</span>
@@ -256,7 +254,7 @@ export default function Navbar(props) {
                                 <span>Instances</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/i/`} className="nav-link">
+                        <Link to={`/${namespace}/i`} className="nav-link">
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
@@ -279,7 +277,7 @@ export default function Navbar(props) {
                                 <span>Settings</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/s/`} className="nav-link">
+                        <Link to={`/${namespace}/s`} className="nav-link">
                             <div>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>

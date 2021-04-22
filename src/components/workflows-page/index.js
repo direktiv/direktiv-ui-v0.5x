@@ -29,7 +29,6 @@ export default function WorkflowsPage() {
     const {fetch, namespace} = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
-    console.log(namespace)
     const fetchWorkflows = useCallback(()=>{
 
         // FIXME: This should stop bad fetches when namespace = <empty-string> before useContext 
