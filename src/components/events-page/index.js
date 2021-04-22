@@ -76,7 +76,7 @@ export function EventsPageBody() {
     },[namespace, fetch])
 
     return(
-        <div id="events-table">
+        <div id="events-table" style={{height:"90%", overflow:"auto"}}>
             {instances.length > 0 ?
             <table style={{ width: "100%" }}>
                 {/* <thead>
