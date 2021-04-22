@@ -57,7 +57,6 @@ export default function ReactEditor(props) {
                         },
                     }}
                     onBeforeChange={(editor, data, value) => {
-                        console.log("value =", value)
                         setValue(value)
                     }}
                 />

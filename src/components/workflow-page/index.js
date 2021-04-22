@@ -71,7 +71,6 @@ export default function WorkflowPage() {
     },[namespace, fetch, params.workflow])
 
     const updateWorkflow = useCallback(()=>{
-        console.log("workflowInfo.fetching =", workflowInfo.fetching)
         if (workflowInfo.fetching){
             return // TODO - User Feedback
         }
@@ -151,9 +150,6 @@ const updateLogEvent = useCallback(()=>{
             fetchWorkflow()
         }
     },[fetchWorkflow, namespace])
-    // useEffect(()=>{
-    //     console.log("Workflow page has mounted")
-    // },[])
 
     let saveButton = (
         <div className={workflowValueOld !== workflowValue ? "editor-footer-button": "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { updateWorkflow() }}>

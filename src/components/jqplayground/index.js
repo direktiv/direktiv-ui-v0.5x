@@ -102,11 +102,18 @@ export default function JQPlaygroundPage() {
             return
         }
         setFetching(true)
+
         async function execJQ() {
-            let rBody = JSON.stringify({
-                query: `${filter}`,
-                input: JSON.parse(input),
-            });
+            let rBody;
+            try {
+                rBody = JSON.stringify({
+                    query: `${filter}`,
+                    input: JSON.parse(input),
+                });
+            } catch (e) {
+                sendNotification(`Invalid JQ Input`, `${e}`.replace("SyntaxError: JSON.parse: ", ""), 0)
+                return
+            }
 
             try {
                 let resp = await fetch(`/jq-playground`, {
