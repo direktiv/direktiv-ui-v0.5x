@@ -34,14 +34,13 @@ export default function DashboardPage() {
 
                     let statusMap = {};
                     if (json.workflowInstances) {
-                        json.workflowInstances.map((obj) => {
-                            if (!statusMap[obj.status]) {
-                                statusMap[obj.status] = 0
+                        for(let x=0; x < json.workflowInstances.length; x++) {
+                            if(!statusMap[json.workflowInstances[x].status]) {
+                                statusMap[json.workflowInstances[x].status] = 0
                             }
-                            statusMap[obj.status] += 1 
-                        })
+                            statusMap[json.workflowInstances[x].status] += 1
+                        }
                     }
-
                     let data = [];
                     
                     Object.keys(statusMap).forEach(function(k, v) {
@@ -70,7 +69,7 @@ export default function DashboardPage() {
         if(metrics === null) {
             fetchMet()
         }
-    },[fetch, params.workflow, metrics])
+    },[fetch, params.workflow, metrics, params.namespace])
 
     return (
         <>
@@ -111,57 +110,61 @@ export default function DashboardPage() {
     )
 }
 
-function TopWorkflows(props) {
+// function TopWorkflows(props) {
 
-    let { instances } = props;
-    console.log(instances);
+//     let { instances } = props;
+//     console.log(instances);
 
-    let workflowsMap = {};
-    if (instances) {
-        if (instances.workflowInstances) {
-            instances.workflowInstances.map((obj) => {
-                let x = obj.id.split("/");
-                let wfName = x[1];
+//     let workflowsMap = {};
+//     if (instances) {
+//         if (instances.workflowInstances) {
+//             instances.workflowInstances.map((obj) => {
+//                 let x = obj.id.split("/");
+//                 let wfName = x[1];
     
-                if (!workflowsMap[wfName]) {
-                    workflowsMap[wfName] = 0;
-                }
+//                 if (!workflowsMap[wfName]) {
+//                     workflowsMap[wfName] = 0;
+//                 }
     
-                workflowsMap[wfName] += 1;
-            })
-        }
-    }
+//                 workflowsMap[wfName] += 1;
+//             })
+//         }
+//     }
 
-    let datasource = {
-        chart: {
-            theme: "fusion"
-        },
-        data: []
-    };
+//     let datasource = {
+//         chart: {
+//             theme: "fusion"
+//         },
+//         data: []
+//     };
 
-    Object.keys(workflowsMap).forEach(function(k, v) {
-        datasource.data.push({
-            label: k,
-            value: workflowsMap[k]
-        })
-    })
+//     Object.keys(workflowsMap).forEach(function(k, v) {
+//         datasource.data.push({
+//             label: k,
+//             value: workflowsMap[k]
+//         })
+//     })
 
-    return(
-        <div style={{ overflowY: "hidden" }}>
+//     return(
+//         <div style={{ overflowY: "hidden" }}>
             
-        </div>
-    )
-}
+//         </div>
+//     )
+// }
 
 function DashboardTotalExecutions(props) {
 
     let { metrics } = props;
-    let rows = [];
 
-    let x = 0;
     if (metrics && metrics.length > 0) {
-        metrics.map((obj, i) => {
-            rows.push(<div className="shadow-soft tile" key={i} style={{ display: "flex", maxWidth: "150px", borderRadius: ".55rem" }} >
+
+
+        return (
+            <div>
+                <PieComponent metrics={metrics} />
+                <div className="container" style={{ justifyContent: "center", flexDirection: "row", marginTop: "20px", alignItems: "center", fontSize: "10pt", flexWrap: "wrap" }}>
+                  {        metrics.map((obj, i) => {
+            return(<div className="shadow-soft tile" key={i} style={{ display: "flex", maxWidth: "150px", borderRadius: ".55rem" }} >
                 <div style={{ marginRight: "5px", display: "flex", flexDirection: "row", alignItems: "center" }}>
                     <IoEllipse className={obj.title} style={{ marginTop: "2px", marginRight: "5px" }} />
                     <span>
@@ -172,13 +175,7 @@ function DashboardTotalExecutions(props) {
                     ({obj.value})
                 </div>
             </div>)
-        })
-
-        return (
-            <div>
-                <PieComponent metrics={metrics} />
-                <div className="container" style={{ justifyContent: "center", flexDirection: "row", marginTop: "20px", alignItems: "center", fontSize: "10pt", flexWrap: "wrap" }}>
-                    {rows}
+        })}
                 </div>
             </div>
         )

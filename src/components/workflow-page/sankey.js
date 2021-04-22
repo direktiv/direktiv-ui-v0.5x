@@ -6,7 +6,6 @@ import {useParams} from 'react-router-dom'
 import {useContext} from 'react'
 import {sendNotification} from '../notifications'
 import MainContext from "../../context"
-import NoResults from '../../noresults'
 
 
 // TODO dont set states
@@ -137,7 +136,7 @@ export default function Sankey(props) {
                         }
 
                         return(
-                            <div style={{textAlign:"center", paddingTop:"10px", fontSize:"11pt", width:"100%", height:dim.height-20, width: dim.width}}>
+                            <div style={{textAlign:"center", paddingTop:"10px", fontSize:"11pt",  height:dim.height-20, width: dim.width}}>
                                 No Metrics are found to draw the sankey have you tried executing the workflow?
                             </div>
                         )
