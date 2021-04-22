@@ -8,4 +8,4 @@ server:
 	if [ ! -d ${mkfile_dir_main}reactjs-embed ]; then \
 		git clone git@github.com:vorteil/reactjs-embed.git; \
 	fi	
-	docker build . --tag vorteil/direktiv-ui
+	docker build . --tag vorteil/test-ui

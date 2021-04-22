@@ -100,26 +100,28 @@ function AuthenticatedContent() {
               <Navbar auth={true} email={getEmail()} fetchNamespaces={fetchNamespaces} name={getUsername()} namespaces={namespaces} setNamespaces={setNamespaces} logout={logout} namespace={namespace} setNamespace={namespace} />
             </div>
             <div id="main-panel">
-              <Switch>
-                <Route exact path="/jq/playground" component={JQPlaygroundPage} />
-                <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
-                <Route exact path="/">
-                  {
-                    namespace !== "" ?
-                      <Redirect to={`/${namespace}`} from="/" />
-                      :
-                      <Route exact path="/">
-                        <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
-                          You are not a part of any namespaces! Create a namespace to continue using Direktiv.
-                        </div>
-                      </Route>
-                  }
-                </Route>
-                <Route exact path="/:namespace" component={DashboardPage} />
-                <Route exact path="/:namespace/w/" component={WorkflowsPage} />
-                <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
-                <Route exact path="/:namespace/i/" component={EventsPage} />
-                <Route exact path="/:namespace/s/" component={SettingsPage} />
+            <Switch>
+                <>
+                  <Route path="/jq/playground" component={JQPlaygroundPage} />
+                  <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+                  <Route exact path="/">
+                    {
+                      namespace !== "" ?
+                        <Redirect to={`/${namespace}`} from="/" />
+                        :
+                        <Route exact path="/">
+                          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
+                            You are not a part of any namespaces! Create a namespace to continue using Direktiv.
+                          </div>
+                        </Route>
+                    }
+                  </Route>
+                  <Route exact path="/:namespace" component={DashboardPage} />
+                  <Route path="/:namespace/w" component={WorkflowsPage} />
+                  <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
+                  <Route path="/:namespace/i" component={EventsPage} />
+                  <Route path="/:namespace/s" component={SettingsPage} />
+                </>
               </Switch>
             </div>
           </Router>
@@ -301,8 +303,8 @@ function Content() {
             <div id="main-panel">
               <Switch>
                 <>
-                  <Route exact path="/jq/playground" component={JQPlaygroundPage} />
-                  <Route exact path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+                  <Route path="/jq/playground" component={JQPlaygroundPage} />
+                  <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
                   <Route exact path="/">
                     {
                       namespace !== "" ?
@@ -316,10 +318,10 @@ function Content() {
                     }
                   </Route>
                   <Route exact path="/:namespace" component={DashboardPage} />
-                  <Route exact path="/:namespace/w/" component={WorkflowsPage} />
-                  <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
-                  <Route exact path="/:namespace/i/" component={EventsPage} />
-                  <Route exact path="/:namespace/s/" component={SettingsPage} />
+                  <Route path="/:namespace/w" component={WorkflowsPage} />
+                  <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
+                  <Route path="/:namespace/i" component={EventsPage} />
+                  <Route path="/:namespace/s" component={SettingsPage} />
                 </>
               </Switch>
             </div>

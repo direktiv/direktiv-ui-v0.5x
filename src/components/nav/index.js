@@ -240,7 +240,7 @@ export default function Navbar(props) {
                                 <span>Workflows</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/w/`} className="nav-link">
+                        <Link to={`/${namespace}/w`} className="nav-link">
                             <div>
                                 <IoShapesSharp style={{ marginRight: "10px" }} />
                                 <span>Workflows</span>
@@ -256,7 +256,7 @@ export default function Navbar(props) {
                                 <span>Instances</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/i/`} className="nav-link">
+                        <Link to={`/${namespace}/i`} className="nav-link">
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
@@ -279,7 +279,7 @@ export default function Navbar(props) {
                                 <span>Settings</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/s/`} className="nav-link">
+                        <Link to={`/${namespace}/s`} className="nav-link">
                             <div>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>
