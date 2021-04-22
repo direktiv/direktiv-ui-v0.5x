@@ -9,7 +9,7 @@ docker_tag = $(if $(DOCKER_TAG),:$(DOCKER_TAG),)
 .PHONY: server
 server:
 	if [ ! -d ${mkfile_dir_main}reactjs-embed ]; then \
-		git clone git@github.com:vorteil/reactjs-embed.git; \
+		git clone https://github.com/vorteil/reactjs-embed.git; \
 	fi	
 	docker build . --tag ${docker_repo}/${docker_image}${docker_tag}
 	docker push ${docker_repo}/${docker_image}${docker_tag}
