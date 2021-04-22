@@ -114,12 +114,11 @@ export default function Navbar(props) {
 
     return(
         <div id="nav">
+            <Link to="/">
             <div id="nav-img-holder">
                 <img src={Logo} alt="main-logo"/>
-                {/* <span style={{ display: "block", marginTop: "-20px", marginBottom: "40px", fontSize: "0.75em" }}>
-                    direktiv
-                </span> */}
             </div>
+            </Link>
             <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
                 <ul id={"namespaces-ul"} style={{ margin: "0px" }}>
                     <li className="namespace-selector" onClick={() => {
@@ -171,7 +170,6 @@ export default function Navbar(props) {
                                             return(
                                                 <li key={i} onClick={()=>{
                                                     localStorage.setItem("namespace", obj)
-                                                    console.log('triggered?')
                                                     setNamespace(obj)
                                                     toggleNamespaceSelector()
                                                 

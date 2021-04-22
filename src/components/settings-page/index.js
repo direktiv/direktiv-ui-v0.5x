@@ -50,7 +50,6 @@ function SettingsAction(props) {
           }
             }
         } catch(e) {
-            console.log(e)
             sendNotification("Failed to delete namespace", e.message, 0)
         }
     }
@@ -204,7 +203,7 @@ function Secrets() {
                             <tbody>
                                 {secrets.map((obj)=>{
                                     return(
-                                        <tr>
+                                        <tr key={obj.name}>
                             <td style={{ paddingLeft: "10px" }}>
                                 <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
                             </td>
@@ -353,7 +352,7 @@ function Registries() {
                 <tbody>
                             {registries.map((obj)=>{
                                 return(
-                                    <tr>
+                                    <tr key={obj.name}>
                                     <td style={{ paddingLeft: "10px" }}>
                                         <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
                                     </td>

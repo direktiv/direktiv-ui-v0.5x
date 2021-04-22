@@ -87,6 +87,7 @@ export default function Logs(props) {
 
     }, [instanceId, fetch, scrolled, logs, logsOffset, limit,])
 
+    
     useEffect(() => {
         if (!init) {
             fetchLogs()
@@ -94,14 +95,14 @@ export default function Logs(props) {
         } else {
             if(timer === null ) {
                 let timerz = setInterval(fetchLogs, 800)
-                setTimer(timerz)            
-            } else {
-                if (status !== "pending" && status !== undefined) {
-                    setTimeout(()=>{
-                        clearInterval(timer)
-                    },4000)
-                    return
-                }
+                setTimer(timerz)        
+            } 
+        }
+
+        // This may cause a weird race condition and you may not end up getting logs potentially.
+        return () => {
+            if (status !== "pending" && status !== undefined) {
+                clearInterval(timer)
             }
         }
     }, [fetchLogs, init, timer, status])

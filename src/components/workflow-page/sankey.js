@@ -103,7 +103,6 @@ export default function Sankey(props) {
         if(failure !== 0) {
             l.push({source:"failure", target: "end", value: failure})
         }
-        console.log(states)
         if(states.length > 0) {
             setLinks(l)
             setNodes(n)
@@ -122,7 +121,6 @@ export default function Sankey(props) {
    
         
     // },[states])
-    console.log(links, nodes)
     return(
         <div style={{height:"80%", width:"80%", minHeight:"300px", margin:"auto", marginTop:"20px"}}>
             {
