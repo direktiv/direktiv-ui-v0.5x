@@ -20,6 +20,7 @@ import { useContext } from 'react';
 import { useCallback, useEffect } from 'react';
 
 
+
 function AuthenticatedContent() {
   const context = useContext(MainContext)
   const [namespace, setNamespace] = useState("")
@@ -37,133 +38,21 @@ function AuthenticatedContent() {
     return fetch(`${context.SERVER_BIND}${path}`, opts);
   }, [context.SERVER_BIND])
 
-  const fetchNamespaces = useCallback((load, val) => {
+  const fetchNamespaces = useCallback((loaded, val) => {
     async function fd() {
       setLoad(true)
       try {
-        let namespacesn = [];
-
-        let resp = await authFetch('/namespaces/', {
-          method: 'GET',
-        })
-        if (resp.ok) {
-          let newNamespace = ""
-          let json = await resp.json()
-
-          if (json.namespaces) {
-
-          if (load) {
-            // if namespaces exist only do this logic
-              // Dont do anything if on jq playground
-              if (window.location.pathname === "/jq/playground") {
-
-              } else {
-                // 1st. check if namespace is in the pathname 
-                if (window.location.pathname.split("/")[1] !== "") {
-                  // handle if pathname is /i as its a different route
-                  if (window.location.pathname.split("/")[1] === "i") {
-                    newNamespace = window.location.pathname.split("/")[2]
-                  } else {
-                    newNamespace = window.location.pathname.split("/")[1]
-                  }
-
-                  // check if namespace exists here if not redirect back to /
-                  let f = false
-                  if (json.namespaces) {
-                    for (let i = 0; i < json.namespaces.length; i++) {
-                      if (json.namespaces[i].name === newNamespace) {
-                        f = true
-                      }
-                    }
-                  }
-
-                  if (!f) {
-                    // need a better solution as keycloak forces reload of the page again.
-
-                    window.location.pathname = "/"
-                    return
-                  }
-                }
-              }
-
-              // if newNamespace isn't found yet try other options
-              if (newNamespace === "") {
-                // if its in storage
-                if (localStorage.getItem("namespace") !== undefined) {
-
-                  // if the value in storage is an empty string
-                  if (localStorage.getItem("namespace") === "") {
-
-                    // if the json namespaces array is greater than 0 set it to the first
-                    if (json.namespaces.length > 0) {
-                      newNamespace = json.namespaces[0].name
-                    }
-                  } else {
-
-                    let found = false
-                    // check if the namespace previously stored in localstorage exists in the list
-                    for (let i = 0; i < json.namespaces.length; i++) {
-                      if (json.namespaces[i].name === localStorage.getItem("namespace")) {
-                        found = true
-                        newNamespace = localStorage.getItem("namespace")
-                        break
-                      }
-                    }
-
-                    if (!found) {
-
-                      // check if json array is greater than 0 to set to the first
-                      if (json.namespaces.length > 0) {
-
-                        newNamespace = json.namespaces[0].name
-                        localStorage.setItem("namespace", json.namespaces[0].name)
-                        sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
-                      }
-                    }
-                  }
-                } else {
-                  // if the json namespace array is greater than 0 set it to the first as no other options is valid
-                  if (json.namespaces.length > 0) {
-
-                    newNamespace = json.namespaces[0].name
-                  }
-                }
-              }
-            }
-            if (newNamespace === "" && val) {
-
-              newNamespace = val
-            }
-            for (let i = 0; i < json.namespaces.length; i++) {
-  
-              namespacesn.push(json.namespaces[i].name)
-            }
-          }
-      
+          let namespacesObj = await fetchNs(authFetch, loaded, setLoad)
           setLoad(false)
-          setNamespace(newNamespace)
-          setNamespaces(namespacesn)
-
-        } else {
-          // 400 should have json response
-          if (resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
-        }
-
+          setNamespace(namespacesObj.namespace)
+          setNamespaces(namespacesObj.namespaces)
       } catch (e) {
-        console.log(e)
         sendNotification("Failed to fetch namespaces", e.message, 0)
         setLoad(false)
-
       }
     }
     fd()
   }, [authFetch])
-
 
   // if namespaces is empty and keycloak has been initialized do things
   useEffect(() => {
@@ -222,7 +111,7 @@ function AuthenticatedContent() {
                       <Route exact path="/">
                         <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
                           You are not a part of any namespaces! Create a namespace to continue using Direktiv.
-                          </div>
+                        </div>
                       </Route>
                   }
                 </Route>
@@ -242,66 +131,50 @@ function AuthenticatedContent() {
   )
 }
 
-function Content() {
-  const context = useContext(MainContext)
 
-  const [namespace, setNamespace] = useState("")
-  const [load, setLoad] = useState(false)
-  const [namespaces, setNamespaces] = useState(null)
+async function fetchNs(fetch, load, setLoad, val) {
+  setLoad(true)
+  try {
+    let newNamespace = ""
+    let namespaces = []
+    let resp = await fetch('/namespaces/', {
+      method: 'GET',
+    })
 
-  const netch = useCallback((path, opts) => {
-    return fetch(`${context.SERVER_BIND}${path}`, opts);
-  }, [context.SERVER_BIND])
-
-
-  const fetchNamespaces = useCallback((load, val) => {
-    async function fd() {
-      setLoad(true)
-      try {
-        let namespacesn = [];
-
-        let resp = await netch('/namespaces/', {
-          method: 'GET',
-        })
-        if (resp.ok) {
-          let newNamespace = ""
-          let json = await resp.json()
-
-          if (json.namespaces) {
-
-          if (load) {
-            // if namespaces exist only do this logic
-              // Dont do anything if on jq playground
-              if (window.location.pathname === "/jq/playground") {
-
+    if(resp.ok) {
+      let json = await resp.json()
+      // if namespaces exist 
+      if(json.namespaces){
+        // if initial load
+        if(load){
+          // if pathname isnt jqplayground check if namespace is provided
+          if(window.location.pathname !== "/jq/playground") {
+            // 1st. check if namespace is in the pathname 
+            if (window.location.pathname.split("/")[1] !== "") {
+              // handle if pathname is /i as its a different route
+              if (window.location.pathname.split("/")[1] === "i") {
+                newNamespace = window.location.pathname.split("/")[2]
               } else {
-                // 1st. check if namespace is in the pathname 
-                if (window.location.pathname.split("/")[1] !== "") {
-                  // handle if pathname is /i as its a different route
-                  if (window.location.pathname.split("/")[1] === "i") {
-                    newNamespace = window.location.pathname.split("/")[2]
-                  } else {
-                    newNamespace = window.location.pathname.split("/")[1]
-                  }
+                newNamespace = window.location.pathname.split("/")[1]
+              }
 
-                  // check if namespace exists here if not redirect back to /
-                  let f = false
-                  if (json.namespaces) {
-                    for (let i = 0; i < json.namespaces.length; i++) {
-                      if (json.namespaces[i].name === newNamespace) {
-                        f = true
-                      }
-                    }
-                  }
-
-                  if (!f) {
-                    // need a better solution as keycloak forces reload of the page again.
-
-                    window.location.pathname = "/"
-                    return
+              // check if namespace exists here if not redirect back to /
+              let f = false
+              if (json.namespaces) {
+                for (let i = 0; i < json.namespaces.length; i++) {
+                  if (json.namespaces[i].name === newNamespace) {
+                    f = true
                   }
                 }
               }
+
+              if (!f) {
+                // need a better solution as keycloak forces reload of the page again.
+                window.location.pathname = "/"
+                return
+              }
+            }
+          }
 
               // if newNamespace isn't found yet try other options
               if (newNamespace === "") {
@@ -353,29 +226,48 @@ function Content() {
             }
             for (let i = 0; i < json.namespaces.length; i++) {
   
-              namespacesn.push(json.namespaces[i].name)
+              namespaces.push(json.namespaces[i].name)
             }
-          }
-      
+      }
+      return {namespaces: namespaces, namespace: newNamespace}
+    
+    } else {
+      if (resp.status === 400) {
+        let json = await resp.json()
+        throw new Error(json.Message)
+      } else {
+        throw new Error(`response code was ${resp.status}`)
+      }
+    }
+  } catch(e) {
+    sendNotification("Failed to fetch namespaces", e.message, 0)
+    setLoad(false)
+  }
+}
+
+function Content() {
+  const context = useContext(MainContext)
+
+  const [namespace, setNamespace] = useState("")
+  const [load, setLoad] = useState(false)
+  const [namespaces, setNamespaces] = useState(null)
+
+  const netch = useCallback((path, opts) => {
+    return fetch(`${context.SERVER_BIND}${path}`, opts);
+  }, [context.SERVER_BIND])
+
+
+  const fetchNamespaces = useCallback((loaded, val) => {
+    async function fd() {
+      setLoad(true)
+      try {
+          let namespacesObj = await fetchNs(netch, loaded, setLoad)
           setLoad(false)
-          setNamespace(newNamespace)
-          setNamespaces(namespacesn)
-
-        } else {
-          // 400 should have json response
-          if (resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
-        }
-
+          setNamespace(namespacesObj.namespace)
+          setNamespaces(namespacesObj.namespaces)
       } catch (e) {
-        console.log(e)
         sendNotification("Failed to fetch namespaces", e.message, 0)
         setLoad(false)
-
       }
     }
     fd()
