@@ -117,7 +117,7 @@ function AuthenticatedContent() {
                     }
                   </Route>
                   <Route exact path="/:namespace" component={DashboardPage} />
-                  <Route path="/:namespace/w" component={WorkflowsPage} />
+                  <Route exact path="/:namespace/w" component={WorkflowsPage} />
                   <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
                   <Route path="/:namespace/i" component={EventsPage} />
                   <Route path="/:namespace/s" component={SettingsPage} />
@@ -318,7 +318,7 @@ function Content() {
                     }
                   </Route>
                   <Route exact path="/:namespace" component={DashboardPage} />
-                  <Route path="/:namespace/w" component={WorkflowsPage} />
+                  <Route exact path="/:namespace/w" component={WorkflowsPage} />
                   <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
                   <Route path="/:namespace/i" component={EventsPage} />
                   <Route path="/:namespace/s" component={SettingsPage} />
