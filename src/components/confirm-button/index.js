@@ -1,10 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../../style/custom.css";
 import { IoCheckmarkSharp, IoCloseSharp } from "react-icons/io5"
 
-export  function ConfirmButton(props) {
+export function ConfirmButton(props) {
     const { Icon, IconColor, OnConfirm, ConfirmationText } = props;
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [listen, setListen] = useState(false);
+
+    const setConfirm = useCallback(()=>{
+        setShowConfirmation(!showConfirmation)
+    },[showConfirmation])
+
+    useEffect(() => {
+        if (showConfirmation && !listen) {
+            setListen(true)
+            document.addEventListener('click',setConfirm, false)
+        }
+
+        return function cleanup() {
+            if (listen && showConfirmation) {
+                setListen(false)
+                document.removeEventListener('click',setConfirm, false);
+            }
+        }
+    }, [showConfirmation, listen, setConfirm])
+    
 
     return (
         <div className={`confirm-btn ${showConfirmation ? "expand" : ""}`} onClick={(ev) => {
@@ -29,6 +49,58 @@ export  function ConfirmButton(props) {
                             ev.stopPropagation()
                         }} />
                         <IoCheckmarkSharp className="confirm-btn-icon confirm" onClick={OnConfirm} />
+                    </div>
+            }
+        </div>
+
+    );
+}
+
+export function MiniConfirmButton(props) {
+    const { Icon, IconColor, OnConfirm, style } = props;
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [listen, setListen] = useState(false);
+
+    const setConfirm = useCallback(()=>{
+        setShowConfirmation(!showConfirmation)
+    },[showConfirmation])
+
+    useEffect(() => {
+        let hideTimeout;
+        if (showConfirmation && !listen) {
+            setListen(true)
+            document.addEventListener('click',setConfirm, false);
+            hideTimeout = setTimeout(function(){ setShowConfirmation(false) }, 5000);
+        }
+
+        return function cleanup() {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout)
+            }
+            if (listen && showConfirmation) {
+                setListen(false)
+                document.removeEventListener('click',setConfirm, false);
+            }
+        }
+    }, [showConfirmation, listen, setConfirm])
+    
+
+    return (
+        <div style={style} className={`confirm-btn`} onClick={(ev) => {
+            ev.stopPropagation()
+        }}>
+            {
+                !showConfirmation ?
+                    <div className="confirm-btn-content" style={{ width: "36px" }} onClick={(ev) => {
+                        setShowConfirmation(true)
+                        ev.stopPropagation()
+                    }}>
+                        <Icon style={IconColor ? { color: `${IconColor}` } : {}} />
+                    </div>
+                    :
+
+                    <div className="confirm-btn-content confirm-btn-icon confirm" onClick={OnConfirm} style={{ padding: "0 10px 0px 10px" }} >                        
+                        <IoCheckmarkSharp  />
                     </div>
             }
         </div>
