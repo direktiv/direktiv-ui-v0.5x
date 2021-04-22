@@ -173,7 +173,7 @@ function SankeyDiagram(props) {
         var linkG = g.append("g")
                     .attr("class", "links")
                     .attr("fill", "none")
-                    .attr("stroke-opacity", 0.2)
+                    .attr("stroke-opacity", 0.1)
                     .selectAll("path");
         var nodeG = g.append("g")
                     .attr("class", "nodes")

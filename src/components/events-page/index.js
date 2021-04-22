@@ -90,14 +90,12 @@ export function EventsPageBody() {
                     {
                         instances.map((obj)=>{
                             return(
-                                <>
-                                    <tr onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
+                                    <tr key={obj.id} onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
                                         <td style={{textAlign:"left"}}>{obj.id}</td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
                                         {/* <td></td> */}
                                     </tr>
-                                </>
                             )
                         })
                     }
