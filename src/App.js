@@ -42,7 +42,7 @@ function AuthenticatedContent() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(authFetch, loaded, setLoad)
+          let namespacesObj = await fetchNs(authFetch, loaded, setLoad, val)
           setLoad(false)
           setNamespace(namespacesObj.namespace)
           setNamespaces(namespacesObj.namespaces)
@@ -222,6 +222,8 @@ async function fetchNs(fetch, load, setLoad, val) {
                 }
               }
             }
+            console.log(newNamespace, val)
+
             if (newNamespace === "" && val) {
 
               newNamespace = val
@@ -231,6 +233,8 @@ async function fetchNs(fetch, load, setLoad, val) {
               namespaces.push(json.namespaces[i].name)
             }
       }
+
+      console.log(newNamespace, val)
       return {namespaces: namespaces, namespace: newNamespace}
     
     } else {
@@ -263,7 +267,7 @@ function Content() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(netch, loaded, setLoad)
+          let namespacesObj = await fetchNs(netch, loaded, setLoad, val)
           setLoad(false)
           setNamespace(namespacesObj.namespace)
           setNamespaces(namespacesObj.namespaces)

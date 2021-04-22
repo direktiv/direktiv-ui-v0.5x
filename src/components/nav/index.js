@@ -112,6 +112,33 @@ export default function Navbar(props) {
     }
     
 
+    let matchInstance = matchPath(location.pathname,  {
+        path: "/:namespace/i"
+    })
+
+    let matchInstanceFull = matchPath(location.pathname, {
+        path: "/i/:namespace/:workflow/:instance"
+    })
+
+    let matchWorkflow = matchPath(location.pathname, {
+        path: "/:namespace/w"
+    }, {
+        path: "/:namespace/w/:workflow"
+    })
+
+    let matchJQ = matchPath(location.pathname, {
+        path: "/jq/playground"
+    })
+
+    let matchSettings = matchPath(location.pathname, {
+        path: "/:namespace/s"
+    })
+
+    let matchDashboard = matchPath(location.pathname, {
+        path: "/:namespace",
+        exact: true
+    })
+
     return(
         <div id="nav">
             <Link to="/">
@@ -223,7 +250,11 @@ export default function Navbar(props) {
                                 <span>Dashboard</span>
                             </div>
                             :
-                        <Link to={`/${namespace}`} className="nav-link">
+                        <Link onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to={`/${namespace}`} className="nav-link" style={{color: matchDashboard !== null ? "#4497f5": ""}}>
                             <div>
                                 <IoGrid style={{ marginRight: "10px" }} />
                                 <span>Dashboard</span>
@@ -238,7 +269,11 @@ export default function Navbar(props) {
                                 <span>Workflows</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/w`} className="nav-link">
+                        <Link onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to={`/${namespace}/w`} style={{color: matchWorkflow !== null ? "#4497f5": ""}} className="nav-link">
                             <div>
                                 <IoShapesSharp style={{ marginRight: "10px" }} />
                                 <span>Workflows</span>
@@ -254,7 +289,11 @@ export default function Navbar(props) {
                                 <span>Instances</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/i`} className="nav-link">
+                        <Link style={{color: matchInstance !== null || matchInstanceFull !== null ? "#4497f5": ""}} onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to={`/${namespace}/i`} className="nav-link">
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
@@ -262,7 +301,11 @@ export default function Navbar(props) {
                         </Link>}
                     </li>
                     <li>
-                        <Link to="/jq/playground" className="nav-link">
+                        <Link style={{color: matchJQ !== null ? "#4497f5": ""}} onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to="/jq/playground" className="nav-link">
                             <div>
                                 <IoExtensionPuzzle style={{ marginRight: "10px" }} />
                                 <span>jq Playground</span>
@@ -277,7 +320,11 @@ export default function Navbar(props) {
                                 <span>Settings</span>
                             </div>
                             :
-                        <Link to={`/${namespace}/s`} className="nav-link">
+                        <Link style={{color: matchSettings !== null ? "#4497f5": ""}} onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to={`/${namespace}/s`} className="nav-link">
                             <div>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>
