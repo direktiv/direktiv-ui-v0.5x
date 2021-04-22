@@ -50,82 +50,82 @@ function AuthenticatedContent() {
 
           if (load) {
             // if namespaces exist only do this logic
-            if (json.namespaces){
-            // Dont do anything if on jq playground
-            if (window.location.pathname === "/jq/playground") {
+            if (json.namespaces) {
+              // Dont do anything if on jq playground
+              if (window.location.pathname === "/jq/playground") {
 
-            } else {
-              // 1st. check if namespace is in the pathname 
-              if (window.location.pathname.split("/")[1] !== "") {
-                // handle if pathname is /i as its a different route
-                if (window.location.pathname.split("/")[1] === "i") {
-                  newNamespace = window.location.pathname.split("/")[2]
-                } else {
-                  newNamespace = window.location.pathname.split("/")[1]
-                }
+              } else {
+                // 1st. check if namespace is in the pathname 
+                if (window.location.pathname.split("/")[1] !== "") {
+                  // handle if pathname is /i as its a different route
+                  if (window.location.pathname.split("/")[1] === "i") {
+                    newNamespace = window.location.pathname.split("/")[2]
+                  } else {
+                    newNamespace = window.location.pathname.split("/")[1]
+                  }
 
-                // check if namespace exists here if not redirect back to /
-                let f = false
-                if (json.namespaces) {
-                  for (let i = 0; i < json.namespaces.length; i++) {
-                    if (json.namespaces[i].name === newNamespace) {
-                      f = true
+                  // check if namespace exists here if not redirect back to /
+                  let f = false
+                  if (json.namespaces) {
+                    for (let i = 0; i < json.namespaces.length; i++) {
+                      if (json.namespaces[i].name === newNamespace) {
+                        f = true
+                      }
                     }
                   }
-                }
 
-                if (!f) {
-                  // need a better solution as keycloak forces reload of the page again.
+                  if (!f) {
+                    // need a better solution as keycloak forces reload of the page again.
 
-                  window.location.pathname = "/"
-                  return
+                    window.location.pathname = "/"
+                    return
+                  }
                 }
               }
-            }
 
-            // if newNamespace isn't found yet try other options
-            if (newNamespace === "") {
-              // if its in storage
-              if (localStorage.getItem("namespace") !== undefined) {
+              // if newNamespace isn't found yet try other options
+              if (newNamespace === "") {
+                // if its in storage
+                if (localStorage.getItem("namespace") !== undefined) {
 
-                // if the value in storage is an empty string
-                if (localStorage.getItem("namespace") === "") {
+                  // if the value in storage is an empty string
+                  if (localStorage.getItem("namespace") === "") {
 
-                  // if the json namespaces array is greater than 0 set it to the first
+                    // if the json namespaces array is greater than 0 set it to the first
+                    if (json.namespaces.length > 0) {
+                      newNamespace = json.namespaces[0].name
+                    }
+                  } else {
+
+                    let found = false
+                    // check if the namespace previously stored in localstorage exists in the list
+                    for (let i = 0; i < json.namespaces.length; i++) {
+                      if (json.namespaces[i].name === localStorage.getItem("namespace")) {
+                        found = true
+                        newNamespace = localStorage.getItem("namespace")
+                        break
+                      }
+                    }
+
+                    if (!found) {
+
+                      // check if json array is greater than 0 to set to the first
+                      if (json.namespaces.length > 0) {
+
+                        newNamespace = json.namespaces[0].name
+                        localStorage.setItem("namespace", json.namespaces[0].name)
+                        sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
+                      }
+                    }
+                  }
+                } else {
+                  // if the json namespace array is greater than 0 set it to the first as no other options is valid
                   if (json.namespaces.length > 0) {
+
                     newNamespace = json.namespaces[0].name
                   }
-                } else {
-
-                  let found = false
-                  // check if the namespace previously stored in localstorage exists in the list
-                  for (let i = 0; i < json.namespaces.length; i++) {
-                    if (json.namespaces[i].name === localStorage.getItem("namespace")) {
-                      found = true
-                      newNamespace = localStorage.getItem("namespace")
-                      break
-                    }
-                  }
-
-                  if (!found) {
-
-                    // check if json array is greater than 0 to set to the first
-                    if (json.namespaces.length > 0) {
-
-                      newNamespace = json.namespaces[0].name
-                      localStorage.setItem("namespace", json.namespaces[0].name)
-                      sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
-                    }
-                  }
-                }
-              } else {
-                // if the json namespace array is greater than 0 set it to the first as no other options is valid
-                if (json.namespaces.length > 0) {
-
-                  newNamespace = json.namespaces[0].name
                 }
               }
-            }
             }
 
           }
@@ -265,82 +265,82 @@ function Content() {
 
           if (load) {
             // if namespaces exist only do this logic
-            if (json.namespaces){
-            // Dont do anything if on jq playground
-            if (window.location.pathname === "/jq/playground") {
+            if (json.namespaces) {
+              // Dont do anything if on jq playground
+              if (window.location.pathname === "/jq/playground") {
 
-            } else {
-              // 1st. check if namespace is in the pathname 
-              if (window.location.pathname.split("/")[1] !== "") {
-                // handle if pathname is /i as its a different route
-                if (window.location.pathname.split("/")[1] === "i") {
-                  newNamespace = window.location.pathname.split("/")[2]
-                } else {
-                  newNamespace = window.location.pathname.split("/")[1]
-                }
+              } else {
+                // 1st. check if namespace is in the pathname 
+                if (window.location.pathname.split("/")[1] !== "") {
+                  // handle if pathname is /i as its a different route
+                  if (window.location.pathname.split("/")[1] === "i") {
+                    newNamespace = window.location.pathname.split("/")[2]
+                  } else {
+                    newNamespace = window.location.pathname.split("/")[1]
+                  }
 
-                // check if namespace exists here if not redirect back to /
-                let f = false
-                if (json.namespaces) {
-                  for (let i = 0; i < json.namespaces.length; i++) {
-                    if (json.namespaces[i].name === newNamespace) {
-                      f = true
+                  // check if namespace exists here if not redirect back to /
+                  let f = false
+                  if (json.namespaces) {
+                    for (let i = 0; i < json.namespaces.length; i++) {
+                      if (json.namespaces[i].name === newNamespace) {
+                        f = true
+                      }
                     }
                   }
-                }
 
-                if (!f) {
-                  // need a better solution as keycloak forces reload of the page again.
+                  if (!f) {
+                    // need a better solution as keycloak forces reload of the page again.
 
-                  window.location.pathname = "/"
-                  return
+                    window.location.pathname = "/"
+                    return
+                  }
                 }
               }
-            }
 
-            // if newNamespace isn't found yet try other options
-            if (newNamespace === "") {
-              // if its in storage
-              if (localStorage.getItem("namespace") !== undefined) {
+              // if newNamespace isn't found yet try other options
+              if (newNamespace === "") {
+                // if its in storage
+                if (localStorage.getItem("namespace") !== undefined) {
 
-                // if the value in storage is an empty string
-                if (localStorage.getItem("namespace") === "") {
+                  // if the value in storage is an empty string
+                  if (localStorage.getItem("namespace") === "") {
 
-                  // if the json namespaces array is greater than 0 set it to the first
+                    // if the json namespaces array is greater than 0 set it to the first
+                    if (json.namespaces.length > 0) {
+                      newNamespace = json.namespaces[0].name
+                    }
+                  } else {
+
+                    let found = false
+                    // check if the namespace previously stored in localstorage exists in the list
+                    for (let i = 0; i < json.namespaces.length; i++) {
+                      if (json.namespaces[i].name === localStorage.getItem("namespace")) {
+                        found = true
+                        newNamespace = localStorage.getItem("namespace")
+                        break
+                      }
+                    }
+
+                    if (!found) {
+
+                      // check if json array is greater than 0 to set to the first
+                      if (json.namespaces.length > 0) {
+
+                        newNamespace = json.namespaces[0].name
+                        localStorage.setItem("namespace", json.namespaces[0].name)
+                        sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
+                      }
+                    }
+                  }
+                } else {
+                  // if the json namespace array is greater than 0 set it to the first as no other options is valid
                   if (json.namespaces.length > 0) {
+
                     newNamespace = json.namespaces[0].name
                   }
-                } else {
-
-                  let found = false
-                  // check if the namespace previously stored in localstorage exists in the list
-                  for (let i = 0; i < json.namespaces.length; i++) {
-                    if (json.namespaces[i].name === localStorage.getItem("namespace")) {
-                      found = true
-                      newNamespace = localStorage.getItem("namespace")
-                      break
-                    }
-                  }
-
-                  if (!found) {
-
-                    // check if json array is greater than 0 to set to the first
-                    if (json.namespaces.length > 0) {
-
-                      newNamespace = json.namespaces[0].name
-                      localStorage.setItem("namespace", json.namespaces[0].name)
-                      sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
-                    }
-                  }
-                }
-              } else {
-                // if the json namespace array is greater than 0 set it to the first as no other options is valid
-                if (json.namespaces.length > 0) {
-
-                  newNamespace = json.namespaces[0].name
                 }
               }
-            }
             }
 
           }
