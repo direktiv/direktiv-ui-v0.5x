@@ -49,6 +49,8 @@ function AuthenticatedContent() {
           let json = await resp.json()
 
           if (load) {
+            // if namespaces exist only do this logic
+            if (json.namespaces){
             // Dont do anything if on jq playground
             if (window.location.pathname === "/jq/playground") {
 
@@ -124,6 +126,8 @@ function AuthenticatedContent() {
                 }
               }
             }
+            }
+
           }
           if (newNamespace === "" && val) {
 
@@ -258,9 +262,10 @@ function Content() {
         if (resp.ok) {
           let newNamespace = ""
           let json = await resp.json()
-          console.log(window.location.pathname)
 
           if (load) {
+            // if namespaces exist only do this logic
+            if (json.namespaces){
             // Dont do anything if on jq playground
             if (window.location.pathname === "/jq/playground") {
 
@@ -336,6 +341,8 @@ function Content() {
                 }
               }
             }
+            }
+
           }
           if (newNamespace === "" && val) {
 
