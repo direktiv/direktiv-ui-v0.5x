@@ -112,7 +112,7 @@ export default function Navbar(props) {
     }
     
 
-    let matchInstance = matchPath(location.pathname,  {
+    let matchInstanceL = matchPath(location.pathname,  {
         path: "/:namespace/i"
     })
 
@@ -289,7 +289,7 @@ export default function Navbar(props) {
                                 <span>Instances</span>
                             </div>
                             :
-                        <Link style={{color: matchInstance !== null || matchInstanceFull !== null ? "#4497f5": ""}} onClick={()=>{
+                        <Link style={{color: matchInstanceL !== null || matchInstanceFull !== null ? "#4497f5": ""}} onClick={()=>{
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
                             }

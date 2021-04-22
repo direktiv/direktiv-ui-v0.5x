@@ -216,12 +216,12 @@ function SankeyDiagram(props) {
         
         link.append("path") 
           .attr("class", "sankey-link")
-          .attr("d", function(link){
-            return link.path;
+          .attr("d", function(linkz){
+            return linkz.path;
           })
           .style("stroke-width", function (d) { return Math.max(1, d.width); })
           .style("opacity", 0.7)
-          .style("stroke", function (link, i) {
+          .style("stroke", function (linkz, i) {
             return  "black"
           })
           

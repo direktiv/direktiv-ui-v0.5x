@@ -139,7 +139,6 @@ export default function InstancePage() {
                                     <Diagram flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
                                     :
                                     <div style={{ marginTop:"28px", fontSize:"12pt"}}>
-
                                         Unable to fetch workflow have you renamed the workflow recently?
                                     </div>
                                 }
