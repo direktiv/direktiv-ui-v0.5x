@@ -33,8 +33,6 @@ export default function ReactEditor(props) {
         console.warn("Editor: saveCallback not set")
     }
 
-    console.log("actions =", actions)
-
     return (
         <div className="editor-wrapper">
             {loading ? <div className="editor-loading"></div> : <></>}

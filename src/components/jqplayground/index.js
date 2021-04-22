@@ -6,7 +6,7 @@ import MainContext from '../../context'
 
 
 import TileTitle from '../tile-title'
-import { IoInformationCircleSharp,  IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
+import { IoInformationCircleSharp, IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
 
 import { sendNotification } from '../notifications/index.js'
 
@@ -89,7 +89,7 @@ const cheatSheetMap = [
 ];
 
 export default function JQPlaygroundPage() {
-    const {fetch} = useContext(MainContext)
+    const { fetch } = useContext(MainContext)
     const [jqInput, setJQInput] = useState("{\n  \n}")
     const [jqFilter, setJQFilter] = useState(".")
     const [jqOutput, setJQOutput] = useState("")
@@ -119,13 +119,19 @@ export default function JQPlaygroundPage() {
                 })
 
                 if (!resp.ok) {
-                    throw await resp.text()
+                    // Check for content type of error
+                    const contentType = resp.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw await resp.text()
+                    } else {
+                        throw (await resp.json()).Message
+                    }
                 } else {
                     let jqOut = await resp.text();
                     setJQOutput(jqOut)
                 }
             } catch (e) {
-                sendNotification(`Invalid JQ Command`, e.message, 0)
+                sendNotification(`Invalid JQ Command`, e, 0)
             }
         }
         execJQ().finally(() => { setFetching(false) })
@@ -145,11 +151,11 @@ export default function JQPlaygroundPage() {
                         {cheatSheetMap[i].tip}
                     </div>
                     <div className="cheatsheet-btn">
-                        <div style={{ flexGrow: 1 }} className="button jq-button" onClick={() => { 
+                        <div style={{ flexGrow: 1 }} className="button jq-button" onClick={() => {
                             setJQInput(cheatSheetMap[i].json)
                             setJQFilter(cheatSheetMap[i].filter)
                             executeJQ(cheatSheetMap[i].json, cheatSheetMap[i].filter)
-                         }}>
+                        }}>
                             Load Example
                             </div>
                     </div>
@@ -207,7 +213,7 @@ export default function JQPlaygroundPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="container" style={{ flexDirection: "row"}}>
+                        <div className="container" style={{ flexDirection: "row" }}>
                             <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", flexBasis: 0, maxHeight: "380px", minWidth: "200px" }}>
                                 <TileTitle name={`How it Works`} >
                                     <IoInformationCircleSharp />
@@ -220,8 +226,8 @@ export default function JQPlaygroundPage() {
                                     <p>The transformed JSON is shown in the Result output field.</p>
                                     <p>For information on the JQ syntax, please refer to the offical JQ manual online.</p>
                                 </div>
-                                <div style={{ display: "flex", width: "100%", justifyContent: "center"}}>
-                                    <div className="button jq-button" onClick={() => { window.open("https://stedolan.github.io/jq/manual/", "_blank")} }>
+                                <div style={{ display: "flex", width: "100%", justifyContent: "center" }}>
+                                    <div className="button jq-button" onClick={() => { window.open("https://stedolan.github.io/jq/manual/", "_blank") }}>
                                         View JQ Manual
                                     </div>
                                 </div>
