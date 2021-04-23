@@ -2,6 +2,7 @@ import React, { useContext, useState, useCallback, useEffect } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
+import YAML from 'js-yaml'
 
 
 import TileTitle from '../tile-title'
@@ -15,6 +16,25 @@ import MainContext from '../../context'
 import Sankey from './sankey'
 import * as dayjs from "dayjs"
 import NoResults from '../../noresults'
+
+async function checkStartType(wf) {
+    // check for event start type
+    try {
+        let y = YAML.load(wf)
+        if(y.start) {
+            if(y.start.type !== "default") {
+                // this file should not be able to be executed.
+                return false
+            }
+        }
+        return true
+    } catch(e) {
+        sendNotification("Unable to parse workflow", e.message, 0)
+        // return true if an error happens as the yaml is not runnable in the first place
+        return true
+    }
+}
+
 export default function WorkflowPage() {
     const {fetch, namespace} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
@@ -25,6 +45,7 @@ export default function WorkflowPage() {
     const [workflowValue, setWorkflowValue] = useState("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
+    const [executable, setExecutable] = useState(true)
     const [workflowInfo, setWorkflowInfo] = useState({revision: 0, active: true, fetching: true})
     const history = useHistory()
     const params = useParams()
@@ -47,6 +68,11 @@ export default function WorkflowPage() {
                 if (resp.ok) {
                     let json = await resp.json()
                     let wf = atob(json.workflow)
+
+
+                    let exec = await checkStartType(wf)
+
+                    setExecutable(exec)
                     setWorkflowValue(wf)
                     setWorkflowValueOld(wf)
                     setWorkflowInfo((wfI) => {
@@ -95,6 +121,9 @@ export default function WorkflowPage() {
                         return {...wfI}
                     })
                     setWorkflowValueOld(workflowValue)
+                    let exec = await checkStartType(workflowValue)
+                    setExecutable(exec)
+
                     history.replace(`${json.id}`)
                 } else {
                     // 400 should have json response
@@ -182,8 +211,8 @@ const updateLogEvent = useCallback(()=>{
     );
 
     let executeButton = (
-        <div className={workflowInfo.active ? "editor-footer-button": "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => {
-            if (workflowInfo.active) {
+        <div className={workflowInfo.active && executable ? "editor-footer-button": "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => {
+            if (workflowInfo.active && executable) {
                 executeWorkflow()
             }
             }}>
