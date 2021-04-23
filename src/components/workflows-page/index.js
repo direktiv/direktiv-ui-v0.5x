@@ -364,26 +364,31 @@ function NewWorkflowForm() {
 
     const fetchTempData = useCallback((temp, setData) => {
         async function fetchd() {
-            try {
-                let resp = await fetch(`/workflow-templates/default/${temp}`, {
-                    method: "GET"
-                })
-                if (resp.ok) {
-                    let text = await resp.text()
-                    setData(text)
-                } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
+            if(temp !== "default-noop"){
+                try {
+                    let resp = await fetch(`/workflow-templates/default/${temp}`, {
+                        method: "GET"
+                    })
+                    if (resp.ok) {
+                        let text = await resp.text()
+                        setData(text)
                     } else {
-                        throw new Error(`response code was ${resp.status}`)
+                        // 400 should have json response
+                        if (resp.status === 400) {
+                            let json = await resp.json()
+                            throw new Error(json.Message)
+                        } else {
+                            throw new Error(`response code was ${resp.status}`)
+                        }
                     }
+                } catch (e) {
+                    sendNotification("Failed to fetch template data", e.message, 0)
                 }
-            } catch (e) {
-                sendNotification("Failed to fetch template data", e.message, 0)
+            } else {
+                setTemplateData(noopState)
             }
-        }
+            }
+
         fetchd()
     }, [fetch])
 
