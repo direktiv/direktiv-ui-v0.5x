@@ -513,7 +513,7 @@ function Basic(props) {
         <section className="container">
             <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: "pointer" }}>
                 <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>Drag 'n' drop a file here, or click to select file</p>
                 <aside style={{ minHeight: "32px", textAlign: "center" }}>
                     <ul>
                         {
