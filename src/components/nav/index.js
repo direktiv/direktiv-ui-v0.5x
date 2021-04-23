@@ -172,7 +172,7 @@ export default function Navbar(props) {
                                     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", paddingTop:"5px" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
                                         {acceptInput ? 
-                                            <input  onKeyPress={(e)=>{
+                                            <input className="namespace-create"  onKeyPress={(e)=>{
                                                 if(e.code === "NumpadEnter" || e.code === "Enter") {
                                                     // create namespace
                                                     createNamespace(e.target.value)

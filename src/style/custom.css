@@ -292,6 +292,10 @@ input[type=text]:focus, input[type=password]:focus, select:hover {
     box-shadow: inset 2px 2px 6px #bebebe, inset -2px -2px 6px #ffffff;
 }
 
+.namespace-create:focus {
+    box-shadow: inset 2px 2px 6px #3d3d3d, inset -2px -2px 6px #000000 !important;
+}
+
 /* ------------------------- */
 
 #nav-img-holder img {
