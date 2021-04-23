@@ -34,7 +34,7 @@
     "yaml": "^1.10.2"
   },
   "scripts": {
-    "start": "REACT_APP_API=http://localhost:32337/api react-scripts start",
+    "start": "REACT_APP_API=http://localhost:32338/api react-scripts start",
     "start-with-auth": "REACT_APP_API=http://localhost:32337/api REACT_APP_KEYCLOAK_URL=https://192.168.1.30:32111 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --coverage",
