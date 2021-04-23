@@ -110,47 +110,6 @@ export default function DashboardPage() {
     )
 }
 
-// function TopWorkflows(props) {
-
-//     let { instances } = props;
-//     console.log(instances);
-
-//     let workflowsMap = {};
-//     if (instances) {
-//         if (instances.workflowInstances) {
-//             instances.workflowInstances.map((obj) => {
-//                 let x = obj.id.split("/");
-//                 let wfName = x[1];
-    
-//                 if (!workflowsMap[wfName]) {
-//                     workflowsMap[wfName] = 0;
-//                 }
-    
-//                 workflowsMap[wfName] += 1;
-//             })
-//         }
-//     }
-
-//     let datasource = {
-//         chart: {
-//             theme: "fusion"
-//         },
-//         data: []
-//     };
-
-//     Object.keys(workflowsMap).forEach(function(k, v) {
-//         datasource.data.push({
-//             label: k,
-//             value: workflowsMap[k]
-//         })
-//     })
-
-//     return(
-//         <div style={{ overflowY: "hidden" }}>
-            
-//         </div>
-//     )
-// }
 
 function DashboardTotalExecutions(props) {
 

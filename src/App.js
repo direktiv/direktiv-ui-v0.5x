@@ -162,13 +162,11 @@ async function fetchNs(fetch, load, setLoad, val) {
 
               // check if namespace exists here if not redirect back to /
               let f = false
-              if (json.namespaces) {
                 for (let i = 0; i < json.namespaces.length; i++) {
                   if (json.namespaces[i].name === newNamespace) {
                     f = true
                   }
                 }
-              }
 
               if (!f) {
                 // need a better solution as keycloak forces reload of the page again.
@@ -222,7 +220,6 @@ async function fetchNs(fetch, load, setLoad, val) {
                 }
               }
             }
-            console.log(newNamespace, val)
 
             if (newNamespace === "" && val) {
 
@@ -234,7 +231,6 @@ async function fetchNs(fetch, load, setLoad, val) {
             }
       }
 
-      console.log(newNamespace, val)
       return {namespaces: namespaces, namespace: newNamespace}
     
     } else {

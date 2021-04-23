@@ -28,7 +28,6 @@ export default function InstancePage() {
             setInit(true)
             if(!init) {
                 try {
-                    console.log(init, "b4 fetch", namespace)
                     let resp = await fetch(`/namespaces/${params.namespace}/workflows/${params.workflow}?name`, {
                         method: "get",
                     })
