@@ -138,27 +138,32 @@ function Secrets() {
     }, [fetchS])
 
     async function createSecret() {
-        try {
-            let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
-                method: "POST",
-                body: JSON.stringify({ name: key, data: value })
-            })
-            if (resp.ok) {
-                setKey("")
-                setValue("")
-                fetchS()
-            } else {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+        if(key !== "" && value !== "") {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
+                    method: "POST",
+                    body: JSON.stringify({ name: key, data: value })
+                })
+                if (resp.ok) {
+                    setKey("")
+                    setValue("")
+                    fetchS()
                 } else {
-                    throw new Error(`response code was ${resp.status}`)
+                    // 400 should have json response
+                    if (resp.status === 400) {
+                        let json = await resp.json()
+                        throw new Error(json.Message)
+                    } else {
+                        throw new Error(`response code was ${resp.status}`)
+                    }
                 }
+            } catch (e) {
+                sendNotification("Failed to create secret", e.message, 0)
             }
-        } catch (e) {
-            sendNotification("Failed to create secret", e.message, 0)
+        } else {
+            sendNotification("Create a Secret", "Key and value needs to be provided", 0)
         }
+    
     }
 
     async function deleteSecret(val) {
@@ -227,7 +232,7 @@ function Secrets() {
                         </td>
                         <td style={{ paddingRight: "10px" }} colSpan="2">
                             <div style={{ display: "flex", alignItems: "center" }}>
-                                <input style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
+                                <input type="text" style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
                                 <div className="circle button success" style={{ marginLeft: "10px" }} onClick={() => createSecret()}>
                                     <span style={{ flex: "auto" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
@@ -284,28 +289,33 @@ function Registries() {
     }, [fetchR])
 
     async function createRegistry() {
-        try {
-            let resp = await fetch(`/namespaces/${namespace}/registries/`, {
-                method: "POST",
-                body: JSON.stringify({ "name": name, "data": `${user}:${token}` })
-            })
-            if (resp.ok) {
-                setName("")
-                setToken("")
-                setUser("")
-                fetchR()
-            } else {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+        if(name !== "" && user !== "" && token !== "") {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/registries/`, {
+                    method: "POST",
+                    body: JSON.stringify({ "name": name, "data": `${user}:${token}` })
+                })
+                if (resp.ok) {
+                    setName("")
+                    setToken("")
+                    setUser("")
+                    fetchR()
                 } else {
-                    throw new Error(`response code was ${resp.status}`)
+                    // 400 should have json response
+                    if (resp.status === 400) {
+                        let json = await resp.json()
+                        throw new Error(json.Message)
+                    } else {
+                        throw new Error(`response code was ${resp.status}`)
+                    }
                 }
+            } catch (e) {
+                sendNotification("Failed to create registry", e.message, 0)
             }
-        } catch (e) {
-            sendNotification("Failed to create registry", e.message, 0)
+        } else {
+            sendNotification("Create a Registry", "Name, User and Token needs to provided.", 0)
         }
+
     }
 
     async function deleteRegistry(val) {

@@ -502,7 +502,7 @@ function WorkflowActions(props) {
     const {active, toggleWorkflow} = props
 
     return(
-        <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center"}}>
+        <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center", marginRight:"12px"}}>
             <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
            
                     {
