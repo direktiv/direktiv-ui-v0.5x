@@ -216,7 +216,7 @@ function readFile(file) {
 function parseYaml(fetch, name, namespace, data, setErr, history) {
     const invalidNameErr = validateName(name, "workflow name")
     if (invalidNameErr) {
-        setErr(invalidNameErr)
+        sendNotification("Name is invalid", invalidNameErr, 0)
         return
     }
 
@@ -225,7 +225,7 @@ function parseYaml(fetch, name, namespace, data, setErr, history) {
         y.id = name
         createWorkflow(fetch, YAMLtoString.stringify(y), namespace, setErr, undefined, history)
     } catch (e) {
-        setErr(e.message)
+        sendNotification("Unable to parse YAML", e.message, 0)
     }
 }
 
@@ -244,19 +244,19 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
             if (setFiles) {
                 setFiles([])
             }
-            setErr("")
+            // setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
             // Check for content type of error
             const contentType = resp.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
-                throw `${resp.status} ${await resp.text()}`
+                throw new Error(`${resp.status} ${await resp.text()}`)
             } else {
-                throw (await resp.json()).Message
+                throw new Error ((await resp.json()).Message)
             }
         }
     } catch (e) {
-        setErr(`Creation Failed: ${e}`)
+        sendNotification("Workflow Creation Failed", e.message, 0)
     }
 }
 
@@ -267,28 +267,33 @@ function APIInteractionTile() {
     const [val, setVal] = useState("")
 
     async function sendEvent() {
-        try {
-            let resp = await fetch(`/namespaces/${namespace}/event`, {
-                method: "POST",
-                headers: {
-                    "content-type": "application/json",
-                },
-                body: val
-            })
-            if (resp.ok) {
-                setVal("")
-            } else {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
+        if (val !== "") {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/event`, {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json",
+                    },
+                    body: val
+                })
+                if (resp.ok) {
+                    setVal("")
                 } else {
-                    throw new Error(`response code was ${resp.status}`)
+                    // 400 should have json response
+                    if (resp.status === 400) {
+                        let json = await resp.json()
+                        throw new Error(json.Message)
+                    } else {
+                        throw new Error(`response code was ${resp.status}`)
+                    }
                 }
+            } catch (e) {
+                sendNotification("Failed to send cloud event", e.message, 0)
             }
-        } catch (e) {
-            sendNotification("Failed to send cloud event", e.message, 0)
+        } else {
+            sendNotification("Send Cloud Event", "Failed to send cloud event as input is empty", 0)
         }
+        
     }
 
 
@@ -330,13 +335,13 @@ function UploadWorkflowForm() {
                         const y = YAML.load(data, 'utf8')
                         invalidNameErr = validateName(y.id, "id")
                     } catch (e) {
-                        setErr(`File is not a valid YAML: ${e.reason}`)
+                        sendNotification(`File is not a valid`, e.reason, 0)
                         return
                     }
 
                     // Check if id is a valid name
                     if (invalidNameErr) {
-                        setErr(`Invalid Workflow ID: ${invalidNameErr}`)
+                        sendNotification(`Invalid Workflow`, `ID: ${invalidNameErr}`, 0)
                     } else {
                         createWorkflow(fetch, data, namespace, setErr, setFiles, history)
                     }
@@ -489,7 +494,7 @@ function Basic(props) {
                 setFiles([...acceptedFiles]);
             }
         },
-        [files]
+        [setData, setFiles]
     );
 
     const { getRootProps, getInputProps } = useDropzone({
