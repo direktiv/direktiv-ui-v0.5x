@@ -4,7 +4,7 @@ import Breadcrumbs from '../breadcrumbs'
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
-import { Link, useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import Logs from './logs'
 import InputOutput from './input-output'
 import Diagram from '../workflow-page/diagram'
@@ -21,6 +21,7 @@ export default function InstancePage() {
     const [wf, setWf] = useState("")
 
     const params = useParams()
+    const history = useHistory()
     let instanceId = `${params.namespace}/${params.workflow}/${params.instance}`
    
     const fetchWf = useCallback(()=>{
@@ -101,11 +102,12 @@ export default function InstancePage() {
                     <div style={{ flex: "auto" }}>
                         <Breadcrumbs instanceId={instanceId} />
                     </div>
-                    <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
+                    <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
+                    onClick={() => {
+                        history.push(`/${params.namespace}/w/${params.workflow}`)
+                    }}>
                         <div style={{ alignItems: "center" }}>
-                            <Link className="dashboard-btn" to={`/${params.namespace}/w/${params.workflow}`}>
                                 View Workflow
-                            </Link>
                         </div>
                     </div>
                     <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>

@@ -275,6 +275,11 @@ input[type=submit]:hover, .button:hover {
     cursor: pointer;
 }
 
+.hover-gradient:hover {
+    background: linear-gradient(145deg, #d1d1d1, #e3e3e3);
+    cursor: pointer;
+}
+
 input[type=submit]:active, .button:active {
     box-shadow: inset 2px 2px 6px #bebebe, inset -2px -2px 6px #ffffff;
 }
