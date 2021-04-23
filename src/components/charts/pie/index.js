@@ -63,7 +63,7 @@ export default function NuePieChart(props) {
           {total}
         </div>
       </div>
-        {pieData === [] ? (
+        {pieData.length === 0 ? (
           <></>
         ) : (
           <div data-tip="" data-for="chart" style={{flex: "auto"}}>
@@ -140,7 +140,7 @@ export function NuePieLegend(props) {
       )}
       {pieData.map((item) => {
         return (
-          <div className="Pie-Legend-Container">
+          <div key={item.title} className="Pie-Legend-Container">
             <div
               className="Pie-Legend-Key"
               style={{ backgroundColor: item.color }}

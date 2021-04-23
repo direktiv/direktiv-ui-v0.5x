@@ -16,6 +16,7 @@ import { sendNotification } from '../notifications'
 export default function InstancePage() {
     const {fetch, namespace} = useContext(MainContext)
     
+    const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
 
@@ -24,29 +25,34 @@ export default function InstancePage() {
    
     const fetchWf = useCallback(()=>{
         async function fetchWorkflow() {
-            try {
-                let resp = await fetch(`/namespaces/${params.namespace}/workflows/${params.workflow}?name`, {
-                    method: "get",
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
-                    let wfn = atob(json.workflow)
-                    setWf(wfn)
-                } else {
-              // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+            setInit(true)
+            if(!init) {
+                try {
+                    let resp = await fetch(`/namespaces/${params.namespace}/workflows/${params.workflow}?name`, {
+                        method: "get",
+                    })
+                    if (resp.ok) {
+                        let json = await resp.json()
+                        let wfn = atob(json.workflow)
+                        setWf(wfn)
+                    } else {
+                        // 400 should have json response
+                        if(resp.status === 400) {
+                            let json = await resp.json()
+                            throw new Error(json.Message)
+                        } else {
+                            throw new Error(`response code was ${resp.status}`)
+                        }
+                    }
+                } catch(e) {
+                    sendNotification("Failed to fetch workflow", e.message, 0)
                 }
-            } catch(e) {
-                sendNotification("Failed to fetch workflow", e.message, 0)
             }
         }
+        if(namespace !== ""){
         fetchWorkflow()
-    },[fetch, params.namespace, params.workflow])
+        }
+    },[init, fetch, params.namespace, params.workflow, namespace])
 
     useEffect(()=>{
         async function fetchInstanceDetails() {
@@ -58,13 +64,13 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-              // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                        // 400 should have json response
+                    if(resp.status === 400) {
+                        let json = await resp.json()
+                        throw new Error(json.Message)
+                    } else {
+                        throw new Error(`response code was ${resp.status}`)
+                    }
                 }
             } catch(e) {
                 sendNotification("Fetch Instance details failed ", e.message, 0)
@@ -131,7 +137,9 @@ export default function InstancePage() {
                                 {instanceDetails.flow && wf ? 
                                     <Diagram flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
                                     :
-                                    ""
+                                    <div style={{ marginTop:"28px", fontSize:"12pt"}}>
+                                        Unable to fetch workflow have you renamed the workflow recently?
+                                    </div>
                                 }
                                 </div>
                         </div>

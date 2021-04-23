@@ -34,11 +34,12 @@
     "yaml": "^1.10.2"
   },
   "scripts": {
-    "start": "REACT_APP_API=http://192.168.1.60:8080/api react-scripts start",
-    "start-with-auth": "REACT_APP_API=http://192.168.1.60:8080/api REACT_APP_KEYCLOAK_URL=https://192.168.1.60:32111 react-scripts start",
+    "start": "REACT_APP_API=http://localhost:32337/api react-scripts start",
+    "start-with-auth": "REACT_APP_API=http://localhost:32337/api REACT_APP_KEYCLOAK_URL=https://192.168.1.30:32111 react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test --env=jsdom --coverage",
+    "eject": "react-scripts eject",
+    "test:coverage": "CI=true yarn test -- env=jsdom --coverage"
   },
   "eslintConfig": {
     "extends": [

@@ -42,7 +42,7 @@ function AuthenticatedContent() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(authFetch, loaded, setLoad)
+          let namespacesObj = await fetchNs(authFetch, loaded, setLoad, val)
           setLoad(false)
           setNamespace(namespacesObj.namespace)
           setNamespaces(namespacesObj.namespaces)
@@ -162,13 +162,11 @@ async function fetchNs(fetch, load, setLoad, val) {
 
               // check if namespace exists here if not redirect back to /
               let f = false
-              if (json.namespaces) {
                 for (let i = 0; i < json.namespaces.length; i++) {
                   if (json.namespaces[i].name === newNamespace) {
                     f = true
                   }
                 }
-              }
 
               if (!f) {
                 // need a better solution as keycloak forces reload of the page again.
@@ -222,6 +220,7 @@ async function fetchNs(fetch, load, setLoad, val) {
                 }
               }
             }
+
             if (newNamespace === "" && val) {
 
               newNamespace = val
@@ -231,6 +230,7 @@ async function fetchNs(fetch, load, setLoad, val) {
               namespaces.push(json.namespaces[i].name)
             }
       }
+
       return {namespaces: namespaces, namespace: newNamespace}
     
     } else {
@@ -263,7 +263,7 @@ function Content() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(netch, loaded, setLoad)
+          let namespacesObj = await fetchNs(netch, loaded, setLoad, val)
           setLoad(false)
           setNamespace(namespacesObj.namespace)
           setNamespaces(namespacesObj.namespaces)

@@ -56,8 +56,8 @@ export default function ReactEditor(props) {
                             },
                         },
                     }}
-                    onBeforeChange={(editor, data, value) => {
-                        setValue(value)
+                    onBeforeChange={(editor, data, val) => {
+                        setValue(val)
                     }}
                 />
             </div>

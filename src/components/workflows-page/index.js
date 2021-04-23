@@ -390,8 +390,8 @@ function NewWorkflowForm() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    if (load) {
-                        setTemplate("noop")
+                    if(load){
+                        setTemplate("default-noop")
                         setTemplateData(noopState)
                         // fetchTempData("noop", setTemplateData)
                         setTemplates(json)
@@ -437,7 +437,7 @@ function NewWorkflowForm() {
                                 setTemplate(e.target.value)
                                 fetchTempData(e.target.value, setTemplateData)
                             }}>
-                                <option key="noop">noop</option>
+                                <option key="default-noop">default-noop</option>
                                 {
                                     templates.map((obj) => <option key={obj} value={obj}>{obj}</option>)
                                 }
