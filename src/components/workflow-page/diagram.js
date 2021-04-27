@@ -73,6 +73,14 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         animated: false,
                         type: 'bezier'
                     })
+                } else if(v.states[i].defaultTransition) {
+                    newElements.push({
+                        id: `${v.states[i].id}-${v.states[i].defaultTransition}`,
+                        source: v.states[i].id,
+                        target: v.states[i].defaultTransition,
+                        animated: false,
+                        type: 'bezier'
+                    })
                 } else {
                     // no transition add end state
                     newElements.push({
@@ -113,7 +121,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         } else 
                         
                         if(newElements[j].id === flow[i]) {
-                            if(!newElements[j].data.state.transition || !newElements[j].data.state.default ){
+                            if(!newElements[j].data.state.transition || !newElements[j].data.state.defaultTransition ){
                                 noTransition = true
                                 if(newElements[j].data.state.catch) {
                                     for(let y=0; y < newElements[j].data.state.catch.length; y++) {
