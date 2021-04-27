@@ -102,7 +102,6 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
             })
 
             // Check flow array change edges to green if it passed 
-            console.log(flow)
             if(flow){
                 // check flow for transitions
                 for(let i=0; i < flow.length; i++) {
@@ -115,14 +114,12 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         
                         if(newElements[j].id === flow[i]) {
                             if(!newElements[j].data.state.transition || !newElements[j].data.state.default ){
-                                console.log(newElements)
                                 noTransition = true
                                 if(newElements[j].data.state.catch) {
                                     for(let y=0; y < newElements[j].data.state.catch.length; y++) {
                                         if(newElements[j].data.state.catch[y].transition){
                                             noTransition = false
                                             if (newElements[j].data.label === flow[flow.length-1]) {
-                                                console.log('supbruh')
                                                 noTransition = true
                                             }
                                         }
