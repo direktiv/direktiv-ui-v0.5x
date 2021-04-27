@@ -78,6 +78,7 @@ export default function Logs(props) {
                             document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
                         }
                     }
+
                 }
             } catch (e) {
                 sendNotification("Failed to fetch logs", e.message, 0)

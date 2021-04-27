@@ -51,7 +51,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
 
                 // Check if state is catching things to transition to
                 if(v.states[i].catch) {
-                    for(let x=0; x < v.states[i].catch.length; i++) {
+                    for(let x=0; x < v.states[i].catch.length; x++) {
                         if(v.states[i].catch[x].transition) {
                             newElements.push({
                                 id: `${v.states[i].id}-${v.states[i].catch[x].transition}`,
@@ -102,6 +102,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
             })
 
             // Check flow array change edges to green if it passed 
+            console.log(flow)
             if(flow){
                 // check flow for transitions
                 for(let i=0; i < flow.length; i++) {
@@ -110,12 +111,23 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         
                         if(newElements[j].target === flow[i]) {
                             newElements[j].animated = true
-                        }
-
-                        // check if the flow is an end element
+                        } else 
+                        
                         if(newElements[j].id === flow[i]) {
-                            if(!newElements[j].data.state.transition || !newElements[j].data.state.default){
+                            if(!newElements[j].data.state.transition || !newElements[j].data.state.default ){
+                                console.log(newElements)
                                 noTransition = true
+                                if(newElements[j].data.state.catch) {
+                                    for(let y=0; y < newElements[j].data.state.catch.length; y++) {
+                                        if(newElements[j].data.state.catch[y].transition){
+                                            noTransition = false
+                                            if (newElements[j].data.label === flow[flow.length-1]) {
+                                                console.log('supbruh')
+                                                noTransition = true
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
