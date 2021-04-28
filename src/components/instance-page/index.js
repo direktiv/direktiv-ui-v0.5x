@@ -90,7 +90,7 @@ export default function InstancePage() {
         return function cleanup() {
             clearInterval(timer)
         }
-    },[instanceId, fetch, fetchWf, instanceDetails.status])
+    },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance])
 
     
     return(
@@ -101,6 +101,34 @@ export default function InstancePage() {
                 <div style={{ flex: "auto", display: "flex" }}>
                     <div style={{ flex: "auto" }}>
                         <Breadcrumbs instanceId={instanceId} />
+                    </div>
+                    <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
+                    onClick={async () => {
+                        try{
+                            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
+                                method: "POST",
+                                body: atob(instanceDetails.input)
+                            })
+                            if(resp.ok) {
+                                let json = await resp.json()    
+                                sendNotification("Rerun", `Successfully executed ${params.workflow}`, 0)
+                                history.push(`/i/${json.instanceId}`)
+                            } else {
+                         // 400 should have json response
+                         if(resp.status === 400) {
+                            let json = await resp.json()
+                            throw new Error(json.Message)
+                          } else {
+                            throw new Error(`response code was ${resp.status}`)
+                          }
+                            }
+                        } catch(e) {
+                            sendNotification("Failed to execute workflow", e.message, 0)
+                        }
+                    }}>
+                        <div style={{ alignItems: "center" }}>
+                                Rerun Workflow
+                        </div>
                     </div>
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={() => {
