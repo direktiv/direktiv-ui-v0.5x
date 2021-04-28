@@ -134,7 +134,8 @@ export default function Logs(props) {
                 <div id="logs" style={{borderRadius:"8px", overflow:"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0, paddingBottom:"40px" }}>
                     <pre>
                         {logs.map((obj, i) => {
-                                let time = dayjs.unix(obj.timestamp.seconds).format("h:mm:ss")
+                                let time = dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")
+                                console.log(time)
                                 return (
                                     <div style={{fontFamily:"monospace"}} key={obj.timestamp.seconds +i}>
                                         <span style={{ color: "#b5b5b5" }}>
