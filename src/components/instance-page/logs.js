@@ -2,9 +2,8 @@ import { useCallback, useEffect, useContext, useState } from "react"
 import MainContext from "../../context"
 import * as dayjs from "dayjs"
 import { sendNotification } from "../notifications"
-import { IoCopy } from "react-icons/io5"
+import { IoCheckmark, IoCloseSharp, IoCopy } from "react-icons/io5"
 import { CopyToClipboard } from "../../util"
-import { useParams } from "react-router"
 import { useRef } from "react"
 
 export default function Logs(props) {
@@ -23,7 +22,7 @@ export default function Logs(props) {
     // const logsRef = useRef([])
 
     
-    
+    const [showCancelEvent, setShowCancelEvent] = useState(false)
     const [logs, setLogs] = useState([])
     // const [logsOffset, setLogsOffset] = useState(0)
     // const [timer, setTimer] = useState(null)
@@ -167,11 +166,45 @@ export default function Logs(props) {
             <div id="test" className="editor-footer">
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">
+                    <>
+            {!showCancelEvent ?
+                <div className="editor-footer-button" style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
+                    // closes after 10 seconds
+                    setTimeout(function () { setShowCancelEvent(false) }, 10000);
+                    setShowCancelEvent(true)
+                }}>
+                    <span style={{}} >Cancel Run</span>
+                    <IoCloseSharp style={{ marginLeft: "5px" }} />
+            </div> :
+                <div className="editor-footer-button" style={{ display: "flex", alignItems: "center", padding: "0 0 0 0" }}>
+                    <div style={{ padding: "0 10px 0 10px", height: "100%", display: "flex", alignItems: "center" }} onClick={async() => {
+                            try {
+                                let resp = await fetch(`/instances/${instanceId}`, {
+                                    method: "DELETE"
+                                })
+                                if(!resp.ok) {
+                                    let text = await resp.text()
+                                    throw (new Error(text))
+                                } else {
+                                    sendNotification("Instance cancelled", `${instanceId} has been cancelled`, 0)
+                                }
+                            }  catch(e) {
+                                sendNotification("Instance cancelled error", `unable to cancel ${instanceId}: ${e.message}`, 0)
+                            }
+                            setShowCancelEvent(false)
+                    }}>
+                        Are you sure you wish to cancel ?
+                        <IoCheckmark style={{marginLeft:'5px'}} />
+                    </div>
+                </div>
+            }
+        </>
                         <div>
+            
                         <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
                             let stringLogs = ""
                             for(let i=0; i < logs.length; i++) {
-                                let time = dayjs.unix(logs[i].timestamp.seconds).format("h:mm:ss")
+                                let time = dayjs.unix(`${logs[i].timestamp.seconds}.${logs[i].timestamp.nanos}`).format("h:mm:ss.SSS")
                                 stringLogs += `[${time}] ${logs[i].message} `
                                 if (logs[i].context && logs[i].context.constructor === Object && Object.keys(logs[i].context).length > 0) {
                                     stringLogs += `(${Object.keys(logs[i].context).map((k)=>`${k}=${logs[i].context[k]} `)})`
@@ -184,6 +217,8 @@ export default function Logs(props) {
                             <IoCopy style={{ marginLeft: "5px" }} />
                         </div>
                         </div>
+              
+
                     </div>
                 </div>
         </div>
