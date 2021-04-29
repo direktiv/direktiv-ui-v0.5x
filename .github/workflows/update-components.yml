@@ -1,9 +1,7 @@
-name: GitHub Actions Demo
+name: Build-UI-Components
 on: [push]
-  branches:
-  - use-bit
 jobs:
-  yarn-dependencies:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
