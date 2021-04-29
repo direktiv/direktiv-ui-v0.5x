@@ -1,7 +1,7 @@
 import {Route, Redirect} from "react-router-dom"
 import DashboardPage from '@vorteil/direktiv-ui.dashboard-page'
 import EventsPage from '@vorteil/direktiv-ui.events-page'
-import InstancePage from '@vorteil/direktiv-ui.instance-page'
+import InstancePage from '../instance-page'
 import JQPlaygroundPage from '@vorteil/direktiv-ui.jqplayground'
 import SettingsPage from '@vorteil/direktiv-ui.settings-page'
 import WorkflowsPage from '@vorteil/direktiv-ui.workflows-page'
@@ -30,6 +30,6 @@ export default function Routes(props) {
             <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
             <Route path="/:namespace/i" component={EventsPage} />
             <Route path="/:namespace/s" component={SettingsPage} />
-            </>
+        </>
     )
 }
