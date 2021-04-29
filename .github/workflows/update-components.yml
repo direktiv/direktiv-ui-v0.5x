@@ -21,6 +21,7 @@ jobs:
           bit config set analytics_reporting false
           bit config set anonymous_reporting false
           bit config set user.token $BIT_TOKEN
+          bit import
           bit status
           bit link --rewire
           bit tag --all
