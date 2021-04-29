@@ -2,110 +2,110 @@
 
 {
     "breadcrumbs": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/components/breadcrumbs"
     },
     "confirm-button": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/components/confirm-button"
     },
     "context": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/context"
     },
     "dashboard-page": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.3",
         "mainFile": "index.js",
         "rootDir": "src/components/dashboard-page"
     },
     "events-page": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.3",
         "mainFile": "index.js",
         "rootDir": "src/components/events-page"
     },
     "img": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "mainFile": "direktiv.svg",
         "rootDir": "src/img"
     },
     "instance-page": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.4",
         "mainFile": "index.js",
         "rootDir": "src/components/instance-page"
     },
     "jqplayground": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.4",
         "mainFile": "index.js",
         "rootDir": "src/components/jqplayground"
     },
     "nav": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.3",
+        "version": "0.0.4",
         "mainFile": "index.js",
         "rootDir": "src/components/nav"
     },
     "notifications": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/components/notifications"
     },
     "pie": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/components/charts/pie"
     },
     "routes": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.4",
         "mainFile": "index.js",
         "rootDir": "src/components/routes"
     },
     "settings-page": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/components/settings-page"
     },
     "style": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "mainFile": "index.css",
         "rootDir": "src/style"
     },
     "tile-title": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.2",
         "mainFile": "index.js",
         "rootDir": "src/components/tile-title"
     },
     "util-funcs": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.2",
+        "version": "0.0.4",
         "mainFile": "index.js",
         "rootDir": "src/util-funcs"
     },
     "workflow-page": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.4",
         "mainFile": "index.js",
         "rootDir": "src/components/workflow-page"
     },
     "workflows-page": {
-        "scope": "",
-        "version": "0.0.1",
+        "scope": "vorteil.direktiv-ui",
+        "version": "0.0.3",
         "mainFile": "index.js",
         "rootDir": "src/components/workflows-page"
     },
