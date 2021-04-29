@@ -17,6 +17,7 @@ jobs:
           bvm version
       - name: tag and export
         run: |
+          export PATH=$HOME/bin:$PATH
           bit config set analytics_reporting false
           bit config set anonymous_reporting false
           bit config set user.token $BIT_TOKEN
