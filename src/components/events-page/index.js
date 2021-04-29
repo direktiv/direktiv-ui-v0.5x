@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
-import './style.css'
 
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";

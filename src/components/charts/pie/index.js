@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./style.css";
+
 import ReactTooltip from "react-tooltip";
 import { PieChart } from "react-minimal-pie-chart";
 

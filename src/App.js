@@ -1,6 +1,3 @@
-import './App.css';
-import './style/scrollbar.css';
-import './style/custom.css';
 
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import Navbar from './components/nav'
