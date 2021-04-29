@@ -3,6 +3,30 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - run: ls .
+
+      - name: install dependencies
+        run: yarn install
+      - name: install bit
+        run: |
+          sudo npm i -g @teambit/bvm
+          bvm install
+          bvm version
+      - name: tag and export
+        run: |
+          bit config set analytics_reporting false
+          bit config set anonymous_reporting false
+          bit config set user.token $BIT_TOKEN
+          bit status
+          bit link --rewire
+          bit tag --all
+          bit export       
+      - name: recommit-changes from rewire
+        run: |
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git commit -am "Automated commit (bit component update)"
+          git push
