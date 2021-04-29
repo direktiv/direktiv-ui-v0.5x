@@ -1,21 +1,22 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react'
-import Breadcrumbs from '../breadcrumbs'
+import Breadcrumbs from '@vorteil/direktiv-ui.breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
 import YAML from 'js-yaml'
 
 
-import TileTitle from '../tile-title'
+import TileTitle from '@vorteil/direktiv-ui.tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle } from 'react-icons/io5'
 
-import {sendNotification} from '../notifications/index.js'
-import PieChart from '../charts/pie'
+import {sendNotification} from '@vorteil/direktiv-ui.notifications'
+import PieChart from '@vorteil/direktiv-ui.pie'
 import { useHistory, useParams } from 'react-router'
-import MainContext from '../../context'
+import MainContext from '@vorteil/direktiv-ui.context'
 import Sankey from './sankey'
 import * as dayjs from "dayjs"
-import NoResults from '../../noresults'
+import {NoResults} from '@vorteil/direktiv-ui.util-funcs'
+
 
 async function checkStartType(wf) {
     // check for event start type

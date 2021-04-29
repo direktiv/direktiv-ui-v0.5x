@@ -1,7 +1,7 @@
 import { IoCopy } from 'react-icons/io5';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { CopyToClipboard } from '../../util';
+import { CopyToClipboard } from '@vorteil/direktiv-ui.util-funcs';
 
 
 function ReactSyntaxHighlighter(props) {

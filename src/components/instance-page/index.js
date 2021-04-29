@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react'
-import TileTitle from '../tile-title'
-import Breadcrumbs from '../breadcrumbs'
+import TileTitle from '@vorteil/direktiv-ui.tile-title'
+import Breadcrumbs from '@vorteil/direktiv-ui.breadcrumbs'
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import { useHistory, useParams } from 'react-router-dom'
 import Logs from './logs'
 import InputOutput from './input-output'
-import Diagram from '../workflow-page/diagram'
+import Diagram from '@vorteil/direktiv-ui.workflow-page/diagram'
 
-import MainContext from '../../context'
+import MainContext from '@vorteil/direktiv-ui.context'
 import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
+import { sendNotification } from '@vorteil/direktiv-ui.notifications'
 
 export default function InstancePage() {
     const {fetch, namespace} = useContext(MainContext)

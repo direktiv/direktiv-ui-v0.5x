@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import TileTitle from '../tile-title'
-import Breadcrumbs from '../breadcrumbs'
+import TileTitle from '@vorteil/direktiv-ui.tile-title'
+import Breadcrumbs from '@vorteil/direktiv-ui.breadcrumbs'
 import { useDropzone } from 'react-dropzone'
 
 import YAML from "js-yaml"
@@ -9,13 +9,14 @@ import YAMLtoString from "yaml"
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
-import MainContext from '../../context'
+import MainContext from '@vorteil/direktiv-ui.context'
 import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
-import NoResults from '../../noresults'
-import { ConfirmButton } from '../confirm-button'
-import { validateName } from "../../util"
+import { sendNotification } from '@vorteil/direktiv-ui.notifications'
+import {NoResults} from '@vorteil/direktiv-ui.util-funcs'
+
+import { ConfirmButton } from '@vorteil/direktiv-ui.confirm-button'
+import { validateName } from "@vorteil/direktiv-ui.util-funcs"
 
 
 const noopState = `id: noop

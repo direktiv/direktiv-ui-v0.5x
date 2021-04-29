@@ -1,14 +1,14 @@
 import React, { useContext, useState, useCallback } from 'react'
-import Breadcrumbs from '../breadcrumbs'
-import Editor from "../workflow-page/editor"
-import MainContext from '../../context'
+import Breadcrumbs from '@vorteil/direktiv-ui.breadcrumbs'
+import Editor from "@vorteil/direktiv-ui.workflow-page/editor"
+import MainContext from '@vorteil/direktiv-ui.context'
 
 
 
-import TileTitle from '../tile-title'
+import TileTitle from '@vorteil/direktiv-ui.tile-title'
 import { IoInformationCircleSharp, IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
 
-import { sendNotification } from '../notifications/index.js'
+import { sendNotification } from '@vorteil/direktiv-ui.notifications'
 
 const cheatSheetMap = [
     {

@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Breadcrumbs from '../breadcrumbs'
-import TileTitle from '../tile-title'
+import Breadcrumbs from '@vorteil/direktiv-ui.breadcrumbs'
+import TileTitle from '@vorteil/direktiv-ui.tile-title'
 
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import MainContext from '../../context'
+import MainContext from '@vorteil/direktiv-ui.context'
 import { useHistory } from 'react-router'
 import { IoList } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
-import NoResults from '../../noresults'
+import { sendNotification } from '@vorteil/direktiv-ui.notifications'
+import {NoResults} from '@vorteil/direktiv-ui.util-funcs'
 
 dayjs.extend(relativeTime);
 
