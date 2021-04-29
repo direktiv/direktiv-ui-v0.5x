@@ -166,6 +166,7 @@ export default function Logs(props) {
             <div id="test" className="editor-footer">
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">
+                    {status !== "pending" ? "":
                     <>
             {!showCancelEvent ?
                 <div className="editor-footer-button" style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
@@ -198,7 +199,7 @@ export default function Logs(props) {
                     </div>
                 </div>
             }
-        </>
+        </>}
                         <div>
             
                         <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 

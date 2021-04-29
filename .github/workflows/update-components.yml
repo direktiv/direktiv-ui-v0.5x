@@ -1,0 +1,10 @@
+name: GitHub Actions Demo
+on: [push]
+  branches:
+  - use-bit
+jobs:
+  yarn-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ls .
