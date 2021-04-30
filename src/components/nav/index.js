@@ -3,7 +3,7 @@ import Logo from '@vorteil/direktiv-ui.img/direktiv.svg'
 import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
-import { PlusCircle } from 'react-bootstrap-icons'
+import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import { useContext } from 'react'
 import MainContext from '@vorteil/direktiv-ui.context'
 import { useState } from 'react'

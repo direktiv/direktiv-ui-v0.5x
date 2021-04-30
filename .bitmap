@@ -21,13 +21,13 @@
     },
     "dashboard-page": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.4",
+        "version": "0.0.7",
         "mainFile": "index.js",
         "rootDir": "src/components/dashboard-page"
     },
     "events-page": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.3",
+        "version": "0.0.5",
         "mainFile": "index.js",
         "rootDir": "src/components/events-page"
     },
@@ -39,19 +39,19 @@
     },
     "instance-page": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.6",
+        "version": "0.0.9",
         "mainFile": "index.js",
         "rootDir": "src/components/instance-page"
     },
     "jqplayground": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.5",
+        "version": "0.0.8",
         "mainFile": "index.js",
         "rootDir": "src/components/jqplayground"
     },
     "nav": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.5",
+        "version": "0.0.6",
         "mainFile": "index.js",
         "rootDir": "src/components/nav"
     },
@@ -69,13 +69,13 @@
     },
     "routes": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.7",
+        "version": "0.0.12",
         "mainFile": "index.js",
         "rootDir": "src/components/routes"
     },
     "settings-page": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.2",
+        "version": "0.0.5",
         "mainFile": "index.js",
         "rootDir": "src/components/settings-page"
     },
@@ -99,13 +99,13 @@
     },
     "workflow-page": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.4",
+        "version": "0.0.6",
         "mainFile": "index.js",
         "rootDir": "src/components/workflow-page"
     },
     "workflows-page": {
         "scope": "vorteil.direktiv-ui",
-        "version": "0.0.3",
+        "version": "0.0.6",
         "mainFile": "index.js",
         "rootDir": "src/components/workflows-page"
     },
