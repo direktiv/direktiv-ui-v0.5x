@@ -7,7 +7,6 @@ jobs:
       BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-
       - name: install dependencies
         run: yarn install
       - name: install bit
@@ -15,5 +14,6 @@ jobs:
           sudo npm install bit-bin --global
       - name: tag and export
         run: |
+          bit import bit.envs/compilers/react --compiler
           bit tag --all
           bit export       
