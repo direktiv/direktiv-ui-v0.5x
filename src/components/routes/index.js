@@ -1,11 +1,11 @@
 import {Route, Redirect} from "react-router-dom"
-import * as DashboardPage from '../dashboard-page'
-import * as EventsPage from '../events-page'
-import * as InstancePage from '../instance-page'
-import * as JQPlaygroundPage from '../jqplayground'
-import * as SettingsPage from '../settings-page'
-import * as WorkflowsPage from '../workflows-page'
-import * as WorkflowPage from '../workflow-page'
+import  DashboardPage from '../dashboard-page'
+import  EventsPage from '../events-page'
+import  InstancePage from '../instance-page'
+import  JQPlaygroundPage from '../jqplayground'
+import  SettingsPage from '../settings-page'
+import  WorkflowsPage from '../workflows-page'
+import  WorkflowPage from '../workflow-page'
 
 export default function Routes(props) {
     const {namespace} = props

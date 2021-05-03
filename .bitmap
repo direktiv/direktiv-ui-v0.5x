@@ -154,7 +154,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "vorteil.direktiv-legacy/routes@1.0.0": {
+    "vorteil.direktiv-legacy/routes@1.0.1": {
         "files": [
             {
                 "relativePath": "src/components/routes/index.js",
