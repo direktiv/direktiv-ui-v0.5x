@@ -12,8 +12,8 @@ export default function Routes(props) {
     console.log('hello test routes')
     return(
         <>
-            <Route path="/jq/playground" component={JQPlaygroundPage.default} />
-            <Route path="/i/:namespace/:workflow/:instance" component={InstancePage.default} />
+            <Route path="/jq/playground" component={JQPlaygroundPage} />
+            <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
             <Route exact path="/">
               {
                 namespace !== "" ?
@@ -26,11 +26,11 @@ export default function Routes(props) {
                   </Route>
               }
             </Route>
-            <Route exact path="/:namespace" component={DashboardPage.default} />
-            <Route exact path="/:namespace/w" component={WorkflowsPage.default} />
-            <Route path="/:namespace/w/:workflow" component={WorkflowPage.default} />
-            <Route path="/:namespace/i" component={EventsPage.default} />
-            <Route path="/:namespace/s" component={SettingsPage.default} />
+            <Route exact path="/:namespace" component={DashboardPage} />
+            <Route exact path="/:namespace/w" component={WorkflowsPage} />
+            <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
+            <Route path="/:namespace/i" component={EventsPage} />
+            <Route path="/:namespace/s" component={SettingsPage} />
         </>
     )
 }
