@@ -7,24 +7,6 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@vorteil/direktiv-ui.breadcrumbs": "^0.0.2",
-    "@vorteil/direktiv-ui.confirm-button": "^0.0.2",
-    "@vorteil/direktiv-ui.context": "^0.0.2",
-    "@vorteil/direktiv-ui.dashboard-page": "^0.0.2",
-    "@vorteil/direktiv-ui.events-page": "^0.0.2",
-    "@vorteil/direktiv-ui.img": "^0.0.2",
-    "@vorteil/direktiv-ui.instance-page": "^0.0.3",
-    "@vorteil/direktiv-ui.jqplayground": "^0.0.3",
-    "@vorteil/direktiv-ui.nav": "^0.0.4",
-    "@vorteil/direktiv-ui.notifications": "^0.0.2",
-    "@vorteil/direktiv-ui.pie": "^0.0.2",
-    "@vorteil/direktiv-ui.routes": "^0.0.3",
-    "@vorteil/direktiv-ui.settings-page": "^0.0.2",
-    "@vorteil/direktiv-ui.style": "^0.0.3",
-    "@vorteil/direktiv-ui.tile-title": "^0.0.2",
-    "@vorteil/direktiv-ui.util-funcs": "^0.0.4",
-    "@vorteil/direktiv-ui.workflow-page": "^0.0.3",
-    "@vorteil/direktiv-ui.workflows-page": "^0.0.2",
     "codemirror": "^5.60.0",
     "customize-cra": "^1.0.0",
     "d3": "^6.7.0",
@@ -88,5 +70,12 @@
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "webpack-bundle-analyzer": "^4.4.1"
+  },
+  "bit": {
+    "env": {
+      "compiler": "bit.envs/compilers/react@2.0.0"
+    },
+    "componentsDefaultDirectory": "components/{name}",
+    "packageManager": "npm"
   }
 }

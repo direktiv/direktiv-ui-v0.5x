@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "@vorteil/direktiv-ui.style/custom.css";
 import { IoCheckmarkSharp, IoCloseSharp } from "react-icons/io5"
 
 export function ConfirmButton(props) {

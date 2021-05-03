@@ -1,15 +1,15 @@
 import React from 'react'
-import Logo from '@vorteil/direktiv-ui.img/direktiv.svg'
+import Logo from '../../img/direktiv.svg'
 import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import { useContext } from 'react'
-import MainContext from '@vorteil/direktiv-ui.context'
+import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
 import { IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
-import { sendNotification } from '@vorteil/direktiv-ui.notifications'
+import { sendNotification } from '../notifications'
 
 export default function Navbar(props) {
 

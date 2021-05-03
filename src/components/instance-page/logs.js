@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useContext, useState } from "react"
-import MainContext from "@vorteil/direktiv-ui.context"
+import MainContext from "../../context"
 import * as dayjs from "dayjs"
-import { sendNotification } from "@vorteil/direktiv-ui.notifications"
+import { sendNotification } from "../notifications"
 import { IoCheckmark, IoCloseSharp, IoCopy } from "react-icons/io5"
-import { CopyToClipboard } from "@vorteil/direktiv-ui.util-funcs"
+import { CopyToClipboard } from "../../util-funcs"
 import { useRef } from "react"
 
 export default function Logs(props) {

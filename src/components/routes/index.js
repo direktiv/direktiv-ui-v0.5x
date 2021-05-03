@@ -1,18 +1,18 @@
 import {Route, Redirect} from "react-router-dom"
-import DashboardPage from '@vorteil/direktiv-ui.dashboard-page'
-import EventsPage from '@vorteil/direktiv-ui.events-page'
-import InstancePage from '@vorteil/direktiv-ui.instance-page'
-import JQPlaygroundPage from '@vorteil/direktiv-ui.jqplayground'
-import SettingsPage from '@vorteil/direktiv-ui.settings-page'
-import WorkflowsPage from '@vorteil/direktiv-ui.workflows-page'
-import WorkflowPage from '@vorteil/direktiv-ui.workflow-page'
+import * as DashboardPage from '../dashboard-page'
+import * as EventsPage from '../events-page'
+import * as InstancePage from '../instance-page'
+import * as JQPlaygroundPage from '../jqplayground'
+import * as SettingsPage from '../settings-page'
+import * as WorkflowsPage from '../workflows-page'
+import * as WorkflowPage from '../workflow-page'
 
 export default function Routes(props) {
     const {namespace} = props
     return(
         <>
-            <Route path="/jq/playground" component={JQPlaygroundPage} />
-            <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+            <Route path="/jq/playground" component={JQPlaygroundPage.default} />
+            <Route path="/i/:namespace/:workflow/:instance" component={InstancePage.default} />
             <Route exact path="/">
               {
                 namespace !== "" ?
@@ -25,11 +25,11 @@ export default function Routes(props) {
                   </Route>
               }
             </Route>
-            <Route exact path="/:namespace" component={DashboardPage} />
-            <Route exact path="/:namespace/w" component={WorkflowsPage} />
-            <Route path="/:namespace/w/:workflow" component={WorkflowPage} />
-            <Route path="/:namespace/i" component={EventsPage} />
-            <Route path="/:namespace/s" component={SettingsPage} />
+            <Route exact path="/:namespace" component={DashboardPage.default} />
+            <Route exact path="/:namespace/w" component={WorkflowsPage.default} />
+            <Route path="/:namespace/w/:workflow" component={WorkflowPage.default} />
+            <Route path="/:namespace/i" component={EventsPage.default} />
+            <Route path="/:namespace/s" component={SettingsPage.default} />
         </>
     )
 }

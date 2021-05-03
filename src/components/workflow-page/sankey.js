@@ -4,8 +4,8 @@ import * as d3 from 'd3'
 import { sankeyCircular, sankeyJustify } from 'd3-sankey-circular'
 import {useParams} from 'react-router-dom'
 import {useContext} from 'react'
-import {sendNotification} from '@vorteil/direktiv-ui.notifications'
-import MainContext from "@vorteil/direktiv-ui.context"
+import {sendNotification} from '../notifications'
+import MainContext from "../../context"
 
 
 // TODO dont set states

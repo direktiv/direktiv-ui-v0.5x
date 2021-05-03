@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import 'codemirror/lib/codemirror.css';
 
 // theme
-import '@vorteil/direktiv-ui.style/editor-theme.css'
+import '../../style/editor-theme.css'
 
 // linting yaml
 import "codemirror/mode/yaml/yaml.js";

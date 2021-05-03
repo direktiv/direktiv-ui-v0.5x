@@ -1,13 +1,13 @@
 import React, { useContext, useState,  useEffect } from 'react'
-import MainContext from '@vorteil/direktiv-ui.context'
+import MainContext from '../../context'
 import { useParams } from 'react-router'
-import {sendNotification} from '@vorteil/direktiv-ui.notifications'
-import PieChart from '@vorteil/direktiv-ui.pie'
-import TileTitle from '@vorteil/direktiv-ui.tile-title'
-import Breadcrumbs from '@vorteil/direktiv-ui.breadcrumbs'
+import {sendNotification} from '../notifications'
+import PieChart from '../charts/pie'
+import TileTitle from '../tile-title'
+import Breadcrumbs from '../breadcrumbs'
 
 import { IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
-import {EventsPageBody} from '@vorteil/direktiv-ui.events-page'
+import {EventsPageBody} from '../events-page'
 
 export default function DashboardPage() {
     // const [instances, setInstances] = useState(null)

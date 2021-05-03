@@ -1,5 +1,5 @@
 import React from "react"
-import  { sendNotification } from '@vorteil/direktiv-ui.notifications'
+import  { sendNotification } from "../components/notifications"
 
 export const ResourceRegex = new RegExp("^[a-z][a-z0-9._-]{1,34}[a-z0-9]$");
 

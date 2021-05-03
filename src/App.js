@@ -4,7 +4,7 @@ import Navbar from './components/nav'
 
 import NotificationSystem, { sendNotification } from './components/notifications/index.js'
 import { useState } from 'react';
-import MainContext from '@vorteil/direktiv-ui.context'
+import MainContext from './context'
 import { useContext } from 'react';
 import { useCallback, useEffect } from 'react';
 import {fetchNs} from './util-funcs'
