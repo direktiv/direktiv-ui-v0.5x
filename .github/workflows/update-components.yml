@@ -14,6 +14,9 @@ jobs:
           sudo npm install bit-bin --global
       - name: tag and export
         run: |
+          bit config set analytics_reporting false
+          bit config set error_reporting false
+          bit config set user.token ${BIT_TOKEN}
           bit import bit.envs/compilers/react --compiler
           bit tag --all
           bit export       
