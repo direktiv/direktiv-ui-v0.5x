@@ -17,6 +17,6 @@ jobs:
           bit config set analytics_reporting false
           bit config set error_reporting false
           bit config set user.token ${BIT_TOKEN}
-          bit import bit.envs/compilers/react --compiler
+          bit import
           bit tag --all
           bit export       
