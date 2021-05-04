@@ -1,5 +1,5 @@
 import React from 'react'
-import Logo from '@vorteil/direktiv-ui.img/direktiv.svg'
+import Logo from '../../img/direktiv.svg'
 import md5 from 'md5'
 import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
