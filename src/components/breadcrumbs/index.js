@@ -1,38 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
+
 import { useHistory, useParams } from 'react-router'
 import useBreadcrumbs from 'use-react-router-breadcrumbs'
-
-const routes = [
-    {
-        path: '/:namespace',
-        breadcrumb: "",
-    },
-    {
-        path: '/:namespace/w',
-        breadcrumb: 'Workflows'
-    },
-    {
-        path: '/:namespace/i',
-        breadcrumb: 'Instances'
-    },
-    {
-        path: '/:namespace/s',
-        breadcrumb: 'Settings'
-    },
-    {
-        path: "/jq",
-        breadcrumb: "",
-    },
-    {
-        path: "/jq/playground",
-        breadcrumb: "JQ Playground"
-    }
-]
+import MainContext from '../../context'
 
 export default function Breadcrumbs(props) {
-    const {dashboard, instanceId} = props
-    
-    const breadcrumbs = useBreadcrumbs(routes)
+    const {dashboard, instanceId } = props
+    const {bcRoutes} = useContext(MainContext)
+    const breadcrumbs = useBreadcrumbs(bcRoutes)
     const history = useHistory()
     const params = useParams()
 

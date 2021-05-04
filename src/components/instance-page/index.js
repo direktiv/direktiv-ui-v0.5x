@@ -13,6 +13,7 @@ import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 
+
 export default function InstancePage() {
     const {fetch, namespace} = useContext(MainContext)
     console.log('hello')

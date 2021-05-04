@@ -9,6 +9,8 @@ import Breadcrumbs from '../breadcrumbs'
 import { IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
 
+
+
 export default function DashboardPage() {
     // const [instances, setInstances] = useState(null)
     const [metrics, setMetrics] = useState(null)

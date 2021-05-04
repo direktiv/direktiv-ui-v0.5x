@@ -10,6 +10,32 @@ import { useCallback, useEffect } from 'react';
 import {fetchNs} from './util-funcs'
 import Routes from './components/routes'
 
+export const  bcRoutes = [
+  {
+      path: '/:namespace',
+      breadcrumb: "",
+  },
+  {
+      path: '/:namespace/w',
+      breadcrumb: 'Workflows'
+  },
+  {
+      path: '/:namespace/i',
+      breadcrumb: 'Instances'
+  },
+  {
+      path: '/:namespace/s',
+      breadcrumb: 'Settings'
+  },
+  {
+      path: "/jq",
+      breadcrumb: "",
+  },
+  {
+      path: "/jq/playground",
+      breadcrumb: "JQ Playground"
+  }
+]
 
 function Content() {
   const context = useContext(MainContext)
@@ -59,6 +85,7 @@ console.log(namespaces)
       namespaces: namespaces,
       setNamespaces: setNamespaces,
       fetchNamespaces: fetchNamespaces,
+      bcRoutes: bcRoutes,
     }}>
       {!load ?
 

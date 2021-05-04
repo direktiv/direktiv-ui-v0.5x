@@ -123,6 +123,15 @@ export default function Navbar(props) {
         path: "/jq/playground"
     })
 
+    let navItemMap = {}
+    if(navItems){
+        for(var i=0; i < navItems.length; i++) {
+            navItemMap[navItems[i].path] = matchPath(location.pathname, {
+                path: navItems[i].path
+            })
+        }
+    }
+
     let matchSettings = matchPath(location.pathname, {
         path: "/:namespace/s"
     })
@@ -132,15 +141,6 @@ export default function Navbar(props) {
         exact: true
     })
 
-    let navItemMap = {}
-    if(navItems){
-        for(var i=0; i < navItems.length; i++) {
-            navItemMap[navItems[i].path] = matchPath(location.pathname, {
-                path: navItems[i].path
-            })
-        }
-    }
- 
 
     return(
         <div id="nav">
