@@ -1,7 +1,6 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
 
-import md5 from 'md5'
 
 import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
@@ -29,7 +28,7 @@ export default function Navbar(props) {
 
     const {fetch, namespace, setNamespace, namespaces, fetchNamespaces} = useContext(MainContext)
     console.log(fetch, namespace, setNamespace, namespaces, fetchNamespaces)
-    const {footer} = props
+    const {footer, navItems} = props
     
 
     async function createNamespace(val) {
@@ -132,6 +131,16 @@ export default function Navbar(props) {
         path: "/:namespace",
         exact: true
     })
+
+    let navItemMap = {}
+    if(navItems){
+        for(var i=0; i < navItems.length; i++) {
+            navItemMap[navItems[i].path] = matchPath(location.pathname, {
+                path: navItems[i].path
+            })
+        }
+    }
+ 
 
     return(
         <div id="nav">
@@ -306,6 +315,24 @@ export default function Navbar(props) {
                             </div>
                         </Link>
                     </li>
+                    {
+                        navItems ? 
+                        <>
+                        {navItems.map((obj)=> <li>
+                        <Link style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to={obj.path} className="nav-link">
+                            <div>
+                                {obj.icon}
+                                <span>{obj.title}</span>
+                            </div>
+                        </Link>
+                    </li>)}
+                        
+                        </> : ''
+                    }
                     <li>
                     {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor: "default"}}>
