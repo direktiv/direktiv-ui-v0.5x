@@ -2,13 +2,10 @@
 
 # Development
 
-Run with no authentication service:
+Run the webserver locally
 - yarn start
-
-Run with an authentication service:
-- yarn start-with-auth
-
 
 # Production
 
-Providing the environment variables KEYCLOAK_URL and API_URL to the go binary run will replace the 'index.html' to use the equivalent options.
+Build a docker image 
+- make server

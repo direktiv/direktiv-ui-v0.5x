@@ -9,13 +9,14 @@ import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle } from 'react-icons/io5'
 
-import {sendNotification} from '../notifications/index.js'
+import {sendNotification} from '../notifications'
 import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
 import Sankey from './sankey'
 import * as dayjs from "dayjs"
-import NoResults from '../../noresults'
+import {NoResults} from '../../util-funcs'
+
 
 async function checkStartType(wf) {
     // check for event start type

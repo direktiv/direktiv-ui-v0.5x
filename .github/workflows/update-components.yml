@@ -1,0 +1,22 @@
+name: Build-UI-Components
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BIT_TOKEN: ${{ secrets.BIT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies
+        run: yarn install
+      - name: install bit
+        run: |
+          sudo npm install bit-bin --global
+      - name: tag and export
+        run: |
+          bit config set analytics_reporting false
+          bit config set error_reporting false
+          bit config set user.token ${BIT_TOKEN}
+          bit import 
+          bit tag --all --ignore-newest-version
+          bit export       

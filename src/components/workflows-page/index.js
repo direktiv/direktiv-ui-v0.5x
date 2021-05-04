@@ -13,9 +13,10 @@ import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
-import NoResults from '../../noresults'
+import {NoResults} from '../../util-funcs'
+
 import { ConfirmButton } from '../confirm-button'
-import { validateName } from "../../util"
+import { validateName } from "../../util-funcs"
 
 
 const noopState = `id: noop

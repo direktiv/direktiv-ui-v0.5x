@@ -8,6 +8,7 @@ COPY public ./public
 COPY src ./src
 COPY package.json ./
 COPY yarn.lock ./
+COPY config-overrides.js ./
 
 RUN yarn install
 RUN ls .

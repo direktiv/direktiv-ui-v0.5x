@@ -10,7 +10,7 @@ import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoList } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
-import NoResults from '../../noresults'
+import {NoResults} from '../../util-funcs'
 
 dayjs.extend(relativeTime);
 

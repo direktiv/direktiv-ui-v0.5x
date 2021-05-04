@@ -153,7 +153,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
     return getLayoutedElements(newElements)
 }
 
-const Start = ( {data} )=> {
+function Start(props) {
     return(
         <div className="normal">
             <Handle
@@ -165,7 +165,7 @@ const Start = ( {data} )=> {
     )
 }
 
-const End = ( {data} ) => {
+function End(props) {
     return(
         <div className="normal">
             <div className="end" />
@@ -177,7 +177,8 @@ const End = ( {data} ) => {
     )
 }
 
-const State = ( { data } ) => {
+function State(props) {
+    const {data} = props
     return(
         <div title={`${data.label}-${data.type}`} className="state" style={{width:"80px", height:"30px"}}>
                <Handle
@@ -199,7 +200,7 @@ const State = ( { data } ) => {
     )
 }
 
-const WorkflowDiagram = (props) => {
+function WorkflowDiagram(props) {
     const { elements } = props
     const { fitView } = useZoomPanHelper();
     

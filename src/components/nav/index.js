@@ -1,10 +1,12 @@
 import React from 'react'
 import Logo from '../../img/direktiv.svg'
+
 import md5 from 'md5'
+
 import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
-import { PlusCircle } from 'react-bootstrap-icons'
+import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
@@ -23,19 +25,11 @@ export default function Navbar(props) {
         x.classList.toggle('active');
     }
 
-    // const [namespaces, setNamespaces] = useState([])
     const [acceptInput, setAcceptInput] = useState(false)
 
     const {fetch, namespace, setNamespace, namespaces, fetchNamespaces} = useContext(MainContext)
-    const {auth, name, email, logout} = props
-
-    let gravatarHash = ""
-    let gravatarURL = ""
-
-    if(auth) {
-        gravatarHash = md5(email)
-        gravatarURL = "https://www.gravatar.com/avatar/" + gravatarHash
-    }
+    console.log(fetch, namespace, setNamespace, namespaces, fetchNamespaces)
+    const {footer} = props
     
 
     async function createNamespace(val) {
@@ -190,7 +184,7 @@ export default function Navbar(props) {
                                         }
                                     </div>
                                 </li>
-                                {namespaces === null ? "":
+                                {namespaces === null || namespaces === undefined  ? "":
                                 <>
                                     {namespaces.map((obj, i)=>{
                                         if(obj !== namespace){
@@ -334,17 +328,7 @@ export default function Navbar(props) {
                     </li>
                 </ul>
             </div>
-            {auth ?
-        <div onClick={()=>logout()} id="nav-user-holder" style={{ paddingBottom: "40px" }}>
-            <img alt="user" style={{border: "solid 3px #0083B0", borderRadius: "50%", maxWidth: "48px"}} src={gravatarURL} />
-            <span style={{ fontSize: "10pt", display: "block" }}>
-                {name}
-            </span>
-        </div>
-            :   
-                            ""
-            }
-
+            {footer ? footer : "" }
         </div>
     )
 }

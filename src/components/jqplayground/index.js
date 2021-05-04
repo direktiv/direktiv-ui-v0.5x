@@ -8,7 +8,7 @@ import MainContext from '../../context'
 import TileTitle from '../tile-title'
 import { IoInformationCircleSharp, IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
 
-import { sendNotification } from '../notifications/index.js'
+import { sendNotification } from '../notifications'
 
 const cheatSheetMap = [
     {
