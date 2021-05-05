@@ -67,15 +67,14 @@ export default function Logs(props) {
     useEffect(()=>{
         statusRef.current = status
         if(status !== undefined){
-            if(status === "pending") {
                 let timer = setInterval(async ()=>{
                     fetchLogs()
                     if(statusRef.current !== "pending") {
+                        // wait a little for noop state before clearing interval
                             clearInterval(timer)
                     }
                 }, 2000)
                 timerRef.current = timer
-            }
         }
         fetchLogs()
     },[status, fetchLogs])
@@ -84,14 +83,13 @@ export default function Logs(props) {
     useEffect(()=>{
         // component will unmount
         return function cleanup() {
-            console.log(instanceId, "new test")
-            clearInterval(timerRef.current)
+               // wait a little for noop state before clearing interval
+                clearInterval(timerRef.current)
             offsetRef.current = 0
             setLogs([])
         }
     },[instanceId])
 
-    console.log(logs, "VALUE OF LOGS")
 
     function checkIfScrollAtBottom(event) {
         if (event.target.offsetHeight + event.target.scrollTop === event.target.scrollHeight) {
@@ -103,9 +101,7 @@ export default function Logs(props) {
         if (checkScrollDirectionIsUp(event)) {
             // setScrolled(true)
             scrollRef.current = true
-            console.log('true up')
         } else if (checkIfScrollAtBottom(event)) {
-            console.log('scroll bot')
             // setScrolled(false)
             scrollRef.current = false
         }
@@ -134,7 +130,6 @@ export default function Logs(props) {
                     <pre>
                         {logs.map((obj, i) => {
                                 let time = dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")
-                                console.log(time)
                                 return (
                                     <div style={{fontFamily:"monospace"}} key={obj.timestamp.seconds +i}>
                                         <span style={{ color: "#b5b5b5" }}>

@@ -57,9 +57,7 @@ function Content() {
           setLoad(false)
           setNamespace(namespacesObj.namespace)
           setNamespaces(namespacesObj.namespaces)
-          console.log(namespacesObj)
       } catch (e) {
-        console.log(e)
         sendNotification("Failed to fetch namespaces", e.message, 0)
         setLoad(false)
       }
@@ -74,7 +72,6 @@ function Content() {
     }
   }, [namespaces, fetchNamespaces])
 
-console.log(namespaces)
   return (
 
     <MainContext.Provider value={{

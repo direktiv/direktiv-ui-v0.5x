@@ -27,7 +27,6 @@ export default function Navbar(props) {
     const [acceptInput, setAcceptInput] = useState(false)
 
     const {fetch, namespace, setNamespace, namespaces, fetchNamespaces} = useContext(MainContext)
-    console.log(fetch, namespace, setNamespace, namespaces, fetchNamespaces)
     const {footer, navItems} = props
     
 
