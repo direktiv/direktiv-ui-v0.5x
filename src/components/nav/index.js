@@ -319,7 +319,7 @@ export default function Navbar(props) {
                         <>
                         {navItems.map((obj)=> {
                 
-                return(   <> {nsRequired ?    <>  {namespace !== "" ? <li>
+                return(   <> {obj.nsRequired ?    <>  {namespace !== "" ? <li>
                         <Link style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
