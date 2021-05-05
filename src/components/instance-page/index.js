@@ -16,7 +16,6 @@ import { sendNotification } from '../notifications'
 
 export default function InstancePage() {
     const {fetch, namespace} = useContext(MainContext)
-    console.log('hello')
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")

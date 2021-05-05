@@ -9,7 +9,6 @@ import  WorkflowPage from '../workflow-page'
 
 export default function Routes(props) {
     const {namespace} = props
-    console.log('hello test routes')
     return(
         <>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
