@@ -27,6 +27,10 @@ input {
     padding-left: 10px;
 }
 
+.multi-select input {
+    border: none;
+}
+
 input:focus {
     /* outline: 1px solid var(--nav-item-hover-color); */
     outline: none;
