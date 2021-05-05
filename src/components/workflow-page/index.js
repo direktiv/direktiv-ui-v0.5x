@@ -321,7 +321,7 @@ const updateLogEvent = useCallback(()=>{
                         <div style={{width: "100%", position: "absolute", display: "flex", flexDirection: "row-reverse"}}>
                                 <div onClick={()=>setViewSankey(false)} title="Swap to Graph View" className="circle button toggled-switch shadow-soft-inverse" style={{ marginLeft: "10px", position: "relative", top: "30px", zIndex: "5" }}>
                                     <span style={{ flex: "auto" }}>
-                                        <IoToggle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                        <IoToggle style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
                                     </span>
                                 </div>
                             </div>
@@ -512,8 +512,8 @@ function WorkflowActions(props) {
                         <IoToggle style={{ fontSize: "12pt", marginBottom: "6px", fill:"green" }} />
                         </span>
                         :
-                        <span style={{ flex: "auto",  rotate: "180deg", WebkitTransform: "rotate(180deg)"}}>
-                        <IoToggleOutline style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                        <span style={{ flex: "auto"}}>
+                        <IoToggleOutline className={"toggled-switch"} style={{ fontSize: "120pt", marginBottom: "6px", marginLeft: "0px" }} />
                 </span>
 
                     }
