@@ -317,7 +317,9 @@ export default function Navbar(props) {
                     {
                         navItems ? 
                         <>
-                        {navItems.map((obj)=> <li>
+                        {navItems.map((obj)=> {
+                
+                return(   <> {nsRequired ?    <>  {namespace !== "" ? <li>
                         <Link style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
@@ -328,7 +330,12 @@ export default function Navbar(props) {
                                 <span>{obj.title}</span>
                             </div>
                         </Link>
-                    </li>)}
+                    </li>: <div style={{color:"#b5b5b5", cursor: "default"}}>
+                                {obj.icon}
+                                <span>{obj.title}</span>
+                            </div>}</> : "" }</>
+                )
+                })}
                         
                         </> : ''
                     }
