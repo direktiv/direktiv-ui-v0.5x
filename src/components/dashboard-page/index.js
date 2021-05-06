@@ -24,7 +24,8 @@ export default function DashboardPage() {
                 complete: "#2fa64d",
                 failed: "#db3447",
                 pending: "#ffbf32",
-                crashed: "#4a4e4e"
+                crashed: "#4a4e4e",
+                cancelled: "#7e7e7e"
             }
             try {
                 let resp = await fetch(`/instances/${params.namespace}`, {
@@ -116,7 +117,6 @@ export default function DashboardPage() {
 function DashboardTotalExecutions(props) {
 
     let { metrics } = props;
-
     if (metrics && metrics.length > 0) {
 
 
@@ -158,7 +158,6 @@ function PieComponent(props) {
     if (metrics === null) {
         return ""
     }
-    
     return(
         <PieChart lineWidth={40} data={metrics} />
     )

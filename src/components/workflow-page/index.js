@@ -504,7 +504,7 @@ function WorkflowActions(props) {
 
     return(
         <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center", marginRight:"12px"}}>
-            <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
+            <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"Enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
            
                     {
                         active ?
@@ -513,7 +513,7 @@ function WorkflowActions(props) {
                         </span>
                         :
                         <span style={{ flex: "auto"}}>
-                        <IoToggleOutline className={"toggled-switch"} style={{ fontSize: "120pt", marginBottom: "6px", marginLeft: "0px" }} />
+                        <IoToggleOutline className={"toggled-switch"} style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
                 </span>
 
                     }

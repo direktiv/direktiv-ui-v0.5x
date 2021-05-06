@@ -125,7 +125,7 @@ export default function Logs(props) {
 
     return(
         <div className="editor-wrapper" style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight:"300px",  top:"-28px", position: "relative", boxShadow:"none"}}>
-            <div style={{width: "100%", height: "100%", position: "relative"}}>
+            <div style={{width: "100%", height: "100%"}}>
                 <div id="logs" style={{borderRadius:"8px", overflow:"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0, paddingBottom:"40px" }}>
                     <pre>
                         {logs.map((obj, i) => {

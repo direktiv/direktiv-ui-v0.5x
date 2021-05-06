@@ -498,6 +498,10 @@ ul li div {
     color: #ffbf32;   
 }
 
+.cancelled {
+    color: #7e7e7e
+}
+
 text {
     color: var(--font-dark);
     fill: var(--font-dark);

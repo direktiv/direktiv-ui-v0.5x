@@ -102,6 +102,7 @@ export default function InstancePage() {
                     <div style={{ flex: "auto" }}>
                         <Breadcrumbs instanceId={instanceId} />
                     </div>
+                    {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={async () => {
                         try{
@@ -129,7 +130,28 @@ export default function InstancePage() {
                         <div style={{ alignItems: "center" }}>
                                 Rerun Workflow
                         </div>
-                    </div>
+                    </div> : 
+  <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
+  onClick={async () => {
+    try {
+        let resp = await fetch(`/instances/${instanceId}`, {
+            method: "DELETE"
+        })
+        if(!resp.ok) {
+            let text = await resp.text()
+            throw (new Error(text))
+        } else {
+            sendNotification("Instance cancelled", `${instanceId} has been cancelled`, 0)
+        }
+    }  catch(e) {
+        sendNotification("Instance cancelled error", `unable to cancel ${instanceId}: ${e.message}`, 0)
+    }
+  }}>
+      <div style={{ alignItems: "center" }}>
+              Cancel Execution
+      </div>
+  </div>
+                    }
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={() => {
                         history.push(`/${params.namespace}/w/${params.workflow}`)
