@@ -368,7 +368,7 @@ const updateLogEvent = useCallback(()=>{
                         <TileTitle name="Instances">
                             <IoList />
                         </TileTitle>
-                        <div style={{ maxHeight: "80%", overflowY: "auto"}}>
+                        <div style={{ maxHeight: "450px", overflowY: "auto"}}>
                             <div id="events-tile" className="tile-contents">
                                 <EventsList/>
                             </div>

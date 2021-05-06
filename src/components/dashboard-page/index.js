@@ -28,7 +28,7 @@ export default function DashboardPage() {
                 cancelled: "#7e7e7e"
             }
             try {
-                let resp = await fetch(`/instances/${params.namespace}`, {
+                let resp = await fetch(`/instances/${params.namespace}?limit=50000`, {
                     method: "GET"
                 })
                 if (resp.ok) {
