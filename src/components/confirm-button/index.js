@@ -98,7 +98,10 @@ export function MiniConfirmButton(props) {
                     </div>
                     :
 
-                    <div className="confirm-btn-content confirm-btn-icon confirm" onClick={OnConfirm} style={{ padding: "0 10px 0px 10px" }} >
+                    <div className="confirm-btn-content confirm-btn-icon confirm" onClick={()=>{
+                        setShowConfirmation(false)
+                        OnConfirm()
+                    }} style={{ padding: "0 10px 0px 10px" }} >
                         {IconConfirm ? <IconConfirm style={IconConfirmColor ? { color: `${IconConfirmColor}` } : {}} />
                             :
                             <IoCheckmarkSharp style={IconConfirmColor ? { color: `${IconConfirmColor}` } : {}} />
