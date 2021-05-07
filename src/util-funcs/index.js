@@ -3,7 +3,16 @@ import  { sendNotification } from "../components/notifications"
 
 export const ResourceRegex = new RegExp("^[a-z][a-z0-9._-]{1,34}[a-z0-9]$");
 
-
+export async function HandleError(summary, resp) {
+    const contentType = resp.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+        let text = await resp.text()
+        throw new Error (`Error ${summary}: ${text}`)
+    } else {
+        let text = (await resp.json()).Message
+        throw new Error (`Error ${summary}: ${text}`)
+    }
+}
 
 export function NoResults() {
 
@@ -47,7 +56,8 @@ export function CopyToClipboard(s) {
     })
 }
 
-export async function fetchNs(fetch, load, setLoad, val) {
+export async function fetchNs(fetch, load, setLoad, val, handleError) {
+  console.log(handleError)
     setLoad(true)
     try {
       let newNamespace = ""
@@ -147,12 +157,7 @@ export async function fetchNs(fetch, load, setLoad, val) {
         return {namespaces: namespaces, namespace: newNamespace}
       
       } else {
-        if (resp.status === 400) {
-          let json = await resp.json()
-          throw new Error(json.Message)
-        } else {
-          throw new Error(`response code was ${resp.status}`)
-        }
+        await handleError('fetch namespaces', resp)
       }
     } catch(e) {
       sendNotification("Failed to fetch namespaces", e.message, 0)

@@ -14,7 +14,7 @@ import {EventsPageBody} from '../events-page'
 export default function DashboardPage() {
     // const [instances, setInstances] = useState(null)
     const [metrics, setMetrics] = useState(null)
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const params = useParams()
 
 
@@ -56,13 +56,7 @@ export default function DashboardPage() {
                     // setInstances(json)
                     setMetrics(data)
                 } else {
-                   // 400 should have json response
-                    if(resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('fetch metrics', resp)
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow`, e.message, 0)
@@ -71,7 +65,7 @@ export default function DashboardPage() {
         if(metrics === null && namespace !== "") {
             fetchMet()
         }
-    },[fetch, params.workflow, metrics, params.namespace, namespace])
+    },[fetch, params.workflow, metrics, params.namespace, namespace, handleError])
 
 
     return (

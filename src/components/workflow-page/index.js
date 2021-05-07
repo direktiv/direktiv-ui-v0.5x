@@ -37,7 +37,7 @@ async function checkStartType(wf) {
 }
 
 export default function WorkflowPage() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -83,19 +83,14 @@ export default function WorkflowPage() {
                     setLogEvent(json.logToEvents)
                 } else {
                 // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                await handleError('fetch workflow', resp)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch workflow", e.message, 0)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
-    },[namespace, fetch, params.workflow])
+    },[namespace, fetch, params.workflow, handleError])
 
     const updateWorkflow = useCallback(()=>{
         if (workflowInfo.fetching){
@@ -127,13 +122,7 @@ export default function WorkflowPage() {
 
                     history.replace(`${json.id}`)
                 } else {
-                    // 400 should have json response
-                    if(resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('update workflow', resp)
                 }
             } catch(e) {
                 sendNotification("Failed to update workflow", e.message, 0)
@@ -141,7 +130,7 @@ export default function WorkflowPage() {
             return
         }
         updateWf().finally(()=>{setFetching(false)})
-    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, params.workflow])
+    },[namespace, workflowValue, fetch, history, workflowInfo.fetching, params.workflow, handleError])
 
 const updateLogEvent = useCallback(()=>{
     if (workflowInfo.fetching){
@@ -160,12 +149,7 @@ const updateLogEvent = useCallback(()=>{
                 body: workflowValueOld
             })
             if (!resp.ok) {
-                if(resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
-                } else {
-                    throw new Error(`response code was ${resp.status}`)
-                }
+                await handleError('post log event', resp)
             }
         } catch(e) {
             sendNotification("Failed to set log event", e.message, 0)
@@ -173,7 +157,7 @@ const updateLogEvent = useCallback(()=>{
         return
     }
     return postLogEvent().finally(()=>{setFetching(false)})
-},[namespace, workflowValueOld, fetch,  workflowInfo.fetching, logEvent, params.workflow])
+},[namespace, workflowValueOld, fetch,  workflowInfo.fetching, logEvent, params.workflow, handleError])
 
     useEffect(()=>{
         if (namespace !== "") {
@@ -232,13 +216,7 @@ const updateLogEvent = useCallback(()=>{
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-         // 400 should have json response
-         if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                await handleError('execute workflow', resp)
             }
         } catch(e) {
             sendNotification("Failed to execute workflow", e.message, 0)
@@ -259,13 +237,7 @@ const updateLogEvent = useCallback(()=>{
                     return {...wfI}
                 })
             } else {
-                // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                await handleError('toggle workflow', resp)
             }
         } catch(e) {
             sendNotification("Failed to disable workflow", e.message, 0)
@@ -382,7 +354,7 @@ const updateLogEvent = useCallback(()=>{
 }
 
 function PieComponent() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const params = useParams()
     const [metrics, setMetrics] = useState(null)
 
@@ -406,13 +378,7 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-              // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                    await handleError('fetch metrics', resp)
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
@@ -421,7 +387,7 @@ function PieComponent() {
         if(metrics === null) {
             fetchMet()
         }
-    },[fetch, namespace, params.workflow, metrics])
+    },[fetch, namespace, params.workflow, metrics, handleError])
 
     if (metrics === null) {
         return ""
@@ -433,7 +399,7 @@ function PieComponent() {
 }
 
 function EventsList(props) {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const params = useParams()
     const history = useHistory()
     const [instances, setInstances] = useState(null)
@@ -452,13 +418,7 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                    await handleError('fetch workflow instances', resp)
                 }
             }catch(e){
                 sendNotification("Unable to fetch workflow instances", e.message, 0)
@@ -467,7 +427,7 @@ function EventsList(props) {
         if(instances === null){
             fetchd()
         }
-    },[fetch, namespace, params.workflow, instances])    
+    },[fetch, namespace, params.workflow, instances, handleError])    
 
     return(
         <div>

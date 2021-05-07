@@ -39,7 +39,7 @@ export default function EventsPage() {
 }
 
 export function EventsPageBody() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const history = useHistory()
     const [instances, setInstances] = useState([])
 
@@ -58,20 +58,14 @@ export function EventsPageBody() {
                         setInstances([])
                     }
                 } else {
-               // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                    await handleError('fetch instances', resp)
                 }
             } catch(e) {
                 sendNotification("Failed to fetch instances", e.message, 0)
             }
         }
         fetchI()
-    },[namespace, fetch])
+    },[namespace, fetch, handleError])
 
     return(
         <div id="events-table" style={{height:"90%", overflow:"auto"}}>

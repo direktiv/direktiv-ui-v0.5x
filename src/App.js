@@ -7,7 +7,7 @@ import { useState } from 'react';
 import MainContext from './context'
 import { useContext } from 'react';
 import { useCallback, useEffect } from 'react';
-import {fetchNs} from './util-funcs'
+import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
 
 export const  bcRoutes = [
@@ -53,7 +53,7 @@ function Content() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(netch, loaded, setLoad, val)
+          let namespacesObj = await fetchNs(netch, loaded, setLoad, val, HandleError)
           setLoad(false)
           setNamespace(namespacesObj.namespace)
           setNamespaces(namespacesObj.namespaces)
@@ -82,6 +82,7 @@ function Content() {
       namespaces: namespaces,
       setNamespaces: setNamespaces,
       fetchNamespaces: fetchNamespaces,
+      handleError: HandleError,
       bcRoutes: bcRoutes,
     }}>
       {!load ?

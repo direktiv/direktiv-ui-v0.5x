@@ -26,7 +26,7 @@ export default function Navbar(props) {
 
     const [acceptInput, setAcceptInput] = useState(false)
 
-    const {fetch, namespace, setNamespace, namespaces, fetchNamespaces} = useContext(MainContext)
+    const {fetch, namespace, setNamespace, namespaces, fetchNamespaces, handleError} = useContext(MainContext)
     const {footer, navItems} = props
     
 
@@ -90,13 +90,7 @@ export default function Navbar(props) {
                 history.push(`/${val}`)
 
             } else {
-            // 400 should have json response
-            if(resp.status === 400) {
-                let json = await resp.json()
-                throw new Error(json.Message)
-              } else {
-                throw new Error(`response code was ${resp.status}`)
-              }
+                await handleError('create namespace', resp)
             }
         } catch(e) {
             sendNotification("Failed to create namespace", e.message, 0)
@@ -330,10 +324,10 @@ export default function Navbar(props) {
                                 <span>{obj.title}</span>
                             </div>
                         </Link>
-                    </li>: <div style={{color:"#b5b5b5", cursor: "default"}}>
+                    </li>: <li><div style={{color:"#b5b5b5", cursor: "default"}}>
                                 {obj.icon}
                                 <span>{obj.title}</span>
-                            </div>}</> : "" }</>
+                            </div></li>}</> : "" }</>
                 )
                 })}
                         

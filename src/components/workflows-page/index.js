@@ -28,7 +28,7 @@ states:
 `
 
 export default function WorkflowsPage() {
-    const { fetch, namespace } = useContext(MainContext)
+    const { fetch, namespace, handleError } = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
     const fetchWorkflows = useCallback(() => {
@@ -54,20 +54,14 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('fetch workflows', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to fetch workflows", e.message, 0)
             }
         }
         fetchWfs()
-    }, [namespace, fetch])
+    }, [namespace, fetch, handleError])
 
     const deleteWorkflow = async (id) => {
         try {
@@ -75,13 +69,7 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if (!resp.ok) {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
-                } else {
-                    throw new Error(`response code was ${resp.status}`)
-                }
+                await handleError('delete workflow', resp)
             }
             fetchWorkflows()
         } catch (e) {
@@ -95,13 +83,7 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
-                } else {
-                    throw new Error(`response code was ${resp.status}`)
-                }
+                await handleError('toggle workflow', resp)
             }
             fetchWorkflows()
         } catch (e) {
@@ -263,7 +245,7 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
 
 function APIInteractionTile() {
 
-    const { fetch, namespace } = useContext(MainContext)
+    const { fetch, namespace, handleError } = useContext(MainContext)
 
     const [val, setVal] = useState("")
 
@@ -280,13 +262,7 @@ function APIInteractionTile() {
                 if (resp.ok) {
                     setVal("")
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('send event', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to send cloud event", e.message, 0)
@@ -354,7 +330,7 @@ function UploadWorkflowForm() {
 
 function NewWorkflowForm() {
 
-    const { fetch, namespace } = useContext(MainContext)
+    const { fetch, namespace, handleError } = useContext(MainContext)
     const history = useHistory()
 
     const [name, setName] = useState("")
@@ -374,13 +350,7 @@ function NewWorkflowForm() {
                         let text = await resp.text()
                         setData(text)
                     } else {
-                        // 400 should have json response
-                        if (resp.status === 400) {
-                            let json = await resp.json()
-                            throw new Error(json.Message)
-                        } else {
-                            throw new Error(`response code was ${resp.status}`)
-                        }
+                        await handleError('fetch template', resp)
                     }
                 } catch (e) {
                     sendNotification("Failed to fetch template data", e.message, 0)
@@ -391,7 +361,7 @@ function NewWorkflowForm() {
             }
 
         fetchd()
-    }, [fetch])
+    }, [fetch, handleError])
 
     const fetchTemps = useCallback((load) => {
         async function fetchTemplates() {
@@ -408,20 +378,14 @@ function NewWorkflowForm() {
                         setTemplates(json)
                     }
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('fetch templates', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to fetch a list of templates", e.message, 0)
             }
         }
         fetchTemplates()
-    }, [fetch])
+    }, [fetch, handleError])
 
     useEffect(() => {
         fetchTemps(true)

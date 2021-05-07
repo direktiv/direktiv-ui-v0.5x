@@ -15,7 +15,7 @@ import { sendNotification } from '../notifications'
 
 
 export default function InstancePage() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -37,13 +37,7 @@ export default function InstancePage() {
                         let wfn = atob(json.workflow)
                         setWf(wfn)
                     } else {
-                        // 400 should have json response
-                        if(resp.status === 400) {
-                            let json = await resp.json()
-                            throw new Error(json.Message)
-                        } else {
-                            throw new Error(`response code was ${resp.status}`)
-                        }
+                        await handleError('fetch workflow', resp)
                     }
                 } catch(e) {
                     sendNotification("Failed to fetch workflow", e.message, 0)
@@ -53,7 +47,7 @@ export default function InstancePage() {
         if(namespace !== ""){
         fetchWorkflow()
         }
-    },[init, fetch, params.namespace, params.workflow, namespace])
+    },[init, fetch, params.namespace, params.workflow, namespace, handleError])
 
     useEffect(()=>{
         async function fetchInstanceDetails() {
@@ -65,13 +59,7 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                        // 400 should have json response
-                    if(resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('fetch instance details', resp)
                 }
             } catch(e) {
                 sendNotification("Fetch Instance details failed ", e.message, 0)
@@ -90,7 +78,7 @@ export default function InstancePage() {
         return function cleanup() {
             clearInterval(timer)
         }
-    },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance])
+    },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
 
     
     return(
@@ -115,13 +103,7 @@ export default function InstancePage() {
                                 sendNotification("Rerun", `Successfully executed ${params.workflow}`, 0)
                                 history.push(`/i/${json.instanceId}`)
                             } else {
-                         // 400 should have json response
-                         if(resp.status === 400) {
-                            let json = await resp.json()
-                            throw new Error(json.Message)
-                          } else {
-                            throw new Error(`response code was ${resp.status}`)
-                          }
+                                await handleError('rerun workflow', resp)
                             }
                         } catch(e) {
                             sendNotification("Failed to execute workflow", e.message, 0)

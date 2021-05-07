@@ -11,7 +11,7 @@ import MainContext from "../../context"
 // TODO dont set states
 export default function Sankey(props) {
 
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
 
     const [links, setLinks] = useState([])
     const [nodes, setNodes] = useState([])
@@ -31,13 +31,7 @@ export default function Sankey(props) {
                 let json = await resp.json()
                 return json.states
             } else {
-                 // 400 should have json response
-          if(resp.status === 400) {
-            let json = await resp.json()
-            throw new Error(json.Message)
-          } else {
-            throw new Error(`response code was ${resp.status}`)
-          }
+                await handleError('fetch workflow metrics', resp)
             }
         } catch(e) {
             sendNotification(`Failed to fetch metrics for workflow:`, e.message, 0)
@@ -112,7 +106,7 @@ export default function Sankey(props) {
         }
         gatherMetrics()
 
-    },[fetch, namespace, params.workflow])
+    },[fetch, namespace, params.workflow, handleError])
     // useEffect(()=>{
     //     setLoad(true)
     //     let n = []

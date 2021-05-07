@@ -11,7 +11,7 @@ import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 
 
 function SettingsAction(props) {
-    const { namespace, fetch, namespaces, fetchNamespaces, setNamespace } = useContext(MainContext)
+    const { namespace, fetch, namespaces, fetchNamespaces, setNamespace, handleError } = useContext(MainContext)
     const history = useHistory()
 
     async function deleteNamespace() {
@@ -42,13 +42,7 @@ function SettingsAction(props) {
 
 
             } else {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
-                } else {
-                    throw new Error(`response code was ${resp.status}`)
-                }
+                await handleError('delete namespace', resp)
             }
         } catch(e) {
             sendNotification("Failed to delete namespace", e.message, 0)
@@ -100,7 +94,7 @@ export default function SettingsPage() {
 
 function Secrets() {
 
-    const { fetch, namespace } = useContext(MainContext)
+    const { fetch, namespace, handleError } = useContext(MainContext)
     const [secrets, setSecrets] = useState([])
     const [key, setKey] = useState("")
     const [value, setValue] = useState("")
@@ -119,20 +113,14 @@ function Secrets() {
                         setSecrets([])
                     }
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('fetch secrets', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to fetch secrets", e.message, 0)
             }
         }
         fetchData()
-    }, [fetch, namespace])
+    }, [fetch, namespace, handleError])
 
     useEffect(() => {
         fetchS()
@@ -150,13 +138,7 @@ function Secrets() {
                     setValue("")
                     fetchS()
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('create secret', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to create secret", e.message, 0)
@@ -177,13 +159,7 @@ function Secrets() {
                 // refetch secrets
                 fetchS()
             } else {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
-                } else {
-                    throw new Error(`response code was ${resp.status}`)
-                }
+                await handleError('delete secret', resp)
             }
         } catch (e) {
             sendNotification("Failed to delete secret", e.message, 0)
@@ -250,7 +226,7 @@ function Secrets() {
 
 function Registries() {
 
-    const { fetch, namespace } = useContext(MainContext)
+    const { fetch, namespace, handleError } = useContext(MainContext)
     const [name, setName] = useState("")
     const [user, setUser] = useState("")
     const [token, setToken] = useState("")
@@ -270,20 +246,14 @@ function Registries() {
                         setRegistries([])
                     }
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('fetch registries', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to fetch registries", e.message, 0)
             }
         }
         fetchData()
-    }, [fetch, namespace])
+    }, [fetch, namespace, handleError])
 
     useEffect(() => {
         fetchR()
@@ -302,13 +272,7 @@ function Registries() {
                     setUser("")
                     fetchR()
                 } else {
-                    // 400 should have json response
-                    if (resp.status === 400) {
-                        let json = await resp.json()
-                        throw new Error(json.Message)
-                    } else {
-                        throw new Error(`response code was ${resp.status}`)
-                    }
+                    await handleError('create registry', resp)
                 }
             } catch (e) {
                 sendNotification("Failed to create registry", e.message, 0)
@@ -329,13 +293,7 @@ function Registries() {
                 // fetch registries
                 fetchR()
             } else {
-                // 400 should have json response
-                if (resp.status === 400) {
-                    let json = await resp.json()
-                    throw new Error(json.Message)
-                } else {
-                    throw new Error(`response code was ${resp.status}`)
-                }
+                await handleError('delete registry', resp)
             }
         } catch (e) {
             sendNotification("Failed to delete registry", e.message, 0)
