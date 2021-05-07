@@ -57,7 +57,6 @@ export function CopyToClipboard(s) {
 }
 
 export async function fetchNs(fetch, load, setLoad, val, handleError) {
-  console.log(handleError)
     setLoad(true)
     try {
       let newNamespace = ""
@@ -116,10 +115,12 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
                       let found = false
                       // check if the namespace previously stored in localstorage exists in the list
                       for (let i = 0; i < json.namespaces.length; i++) {
-                        if (json.namespaces[i].name === localStorage.getItem("namespace")) {
-                          found = true
-                          newNamespace = localStorage.getItem("namespace")
-                          break
+                        if(json.namespaces[i] !== null) {
+                          if (json.namespaces[i].name === localStorage.getItem("namespace")) {
+                            found = true
+                            newNamespace = localStorage.getItem("namespace")
+                            break
+                          }
                         }
                       }
   
@@ -127,7 +128,6 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
   
                         // check if json array is greater than 0 to set to the first
                         if (json.namespaces.length > 0) {
-  
                           newNamespace = json.namespaces[0].name
                           localStorage.setItem("namespace", json.namespaces[0].name)
                           sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
@@ -137,7 +137,6 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
                   } else {
                     // if the json namespace array is greater than 0 set it to the first as no other options is valid
                     if (json.namespaces.length > 0) {
-  
                       newNamespace = json.namespaces[0].name
                     }
                   }
@@ -145,11 +144,9 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
               }
   
               if (newNamespace === "" && val) {
-  
                 newNamespace = val
               }
               for (let i = 0; i < json.namespaces.length; i++) {
-    
                 namespaces.push(json.namespaces[i].name)
               }
         }
