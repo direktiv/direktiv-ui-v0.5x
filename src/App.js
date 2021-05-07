@@ -54,9 +54,10 @@ function Content() {
       setLoad(true)
       try {
           let namespacesObj = await fetchNs(netch, loaded, setLoad, val, HandleError)
-          setLoad(false)
-          setNamespace(namespacesObj.namespace)
-          setNamespaces(namespacesObj.namespaces)
+            setLoad(false)
+            setNamespace(namespacesObj.namespace)
+            setNamespaces(namespacesObj.namespaces)
+          
       } catch (e) {
         sendNotification("Failed to fetch namespaces", e.message, 0)
         setLoad(false)
@@ -96,7 +97,7 @@ function Content() {
               </div>
             <div id="main-panel">
               <Switch>
-                <Routes namespace={namespace}/>
+                <Routes noNamespaces={"You are not a part of any namespaces! Create a namespace to continue using Direktiv."} namespaces={namespaces} namespace={namespace}/>
               </Switch>
             </div>
           </Router>

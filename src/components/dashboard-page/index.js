@@ -14,9 +14,8 @@ import {EventsPageBody} from '../events-page'
 export default function DashboardPage() {
     // const [instances, setInstances] = useState(null)
     const [metrics, setMetrics] = useState(null)
-    const {fetch, namespace, handleError} = useContext(MainContext)
+    const {fetch, namespace, namespaces, handleError} = useContext(MainContext)
     const params = useParams()
-
 
     useEffect(()=>{
         async function fetchMet() {
@@ -65,7 +64,8 @@ export default function DashboardPage() {
         if(metrics === null && namespace !== "") {
             fetchMet()
         }
-    },[fetch, params.workflow, metrics, params.namespace, namespace, handleError])
+
+    },[fetch, params.workflow, metrics, params.namespace, namespace, handleError, namespaces])
 
 
     return (

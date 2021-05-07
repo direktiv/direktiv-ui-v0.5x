@@ -1,4 +1,4 @@
-import {Route, Redirect} from "react-router-dom"
+import {Route, Redirect, useLocation, useHistory} from "react-router-dom"
 import  DashboardPage from '../dashboard-page'
 import  EventsPage from '../events-page'
 import  InstancePage from '../instance-page'
@@ -8,9 +8,14 @@ import  WorkflowsPage from '../workflows-page'
 import  WorkflowPage from '../workflow-page'
 
 export default function Routes(props) {
-    const {namespace} = props
+    const {namespace, namespaces, noNamespaces} = props
+    const location = useLocation()
+    const history = useHistory()
+    if(namespace === "" && namespaces === null && location.pathname !== "/") {
+        // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
+        history.push("/")
+    } 
 
-    console.log(namespace, "Namespace in routes component")
     return(
         <>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
@@ -22,7 +27,7 @@ export default function Routes(props) {
                   :
                   <Route exact path="/">
                     <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
-                      You are not a part of any namespaces! Create a namespace to continue using Direktiv.
+                      {noNamespaces}
                     </div>
                   </Route>
               }
