@@ -16,6 +16,7 @@ export default function DashboardPage() {
     const [metrics, setMetrics] = useState(null)
     const {fetch, namespace, namespaces, handleError} = useContext(MainContext)
     const params = useParams()
+    const [forbidden, setForbidden] = useState(false)
 
     useEffect(()=>{
         async function fetchMet() {
@@ -55,7 +56,11 @@ export default function DashboardPage() {
                     // setInstances(json)
                     setMetrics(data)
                 } else {
-                    await handleError('fetch metrics', resp)
+                    if(resp.status !== 403) {
+                        await handleError('fetch metrics', resp)
+                    } else {
+                        setForbidden(true)
+                    }
                 }
             } catch(e) {
                 sendNotification(`Failed to fetch metrics for workflow`, e.message, 0)
@@ -78,17 +83,16 @@ export default function DashboardPage() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                {/* <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "2", minWidth: "300px", maxHeight: "400px"}}>
-                    <TileTitle name="Top Workflows">
-                        <IoBarChartSharp />
-                    </TileTitle>
-                    <TopWorkflows instances={instances} />
-                </div> */}
                 <div className="shadow-soft rounded tile" style={{ flex: "auto", minWidth: "300px", maxWidth: "400px", maxHeight: "400px" }}>
                     <TileTitle name="Recent Workflows">
                         <IoCodeSlashOutline />
                     </TileTitle>
-                    <DashboardTotalExecutions metrics={metrics} />
+                    {
+                        !forbidden ? 
+                            <DashboardTotalExecutions metrics={metrics} />
+                            :
+                            "You are forbidden to view total executions."
+                    }
                 </div>
                 <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1", maxHeight: "400px" }}>
                     <TileTitle name="Events">
