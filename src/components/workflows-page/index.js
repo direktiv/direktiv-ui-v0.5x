@@ -257,6 +257,7 @@ function APIInteractionTile() {
     const { fetch, namespace, handleError } = useContext(MainContext)
 
     const [val, setVal] = useState("")
+    const [err, setErr] = useState("")
 
     async function sendEvent() {
         if (val !== "") {
@@ -270,14 +271,19 @@ function APIInteractionTile() {
                 })
                 if (resp.ok) {
                     setVal("")
+                    setErr("")
                 } else {
-                    await handleError('send event', resp)
+                    if(resp.status !== 403) {
+                        await handleError('send event', resp)
+                    } else {
+                        setErr("You are forbidden to send a cloud event to this namespace.")
+                    }
                 }
             } catch (e) {
-                sendNotification("Failed to send cloud event", e.message, 0)
+                setErr(`Failed to send cloud event: ${e.message}`)
             }
         } else {
-            sendNotification("Send Cloud Event", "Failed to send cloud event as input is empty", 0)
+            setErr(`Send Cloud Event: Failed to send cloud event as input is empty`)
         }
         
     }
@@ -286,6 +292,13 @@ function APIInteractionTile() {
     return (
         <div>
             <textarea value={val} onChange={(e) => setVal(e.target.value)} rows={13} style={{ width: "100%", height: "100%", resize: "none" }} />
+            {err !== "" ?
+                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {err}
+                </div>
+                :
+                ""
+            }
             <div style={{ textAlign: "right" }}>
                 <input onClick={() => sendEvent()} type="submit" value="Submit" />
             </div>
@@ -367,8 +380,7 @@ function NewWorkflowForm() {
             } else {
                 setTemplateData(noopState)
             }
-            }
-
+        }
         fetchd()
     }, [fetch, handleError])
 
@@ -383,11 +395,12 @@ function NewWorkflowForm() {
                     if(load){
                         setTemplate("default-noop")
                         setTemplateData(noopState)
-                        // fetchTempData("noop", setTemplateData)
                         setTemplates(json)
                     }
                 } else {
-                    await handleError('fetch templates', resp)
+                    if(resp.status !== 403) {
+                        await handleError('fetch templates', resp)
+                    }
                 }
             } catch (e) {
                 sendNotification("Failed to fetch a list of templates", e.message, 0)
