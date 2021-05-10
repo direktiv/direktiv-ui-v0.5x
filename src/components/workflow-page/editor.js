@@ -13,7 +13,7 @@ import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
 export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading } = props;
+    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err } = props;
     const [height, setHeight] = useState("93%")
 
     useEffect(() => {
@@ -61,10 +61,15 @@ export default function ReactEditor(props) {
                     }}
                 />
             </div>
+
             {showFooter !== undefined && showFooter ? (<>
                 <div id="test" className="editor-footer">
+                 
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">
+                    {err !== "" ?<div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", marginRight:"20px", color: "red" }}>
+                        {err}
+                        </div>:""}
                         {actions !== undefined ? (
                             actions.map(function (Action, i) {
                                 return (

@@ -8,7 +8,6 @@ import MainContext from '../../context'
 import TileTitle from '../tile-title'
 import { IoInformationCircleSharp, IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
 
-import { sendNotification } from '../notifications'
 
 const cheatSheetMap = [
     {
@@ -94,7 +93,7 @@ export default function JQPlaygroundPage() {
     const [jqFilter, setJQFilter] = useState(".")
     const [jqOutput, setJQOutput] = useState("")
     const [fetching, setFetching] = useState(false)
-
+    const [err, setErr] = useState("")
 
 
     const executeJQ = useCallback((input, filter) => {
@@ -111,7 +110,7 @@ export default function JQPlaygroundPage() {
                     input: JSON.parse(input),
                 });
             } catch (e) {
-                sendNotification(`Invalid JQ Input`, `${e}`.replace("SyntaxError: JSON.parse: ", ""), 0)
+                setErr(`Invalid JQ Input: ${e.replace("SyntaxError: JSON.parse: ", "")}`)
                 return
             }
 
@@ -126,19 +125,24 @@ export default function JQPlaygroundPage() {
                 })
 
                 if (!resp.ok) {
-                    // Check for content type of error
-                    const contentType = resp.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw await resp.text()
+                    if (resp.status !== 403) {
+                        // Check for content type of error
+                        const contentType = resp.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            throw await resp.text()
+                        } else {
+                            throw (await resp.json()).Message
+                        }
                     } else {
-                        throw (await resp.json()).Message
+                        setErr("You are forbidden to execute JQ commands on the playground.")
                     }
+              
                 } else {
                     let jqOut = await resp.text();
                     setJQOutput(jqOut)
                 }
             } catch (e) {
-                sendNotification(`Invalid JQ Command`, e, 0)
+                setErr(`Invalid JQ Command: ${e}`)
             }
         }
         execJQ().finally(() => { setFetching(false) })
@@ -187,11 +191,19 @@ export default function JQPlaygroundPage() {
                             <TileTitle name="JQ Filter">
                                 <IoCode />
                             </TileTitle>
-                            <div style={{ display: "flex" }}>
+                            <div style={{ display: "flex", flexDirection:"column" }}>
+                                <div style={{display:"flex"}}>
+
                                 <input style={{ flexGrow: 7 }} type="text" placeholder="Enter JQ Filter Command" value={jqFilter} onChange={(e) => setJQFilter(e.target.value)} />
                                 <div style={{ flexGrow: 1 }} className="button jq-button" onClick={() => { executeJQ(jqInput, jqFilter) }}>
                                     Execute
                             </div>
+                            </div>
+                            {err !== "" ? 
+                             <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                             {err}
+                             </div>
+                            :""}
                             </div>
                         </div>
                         <div className="container" style={{ flexDirection: "row", width: "100%" }}>

@@ -1,7 +1,6 @@
 import React, { useContext, useState,  useEffect } from 'react'
 import MainContext from '../../context'
 import { useParams } from 'react-router'
-import {sendNotification} from '../notifications'
 import PieChart from '../charts/pie'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'

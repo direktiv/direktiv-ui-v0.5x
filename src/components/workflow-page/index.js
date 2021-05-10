@@ -9,7 +9,6 @@ import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle } from 'react-icons/io5'
 
-import {sendNotification} from '../notifications'
 import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import MainContext from '../../context'
@@ -18,7 +17,7 @@ import * as dayjs from "dayjs"
 import {NoResults} from '../../util-funcs'
 
 
-async function checkStartType(wf) {
+async function checkStartType(wf, setError) {
     // check for event start type
     try {
         let y = YAML.load(wf)
@@ -30,7 +29,7 @@ async function checkStartType(wf) {
         }
         return true
     } catch(e) {
-        sendNotification("Unable to parse workflow", e.message, 0)
+        setError(`Unable to parse workflow: ${e.message}`)
         // return true if an error happens as the yaml is not runnable in the first place
         return true
     }
@@ -48,6 +47,12 @@ export default function WorkflowPage() {
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [executable, setExecutable] = useState(true)
     const [workflowInfo, setWorkflowInfo] = useState({revision: 0, active: true, fetching: true})
+
+    const [err, setErr] = useState("")
+    const [actionErr, setActionErr] = useState("")
+    const [executeErr, setExecuteErr] = useState("")
+    const [toggleErr, setToggleErr] = useState("")
+
     const history = useHistory()
     const params = useParams()
 
@@ -82,11 +87,16 @@ export default function WorkflowPage() {
                     })
                     setLogEvent(json.logToEvents)
                 } else {
-                // 400 should have json response
-                await handleError('fetch workflow', resp)
+                    if(resp.status !== 403) {
+                        // 400 should have json response
+                        await handleError('fetch workflow', resp)
+                    } else {
+                        setErr("You are forbidden to fetch the workflow")
+                    }
                 }
             } catch(e) {
-                sendNotification("Failed to fetch workflow", e.message, 0)
+                // sendNotification("Failed to fetch workflow", e.message, 0)
+                setErr(`Failed to fetch workflow: ${e.message}`)
             }
         }
         fetchWf().finally(()=>{setFetching(false)})
@@ -119,13 +129,17 @@ export default function WorkflowPage() {
                     setWorkflowValueOld(workflowValue)
                     let exec = await checkStartType(workflowValue)
                     setExecutable(exec)
-
+                    setActionErr("")
                     history.replace(`${json.id}`)
                 } else {
-                    await handleError('update workflow', resp)
+                    if(resp.status !== 403) {
+                        await handleError('update workflow', resp)
+                    } else {
+                        setActionErr("You are forbidden to update the workflow.")
+                    }
                 }
             } catch(e) {
-                sendNotification("Failed to update workflow", e.message, 0)
+                setActionErr(`Failed to update workflow: ${e.message}`)
             }
             return
         }
@@ -149,10 +163,16 @@ const updateLogEvent = useCallback(()=>{
                 body: workflowValueOld
             })
             if (!resp.ok) {
-                await handleError('post log event', resp)
+                if(resp.status !== 403) {
+                    await handleError('post log event', resp)
+                } else {
+                    setActionErr("You are forbidden to change the log event.")
+                }
+            } else {
+                setActionErr("")
             }
         } catch(e) {
-            sendNotification("Failed to set log event", e.message, 0)
+            setActionErr(`Failed to set log event: ${e.message}`)
         }
         return
     }
@@ -216,10 +236,14 @@ const updateLogEvent = useCallback(()=>{
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-                await handleError('execute workflow', resp)
+                if(resp.status !== 403) {
+                    await handleError('execute workflow', resp)
+                } else {
+                    setExecuteErr("You are forbidden to execute this workflow.")
+                }
             }
         } catch(e) {
-            sendNotification("Failed to execute workflow", e.message, 0)
+            setExecuteErr(`Failed to execute workflow: ${e.message}`)
         }
     }
 
@@ -236,11 +260,17 @@ const updateLogEvent = useCallback(()=>{
                     wfI.active = json.active;
                     return {...wfI}
                 })
+                setToggleErr("")
+
             } else {
-                await handleError('toggle workflow', resp)
+                if(resp.status !== 403) {
+                    await handleError('toggle workflow', resp)
+                } else {
+                    setToggleErr("You are forbidden to toggle this workflow.")
+                }
             }
         } catch(e) {
-            sendNotification("Failed to disable workflow", e.message, 0)
+            setToggleErr(`Failed to toggle workflow: ${e.message}`)
         }
     }
 
@@ -251,9 +281,14 @@ const updateLogEvent = useCallback(()=>{
         {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
+
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs elements={["Workflows", "Example"]} />
                 </div>
+                {toggleErr !== "" ?  <div style={{ fontSize: "12px", marginRight:"20px", paddingTop: "5px", paddingBottom: "5px", color: "red", display:"flex", alignItems:"center" }}>
+                {toggleErr}
+                </div>:""
+                }
                 <WorkflowActions viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
@@ -263,13 +298,18 @@ const updateLogEvent = useCallback(()=>{
                             <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
                                 <IoPencil />
                             </TileTitle>
+                            {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div>
+                            :
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                                        <Editor value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={Actions}/>
+                                        <Editor err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={Actions}/>
                                     </div>
                                 </div>
                             </div>
+                            }
                         </div>
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", minWidth: "350px" }}>
                             <TileTitle name="Execute Workflow">
@@ -278,8 +318,9 @@ const updateLogEvent = useCallback(()=>{
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                                        <Editor value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]}/>
+                                        <Editor err={executeErr} value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]}/>
                                     </div>
+                                  
                                 </div>
                             </div>
                         </div>
@@ -307,14 +348,19 @@ const updateLogEvent = useCallback(()=>{
                         <TileTitle name="Graph">
                             <IoEaselOutline />
                         </TileTitle>
+                        {err  !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div> :
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
-                            <div style={{width: "100%", position: "absolute", display: "flex", flexDirection: "row-reverse"}}>
+                
+                            <><div style={{width: "100%", position: "absolute", display: "flex", flexDirection: "row-reverse"}}>
                                 <div onClick={()=>setViewSankey(true)} title="Swap to Sankey View" className="circle button" style={{ marginLeft: "10px", position: "relative", top: "30px", zIndex: "5" }}>
                                     <span style={{ flex: "auto" }}>
                                         <IoToggleOutline style={{ fontSize: "12pt", marginBottom: "6px" }} />
                                     </span>
                                 </div>
                             </div>
+          
                             <div style={{ flex: "auto" }}>
                                 {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
                                     {workflowValueOld !== "" ?
@@ -322,8 +368,9 @@ const updateLogEvent = useCallback(()=>{
                                         :
                                         ""
                                     }
-                            </div>
+                            </div></>
                         </div>
+}
                     </div>
                     }
                 </div>
@@ -357,6 +404,7 @@ function PieComponent() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const params = useParams()
     const [metrics, setMetrics] = useState(null)
+    const [err, setErr] = useState("")
 
     useEffect(()=>{
         async function fetchMet() {
@@ -378,10 +426,14 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-                    await handleError('fetch metrics', resp)
+                    if(resp.status !== 403) {
+                        await handleError('fetch metrics', resp)
+                    } else {
+                        setErr("You are forbidden to view workflow metrics.")
+                    }
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch metrics for workflow: ${e.message}`, 0)
+                setErr(`Failed to fetch metrics for workflow: ${e.message}`)
             }
         }
         if(metrics === null) {
@@ -389,10 +441,20 @@ function PieComponent() {
         }
     },[fetch, namespace, params.workflow, metrics, handleError])
 
+    if(err !== "") {
+        return(
+            <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+            </div>
+        )
+    }
+
     if (metrics === null) {
         return ""
     }
     
+
+
     return(
         <PieChart lineWidth={40} data={metrics} />
     )
@@ -403,6 +465,7 @@ function EventsList(props) {
     const params = useParams()
     const history = useHistory()
     const [instances, setInstances] = useState(null)
+    const [err, setErr] = useState("")
 
     useEffect(()=>{
         async function fetchd() {
@@ -418,10 +481,14 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    await handleError('fetch workflow instances', resp)
+                    if(resp.status !== 403) {
+                        await handleError('fetch workflow instances', resp)
+                    } else {
+                        setErr("You are forbidden to view workflow instances.")
+                    }
                 }
             }catch(e){
-                sendNotification("Unable to fetch workflow instances", e.message, 0)
+                setErr(`Unable to fetch workflow instances: ${e.message}`)
             }
         }
         if(instances === null){
@@ -431,6 +498,12 @@ function EventsList(props) {
 
     return(
         <div>
+            {
+                err !== "" ?
+                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+            </div>
+            :
             <ul style={{ margin: "0px" }}>
                 {instances !== null ?
                 <>
@@ -454,7 +527,7 @@ function EventsList(props) {
                 </>
                 : <NoResults/>}
 </>:""}
-            </ul>
+            </ul>}
         </div>
     )
 }
@@ -465,7 +538,6 @@ function WorkflowActions(props) {
     return(
         <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center", marginRight:"12px"}}>
             <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"Enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
-           
                     {
                         active ?
                         <span style={{ flex: "auto"}}>

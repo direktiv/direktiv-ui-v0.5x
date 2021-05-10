@@ -12,7 +12,6 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
 import {NoResults} from '../../util-funcs'
 
 import { ConfirmButton } from '../confirm-button'
@@ -515,7 +514,7 @@ function Basic(props) {
                 setFiles([...acceptedFiles]);
             }
         },
-        [setData, setFiles]
+        [setData, setFiles, setErr]
     );
 
     const { getRootProps, getInputProps } = useDropzone({

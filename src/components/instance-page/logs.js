@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useContext, useState } from "react"
 import MainContext from "../../context"
 import * as dayjs from "dayjs"
-import { sendNotification } from "../notifications"
-import { IoCheckmark, IoCloseSharp, IoCopy } from "react-icons/io5"
+import { IoCopy } from "react-icons/io5"
 import { CopyToClipboard } from "../../util-funcs"
 import { useRef } from "react"
 
@@ -10,7 +9,7 @@ export default function Logs(props) {
     const {instanceId, status} = props
 
     // const params = useParams()
-    const {fetch} = useContext(MainContext)
+    const {fetch, handleError} = useContext(MainContext)
 
     // const [logs, setLogs] = useState([])
 
@@ -22,8 +21,8 @@ export default function Logs(props) {
     // const logsRef = useRef([])
 
     
-    const [showCancelEvent, setShowCancelEvent] = useState(false)
     const [logs, setLogs] = useState([])
+    const [err, setErr] = useState("")
     // const [logsOffset, setLogsOffset] = useState(0)
     // const [timer, setTimer] = useState(null)
 
@@ -38,8 +37,11 @@ export default function Logs(props) {
                     method: "GET"
                 })
                 if(!resp.ok) {
-                    let text = await resp.text()
-                    throw (new Error(text))
+                    if(resp.status !== 403) {
+                        await handleError(resp)
+                    } else {
+                        setErr("You are forbidden from getting logs.")
+                    }
                 } else {
                     let json = await resp.json()
                     
@@ -58,11 +60,11 @@ export default function Logs(props) {
                     }
                 }
             } catch(e) {
-                sendNotification("Failed to fetch logs", e.message, 0)
+                setErr(`Failed to fetch logs: ${e.message}`)
             }
         }
         getLogs()
-    },[instanceId,fetch])
+    },[instanceId,fetch, handleError])
 
     useEffect(()=>{
         statusRef.current = status
@@ -161,42 +163,9 @@ export default function Logs(props) {
             <div id="test" className="editor-footer">
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">
-                    {status !== "pending" ? "":
-                    <>
-            {!showCancelEvent ?
-                <div className="editor-footer-button" style={{ maxHeight: "%", padding: "0 10px 0 10px" }} onClick={() => {
-                    // closes after 10 seconds
-                    setTimeout(function () { setShowCancelEvent(false) }, 10000);
-                    setShowCancelEvent(true)
-                }}>
-                    <span style={{}} >Cancel Run</span>
-                    <IoCloseSharp style={{ marginLeft: "5px" }} />
-            </div> :
-                <div className="editor-footer-button" style={{ display: "flex", alignItems: "center", padding: "0 0 0 0" }}>
-                    <div style={{ padding: "0 10px 0 10px", height: "100%", display: "flex", alignItems: "center" }} onClick={async() => {
-                            try {
-                                let resp = await fetch(`/instances/${instanceId}`, {
-                                    method: "DELETE"
-                                })
-                                if(!resp.ok) {
-                                    let text = await resp.text()
-                                    throw (new Error(text))
-                                } else {
-                                    sendNotification("Instance cancelled", `${instanceId} has been cancelled`, 0)
-                                }
-                            }  catch(e) {
-                                sendNotification("Instance cancelled error", `unable to cancel ${instanceId}: ${e.message}`, 0)
-                            }
-                            setShowCancelEvent(false)
-                    }}>
-                        Are you sure you wish to cancel ?
-                        <IoCheckmark style={{marginLeft:'5px'}} />
-                    </div>
-                </div>
-            }
-        </>}
-                        <div>
-            
+                    {err !== "" ?<div style={{ fontSize: "12px", paddingTop: "8px", paddingBottom: "5px", marginRight:"20px", color: "red" }}>
+                        {err}
+                        </div>:""}
                         <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
                             let stringLogs = ""
                             for(let i=0; i < logs.length; i++) {
@@ -212,9 +181,6 @@ export default function Logs(props) {
                             <span style={{}} >Copy</span>
                             <IoCopy style={{ marginLeft: "5px" }} />
                         </div>
-                        </div>
-              
-
                     </div>
                 </div>
         </div>
