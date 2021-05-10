@@ -135,7 +135,7 @@ export default function JQPlaygroundPage() {
             }
         }
         execJQ().finally(() => { setFetching(false) })
-    }, [fetching, fetch])
+    }, [fetching, fetch, handleError])
 
 
 

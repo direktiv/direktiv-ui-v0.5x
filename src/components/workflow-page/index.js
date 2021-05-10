@@ -36,7 +36,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function WorkflowPage() {
-    const {fetch, namespace, handleError} = useContext(MainContext)
+    const {fetch, namespace, handleError, attributeAdd} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -372,6 +372,7 @@ const updateLogEvent = useCallback(()=>{
                             </div>
                         </div>
                     </div>
+                    {attributeAdd ? attributeAdd:""}
                 </div>
             </div>
         </div>:""}
