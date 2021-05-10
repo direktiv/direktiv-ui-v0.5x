@@ -195,7 +195,6 @@ function Secrets() {
                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                 deleteSecret(obj.name)
-                                                ev.stopPropagation()
                                             }} />
                                         </div>
                                     </div>
@@ -335,7 +334,6 @@ function Registries() {
                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                 deleteRegistry(obj.name)
-                                                ev.stopPropagation()
                                             }} />
                                         </div>
                                     </div>

@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
+import {Link} from 'react-router-dom'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
 import { sendNotification } from '../notifications'
 import {NoResults} from '../../util-funcs'
@@ -29,7 +30,6 @@ states:
 
 export default function WorkflowsPage() {
     const { fetch, namespace, handleError } = useContext(MainContext)
-    const history = useHistory()
     const [workflows, setWorkflows] = useState([])
     const [forbidden, setForbidden] = useState(false)
 
@@ -123,7 +123,7 @@ export default function WorkflowsPage() {
                                     <>
                                         {workflows.map(function (obj, i) {
                                             return (
-                                                <div key={`workflow-item-${i}`} className="workflows-list-item" onClick={() => history.push(`/${namespace}/w/${obj.id}`)}>
+                                                <Link key={`workflow-item-${obj.id}`} style={{ color: "inherit", textDecoration: "inherit" }} className="workflows-list-item" to={`/${namespace}/w/${obj.id}`}>
                                                     <div className="workflows-list-name">
                                                         {obj.id}
                                                     </div>
@@ -134,8 +134,8 @@ export default function WorkflowsPage() {
                                                         <div className="actions-button-div">
                                                             {obj.active ?
                                                                 <div className="button circle success" onClick={(ev) => {
+                                                                    ev.preventDefault();
                                                                     toggleWorkflow(obj.id)
-                                                                    ev.stopPropagation()
                                                                 }}>
                                                                     <span>
                                                                         <IoToggle />
@@ -143,8 +143,8 @@ export default function WorkflowsPage() {
                                                                 </div>
                                                                 :
                                                                 <div className="button circle" onClick={(ev) => {
+                                                                    ev.preventDefault();
                                                                     toggleWorkflow(obj.id)
-                                                                    ev.stopPropagation()
                                                                 }}>
                                                                     <span>
                                                                         <IoToggleOutline className={"toggled-switch"} />
@@ -152,12 +152,12 @@ export default function WorkflowsPage() {
                                                                 </div>
                                                             }
                                                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                                                ev.preventDefault();
                                                                 deleteWorkflow(obj.id)
-                                                                ev.stopPropagation()
                                                             }} />
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </Link>
                                             )
                                         })}
                                     </> :
@@ -400,6 +400,12 @@ function NewWorkflowForm() {
         fetchTemps(true)
     }, [fetchTemps])
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            parseYaml(fetch, name, namespace, templateData, setErr, history)
+        }
+    }
+
     return (
         <div style={{ fontSize: "12pt" }}>
             <table>
@@ -409,7 +415,7 @@ function NewWorkflowForm() {
                             <b>Name:</b>
                         </td>
                         <td style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Workflow name" />
+                            <input value={name}  onKeyDown={handleKeyDown} onChange={(e) => setName(e.target.value)} type="text" placeholder="Workflow name" />
                         </td>
                     </tr>
                     <tr>
