@@ -31,7 +31,9 @@ export default function WorkflowsPage() {
     const { fetch, namespace, handleError } = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
-    const [forbidden, setForbidden] = useState(false)
+    // const [forbidden, setForbidden] = useState(false)
+    const [err, setErr] = useState("")
+
 
     const fetchWorkflows = useCallback(() => {
         // FIXME: This should stop bad fetches when namespace = <empty-string> before useContext 
@@ -58,11 +60,11 @@ export default function WorkflowsPage() {
                     if(resp.status !== 403) {
                         await handleError('fetch workflows', resp)
                     } else {
-                        setForbidden(true)
+                        setErr(`You are forbidden to list workflows for this namespace.`)
                     }
                 }
             } catch (e) {
-                sendNotification("Failed to fetch workflows", e.message, 0)
+                setErr(`Failed to fetch workflows: ${e.message}`)
             }
         }
         fetchWfs()
@@ -74,11 +76,15 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if (!resp.ok) {
-                await handleError('delete workflow', resp)
+                if(resp.status !== 403) {
+                    await handleError('delete workflow', resp)
+                } else {
+                    setErr(`You are forbidden to delete workflow '${id}'.`)
+                }
             }
             fetchWorkflows()
         } catch (e) {
-            sendNotification("Failed to delete workflow", e.message, 0)
+            setErr(`Failed to delete workflow ${id}: ${e.message}`)
         }
     }
 
@@ -88,11 +94,15 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                await handleError('toggle workflow', resp)
+                if(resp.status !== 403) {
+                    await handleError('toggle workflow', resp)                    
+                } else {
+                    setErr(`You are forbidden to toggle workflow '${id}'.`)
+                }
             }
             fetchWorkflows()
         } catch (e) {
-            sendNotification("Failed to toggle workflow", e.message, 0)
+            setErr(`Failed to toggle workflow ${id}: ${e.message}`)
         }
     }
 
@@ -114,9 +124,10 @@ export default function WorkflowsPage() {
                             <TileTitle name="All workflows">
                                 <IoList />
                             </TileTitle>
+
                             <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
-                                {forbidden ? 
-                                    <span style={{fontSize:"12pt"}}>You are forbidden to list workflows for this namespace</span>
+                                {err ? 
+                                    <span style={{fontSize:"12pt", color:"red"}}>{err}</span>
                                 :
                                 <>
                                 {workflows.length > 0 ?
@@ -210,7 +221,7 @@ function readFile(file) {
 function parseYaml(fetch, name, namespace, data, setErr, history) {
     const invalidNameErr = validateName(name, "workflow name")
     if (invalidNameErr) {
-        sendNotification("Name is invalid", invalidNameErr, 0)
+        setErr(`Name is invalid: ${invalidNameErr}`)
         return
     }
 
@@ -219,7 +230,7 @@ function parseYaml(fetch, name, namespace, data, setErr, history) {
         y.id = name
         createWorkflow(fetch, YAMLtoString.stringify(y), namespace, setErr, undefined, history)
     } catch (e) {
-        sendNotification("Unable to parse YAML", e.message, 0)
+        setErr(`Unable to parse YAML: ${e.message}`)
     }
 }
 
@@ -248,7 +259,7 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history,
             }
         }
     } catch (e) {
-        sendNotification("Workflow Creation Failed", e.message, 0)
+        setErr(`Workflow creation failed: ${e.message}`)
     }
 }
 
@@ -317,7 +328,7 @@ function UploadWorkflowForm() {
     return (
         <div>
             <div className="file-form">
-                <Basic files={files} setFiles={setFiles} data={data} setData={setData} />
+                <Basic setErr={setErr} files={files} setFiles={setFiles} data={data} setData={setData} />
             </div>
             {err !== "" ?
                 <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
@@ -334,13 +345,13 @@ function UploadWorkflowForm() {
                         const y = YAML.load(data, 'utf8')
                         invalidNameErr = validateName(y.id, "id")
                     } catch (e) {
-                        sendNotification(`File is not a valid`, e.reason, 0)
+                        setErr(`File is not a valid: ${e.reason}`)
                         return
                     }
 
                     // Check if id is a valid name
                     if (invalidNameErr) {
-                        sendNotification(`Invalid Workflow`, `ID: ${invalidNameErr}`, 0)
+                        setErr(`Invalid workflow: ID: ${invalidNameErr}`)
                     } else {
                         createWorkflow(fetch, data, namespace, setErr, setFiles, history, handleError)
                     }
@@ -372,10 +383,14 @@ function NewWorkflowForm() {
                         let text = await resp.text()
                         setData(text)
                     } else {
-                        await handleError('fetch template', resp)
+                        if(resp.status !== 403) {
+                            await handleError('fetch template', resp)
+                        } else {
+                            setErr(`You are forbidden to fetch the template data`)
+                        }
                     }
                 } catch (e) {
-                    sendNotification("Failed to fetch template data", e.message, 0)
+                    setErr(`Failed to fetch template data: ${e.message}`)
                 }
             } else {
                 setTemplateData(noopState)
@@ -400,10 +415,15 @@ function NewWorkflowForm() {
                 } else {
                     if(resp.status !== 403) {
                         await handleError('fetch templates', resp)
+                    } else {
+                        // set default template
+                        setTemplate("default-noop")
+                        setTemplateData(noopState)
+                        setErr(`You are forbidden to fetch a list of templates`)
                     }
                 }
             } catch (e) {
-                sendNotification("Failed to fetch a list of templates", e.message, 0)
+                setErr(`Failed to fetch a list of templates: ${e.message}`)
             }
         }
         fetchTemplates()
@@ -475,12 +495,12 @@ function NewWorkflowForm() {
 }
 
 function Basic(props) {
-    const { setData, files, setFiles } = props
+    const { setData, files, setFiles, setErr } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
             if (fileRejections.length > 0) {
-                sendNotification("Invalid File", `File: '${fileRejections[0].file.name}' is not supported, ${fileRejections[0].errors[0].message}`, 0)
+                setErr(`Invalid File: File: '${fileRejections[0].file.name}' is not supported, ${fileRejections[0].errors[0].message}`)
             } else {
                 setData(await readFile(acceptedFiles[0]))
                 setFiles([...acceptedFiles]);
