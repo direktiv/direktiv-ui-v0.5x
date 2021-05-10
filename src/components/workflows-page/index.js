@@ -134,7 +134,7 @@ export default function WorkflowsPage() {
                                 :
                                 <>
                                 {actionErr !== "" ?  <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                            {err}
+                            {actionErr}
                         </div>
                                 :""}
                                 <>
