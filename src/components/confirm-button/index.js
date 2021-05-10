@@ -27,11 +27,13 @@ export function ConfirmButton(props) {
 
     return (
         <div className={`confirm-btn ${showConfirmation ? "expand" : ""}`} onClick={(ev) => {
+            ev.preventDefault();
             ev.stopPropagation()
         }}>
             {
                 !showConfirmation ?
                     <div className="confirm-btn-content" style={{ width: "36px" }} onClick={(ev) => {
+                        ev.preventDefault();
                         setShowConfirmation(true)
                         ev.stopPropagation()
                     }}>
@@ -44,6 +46,7 @@ export function ConfirmButton(props) {
                             {ConfirmationText ? ConfirmationText : "Are you sure?"}
                         </span>
                         <IoCloseSharp className="confirm-btn-icon cancel" style={{ paddingRight: "2px" }} onClick={(ev) => {
+                            ev.preventDefault();
                             setShowConfirmation(false)
                             ev.stopPropagation()
                         }} />

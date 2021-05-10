@@ -7,7 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
-import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 import { IoList } from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
 dayjs.extend(relativeTime);
@@ -39,7 +39,6 @@ export default function EventsPage() {
 
 export function EventsPageBody() {
     const {fetch, namespace, handleError} = useContext(MainContext)
-    const history = useHistory()
     const [instances, setInstances] = useState([])
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
@@ -88,13 +87,14 @@ export function EventsPageBody() {
                 <tbody>
                     {
                         instances.map((obj)=>{
-                            return(
-                                    <tr key={obj.id} onClick={()=>{history.push(`/i/${obj.id}`)}} className="event-list-item">
+                            return (
+                                <Link key={obj.id} to={`/i/${obj.id}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
+                                    <tr className="event-list-item">
                                         <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
-                                        <td style={{textAlign:"left"}}>{obj.id}</td>
+                                        <td style={{ textAlign: "left" }}>{obj.id}</td>
                                         <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
-                                        {/* <td></td> */}
                                     </tr>
+                                </Link>
                             )
                         })
                     }

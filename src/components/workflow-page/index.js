@@ -11,6 +11,7 @@ import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp,
 
 import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
+import {Link} from "react-router-dom"
 import MainContext from '../../context'
 import Sankey from './sankey'
 import * as dayjs from "dayjs"
@@ -439,7 +440,6 @@ function PieComponent() {
 function EventsList(props) {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const params = useParams()
-    const history = useHistory()
     const [instances, setInstances] = useState(null)
     const [err, setErr] = useState("")
 
@@ -483,17 +483,19 @@ function EventsList(props) {
                 <>
                 {instances.map((obj)=>{
                     return(
-                        <li key={obj.id} style={{cursor:"pointer"}} onClick={()=>history.push(`/i/${obj.id}`)} className="event-list-item">
-                        <div>
-                            <span><CircleFill className={obj.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                            <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
-                                {dayjs.unix(obj.beginTime.seconds).fromNow()}
-                            </span>
-                            <span>    
-                                {obj.id}
-                            </span>
-                        </div>
-                    </li>
+                        <Link key={obj.id} to={`/i/${obj.id}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
+                            <li style={{ cursor: "pointer" }} className="event-list-item">
+                                <div>
+                                    <span><CircleFill className={obj.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                                    <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
+                                        {dayjs.unix(obj.beginTime.seconds).fromNow()}
+                                    </span>
+                                    <span>
+                                        {obj.id}
+                                    </span>
+                                </div>
+                            </li>
+                        </Link>
                     )
                 })}
                 </>
