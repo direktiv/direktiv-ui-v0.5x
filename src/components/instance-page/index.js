@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
+import YAML from 'js-yaml'
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
@@ -13,6 +14,24 @@ import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
 
 
+async function checkStartType(wf, setError) {
+    // check for event start type
+    try {
+        let y = YAML.load(wf)
+        if(y.start) {
+            if(y.start.type !== "default") {
+                // this file should not be able to be executed.
+                return false
+            }
+        }
+        return true
+    } catch(e) {
+        setError(`Unable to parse workflow: ${e.message}`)
+        // return true if an error happens as the yaml is not runnable in the first place
+        return true
+    }
+}
+
 export default function InstancePage() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const [init, setInit] = useState(null)
@@ -22,6 +41,10 @@ export default function InstancePage() {
     const [workflowErr, setWorkflowErr] = useState("")
     const [detailsErr, setDetailsErr] = useState("")
     const [actionErr, setActionErr] = useState("")
+    
+    // true starts with default false any other start type
+    const [startType, setStartType] = useState(true)
+
 
     const params = useParams()
     const history = useHistory()
@@ -38,7 +61,9 @@ export default function InstancePage() {
                     if (resp.ok) {
                         let json = await resp.json()
                         let wfn = atob(json.workflow)
+                        let start = await checkStartType(wfn, setWorkflowErr)
                         setWf(wfn)
+                        setStartType(start)
                     } else {
                         await handleError('fetch workflow', resp, 'GetWorkflow')
                     }
@@ -101,6 +126,9 @@ export default function InstancePage() {
                             :""
                         }
                     {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
+                    
+                    <>
+                    {startType ?
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={async () => {
                         try{
@@ -121,7 +149,7 @@ export default function InstancePage() {
                         <div style={{ alignItems: "center" }}>
                                 Rerun Workflow
                         </div>
-                    </div> : 
+                    </div>:""}</> : 
   <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
   onClick={async () => {
     try {
