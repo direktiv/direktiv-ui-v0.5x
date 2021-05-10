@@ -9,3 +9,4 @@ Run the webserver locally
 
 Build a docker image 
 - make server
+
