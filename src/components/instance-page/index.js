@@ -11,7 +11,6 @@ import Diagram from '../workflow-page/diagram'
 
 import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
 
 
 export default function InstancePage() {
@@ -19,6 +18,10 @@ export default function InstancePage() {
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
+
+    const [workflowErr, setWorkflowErr] = useState("")
+    const [detailsErr, setDetailsErr] = useState("")
+    const [actionErr, setActionErr] = useState("")
 
     const params = useParams()
     const history = useHistory()
@@ -37,10 +40,10 @@ export default function InstancePage() {
                         let wfn = atob(json.workflow)
                         setWf(wfn)
                     } else {
-                        await handleError('fetch workflow', resp)
+                        await handleError('fetch workflow', resp, 'GetWorkflow')
                     }
                 } catch(e) {
-                    sendNotification("Failed to fetch workflow", e.message, 0)
+                    setWorkflowErr(`Failed to fetch workflow: ${e.message}`)
                 }
             }
         }
@@ -59,10 +62,10 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                    await handleError('fetch instance details', resp)
+                    await handleError('fetch instance details', resp, 'GetInstance')
                 }
             } catch(e) {
-                sendNotification("Fetch Instance details failed ", e.message, 0)
+                setDetailsErr(`Fetch Instance details failed: ${e.message}`)
             }
 
         }
@@ -90,6 +93,13 @@ export default function InstancePage() {
                     <div style={{ flex: "auto" }}>
                         <Breadcrumbs instanceId={instanceId} />
                     </div>
+            <>
+                        {actionErr !== "" ? 
+                            <div style={{ display:"flex", alignItems:"center", marginRight:"15px", fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                            {actionErr}
+                            </div>
+                            :""
+                        }
                     {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={async () => {
@@ -100,13 +110,12 @@ export default function InstancePage() {
                             })
                             if(resp.ok) {
                                 let json = await resp.json()    
-                                sendNotification("Rerun", `Successfully executed ${params.workflow}`, 0)
                                 history.push(`/i/${json.instanceId}`)
                             } else {
-                                await handleError('rerun workflow', resp)
+                                await handleError('rerun workflow', resp, 'ExecuteWorkflow')
                             }
                         } catch(e) {
-                            sendNotification("Failed to execute workflow", e.message, 0)
+                            setActionErr(`Unable to execute workflow: ${e.message}`)
                         }
                     }}>
                         <div style={{ alignItems: "center" }}>
@@ -120,20 +129,17 @@ export default function InstancePage() {
             method: "DELETE"
         })
         if(!resp.ok) {
-            let text = await resp.text()
-            throw (new Error(text))
-        } else {
-            sendNotification("Instance cancelled", `${instanceId} has been cancelled`, 0)
+            await handleError('cancel instance', resp, 'CancelInstance')
         }
     }  catch(e) {
-        sendNotification("Instance cancelled error", `unable to cancel ${instanceId}: ${e.message}`, 0)
+        setActionErr(`Instance cancelled error: ${e.message}`)
     }
   }}>
       <div style={{ alignItems: "center" }}>
               Cancel Execution
       </div>
   </div>
-                    }
+                    }</>
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={() => {
                         history.push(`/${params.namespace}/w/${params.workflow}`)
@@ -166,8 +172,17 @@ export default function InstancePage() {
                         <TileTitle name="Graph">
                             <IoEaselOutline />
                         </TileTitle>
+                        {
+                                detailsErr !== "" || workflowErr !== "" ? 
+                                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                    {detailsErr !== "" ? detailsErr : workflowErr}
+                                </div>
+                                :
                         <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
-                            <div style={{ flex: "auto" }}>
+                        <div style={{ flex: "auto" }}>
+
+                        
+                                <>
                                 {instanceDetails.flow && wf ? 
                                     <Diagram flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
                                     :
@@ -175,8 +190,10 @@ export default function InstancePage() {
                                         Unable to fetch workflow have you renamed the workflow recently?
                                     </div>
                                 }
+                                </>
                                 </div>
-                        </div>
+
+                        </div>}
                     </div>
                 </div>
                 <div className="container" style={{ flexGrow: "inherit", maxWidth: "400px" }}>
@@ -184,14 +201,28 @@ export default function InstancePage() {
                         <TileTitle name="Input">
                             <IoCode />
                         </TileTitle>
+                        {
+                                detailsErr !== "" ? 
+                                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                    {detailsErr}
+                                </div>
+                                :
                         <InputOutput data={instanceDetails.input} status={instanceDetails.status} />
+}
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Output">
                             <IoCode />
                         </TileTitle>
+                        {
+                                detailsErr !== "" ? 
+                                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                    {detailsErr}
+                                </div>
+                                :
                         <InputOutput data={instanceDetails.output} status={instanceDetails.status}/>
-                    </div>
+                        }
+                        </div>
                 </div>
             </div>
         </div>

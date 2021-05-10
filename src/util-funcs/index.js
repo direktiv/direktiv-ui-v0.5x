@@ -3,15 +3,20 @@ import  { sendNotification } from "../components/notifications"
 
 export const ResourceRegex = new RegExp("^[a-z][a-z0-9._-]{1,34}[a-z0-9]$");
 
-export async function HandleError(summary, resp) {
+export async function HandleError(summary, resp, perm) {
     const contentType = resp.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
+    if(resp.status !== 403) {
+      if (!contentType || !contentType.includes('application/json')) {
         let text = await resp.text()
-        throw new Error (`Error ${summary}: ${text}`)
-    } else {
-        let text = (await resp.json()).Message
-        throw new Error (`Error ${summary}: ${text}`)
-    }
+        throw new Error (`${summary}: ${text}`)
+      } else {
+          let text = (await resp.json()).Message
+          throw new Error (`${summary}: ${text}`)
+      }
+     } else {
+        throw new Error(`You are unable to '${summary}', contact system admin to grant '${perm}'.`)
+     }
+
 }
 
 export function NoResults() {

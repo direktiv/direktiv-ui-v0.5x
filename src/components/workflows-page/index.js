@@ -13,7 +13,6 @@ import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import {Link} from 'react-router-dom'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
 import {NoResults} from '../../util-funcs'
 
 import { ConfirmButton } from '../confirm-button'
@@ -31,7 +30,10 @@ states:
 export default function WorkflowsPage() {
     const { fetch, namespace, handleError } = useContext(MainContext)
     const [workflows, setWorkflows] = useState([])
-    const [forbidden, setForbidden] = useState(false)
+    // const [forbidden, setForbidden] = useState(false)
+    const [err, setErr] = useState("")
+    const [actionErr, setActionErr] = useState("")
+
 
     const fetchWorkflows = useCallback(() => {
         // FIXME: This should stop bad fetches when namespace = <empty-string> before useContext 
@@ -55,14 +57,10 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch workflows', resp)
-                    } else {
-                        setForbidden(true)
-                    }
+                    await handleError('fetch workflows', resp, 'ListWorkflows')
                 }
             } catch (e) {
-                sendNotification("Failed to fetch workflows", e.message, 0)
+                setErr(`Failed to fetch workflows: ${e.message}`)
             }
         }
         fetchWfs()
@@ -74,11 +72,11 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if (!resp.ok) {
-                await handleError('delete workflow', resp)
+                    await handleError('delete workflow', resp, 'DeleteWorkflow')
             }
             fetchWorkflows()
         } catch (e) {
-            sendNotification("Failed to delete workflow", e.message, 0)
+            setActionErr(`Failed to delete workflow ${id}: ${e.message}`)
         }
     }
 
@@ -88,11 +86,11 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                await handleError('toggle workflow', resp)
+                    await handleError('toggle workflow', resp, 'ToggleWorkflow')                    
             }
             fetchWorkflows()
         } catch (e) {
-            sendNotification("Failed to toggle workflow", e.message, 0)
+            setActionErr(`Failed to toggle workflow ${id}: ${e.message}`)
         }
     }
 
@@ -114,10 +112,18 @@ export default function WorkflowsPage() {
                             <TileTitle name="All workflows">
                                 <IoList />
                             </TileTitle>
+
                             <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
-                                {forbidden ? 
-                                    <span style={{fontSize:"12pt"}}>You are forbidden to list workflows for this namespace</span>
+                                {err ? 
+                                    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                    {err}
+                                </div>
                                 :
+                                <>
+                                {actionErr !== "" ?  <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                            {actionErr}
+                        </div>
+                                :""}
                                 <>
                                 {workflows.length > 0 ?
                                     <>
@@ -163,6 +169,7 @@ export default function WorkflowsPage() {
                                     </> :
                                     <NoResults />
                                 }
+                                </>
                                 </>
 }
                             </div>
@@ -210,7 +217,7 @@ function readFile(file) {
 function parseYaml(fetch, name, namespace, data, setErr, history) {
     const invalidNameErr = validateName(name, "workflow name")
     if (invalidNameErr) {
-        sendNotification("Name is invalid", invalidNameErr, 0)
+        setErr(`Name is invalid: ${invalidNameErr}`)
         return
     }
 
@@ -219,7 +226,7 @@ function parseYaml(fetch, name, namespace, data, setErr, history) {
         y.id = name
         createWorkflow(fetch, YAMLtoString.stringify(y), namespace, setErr, undefined, history)
     } catch (e) {
-        sendNotification("Unable to parse YAML", e.message, 0)
+        setErr(`Unable to parse YAML: ${e.message}`)
     }
 }
 
@@ -241,14 +248,10 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history,
             // setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-            if (resp.status !== 403) {
-                await handleError('create workflow', resp)
-            } else {
-                setErr("You are forbidden to upload a new workflow")
-            }
+                await handleError('create workflow', resp, 'CreateWorkflow')
         }
     } catch (e) {
-        sendNotification("Workflow Creation Failed", e.message, 0)
+        setErr(`Workflow creation failed: ${e.message}`)
     }
 }
 
@@ -257,6 +260,7 @@ function APIInteractionTile() {
     const { fetch, namespace, handleError } = useContext(MainContext)
 
     const [val, setVal] = useState("")
+    const [err, setErr] = useState("")
 
     async function sendEvent() {
         if (val !== "") {
@@ -270,14 +274,15 @@ function APIInteractionTile() {
                 })
                 if (resp.ok) {
                     setVal("")
+                    setErr("")
                 } else {
-                    await handleError('send event', resp)
+                        await handleError('send event', resp, 'NamespaceEvent')
                 }
             } catch (e) {
-                sendNotification("Failed to send cloud event", e.message, 0)
+                setErr(`Failed to send cloud event: ${e.message}`)
             }
         } else {
-            sendNotification("Send Cloud Event", "Failed to send cloud event as input is empty", 0)
+            setErr(`Send Cloud Event: Failed to send cloud event as input is empty`)
         }
         
     }
@@ -286,6 +291,13 @@ function APIInteractionTile() {
     return (
         <div>
             <textarea value={val} onChange={(e) => setVal(e.target.value)} rows={13} style={{ width: "100%", height: "100%", resize: "none" }} />
+            {err !== "" ?
+                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {err}
+                </div>
+                :
+                ""
+            }
             <div style={{ textAlign: "right" }}>
                 <input onClick={() => sendEvent()} type="submit" value="Submit" />
             </div>
@@ -304,7 +316,7 @@ function UploadWorkflowForm() {
     return (
         <div>
             <div className="file-form">
-                <Basic files={files} setFiles={setFiles} data={data} setData={setData} />
+                <Basic setErr={setErr} files={files} setFiles={setFiles} data={data} setData={setData} />
             </div>
             {err !== "" ?
                 <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
@@ -321,13 +333,13 @@ function UploadWorkflowForm() {
                         const y = YAML.load(data, 'utf8')
                         invalidNameErr = validateName(y.id, "id")
                     } catch (e) {
-                        sendNotification(`File is not a valid`, e.reason, 0)
+                        setErr(`File is not a valid: ${e.reason}`)
                         return
                     }
 
                     // Check if id is a valid name
                     if (invalidNameErr) {
-                        sendNotification(`Invalid Workflow`, `ID: ${invalidNameErr}`, 0)
+                        setErr(`Invalid workflow: ID: ${invalidNameErr}`)
                     } else {
                         createWorkflow(fetch, data, namespace, setErr, setFiles, history, handleError)
                     }
@@ -359,16 +371,15 @@ function NewWorkflowForm() {
                         let text = await resp.text()
                         setData(text)
                     } else {
-                        await handleError('fetch template', resp)
+                            await handleError('fetch template', resp, 'GetWorkflowTemplate')
                     }
                 } catch (e) {
-                    sendNotification("Failed to fetch template data", e.message, 0)
+                    setErr(`Failed to fetch template data: ${e.message}`)
                 }
             } else {
                 setTemplateData(noopState)
             }
-            }
-
+        }
         fetchd()
     }, [fetch, handleError])
 
@@ -383,14 +394,15 @@ function NewWorkflowForm() {
                     if(load){
                         setTemplate("default-noop")
                         setTemplateData(noopState)
-                        // fetchTempData("noop", setTemplateData)
                         setTemplates(json)
                     }
                 } else {
-                    await handleError('fetch templates', resp)
+                        await handleError('fetch templates', resp, 'ListWorkflowTemplates')
                 }
             } catch (e) {
-                sendNotification("Failed to fetch a list of templates", e.message, 0)
+                setErr(`Failed to fetch a list of templates: ${e.message}`)
+                setTemplate("default-noop")
+                setTemplateData(noopState)
             }
         }
         fetchTemplates()
@@ -468,18 +480,18 @@ function NewWorkflowForm() {
 }
 
 function Basic(props) {
-    const { setData, files, setFiles } = props
+    const { setData, files, setFiles, setErr } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
             if (fileRejections.length > 0) {
-                sendNotification("Invalid File", `File: '${fileRejections[0].file.name}' is not supported, ${fileRejections[0].errors[0].message}`, 0)
+                setErr(`Invalid File: File: '${fileRejections[0].file.name}' is not supported, ${fileRejections[0].errors[0].message}`)
             } else {
                 setData(await readFile(acceptedFiles[0]))
                 setFiles([...acceptedFiles]);
             }
         },
-        [setData, setFiles]
+        [setData, setFiles, setErr]
     );
 
     const { getRootProps, getInputProps } = useDropzone({

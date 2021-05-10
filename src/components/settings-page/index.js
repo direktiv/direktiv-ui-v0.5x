@@ -6,13 +6,13 @@ import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import XCircle from 'react-bootstrap-icons/dist/icons/x-circle'
 import { useHistory } from 'react-router'
 import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 
 
 function SettingsAction(props) {
     const { namespace, fetch, namespaces, fetchNamespaces, setNamespace, handleError } = useContext(MainContext)
     const history = useHistory()
+    const [err, setErr] = useState("")
 
     async function deleteNamespace() {
         try {
@@ -42,21 +42,27 @@ function SettingsAction(props) {
 
 
             } else {
-                await handleError('delete namespace', resp)
+                await handleError('delete namespace', resp, 'DeleteNamespace')
             }
         } catch(e) {
-            sendNotification("Failed to delete namespace", e.message, 0)
+            setErr(`Failed to delete namespace: ${e.message}`)
         }
     }
 
 
     return (
-        <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px" }}>
+       <>
+       {
+                err !== "" ?    <div style={{ display:"flex", alignItems:"center", marginRight:"20px", fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div> :"" }
+       <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px" }}>
             <ConfirmButton ConfirmationText={"Delete Namespace Confirmation"} Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                 deleteNamespace()
                 ev.stopPropagation()
             }} />
         </div>
+        </>
     )
 }
 
@@ -98,6 +104,8 @@ function Secrets() {
     const [secrets, setSecrets] = useState([])
     const [key, setKey] = useState("")
     const [value, setValue] = useState("")
+    const [err, setErr] = useState("")
+    const [actionErr, setActionErr] = useState("")
 
     const fetchS = useCallback(() => {
         async function fetchData() {
@@ -113,10 +121,10 @@ function Secrets() {
                         setSecrets([])
                     }
                 } else {
-                    await handleError('fetch secrets', resp)
+                        await handleError('fetch secrets', resp, 'ListSecrets')
                 }
             } catch (e) {
-                sendNotification("Failed to fetch secrets", e.message, 0)
+                setErr(`Failed to fetch secrets: ${e.message}`)
             }
         }
         fetchData()
@@ -135,16 +143,17 @@ function Secrets() {
                 })
                 if (resp.ok) {
                     setKey("")
+                    setActionErr("")
                     setValue("")
                     fetchS()
                 } else {
-                    await handleError('create secret', resp)
+                        await handleError('create secret', resp, 'CreateSecret')                        
                 }
             } catch (e) {
-                sendNotification("Failed to create secret", e.message, 0)
+                setActionErr(`Failed to create secret: ${e.message}`)
             }
         } else {
-            sendNotification("Create a Secret", "Key and value needs to be provided", 0)
+            setActionErr(`Failed to create Secret: key and value needs to be provided.`)
         }
     
     }
@@ -157,17 +166,28 @@ function Secrets() {
             })
             if (resp.ok) {
                 // refetch secrets
+                setActionErr("")
                 fetchS()
             } else {
-                await handleError('delete secret', resp)
+                await handleError('delete secret', resp, 'DeleteSecret')
             }
         } catch (e) {
-            sendNotification("Failed to delete secret", e.message, 0)
+            setActionErr(`Failed to delete secret: ${e.message}`)
         }
     }
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+            {
+                err !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div>
+                :
+            <>
+            {actionErr !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                             {actionErr}
+                             </div>
+            :""}
             <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
                 <thead>
                     <tr className="no-neumorph">
@@ -219,6 +239,8 @@ function Secrets() {
                     </tr>
                 </tbody>
             </table>
+            </>
+            }
         </div>
     )
 }
@@ -230,6 +252,8 @@ function Registries() {
     const [user, setUser] = useState("")
     const [token, setToken] = useState("")
     const [registries, setRegistries] = useState([])
+    const [err, setErr] = useState("")
+    const [actionErr, setActionErr] = useState("")
 
     const fetchR = useCallback(() => {
         async function fetchData() {
@@ -245,10 +269,10 @@ function Registries() {
                         setRegistries([])
                     }
                 } else {
-                    await handleError('fetch registries', resp)
+                        await handleError('fetch registries', resp, 'ListRegistries')
                 }
             } catch (e) {
-                sendNotification("Failed to fetch registries", e.message, 0)
+                setErr(`Failed to fetch registries: ${e.message}`)
             }
         }
         fetchData()
@@ -269,15 +293,16 @@ function Registries() {
                     setName("")
                     setToken("")
                     setUser("")
+                    setActionErr("")
                     fetchR()
                 } else {
-                    await handleError('create registry', resp)
+                        await handleError('create registry', resp, 'CreateRegistry')
                 }
             } catch (e) {
-                sendNotification("Failed to create registry", e.message, 0)
+                setActionErr(`Failed to create registry: ${e.message}`)
             }
         } else {
-            sendNotification("Create a Registry", "Name, User and Token needs to provided.", 0)
+            setActionErr(`Failed to create a registry: Name, user and Token needs to be provided.`)
         }
 
     }
@@ -290,17 +315,26 @@ function Registries() {
             })
             if (resp.ok) {
                 // fetch registries
+                setActionErr("")
                 fetchR()
             } else {
-                await handleError('delete registry', resp)
+                    await handleError('delete registry', resp, 'DeleteRegistry')
             }
         } catch (e) {
-            sendNotification("Failed to delete registry", e.message, 0)
+            setActionErr(`Failed to delete registry: ${e.message}`)
         }
     }
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+            {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div>
+            :
+            <>
+            {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {actionErr}
+                </div>: "" }
             <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
                 <thead>
                     <tr className="no-neumorph">
@@ -361,6 +395,8 @@ function Registries() {
                     </tr>
                 </tbody>
             </table>
+            </>
+}
         </div>
     )
 }

@@ -1,7 +1,6 @@
 import React, { useContext, useState,  useEffect } from 'react'
 import MainContext from '../../context'
 import { useParams } from 'react-router'
-import {sendNotification} from '../notifications'
 import PieChart from '../charts/pie'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
@@ -16,8 +15,9 @@ export default function DashboardPage() {
     const [metrics, setMetrics] = useState(null)
     const {fetch, namespace, namespaces, handleError} = useContext(MainContext)
     const params = useParams()
-    const [forbidden, setForbidden] = useState(false)
-
+    // const [forbidden, setForbidden] = useState(false)
+    const [err, setErr] = useState("")
+    
     useEffect(()=>{
         async function fetchMet() {
             let pieColors = {
@@ -56,14 +56,10 @@ export default function DashboardPage() {
                     // setInstances(json)
                     setMetrics(data)
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch metrics', resp)
-                    } else {
-                        setForbidden(true)
-                    }
+                        await handleError('fetch metrics', resp, 'ListInstances')
                 }
             } catch(e) {
-                sendNotification(`Failed to fetch metrics for workflow`, e.message, 0)
+                setErr(`Failed to fetch metrics for workflow: ${e.message}`)
             }
         }
         if(metrics === null && namespace !== "") {
@@ -88,10 +84,12 @@ export default function DashboardPage() {
                         <IoCodeSlashOutline />
                     </TileTitle>
                     {
-                        !forbidden ? 
+                        err === "" ? 
                             <DashboardTotalExecutions metrics={metrics} />
                             :
-                            <span style={{fontSize:"12pt"}}>You are forbidden to view total executions.</span>
+                            <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                            {err}
+                        </div>
                     }
                 </div>
                 <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1", maxHeight: "400px" }}>

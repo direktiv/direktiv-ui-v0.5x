@@ -11,7 +11,6 @@ import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
 import { IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
 
 export default function Navbar(props) {
 
@@ -25,6 +24,7 @@ export default function Navbar(props) {
     }
 
     const [acceptInput, setAcceptInput] = useState(false)
+    const [err, setError] = useState("")
 
     const {fetch, namespace, setNamespace, namespaces, fetchNamespaces, handleError} = useContext(MainContext)
     const {footer, navItems} = props
@@ -53,8 +53,9 @@ export default function Navbar(props) {
                     setAcceptInput(!acceptInput)
                     toggleNamespaceSelector()
                     setNamespace(val)
-                    sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
+                    // sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
                     fetchNamespaces(false, val)
+                    setError("")
                     history.push(`/${val}/w`)
                     return
                 }
@@ -73,8 +74,10 @@ export default function Navbar(props) {
                     setAcceptInput(!acceptInput)
                     toggleNamespaceSelector()
                     setNamespace(val)
-                    sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
+                    // sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
                     fetchNamespaces(false, val)
+                    setError("")
+
                     history.push(`/${val}/i`)
                     return
                 }
@@ -84,16 +87,17 @@ export default function Navbar(props) {
                 setAcceptInput(!acceptInput)
                 toggleNamespaceSelector()
                 setNamespace(val)
-                sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
+                // sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
                 fetchNamespaces(false, val)
+                setError("")
 
                 history.push(`/${val}`)
 
             } else {
-                await handleError('create namespace', resp)
+                await handleError('create namespace', resp, 'AddNamespace')
             }
         } catch(e) {
-            sendNotification("Failed to create namespace", e.message, 0)
+            setError(`Failed to create namespace: ${e.message}`)
         }
     }
     
@@ -165,6 +169,7 @@ export default function Navbar(props) {
                             <ul>
                                 <>
                                 <li>
+                                    <div style={{display:"flex", flexDirection:"column", flexFlow:"wrap"}}>
                                     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", paddingTop:"5px" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
                                         {acceptInput ? 
@@ -184,6 +189,13 @@ export default function Navbar(props) {
                                                 New namespace
                                             </span>
                                         }
+                                        <>
+            
+                                        </>
+                                    </div>
+                                    {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div>:""}
                                     </div>
                                 </li>
                                 {namespaces === null || namespaces === undefined  ? "":

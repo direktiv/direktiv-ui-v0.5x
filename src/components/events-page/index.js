@@ -9,7 +9,6 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import MainContext from '../../context'
 import { Link } from 'react-router-dom'
 import { IoList } from 'react-icons/io5'
-import { sendNotification } from '../notifications'
 import {NoResults} from '../../util-funcs'
 dayjs.extend(relativeTime);
 
@@ -41,7 +40,8 @@ export default function EventsPage() {
 export function EventsPageBody() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const [instances, setInstances] = useState([])
-    const [forbidden, setForbidden] = useState(false)
+    // const [forbidden, setForbidden] = useState(false)
+    const [err, setErr] = useState("")
 
     useEffect(()=>{
         async function fetchI() {
@@ -58,14 +58,10 @@ export function EventsPageBody() {
                         setInstances([])
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch instances', resp)
-                    } else {
-                        setForbidden(true)
-                    }
+                    await handleError('fetch instances', resp, 'ListInstances')
                 }
             } catch(e) {
-                sendNotification("Failed to fetch instances", e.message, 0)
+                setErr(`Failed to fetch instances: ${e.message}`)
             }
         }
         fetchI()
@@ -73,9 +69,11 @@ export function EventsPageBody() {
 
     return(
         <div id="events-table" style={{height:"90%", overflow:"auto"}}>
-            {forbidden ? 
-                <span style={{fontSize:"12pt"}}>You are forbidden to view the list of events for this namespace.</span>
-                :
+            {
+                        err !== "" ? 
+                        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                        {err}
+                    </div>:
             <>
             {instances.length > 0 ?
             <table style={{ width: "100%" }}>
