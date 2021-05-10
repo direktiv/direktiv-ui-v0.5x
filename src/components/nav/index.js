@@ -94,11 +94,7 @@ export default function Navbar(props) {
                 history.push(`/${val}`)
 
             } else {
-                if (resp.status !== 403) {
-                    await handleError('create namespace', resp)
-                } else {
-                    setError("You are forbidden to create namespace")
-                }
+                await handleError('create namespace', resp, 'AddNamespace')
             }
         } catch(e) {
             setError(`Failed to create namespace: ${e.message}`)

@@ -42,11 +42,7 @@ function SettingsAction(props) {
 
 
             } else {
-                if (resp.status !== 403) {
-                    await handleError('delete namespace', resp)
-                } else {
-                    setErr("You are forbidden from deleting this namespace")
-                }
+                await handleError('delete namespace', resp, 'DeleteNamespace')
             }
         } catch(e) {
             setErr(`Failed to delete namespace: ${e.message}`)
@@ -125,11 +121,7 @@ function Secrets() {
                         setSecrets([])
                     }
                 } else {
-                    if (resp.status !== 403) {
-                        await handleError('fetch secrets', resp)
-                    } else {
-                        setErr("You are forbidden to list secrets.")
-                    }
+                        await handleError('fetch secrets', resp, 'ListSecrets')
                 }
             } catch (e) {
                 setErr(`Failed to fetch secrets: ${e.message}`)
@@ -155,11 +147,7 @@ function Secrets() {
                     setValue("")
                     fetchS()
                 } else {
-                    if(resp.status !== 403) {
-                        setActionErr("You are forbidden to create a secret")
-                    } else {
-                        await handleError('create secret', resp)                        
-                    }
+                        await handleError('create secret', resp, 'CreateSecret')                        
                 }
             } catch (e) {
                 setActionErr(`Failed to create secret: ${e.message}`)
@@ -181,11 +169,7 @@ function Secrets() {
                 setActionErr("")
                 fetchS()
             } else {
-                if(resp.status !== 403) {
-                    await handleError('delete secret', resp)
-                } else {
-                    setActionErr("You are forbidden to delete a secret.")
-                }
+                await handleError('delete secret', resp, 'DeleteSecret')
             }
         } catch (e) {
             setActionErr(`Failed to delete secret: ${e.message}`)
@@ -285,11 +269,7 @@ function Registries() {
                         setRegistries([])
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch registries', resp)
-                    } else {
-                        setErr("You are forbidden to list registries.")
-                    }
+                        await handleError('fetch registries', resp, 'ListRegistries')
                 }
             } catch (e) {
                 setErr(`Failed to fetch registries: ${e.message}`)
@@ -316,11 +296,7 @@ function Registries() {
                     setActionErr("")
                     fetchR()
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('create registry', resp)
-                    } else {
-                        setActionErr("You are forbidden to create a registry")
-                    }
+                        await handleError('create registry', resp, 'CreateRegistry')
                 }
             } catch (e) {
                 setActionErr(`Failed to create registry: ${e.message}`)
@@ -342,11 +318,7 @@ function Registries() {
                 setActionErr("")
                 fetchR()
             } else {
-                if (resp.status !== 403) {
-                    await handleError('delete registry', resp)
-                } else {
-                    setActionErr("You are forbidden to delete a registry")
-                }
+                    await handleError('delete registry', resp, 'DeleteRegistry')
             }
         } catch (e) {
             setActionErr(`Failed to delete registry: ${e.message}`)

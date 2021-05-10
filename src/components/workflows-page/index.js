@@ -57,11 +57,7 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch workflows', resp)
-                    } else {
-                        setErr(`You are forbidden to list workflows for this namespace.`)
-                    }
+                    await handleError('fetch workflows', resp, 'ListWorkflows')
                 }
             } catch (e) {
                 setErr(`Failed to fetch workflows: ${e.message}`)
@@ -76,11 +72,7 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if (!resp.ok) {
-                if(resp.status !== 403) {
-                    await handleError('delete workflow', resp)
-                } else {
-                    setActionErr(`You are forbidden to delete workflow '${id}'.`)
-                }
+                    await handleError('delete workflow', resp, 'DeleteWorkflow')
             }
             fetchWorkflows()
         } catch (e) {
@@ -94,11 +86,7 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                if(resp.status !== 403) {
-                    await handleError('toggle workflow', resp)                    
-                } else {
-                    setActionErr(`You are forbidden to toggle workflow '${id}'.`)
-                }
+                    await handleError('toggle workflow', resp, 'ToggleWorkflow')                    
             }
             fetchWorkflows()
         } catch (e) {
@@ -260,11 +248,7 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history,
             // setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-            if (resp.status !== 403) {
-                await handleError('create workflow', resp)
-            } else {
-                setErr("You are forbidden to upload a new workflow")
-            }
+                await handleError('create workflow', resp, 'CreateWorkflow')
         }
     } catch (e) {
         setErr(`Workflow creation failed: ${e.message}`)
@@ -292,11 +276,7 @@ function APIInteractionTile() {
                     setVal("")
                     setErr("")
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('send event', resp)
-                    } else {
-                        setErr("You are forbidden to send a cloud event to this namespace.")
-                    }
+                        await handleError('send event', resp, 'NamespaceEvent')
                 }
             } catch (e) {
                 setErr(`Failed to send cloud event: ${e.message}`)
@@ -391,11 +371,7 @@ function NewWorkflowForm() {
                         let text = await resp.text()
                         setData(text)
                     } else {
-                        if(resp.status !== 403) {
-                            await handleError('fetch template', resp)
-                        } else {
-                            setErr(`You are forbidden to fetch the template data`)
-                        }
+                            await handleError('fetch template', resp, 'GetWorkflowTemplate')
                     }
                 } catch (e) {
                     setErr(`Failed to fetch template data: ${e.message}`)
@@ -421,17 +397,12 @@ function NewWorkflowForm() {
                         setTemplates(json)
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch templates', resp)
-                    } else {
-                        // set default template
-                        setTemplate("default-noop")
-                        setTemplateData(noopState)
-                        setErr(`You are forbidden to fetch a list of templates`)
-                    }
+                        await handleError('fetch templates', resp, 'ListWorkflowTemplates')
                 }
             } catch (e) {
                 setErr(`Failed to fetch a list of templates: ${e.message}`)
+                setTemplate("default-noop")
+                setTemplateData(noopState)
             }
         }
         fetchTemplates()

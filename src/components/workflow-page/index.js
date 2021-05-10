@@ -87,12 +87,7 @@ export default function WorkflowPage() {
                     })
                     setLogEvent(json.logToEvents)
                 } else {
-                    if(resp.status !== 403) {
-                        // 400 should have json response
-                        await handleError('fetch workflow', resp)
-                    } else {
-                        setErr("You are forbidden to fetch the workflow")
-                    }
+                    await handleError('fetch workflow', resp, 'GetWorkflow')
                 }
             } catch(e) {
                 // sendNotification("Failed to fetch workflow", e.message, 0)
@@ -132,11 +127,7 @@ export default function WorkflowPage() {
                     setActionErr("")
                     history.replace(`${json.id}`)
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('update workflow', resp)
-                    } else {
-                        setActionErr("You are forbidden to update the workflow.")
-                    }
+                        await handleError('update workflow', resp, 'UpdateWorkflow')
                 }
             } catch(e) {
                 setActionErr(`Failed to update workflow: ${e.message}`)
@@ -163,11 +154,7 @@ const updateLogEvent = useCallback(()=>{
                 body: workflowValueOld
             })
             if (!resp.ok) {
-                if(resp.status !== 403) {
-                    await handleError('post log event', resp)
-                } else {
-                    setActionErr("You are forbidden to change the log event.")
-                }
+                    await handleError('post log event', resp, 'UpdateWorkflow')
             } else {
                 setActionErr("")
             }
@@ -236,11 +223,7 @@ const updateLogEvent = useCallback(()=>{
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-                if(resp.status !== 403) {
-                    await handleError('execute workflow', resp)
-                } else {
-                    setExecuteErr("You are forbidden to execute this workflow.")
-                }
+                    await handleError('execute workflow', resp, 'ExecuteWorkflow')
             }
         } catch(e) {
             setExecuteErr(`Failed to execute workflow: ${e.message}`)
@@ -263,11 +246,7 @@ const updateLogEvent = useCallback(()=>{
                 setToggleErr("")
 
             } else {
-                if(resp.status !== 403) {
-                    await handleError('toggle workflow', resp)
-                } else {
-                    setToggleErr("You are forbidden to toggle this workflow.")
-                }
+                    await handleError('toggle workflow', resp, 'ToggleWorkflow')
             }
         } catch(e) {
             setToggleErr(`Failed to toggle workflow: ${e.message}`)
@@ -426,11 +405,7 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch metrics', resp)
-                    } else {
-                        setErr("You are forbidden to view workflow metrics.")
-                    }
+                        await handleError('fetch metrics', resp, 'GetWorkflowMetrics')
                 }
             } catch(e) {
                 setErr(`Failed to fetch metrics for workflow: ${e.message}`)
@@ -481,11 +456,7 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch workflow instances', resp)
-                    } else {
-                        setErr("You are forbidden to view workflow instances.")
-                    }
+                    await handleError('fetch workflow instances', resp, 'ListWorkflowInstances')
                 }
             }catch(e){
                 setErr(`Unable to fetch workflow instances: ${e.message}`)

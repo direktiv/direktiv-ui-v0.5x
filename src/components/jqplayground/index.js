@@ -88,7 +88,7 @@ const cheatSheetMap = [
 ];
 
 export default function JQPlaygroundPage() {
-    const { fetch } = useContext(MainContext)
+    const { fetch, handleError } = useContext(MainContext)
     const [jqInput, setJQInput] = useState("{\n  \n}")
     const [jqFilter, setJQFilter] = useState(".")
     const [jqOutput, setJQOutput] = useState("")
@@ -125,24 +125,13 @@ export default function JQPlaygroundPage() {
                 })
 
                 if (!resp.ok) {
-                    if (resp.status !== 403) {
-                        // Check for content type of error
-                        const contentType = resp.headers.get('content-type');
-                        if (!contentType || !contentType.includes('application/json')) {
-                            throw await resp.text()
-                        } else {
-                            throw (await resp.json()).Message
-                        }
-                    } else {
-                        setErr("You are forbidden to execute JQ commands on the playground.")
-                    }
-              
+                    await handleError('execute jq', resp, 'JQPlayground')
                 } else {
                     let jqOut = await resp.text();
                     setJQOutput(jqOut)
                 }
             } catch (e) {
-                setErr(`Invalid JQ Command: ${e}`)
+                setErr(`Invalid JQ Command: ${e.message}`)
             }
         }
         execJQ().finally(() => { setFetching(false) })

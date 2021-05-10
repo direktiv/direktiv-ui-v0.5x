@@ -37,11 +37,7 @@ export default function Logs(props) {
                     method: "GET"
                 })
                 if(!resp.ok) {
-                    if(resp.status !== 403) {
-                        await handleError(resp)
-                    } else {
-                        setErr("You are forbidden from getting logs.")
-                    }
+                        await handleError('fetch logs', resp, 'GetInstanceLogs')
                 } else {
                     let json = await resp.json()
                     

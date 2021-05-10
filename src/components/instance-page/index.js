@@ -40,11 +40,7 @@ export default function InstancePage() {
                         let wfn = atob(json.workflow)
                         setWf(wfn)
                     } else {
-                        if (resp.status !== 403) {
-                            await handleError('fetch workflow', resp)
-                        } else {
-                            setWorkflowErr("You are forbidden to retrieve workflow data")
-                        }
+                        await handleError('fetch workflow', resp, 'GetWorkflow')
                     }
                 } catch(e) {
                     setWorkflowErr(`Failed to fetch workflow: ${e.message}`)
@@ -66,11 +62,7 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch instance details', resp)
-                    } else {
-                        setDetailsErr("You are forbidden to get instance details.")
-                    }
+                    await handleError('fetch instance details', resp, 'GetInstance')
                 }
             } catch(e) {
                 setDetailsErr(`Fetch Instance details failed: ${e.message}`)
@@ -120,11 +112,7 @@ export default function InstancePage() {
                                 let json = await resp.json()    
                                 history.push(`/i/${json.instanceId}`)
                             } else {
-                                if(resp.status !== 403) {
-                                    await handleError('rerun workflow', resp)
-                                } else {
-                                    setActionErr("You are forbidden to execute this workflow.")
-                                }
+                                await handleError('rerun workflow', resp, 'ExecuteWorkflow')
                             }
                         } catch(e) {
                             setActionErr(`Unable to execute workflow: ${e.message}`)
@@ -141,11 +129,7 @@ export default function InstancePage() {
             method: "DELETE"
         })
         if(!resp.ok) {
-            if(resp.status !== 403) {
-                await handleError(resp)
-            } else {
-                setActionErr(`You are forbidden to cancel this instance.`)
-            }
+            await handleError('cancel instance', resp, 'CancelInstance')
         }
     }  catch(e) {
         setActionErr(`Instance cancelled error: ${e.message}`)

@@ -56,11 +56,7 @@ export default function DashboardPage() {
                     // setInstances(json)
                     setMetrics(data)
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch metrics', resp)
-                    } else {
-                        setErr("You are forbidden to view total executions.")
-                    }
+                        await handleError('fetch metrics', resp, 'ListInstances')
                 }
             } catch(e) {
                 setErr(`Failed to fetch metrics for workflow: ${e.message}`)

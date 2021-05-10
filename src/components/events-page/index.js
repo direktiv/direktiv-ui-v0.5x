@@ -59,11 +59,7 @@ export function EventsPageBody() {
                         setInstances([])
                     }
                 } else {
-                    if(resp.status !== 403) {
-                        await handleError('fetch instances', resp)
-                    } else {
-                        setErr("You are forbidden to view the list of events for this namespace")
-                    }
+                    await handleError('fetch instances', resp, 'ListInstances')
                 }
             } catch(e) {
                 setErr(`Failed to fetch instances: ${e.message}`)
