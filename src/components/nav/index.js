@@ -325,7 +325,7 @@ export default function Navbar(props) {
                         <>
                         {navItems.map((obj)=> {
                 
-                return(   <> {obj.nsRequired ?    <>  {namespace !== "" ? <li>
+                return(   <> {obj.nsRequired ?    <>  {namespace !== "" ? <li key={obj.title}>
                         <Link style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
@@ -336,7 +336,7 @@ export default function Navbar(props) {
                                 <span>{obj.title}</span>
                             </div>
                         </Link>
-                    </li>: <li><div style={{color:"#b5b5b5", cursor: "default"}}>
+                    </li>: <li key={obj.title}><div style={{color:"#b5b5b5", cursor: "default"}}>
                                 {obj.icon}
                                 <span>{obj.title}</span>
                             </div></li>}</> : "" }</>

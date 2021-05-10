@@ -73,6 +73,7 @@ function Content() {
     }
   }, [namespaces, fetchNamespaces])
 
+
   return (
 
     <MainContext.Provider value={{
@@ -84,7 +85,7 @@ function Content() {
       setNamespaces: setNamespaces,
       fetchNamespaces: fetchNamespaces,
       handleError: HandleError,
-      bcRoutes: bcRoutes,
+      bcRoutes: bcRoutes
     }}>
       {!load ?
 
