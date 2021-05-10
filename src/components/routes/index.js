@@ -11,7 +11,13 @@ export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
     const location = useLocation()
     const history = useHistory()
-    if(namespace === "" && namespaces === null && location.pathname !== "/") {
+
+    if(namespaces === null) {
+      return ""
+    }
+
+    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/") {
+        // console.log('triggered')
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
         history.push("/")
     } 

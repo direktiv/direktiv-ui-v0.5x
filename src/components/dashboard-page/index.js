@@ -91,7 +91,7 @@ export default function DashboardPage() {
                         !forbidden ? 
                             <DashboardTotalExecutions metrics={metrics} />
                             :
-                            "You are forbidden to view total executions."
+                            <span style={{fontSize:"12pt"}}>You are forbidden to view total executions.</span>
                     }
                 </div>
                 <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1", maxHeight: "400px" }}>

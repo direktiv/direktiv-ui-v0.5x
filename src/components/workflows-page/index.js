@@ -31,11 +31,12 @@ export default function WorkflowsPage() {
     const { fetch, namespace, handleError } = useContext(MainContext)
     const history = useHistory()
     const [workflows, setWorkflows] = useState([])
-    const fetchWorkflows = useCallback(() => {
+    const [forbidden, setForbidden] = useState(false)
 
+    const fetchWorkflows = useCallback(() => {
         // FIXME: This should stop bad fetches when namespace = <empty-string> before useContext 
         // populates the namespace value.
-        // This is temp fix, this problem occurs on other componenets and can probably fixed globally
+        // This is temp fix, this problem occurs on other components and can probably fixed globally
         // with changes to App.js
         if (!namespace) {
             return
@@ -54,7 +55,11 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    await handleError('fetch workflows', resp)
+                    if(resp.status !== 403) {
+                        await handleError('fetch workflows', resp)
+                    } else {
+                        setForbidden(true)
+                    }
                 }
             } catch (e) {
                 sendNotification("Failed to fetch workflows", e.message, 0)
@@ -110,6 +115,10 @@ export default function WorkflowsPage() {
                                 <IoList />
                             </TileTitle>
                             <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
+                                {forbidden ? 
+                                    <span style={{fontSize:"12pt"}}>You are forbidden to list workflows for this namespace</span>
+                                :
+                                <>
                                 {workflows.length > 0 ?
                                     <>
                                         {workflows.map(function (obj, i) {
@@ -154,6 +163,8 @@ export default function WorkflowsPage() {
                                     </> :
                                     <NoResults />
                                 }
+                                </>
+}
                             </div>
                         </div>
                         <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
@@ -212,7 +223,7 @@ function parseYaml(fetch, name, namespace, data, setErr, history) {
     }
 }
 
-async function createWorkflow(fetch, data, namespace, setErr, setFiles, history) {
+async function createWorkflow(fetch, data, namespace, setErr, setFiles, history, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/workflows`, {
             headers: {
@@ -230,12 +241,10 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history)
             // setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-            // Check for content type of error
-            const contentType = resp.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new Error(`${resp.status} ${await resp.text()}`)
+            if (resp.status !== 403) {
+                await handleError('create workflow', resp)
             } else {
-                throw new Error ((await resp.json()).Message)
+                setErr("You are forbidden to upload a new workflow")
             }
         }
     } catch (e) {
@@ -285,7 +294,7 @@ function APIInteractionTile() {
 }
 
 function UploadWorkflowForm() {
-    const { fetch, namespace } = useContext(MainContext)
+    const { fetch, namespace, handleError } = useContext(MainContext)
     const history = useHistory()
 
     const [data, setData] = useState("")
@@ -320,7 +329,7 @@ function UploadWorkflowForm() {
                     if (invalidNameErr) {
                         sendNotification(`Invalid Workflow`, `ID: ${invalidNameErr}`, 0)
                     } else {
-                        createWorkflow(fetch, data, namespace, setErr, setFiles, history)
+                        createWorkflow(fetch, data, namespace, setErr, setFiles, history, handleError)
                     }
                 }} type="submit" value="Submit" />
             </div>

@@ -75,7 +75,7 @@ export function EventsPageBody() {
     return(
         <div id="events-table" style={{height:"90%", overflow:"auto"}}>
             {forbidden ? 
-                "You are forbidden to view the list of instances for this namespace."
+                <span style={{fontSize:"12pt"}}>You are forbidden to view the list of events for this namespace.</span>
                 :
             <>
             {instances.length > 0 ?
