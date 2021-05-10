@@ -42,7 +42,8 @@ export function EventsPageBody() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const history = useHistory()
     const [instances, setInstances] = useState([])
-    const [forbidden, setForbidden] = useState(false)
+    // const [forbidden, setForbidden] = useState(false)
+    const [err, setErr] = useState("")
 
     useEffect(()=>{
         async function fetchI() {
@@ -62,11 +63,11 @@ export function EventsPageBody() {
                     if(resp.status !== 403) {
                         await handleError('fetch instances', resp)
                     } else {
-                        setForbidden(true)
+                        setErr("You are forbidden to view the list of events for this namespace")
                     }
                 }
             } catch(e) {
-                sendNotification("Failed to fetch instances", e.message, 0)
+                setErr(`Failed to fetch instances: ${e.message}`)
             }
         }
         fetchI()
@@ -74,9 +75,11 @@ export function EventsPageBody() {
 
     return(
         <div id="events-table" style={{height:"90%", overflow:"auto"}}>
-            {forbidden ? 
-                <span style={{fontSize:"12pt"}}>You are forbidden to view the list of events for this namespace.</span>
-                :
+            {
+                        err !== "" ? 
+                        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                        {err}
+                    </div>:
             <>
             {instances.length > 0 ?
             <table style={{ width: "100%" }}>

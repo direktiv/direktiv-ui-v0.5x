@@ -33,6 +33,7 @@ export default function WorkflowsPage() {
     const [workflows, setWorkflows] = useState([])
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
+    const [actionErr, setActionErr] = useState("")
 
 
     const fetchWorkflows = useCallback(() => {
@@ -79,12 +80,12 @@ export default function WorkflowsPage() {
                 if(resp.status !== 403) {
                     await handleError('delete workflow', resp)
                 } else {
-                    setErr(`You are forbidden to delete workflow '${id}'.`)
+                    setActionErr(`You are forbidden to delete workflow '${id}'.`)
                 }
             }
             fetchWorkflows()
         } catch (e) {
-            setErr(`Failed to delete workflow ${id}: ${e.message}`)
+            setActionErr(`Failed to delete workflow ${id}: ${e.message}`)
         }
     }
 
@@ -97,12 +98,12 @@ export default function WorkflowsPage() {
                 if(resp.status !== 403) {
                     await handleError('toggle workflow', resp)                    
                 } else {
-                    setErr(`You are forbidden to toggle workflow '${id}'.`)
+                    setActionErr(`You are forbidden to toggle workflow '${id}'.`)
                 }
             }
             fetchWorkflows()
         } catch (e) {
-            setErr(`Failed to toggle workflow ${id}: ${e.message}`)
+            setActionErr(`Failed to toggle workflow ${id}: ${e.message}`)
         }
     }
 
@@ -127,8 +128,15 @@ export default function WorkflowsPage() {
 
                             <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
                                 {err ? 
-                                    <span style={{fontSize:"12pt", color:"red"}}>{err}</span>
+                                    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                    {err}
+                                </div>
                                 :
+                                <>
+                                {actionErr !== "" ?  <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                            {err}
+                        </div>
+                                :""}
                                 <>
                                 {workflows.length > 0 ?
                                     <>
@@ -174,6 +182,7 @@ export default function WorkflowsPage() {
                                     </> :
                                     <NoResults />
                                 }
+                                </>
                                 </>
 }
                             </div>
