@@ -352,8 +352,7 @@ export default function Navbar(props) {
                     <li>
                     {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor: "default"}}>
-                                                               <IoSettingsSharp style={{ marginRight: "10px" }} />
-
+                                <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>
                             </div>
                             :

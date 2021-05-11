@@ -10,6 +10,10 @@ import { useCallback, useEffect } from 'react';
 import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
 
+export function CheckPerm() {
+  return true
+}
+
 export const  bcRoutes = [
   {
       path: '/:namespace',
@@ -85,7 +89,8 @@ function Content() {
       setNamespaces: setNamespaces,
       fetchNamespaces: fetchNamespaces,
       handleError: HandleError,
-      bcRoutes: bcRoutes
+      bcRoutes: bcRoutes,
+      checkPerm: CheckPerm,
     }}>
       {!load ?
 

@@ -29,7 +29,7 @@ states:
 `
 
 export default function WorkflowsPage() {
-    const { fetch, namespace, handleError } = useContext(MainContext)
+    const { fetch, namespace, handleError, checkPerm, permissions } = useContext(MainContext)
     const [workflows, setWorkflows] = useState([])
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
@@ -139,6 +139,8 @@ export default function WorkflowsPage() {
                                                     </div>
                                                     <div style={{ flexGrow: "1", flexBasis: "0" }}>
                                                         <div className="actions-button-div">
+                                                          {checkPerm(permissions, "toggleWorkflow") ?
+                                                          <>
                                                             {obj.active ?
                                                                 <div className="button circle success" onClick={(ev) => {
                                                                     ev.preventDefault();
@@ -158,10 +160,13 @@ export default function WorkflowsPage() {
                                                                     </span>
                                                                 </div>
                                                             }
+                                                            </>: ""}
+                                                            {checkPerm(permissions, "deleteWorkflow") ? 
+                                                            
                                                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                                                                 ev.preventDefault();
                                                                 deleteWorkflow(obj.id)
-                                                            }} />
+                                                            }} /> : ""}
                                                         </div>
                                                     </div>
                                                 </Link>
@@ -175,7 +180,10 @@ export default function WorkflowsPage() {
 }
                             </div>
                         </div>
+                        {checkPerm(permissions, "createWorkflow") || checkPerm(permissions, "namespaceEvent") ? 
                         <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
+                            {checkPerm(permissions, "createWorkflow") ? 
+                            <>
                             <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                                 <TileTitle name="Upload workflow file">
                                     <IoCloudUploadSharp />
@@ -187,14 +195,16 @@ export default function WorkflowsPage() {
                                     <IoAddSharp />
                                 </TileTitle>
                                 <NewWorkflowForm />
-                            </div>
+                            </div></>
+                            : ""}
+                            {checkPerm(permissions, "namespaceEvent") ?
                             <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                                 <TileTitle name="Send namespace event">
                                     <IoAddSharp />
                                 </TileTitle>
                                 <APIInteractionTile />
-                            </div>
-                        </div>
+                            </div>: ""}
+                        </div>:""}
                     </div>
                 </div>
                 : ""}
