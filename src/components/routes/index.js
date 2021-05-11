@@ -12,7 +12,7 @@ export default function Routes(props) {
     const location = useLocation()
     const history = useHistory()
 
-    if(namespaces === null || namespaces === undefined) {
+    if(namespaces === null) {
       return ""
     }
 
