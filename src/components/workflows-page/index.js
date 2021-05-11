@@ -17,6 +17,7 @@ import {NoResults} from '../../util-funcs'
 
 import { ConfirmButton } from '../confirm-button'
 import { validateName } from "../../util-funcs"
+import { TemplateHighlighter } from '../instance-page/input-output'
 
 
 const noopState = `id: noop
@@ -455,12 +456,13 @@ function NewWorkflowForm() {
                         Template Preview
                     </span>
                 </div>
-                <div style={{ marginTop: "10px", backgroundColor: "#252525", borderRadius: "4px", padding: "10px" }}>
-                    <code style={{ textAlign: "left", maxWidth: "400px" }}>
-                        <pre style={{ maxWidth: "400px", minWidth: "400px" }}>
-                            {templateData}
-                        </pre>
-                    </code>
+                <div style={{ marginTop: "10px",  borderRadius: "4px", padding: "10px" }}>
+                        <div style={{ maxWidth: "550px", minWidth: "550px", margin:"auto" }}>
+                            {templateData !== "" ?
+                            <TemplateHighlighter data={templateData} lang={"yaml"}/>
+                            :
+""}
+                        </div>
                 </div>
             </div>
             <div className="divider-dark" />

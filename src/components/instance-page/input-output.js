@@ -4,6 +4,19 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from '../../util-funcs';
 
 
+export function TemplateHighlighter(props) {
+    const {data, lang} = props
+    console.log(data, lang)
+    return(
+            <div className="input-output" style={{ maxHeight:"300px", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
+            <SyntaxHighlighter language={lang} style={tomorrow}>
+            {data}
+0           </SyntaxHighlighter>
+            </div>
+
+    )
+}
+
 function ReactSyntaxHighlighter(props) {
     const {code}=props
 

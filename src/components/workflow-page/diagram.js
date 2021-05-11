@@ -33,6 +33,20 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                     type: 'state'
                 })
 
+                // check if the state has events
+                if (v.states[i].events) {
+                    for(let j=0; j < v.states[i].events.length; j++) {
+                        if(v.states[i].events[j].transition) {
+                            newElements.push({
+                                id: `${v.states[i].id}-${v.states[i].events[j].transition}`,
+                                source: v.states[i].id,
+                                target: v.states[i].events[j].transition,
+                                animated: false,
+                                type: 'bezier'
+                            })
+                        }
+                    }
+                }
 
                 // Check if the state has conditions
                 if(v.states[i].conditions) {
