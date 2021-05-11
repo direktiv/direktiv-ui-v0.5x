@@ -10,7 +10,7 @@ import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 
 
 function SettingsAction(props) {
-    const { namespace, fetch, namespaces, fetchNamespaces, setNamespace, handleError } = useContext(MainContext)
+    const { namespace, fetch, namespaces, fetchNamespaces, setNamespace, handleError, permissions, checkPerm } = useContext(MainContext)
     const history = useHistory()
     const [err, setErr] = useState("")
 
@@ -56,12 +56,13 @@ function SettingsAction(props) {
                 err !== "" ?    <div style={{ display:"flex", alignItems:"center", marginRight:"20px", fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                 {err}
                 </div> :"" }
+                {checkPerm(permissions, "deleteNamespace") ? 
        <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px" }}>
             <ConfirmButton ConfirmationText={"Delete Namespace Confirmation"} Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                 deleteNamespace()
                 ev.stopPropagation()
             }} />
-        </div>
+        </div>: ""}
         </>
     )
 }
@@ -100,7 +101,7 @@ export default function SettingsPage() {
 
 function Secrets() {
 
-    const { fetch, namespace, handleError } = useContext(MainContext)
+    const { fetch, namespace, handleError, permissions, checkPerm } = useContext(MainContext)
     const [secrets, setSecrets] = useState([])
     const [key, setKey] = useState("")
     const [value, setValue] = useState("")
@@ -178,12 +179,7 @@ function Secrets() {
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-            {
-                err !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
-                </div>
-                :
-            <>
+         
             {actionErr !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                              {actionErr}
                              </div>
@@ -203,7 +199,12 @@ function Secrets() {
                     </tr>
                 </thead>
                 <tbody>
-                    {secrets.map((obj) => {
+                {
+                err !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div>
+                :
+                    secrets.map((obj) => {
                         return (
                             <tr key={obj.name}>
                                 <td style={{ paddingLeft: "10px" }}>
@@ -212,16 +213,18 @@ function Secrets() {
                                 <td style={{ paddingRight: "10px" }} colSpan="2">
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
+                                        {checkPerm(permissions, "deleteSecret")?  
                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                 deleteSecret(obj.name)
                                             }} />
-                                        </div>
+                                        </div>:""}
                                     </div>
                                 </td>
                             </tr>
                         )
                     })}
+                    {checkPerm(permissions, "createSecret") ? 
                     <tr>
                         <td style={{ paddingLeft: "10px" }}>
                             <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e) => setKey(e.target.value)} />
@@ -236,18 +239,16 @@ function Secrets() {
                                 </div>
                             </div>
                         </td>
-                    </tr>
+                    </tr>:""}
                 </tbody>
             </table>
-            </>
-            }
         </div>
     )
 }
 
 function Registries() {
 
-    const { fetch, namespace, handleError } = useContext(MainContext)
+    const { fetch, namespace, handleError, permissions, checkPerm } = useContext(MainContext)
     const [name, setName] = useState("")
     const [user, setUser] = useState("")
     const [token, setToken] = useState("")
@@ -327,11 +328,7 @@ function Registries() {
 
     return (
         <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-            {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
-                </div>
-            :
-            <>
+       
             {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                 {actionErr}
                 </div>: "" }
@@ -353,7 +350,12 @@ function Registries() {
                     </tr>
                 </thead>
                 <tbody>
-                    {registries.map((obj) => {
+                    <>
+                    {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                {err}
+                </div>
+            :
+                    registries.map((obj) => {
                         return (
                             <tr key={obj.name}>
                                 <td style={{ paddingLeft: "10px" }}>
@@ -365,16 +367,20 @@ function Registries() {
                                 <td style={{ paddingRight: "10px" }} colSpan="2">
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
+                                        {checkPerm(permissions, "deleteRegistry")?  
+                                        
                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                 deleteRegistry(obj.name)
                                             }} />
-                                        </div>
+                                        </div>: ""}
                                     </div>
                                 </td>
                             </tr>
                         )
                     })}
+                        {checkPerm(permissions, "createRegistry") ? 
+
                     <tr>
                         <td style={{ paddingLeft: "10px" }}>
                             <input style={{ maxWidth: "150px" }} type="text" onChange={(e) => setName(e.target.value)} value={name} placeholder="Enter URL" />
@@ -392,11 +398,10 @@ function Registries() {
                                 </div>
                             </div>
                         </td>
-                    </tr>
+                    </tr>: ""}
+                    </>
                 </tbody>
             </table>
-            </>
-}
         </div>
     )
 }

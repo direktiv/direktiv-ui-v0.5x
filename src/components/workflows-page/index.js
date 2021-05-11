@@ -225,7 +225,7 @@ function readFile(file) {
     })
 }
 
-function parseYaml(fetch, name, namespace, data, setErr, history) {
+function parseYaml(fetch, name, namespace, data, setErr, history, handleError) {
     const invalidNameErr = validateName(name, "workflow name")
     if (invalidNameErr) {
         setErr(`Name is invalid: ${invalidNameErr}`)
@@ -235,7 +235,7 @@ function parseYaml(fetch, name, namespace, data, setErr, history) {
     try {
         let y = YAML.load(data, 'utf8')
         y.id = name
-        createWorkflow(fetch, YAMLtoString.stringify(y), namespace, setErr, undefined, history)
+        createWorkflow(fetch, YAMLtoString.stringify(y), namespace, setErr, undefined, history, handleError)
     } catch (e) {
         setErr(`Unable to parse YAML: ${e.message}`)
     }
@@ -425,7 +425,7 @@ function NewWorkflowForm() {
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-            parseYaml(fetch, name, namespace, templateData, setErr, history)
+            parseYaml(fetch, name, namespace, templateData, setErr, history, handleError)
         }
     }
 

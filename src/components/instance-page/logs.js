@@ -65,6 +65,7 @@ export default function Logs(props) {
     useEffect(()=>{
         statusRef.current = status
         if(status !== undefined){
+                fetchLogs()
                 let timer = setInterval(async ()=>{
                     fetchLogs()
                     if(statusRef.current !== "pending") {

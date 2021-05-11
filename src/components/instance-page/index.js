@@ -33,7 +33,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function InstancePage() {
-    const {fetch, namespace, handleError} = useContext(MainContext)
+    const {fetch, namespace, handleError, checkPerm, permissions} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -128,7 +128,7 @@ export default function InstancePage() {
                     {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
                     
                     <>
-                    {startType ?
+                    {startType && checkPerm(permissions, "executeWorkflow") ?
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={async () => {
                         try{
@@ -150,6 +150,9 @@ export default function InstancePage() {
                                 Rerun Workflow
                         </div>
                     </div>:""}</> : 
+                    <>
+                    {checkPerm(permissions, "cancelInstance") ?
+
   <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
   onClick={async () => {
     try {
@@ -166,7 +169,8 @@ export default function InstancePage() {
       <div style={{ alignItems: "center" }}>
               Cancel Execution
       </div>
-  </div>
+  </div> :""}
+  </>
                     }</>
                     <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={() => {

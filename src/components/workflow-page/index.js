@@ -304,7 +304,7 @@ const updateLogEvent = useCallback(()=>{
                                 </div>
                             </div>: 
                             <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                              You are not allowed to execute workflow. Contact System Admin to grant 'executeWorkflow'
+                              You are unable to 'execute workflow', contact system admin to grant 'executeWorkflow'.
                             </div>
                             }
                         </div>
@@ -491,9 +491,6 @@ function EventsList(props) {
                             <li style={{ cursor: "pointer" }} className="event-list-item">
                                 <div>
                                     <span><CircleFill className={obj.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                                    <span style={{ fontSize: "8pt", textAlign: "left", marginRight: "10px" }}>
-                                        {dayjs.unix(obj.beginTime.seconds).fromNow()}
-                                    </span>
                                     <span>
                                         {obj.id}
                                     </span>
