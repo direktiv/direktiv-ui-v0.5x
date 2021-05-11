@@ -94,7 +94,7 @@ export default function Navbar(props) {
                 history.push(`/${val}`)
 
             } else {
-                await handleError('create namespace', resp, 'AddNamespace')
+                await handleError('create namespace', resp, 'addNamespace')
             }
         } catch(e) {
             setError(`Failed to create namespace: ${e.message}`)
@@ -310,7 +310,6 @@ export default function Navbar(props) {
                             </div>
                         </Link>}
                     </li>
-                    {checkPerm(permissions, "jqPlayground") ? 
                     <li>
                         <Link style={{color: matchJQ !== null ? "#4497f5": ""}} onClick={()=>{
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
@@ -323,7 +322,6 @@ export default function Navbar(props) {
                             </div>
                         </Link>
                     </li>
-                    :""}
                     {
                         navItems ? 
                         <>

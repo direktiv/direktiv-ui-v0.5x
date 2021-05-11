@@ -42,7 +42,7 @@ function SettingsAction(props) {
 
 
             } else {
-                await handleError('delete namespace', resp, 'DeleteNamespace')
+                await handleError('delete namespace', resp, 'deleteNamespace')
             }
         } catch(e) {
             setErr(`Failed to delete namespace: ${e.message}`)
@@ -121,7 +121,7 @@ function Secrets() {
                         setSecrets([])
                     }
                 } else {
-                        await handleError('fetch secrets', resp, 'ListSecrets')
+                        await handleError('fetch secrets', resp, 'listSecrets')
                 }
             } catch (e) {
                 setErr(`Failed to fetch secrets: ${e.message}`)
@@ -147,7 +147,7 @@ function Secrets() {
                     setValue("")
                     fetchS()
                 } else {
-                        await handleError('create secret', resp, 'CreateSecret')                        
+                        await handleError('create secret', resp, 'createSecret')                        
                 }
             } catch (e) {
                 setActionErr(`Failed to create secret: ${e.message}`)
@@ -169,7 +169,7 @@ function Secrets() {
                 setActionErr("")
                 fetchS()
             } else {
-                await handleError('delete secret', resp, 'DeleteSecret')
+                await handleError('delete secret', resp, 'deleteSecret')
             }
         } catch (e) {
             setActionErr(`Failed to delete secret: ${e.message}`)
@@ -269,7 +269,7 @@ function Registries() {
                         setRegistries([])
                     }
                 } else {
-                        await handleError('fetch registries', resp, 'ListRegistries')
+                        await handleError('fetch registries', resp, 'listRegistries')
                 }
             } catch (e) {
                 setErr(`Failed to fetch registries: ${e.message}`)
@@ -296,7 +296,7 @@ function Registries() {
                     setActionErr("")
                     fetchR()
                 } else {
-                        await handleError('create registry', resp, 'CreateRegistry')
+                        await handleError('create registry', resp, 'createRegistry')
                 }
             } catch (e) {
                 setActionErr(`Failed to create registry: ${e.message}`)
@@ -318,7 +318,7 @@ function Registries() {
                 setActionErr("")
                 fetchR()
             } else {
-                    await handleError('delete registry', resp, 'DeleteRegistry')
+                    await handleError('delete registry', resp, 'deleteRegistry')
             }
         } catch (e) {
             setActionErr(`Failed to delete registry: ${e.message}`)

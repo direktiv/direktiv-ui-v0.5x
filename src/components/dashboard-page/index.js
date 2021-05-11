@@ -56,7 +56,7 @@ export default function DashboardPage() {
                     // setInstances(json)
                     setMetrics(data)
                 } else {
-                        await handleError('fetch metrics', resp, 'ListInstances')
+                        await handleError('fetch metrics', resp, 'listInstances')
                 }
             } catch(e) {
                 setErr(`Failed to fetch metrics for workflow: ${e.message}`)

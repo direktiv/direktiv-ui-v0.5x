@@ -58,7 +58,7 @@ export function EventsPageBody() {
                         setInstances([])
                     }
                 } else {
-                    await handleError('fetch instances', resp, 'ListInstances')
+                    await handleError('fetch instances', resp, 'listInstances')
                 }
             } catch(e) {
                 setErr(`Failed to fetch instances: ${e.message}`)

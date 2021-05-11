@@ -37,7 +37,7 @@ export default function Logs(props) {
                     method: "GET"
                 })
                 if(!resp.ok) {
-                        await handleError('fetch logs', resp, 'GetInstanceLogs')
+                        await handleError('fetch logs', resp, 'getInstanceLogs')
                 } else {
                     let json = await resp.json()
                     

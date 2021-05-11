@@ -37,7 +37,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function WorkflowPage() {
-    const {fetch, namespace, handleError, attributeAdd, permissions, checkPerm} = useContext(MainContext)
+    const {fetch, namespace, handleError, attributeAdd} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -88,7 +88,7 @@ export default function WorkflowPage() {
                     })
                     setLogEvent(json.logToEvents)
                 } else {
-                    await handleError('fetch workflow', resp, 'GetWorkflow')
+                    await handleError('fetch workflow', resp, 'getWorkflow')
                 }
             } catch(e) {
                 // sendNotification("Failed to fetch workflow", e.message, 0)
@@ -128,7 +128,7 @@ export default function WorkflowPage() {
                     setActionErr("")
                     history.replace(`${json.id}`)
                 } else {
-                        await handleError('update workflow', resp, 'UpdateWorkflow')
+                        await handleError('update workflow', resp, 'updateWorkflow')
                 }
             } catch(e) {
                 setActionErr(`Failed to update workflow: ${e.message}`)
@@ -155,7 +155,7 @@ const updateLogEvent = useCallback(()=>{
                 body: workflowValueOld
             })
             if (!resp.ok) {
-                    await handleError('post log event', resp, 'UpdateWorkflow')
+                    await handleError('post log event', resp, 'updateWorkflow')
             } else {
                 setActionErr("")
             }
@@ -224,7 +224,7 @@ const updateLogEvent = useCallback(()=>{
                 let json = await resp.json()    
                 history.push(`/i/${json.instanceId}`)
             } else {
-                    await handleError('execute workflow', resp, 'ExecuteWorkflow')
+                    await handleError('execute workflow', resp, 'executeWorkflow')
             }
         } catch(e) {
             setExecuteErr(`Failed to execute workflow: ${e.message}`)
@@ -247,7 +247,7 @@ const updateLogEvent = useCallback(()=>{
                 setToggleErr("")
 
             } else {
-                    await handleError('toggle workflow', resp, 'ToggleWorkflow')
+                    await handleError('toggle workflow', resp, 'toggleWorkflow')
             }
         } catch(e) {
             setToggleErr(`Failed to toggle workflow: ${e.message}`)
@@ -269,13 +269,11 @@ const updateLogEvent = useCallback(()=>{
                 {toggleErr}
                 </div>:""
                 }
-                <WorkflowActions checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
+                <WorkflowActions viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
-                    {checkPerm(permissions, "updateWorkflow") || checkPerm(permissions, "executeWorkflow") ? 
                     <div className="container" style={{ flexDirection: "row" }}>
-                        {checkPerm(permissions, "updateWorkflow") && checkPerm(permissions, "getWorkflow") ? 
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2", minWidth: "350px" }}>
                             <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
                                 <IoPencil />
@@ -292,8 +290,7 @@ const updateLogEvent = useCallback(()=>{
                                 </div>
                             </div>
                             }
-                        </div>: ""}
-                        {checkPerm(permissions, "executeWorkflow") ?
+                        </div>
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", minWidth: "350px" }}>
                             <TileTitle name="Execute Workflow">
                                 <IoChevronForwardOutline />
@@ -306,10 +303,8 @@ const updateLogEvent = useCallback(()=>{
                                   
                                 </div>
                             </div>
-                        </div>: ""}
-                    </div> :""}
-                    {checkPerm(permissions, "getWorkflow") ? 
-                    <>
+                        </div>
+                    </div>
                     {viewSankey ?
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Sankey">
@@ -358,11 +353,8 @@ const updateLogEvent = useCallback(()=>{
 }
                     </div>
                     }
-                    
-                    </>: ""}
                 </div>
                 <div className="container graph-contents" style={{ width: "300px" }}>
-                    {checkPerm(permissions, "getWorkflowMetrics") ?
                     <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
                         <TileTitle name="Executed Workflows">
                             <IoPieChartSharp />
@@ -370,7 +362,7 @@ const updateLogEvent = useCallback(()=>{
                         <div id="pie-dish" className="tile-contents">
                             <PieComponent/>
                         </div>
-                    </div>: ""}
+                    </div>
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Instances">
                             <IoList />
@@ -415,7 +407,7 @@ function PieComponent() {
                     ]
                     setMetrics(met)
                 } else {
-                        await handleError('fetch metrics', resp, 'GetWorkflowMetrics')
+                        await handleError('fetch metrics', resp, 'getWorkflowMetrics')
                 }
             } catch(e) {
                 setErr(`Failed to fetch metrics for workflow: ${e.message}`)
@@ -465,7 +457,7 @@ function EventsList(props) {
                         setInstances([])                        
                     }
                 } else {
-                    await handleError('fetch workflow instances', resp, 'ListWorkflowInstances')
+                    await handleError('fetch workflow instances', resp, 'listWorkflowInstances')
                 }
             }catch(e){
                 setErr(`Unable to fetch workflow instances: ${e.message}`)
@@ -515,11 +507,10 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const {active, toggleWorkflow, checkPerm, permissions} = props
+    const {active, toggleWorkflow} = props
 
     return(
         <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center", marginRight:"12px"}}>
-            {checkPerm(permissions, "toggleWorkflow") ? 
             <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"Enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
                     {
                         active ?
@@ -532,8 +523,7 @@ function WorkflowActions(props) {
                 </span>
 
                     }
-            </div>:
-            ""}
+            </div>
         </div>
   
     )

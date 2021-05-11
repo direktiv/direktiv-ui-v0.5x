@@ -65,7 +65,7 @@ export default function InstancePage() {
                         setWf(wfn)
                         setStartType(start)
                     } else {
-                        await handleError('fetch workflow', resp, 'GetWorkflow')
+                        await handleError('fetch workflow', resp, 'getWorkflow')
                     }
                 } catch(e) {
                     setWorkflowErr(`Failed to fetch workflow: ${e.message}`)
@@ -87,7 +87,7 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setInstanceDetails(json)
                 } else {
-                    await handleError('fetch instance details', resp, 'GetInstance')
+                    await handleError('fetch instance details', resp, 'getInstance')
                 }
             } catch(e) {
                 setDetailsErr(`Fetch Instance details failed: ${e.message}`)
@@ -140,7 +140,7 @@ export default function InstancePage() {
                                 let json = await resp.json()    
                                 history.push(`/i/${json.instanceId}`)
                             } else {
-                                await handleError('rerun workflow', resp, 'ExecuteWorkflow')
+                                await handleError('rerun workflow', resp, 'executeWorkflow')
                             }
                         } catch(e) {
                             setActionErr(`Unable to execute workflow: ${e.message}`)
@@ -157,7 +157,7 @@ export default function InstancePage() {
             method: "DELETE"
         })
         if(!resp.ok) {
-            await handleError('cancel instance', resp, 'CancelInstance')
+            await handleError('cancel instance', resp, 'cancelInstance')
         }
     }  catch(e) {
         setActionErr(`Instance cancelled error: ${e.message}`)

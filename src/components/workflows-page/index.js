@@ -58,7 +58,7 @@ export default function WorkflowsPage() {
                         setWorkflows([])
                     }
                 } else {
-                    await handleError('fetch workflows', resp, 'ListWorkflows')
+                    await handleError('fetch workflows', resp, 'listWorkflows')
                 }
             } catch (e) {
                 setErr(`Failed to fetch workflows: ${e.message}`)
@@ -73,7 +73,7 @@ export default function WorkflowsPage() {
                 method: "DELETE"
             })
             if (!resp.ok) {
-                    await handleError('delete workflow', resp, 'DeleteWorkflow')
+                    await handleError('delete workflow', resp, 'deleteWorkflow')
             }
             fetchWorkflows()
         } catch (e) {
@@ -87,7 +87,7 @@ export default function WorkflowsPage() {
                 method: "PUT",
             })
             if (!resp.ok) {
-                    await handleError('toggle workflow', resp, 'ToggleWorkflow')                    
+                    await handleError('toggle workflow', resp, 'toggleWorkflow')                    
             }
             fetchWorkflows()
         } catch (e) {
@@ -259,7 +259,7 @@ async function createWorkflow(fetch, data, namespace, setErr, setFiles, history,
             // setErr("")
             history.push(`/${namespace}/w/${json.id}`)
         } else {
-                await handleError('create workflow', resp, 'CreateWorkflow')
+                await handleError('create workflow', resp, 'createWorkflow')
         }
     } catch (e) {
         setErr(`Workflow creation failed: ${e.message}`)
@@ -287,7 +287,7 @@ function APIInteractionTile() {
                     setVal("")
                     setErr("")
                 } else {
-                        await handleError('send event', resp, 'NamespaceEvent')
+                        await handleError('send event', resp, 'namespaceEvent')
                 }
             } catch (e) {
                 setErr(`Failed to send cloud event: ${e.message}`)
@@ -382,7 +382,7 @@ function NewWorkflowForm() {
                         let text = await resp.text()
                         setData(text)
                     } else {
-                            await handleError('fetch template', resp, 'GetWorkflowTemplate')
+                            await handleError('fetch template', resp, 'getWorkflowTemplate')
                     }
                 } catch (e) {
                     setErr(`Failed to fetch template data: ${e.message}`)
@@ -408,7 +408,7 @@ function NewWorkflowForm() {
                         setTemplates(json)
                     }
                 } else {
-                        await handleError('fetch templates', resp, 'ListWorkflowTemplates')
+                        await handleError('fetch templates', resp, 'listWorkflowTemplates')
                 }
             } catch (e) {
                 setErr(`Failed to fetch a list of templates: ${e.message}`)

@@ -125,7 +125,7 @@ export default function JQPlaygroundPage() {
                 })
 
                 if (!resp.ok) {
-                    await handleError('execute jq', resp, 'JQPlayground')
+                    await handleError('execute jq', resp, 'jqPlayground')
                 } else {
                     let jqOut = await resp.text();
                     setJQOutput(jqOut)
