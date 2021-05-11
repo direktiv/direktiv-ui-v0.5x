@@ -37,7 +37,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function WorkflowPage() {
-    const {fetch, namespace, handleError, attributeAdd} = useContext(MainContext)
+    const {fetch, namespace, handleError, attributeAdd, checkPerm, permissions} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -269,7 +269,7 @@ const updateLogEvent = useCallback(()=>{
                 {toggleErr}
                 </div>:""
                 }
-                <WorkflowActions viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
+                <WorkflowActions checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
@@ -295,14 +295,18 @@ const updateLogEvent = useCallback(()=>{
                             <TileTitle name="Execute Workflow">
                                 <IoChevronForwardOutline />
                             </TileTitle>
+                            {checkPerm(permissions, "executeWorkflow") ? 
                             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top:"-28px", position: "relative"}}>
                                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                                     <div style={{height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
                                         <Editor err={executeErr} value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]}/>
-                                    </div>
-                                  
+                                    </div>         
                                 </div>
+                            </div>: 
+                            <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                              You are not allowed to execute workflow. Contact System Admin to grant 'executeWorkflow'
                             </div>
+                            }
                         </div>
                     </div>
                     {viewSankey ?
@@ -507,10 +511,11 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const {active, toggleWorkflow} = props
+    const {checkPerm, permissions, active, toggleWorkflow} = props
 
     return(
         <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center", marginRight:"12px"}}>
+            {checkPerm(permissions, "toggleWorkflow") ? 
             <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"Enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
                     {
                         active ?
@@ -523,7 +528,7 @@ function WorkflowActions(props) {
                 </span>
 
                     }
-            </div>
+            </div>: ""}
         </div>
   
     )
