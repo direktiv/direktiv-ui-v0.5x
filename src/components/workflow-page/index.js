@@ -37,7 +37,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function WorkflowPage() {
-    const {fetch, namespace, handleError, attributeAdd} = useContext(MainContext)
+    const {fetch, namespace, handleError, attributeAdd, permissions, checkPerm} = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -269,11 +269,13 @@ const updateLogEvent = useCallback(()=>{
                 {toggleErr}
                 </div>:""
                 }
-                <WorkflowActions viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
+                <WorkflowActions checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow}/>
             </div>
             <div id="workflows-page">
                 <div className="container" style={{ flexGrow: "2" }}>
+                    {checkPerm(permissions, "updateWorkflow") || checkPerm(permissions, "executeWorkflow") ? 
                     <div className="container" style={{ flexDirection: "row" }}>
+                        {checkPerm(permissions, "updateWorkflow") && checkPerm(permissions, "getWorkflow") ? 
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2", minWidth: "350px" }}>
                             <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
                                 <IoPencil />
@@ -290,7 +292,8 @@ const updateLogEvent = useCallback(()=>{
                                 </div>
                             </div>
                             }
-                        </div>
+                        </div>: ""}
+                        {checkPerm(permissions, "executeWorkflow") ?
                         <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", minWidth: "350px" }}>
                             <TileTitle name="Execute Workflow">
                                 <IoChevronForwardOutline />
@@ -303,8 +306,10 @@ const updateLogEvent = useCallback(()=>{
                                   
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div>: ""}
+                    </div> :""}
+                    {checkPerm(permissions, "getWorkflow") ? 
+                    <>
                     {viewSankey ?
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Sankey">
@@ -353,8 +358,11 @@ const updateLogEvent = useCallback(()=>{
 }
                     </div>
                     }
+                    
+                    </>: ""}
                 </div>
                 <div className="container graph-contents" style={{ width: "300px" }}>
+                    {checkPerm(permissions, "getWorkflowMetrics") ?
                     <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
                         <TileTitle name="Executed Workflows">
                             <IoPieChartSharp />
@@ -362,7 +370,7 @@ const updateLogEvent = useCallback(()=>{
                         <div id="pie-dish" className="tile-contents">
                             <PieComponent/>
                         </div>
-                    </div>
+                    </div>: ""}
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle name="Instances">
                             <IoList />
@@ -507,10 +515,11 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const {active, toggleWorkflow} = props
+    const {active, toggleWorkflow, checkPerm, permissions} = props
 
     return(
         <div style={{display: "flex", flexDirection: "row-reverse", alignItems:"center", marginRight:"12px"}}>
+            {checkPerm(permissions, "toggleWorkflow") ? 
             <div onClick={()=>toggleWorkflow()} title={active ? "Disable":"Enable"} className="circle button" style={{  position: "relative", zIndex: "5" }}>
                     {
                         active ?
@@ -523,7 +532,8 @@ function WorkflowActions(props) {
                 </span>
 
                     }
-            </div>
+            </div>:
+            ""}
         </div>
   
     )
