@@ -26,7 +26,7 @@ export default function Navbar(props) {
     const [acceptInput, setAcceptInput] = useState(false)
     const [err, setError] = useState("")
 
-    const {fetch, namespace, setNamespace, namespaces, fetchNamespaces, handleError} = useContext(MainContext)
+    const {fetch, namespace, setNamespace, namespaces, fetchNamespaces, handleError, checkPerm, permissions} = useContext(MainContext)
     const {footer, navItems} = props
     
 
@@ -168,8 +168,10 @@ export default function Navbar(props) {
                         <div style={{ width: "100%" }} >
                             <ul>
                                 <>
+                                {checkPerm(permissions, "addNamespace") ? 
                                 <li>
                                     <div style={{display:"flex", flexDirection:"column", flexFlow:"wrap"}}>
+                                    
                                     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", paddingTop:"5px" }}>
                                         <PlusCircle style={{ fontSize: "12pt", marginRight: "10px" }} />
                                         {acceptInput ? 
@@ -194,10 +196,10 @@ export default function Navbar(props) {
                                         </>
                                     </div>
                                     {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
-                </div>:""}
+                                        {err}
+                                        </div>:""}
                                     </div>
-                                </li>
+                                </li>:""}
                                 {namespaces === null || namespaces === undefined  ? "":
                                 <>
                                     {namespaces.map((obj, j)=>{
@@ -308,6 +310,7 @@ export default function Navbar(props) {
                             </div>
                         </Link>}
                     </li>
+                    {checkPerm(permissions, "jqPlayground") ? 
                     <li>
                         <Link style={{color: matchJQ !== null ? "#4497f5": ""}} onClick={()=>{
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
@@ -320,6 +323,7 @@ export default function Navbar(props) {
                             </div>
                         </Link>
                     </li>
+                    :""}
                     {
                         navItems ? 
                         <>
