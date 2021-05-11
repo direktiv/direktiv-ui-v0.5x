@@ -74,7 +74,7 @@ export default function Logs(props) {
                 }, 2000)
                 timerRef.current = timer
         }
-        fetchLogs()
+        // fetchLogs()
     },[status, fetchLogs])
 
     // Handle rerunning to set back to default values
