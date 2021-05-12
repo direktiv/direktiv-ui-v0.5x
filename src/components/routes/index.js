@@ -16,7 +16,7 @@ export default function Routes(props) {
       return ""
     }
 
-    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/") {
+    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
         history.push("/")
     } 
