@@ -239,7 +239,7 @@ export default function InstancePage() {
                                     {detailsErr}
                                 </div>
                                 :
-                        <InputOutput data={instanceDetails.input} status={instanceDetails.status} />
+                        <InputOutput id="input" data={instanceDetails.input} status={instanceDetails.status} />
 }
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
@@ -252,7 +252,7 @@ export default function InstancePage() {
                                     {detailsErr}
                                 </div>
                                 :
-                        <InputOutput data={instanceDetails.output} status={instanceDetails.status}/>
+                        <InputOutput id="output" data={instanceDetails.output} status={instanceDetails.status}/>
                         }
                         </div>
                 </div>

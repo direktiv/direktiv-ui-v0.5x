@@ -14,7 +14,6 @@ import { useHistory, useParams } from 'react-router'
 import {Link} from "react-router-dom"
 import MainContext from '../../context'
 import Sankey from './sankey'
-import * as dayjs from "dayjs"
 import {NoResults} from '../../util-funcs'
 
 
