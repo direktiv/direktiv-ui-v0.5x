@@ -10,15 +10,20 @@ import { CopyToClipboard } from '../../util-funcs';
 
 
 export function Code({ id, code, language }) {
+
     const [load, setLoad] = useState(true)
+    
     useEffect(() => {
-        
-      Prism.highlightElement(document.getElementById(id))
-      setLoad(false)
-    }, [id]);
+      async function highlightCodeBlock() {
+        setLoad(true)
+        Prism.highlightElement(document.getElementById(id))
+        setLoad(false)
+      }
+      highlightCodeBlock()
+    }, [id, code]);
 
     return (
-      <div  className="Code">
+      <div style={{height:"99%"}} className="Code">
         <pre>
           <code style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</code>
         </pre>
@@ -27,14 +32,12 @@ export function Code({ id, code, language }) {
 }
 
 export function TemplateHighlighter(props) {
-    const {data, lang} = props
-
+    const {data, lang, id} = props
 
     return(
-            <div className="input-output" style={{ maxHeight:"91%", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
-                <Code id="yaml" language={lang} code={data} />
-            </div>
-
+        <div className="input-output" style={{ maxHeight:"300px", height:"300px", minHeight:"300px", overflow:"hidden", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
+            <Code  id={id} language={lang} code={data} />
+        </div>
     )
 }
 
@@ -55,11 +58,13 @@ function ReactSyntaxHighlighter(props) {
     }
 
     return(
-     <div className="input-output" style={{ maxHeight:"91%", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
-                    {!load ? 
-                    <Code id={id} language={"json"} code={data} />
-                        :""}
-            </div>
+        <div className="input-output" style={{ maxHeight:"91%", height:"92%", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
+            {!load ? 
+                <Code id={id} language={"json"} code={data} />
+                :
+                ""
+            }
+        </div>
     )
 }
 
