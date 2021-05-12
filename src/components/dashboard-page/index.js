@@ -96,7 +96,7 @@ export default function DashboardPage() {
                     <TileTitle name="Events">
                         <IoList />
                     </TileTitle>
-                    <div style={{maxHeight:"365px", overflow:"hidden"}}>
+                    <div style={{maxHeight:"365px", overflow:"auto"}}>
                         <EventsPageBody />
                     </div>
                 </div>
