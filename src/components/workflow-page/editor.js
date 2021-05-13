@@ -36,7 +36,7 @@ export default function ReactEditor(props) {
     return (
         <div className="editor-wrapper">
             {loading ? <div className="editor-loading"></div> : <></>}
-            <div style={{ height: `${height}`, minHeight: `${height}` }}>
+            <div className={showFooter ? "editor-small" : "editor-full"}>
                 <CodeMirror
                     value={value}
                     options={{
