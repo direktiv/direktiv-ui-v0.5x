@@ -1,38 +1,75 @@
+import { useEffect, useState } from 'react';
 import { IoCopy } from 'react-icons/io5';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
+
+import "prismjs/components/prism-json"
+import "prismjs/components/prism-yaml"
+
 import { CopyToClipboard } from '../../util-funcs';
 
 
-export function TemplateHighlighter(props) {
-    const {data, lang} = props
-    console.log(data, lang)
-    return(
-            <div className="input-output" style={{ maxHeight:"300px", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
-            <SyntaxHighlighter language={lang} style={tomorrow}>
-            {data}
-0           </SyntaxHighlighter>
-            </div>
+export function Code({ id, code, language }) {
 
+    const [load, setLoad] = useState(true)
+    
+    useEffect(() => {
+      async function highlightCodeBlock() {
+        setLoad(true)
+        Prism.highlightElement(document.getElementById(id))
+        setLoad(false)
+      }
+      highlightCodeBlock()
+    }, [id, code]);
+
+    return (
+      <div style={{height:"99%"}} className="Code">
+        <pre>
+          <code style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</code>
+        </pre>
+      </div>
+    );
+}
+
+export function TemplateHighlighter(props) {
+    const {data, lang, id} = props
+
+    return(
+        <div className="input-output" style={{ maxHeight:"300px", height:"300px", minHeight:"300px", overflow:"hidden", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
+            <Code  id={id} language={lang} code={data} />
+        </div>
     )
 }
 
 function ReactSyntaxHighlighter(props) {
-    const {code}=props
+    const {code, id} = props
 
-    const json = JSON.parse(code)
-    const data = JSON.stringify(json, null, '\t')
+    const [data, setData] = useState(code)
+    const [load, setLoad] = useState(true)
 
+    useEffect(()=>{
+        const json = JSON.parse(atob(code))
+        setData(JSON.stringify(json, null, '\t'))
+        setLoad(false)
+    },[code])
+
+    if(load) {
+        return ""
+    }
 
     return(
-        <SyntaxHighlighter language="json" style={tomorrow}>
-            {data}
-        </SyntaxHighlighter>
+        <div className="input-output" style={{ maxHeight:"91%", height:"92%", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
+            {!load ? 
+                <Code id={id} language={"json"} code={data} />
+                :
+                ""
+            }
+        </div>
     )
 }
 
 export default function InputOutput(props) {
-    const {data, status} = props
+    const {data, status, id} = props
 
 
     if (data !== undefined && data !== "") {
@@ -40,7 +77,7 @@ export default function InputOutput(props) {
             <div className="editor-wrapper" style={{display: "flex", boxShadow:"none", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
                 <div style={{width: "100%", height: "100%", position: "relative"}}>
                     <div className="input-output" style={{borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
-                        <ReactSyntaxHighlighter code={atob(data)}/>
+                        <ReactSyntaxHighlighter id={id} code={data}/>
                     </div>
                 </div>
                 <div id="test" className="editor-footer">

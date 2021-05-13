@@ -469,7 +469,7 @@ function NewWorkflowForm() {
                 <div style={{ marginTop: "10px",  borderRadius: "4px", padding: "10px" }}>
                         <div style={{ maxWidth: "550px", minWidth: "550px", margin:"auto" }}>
                             {templateData !== "" ?
-                            <TemplateHighlighter data={templateData} lang={"yaml"}/>
+                            <TemplateHighlighter id={template} data={templateData} lang={"yaml"}/>
                             :
 ""}
                         </div>

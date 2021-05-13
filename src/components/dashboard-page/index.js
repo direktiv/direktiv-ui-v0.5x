@@ -92,11 +92,13 @@ export default function DashboardPage() {
                         </div>
                     }
                 </div>
-                <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1", maxHeight: "400px" }}>
+                <div className="shadow-soft rounded tile" style={{  flex: "auto", flexGrow: "1", maxHeight: "400px",  marginBottom:"10px" }}>
                     <TileTitle name="Events">
                         <IoList />
                     </TileTitle>
-                    <EventsPageBody />
+                    <div style={{maxHeight:"365px", overflow:"auto"}}>
+                        <EventsPageBody />
+                    </div>
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }}>

@@ -108,7 +108,6 @@ export default function InstancePage() {
         }
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
 
-    
     return(
         <>
         {namespace !== "" ?
@@ -192,6 +191,14 @@ export default function InstancePage() {
                     </div>
                 </div>
             </div>
+            {instanceDetails.errorMessage !== "" && instanceDetails.errorMessage !== undefined ?
+            <div className="container">
+                <div className="shadow-soft rounded tile">
+                    <div style={{fontSize:"12pt", background:"#f3b2b2", borderRadius:"4px", border:"1px solid red", padding:"5px"}}>
+                        Workflow Error: {instanceDetails.errorCode} - {instanceDetails.errorMessage} 
+                    </div>
+                </div>
+            </div>: ""}
             <div className="container" style={{ flexGrow: "1", flexDirection: "row" }}>
                 <div className="container" style={{ flexGrow: "inherit" }}>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
@@ -239,7 +246,7 @@ export default function InstancePage() {
                                     {detailsErr}
                                 </div>
                                 :
-                        <InputOutput data={instanceDetails.input} status={instanceDetails.status} />
+                        <InputOutput id="input" data={instanceDetails.input} status={instanceDetails.status} />
 }
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
@@ -252,7 +259,7 @@ export default function InstancePage() {
                                     {detailsErr}
                                 </div>
                                 :
-                        <InputOutput data={instanceDetails.output} status={instanceDetails.status}/>
+                        <InputOutput id="output" data={instanceDetails.output} status={instanceDetails.status}/>
                         }
                         </div>
                 </div>
