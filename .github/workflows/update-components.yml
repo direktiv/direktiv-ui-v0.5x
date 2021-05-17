@@ -18,6 +18,5 @@ jobs:
           bit config set error_reporting false
           bit config set user.token ${BIT_TOKEN}
           bit import 
-          bit link
           bit tag --all --ignore-newest-version
           bit export       
