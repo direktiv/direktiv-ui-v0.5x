@@ -293,6 +293,11 @@
                 "relativePath": "src/components/workflows-page/index.js",
                 "test": false,
                 "name": "index.js"
+            },
+            {
+                "relativePath": "src/components/workflows-page/interactions.js",
+                "test": false,
+                "name": "interactions.js"
             }
         ],
         "mainFile": "src/components/workflows-page/index.js",

@@ -1,12 +1,12 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import Breadcrumbs from '../breadcrumbs'
-import TileTitle from '../tile-title'
-import MainContext from '../../context'
+import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
+import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import XCircle from 'react-bootstrap-icons/dist/icons/x-circle'
 import { useHistory } from 'react-router'
 import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons/io5'
-import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
+import { ConfirmButton, MiniConfirmButton } from '@bit/vorteil.direktiv-legacy.confirm-button'
 
 
 function SettingsAction(props) {

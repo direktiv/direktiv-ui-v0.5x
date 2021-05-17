@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Breadcrumbs from '../breadcrumbs'
-import TileTitle from '../tile-title'
+import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
+import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
 
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import MainContext from '../../context'
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 import { Link } from 'react-router-dom'
 import { IoList } from 'react-icons/io5'
-import {NoResults} from '../../util-funcs'
+import {NoResults} from '@bit/vorteil.direktiv-legacy.util-funcs'
 dayjs.extend(relativeTime);
 
 export default function EventsPage() {

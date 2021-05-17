@@ -6,7 +6,7 @@ import "prismjs/themes/prism-tomorrow.css";
 import "prismjs/components/prism-json"
 import "prismjs/components/prism-yaml"
 
-import { CopyToClipboard } from '../../util-funcs';
+import { CopyToClipboard } from '@bit/vorteil.direktiv-legacy.util-funcs';
 
 
 export function Code({ id, code, language }) {

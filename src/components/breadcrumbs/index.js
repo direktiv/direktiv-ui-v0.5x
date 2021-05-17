@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 
 import { useHistory, useParams } from 'react-router'
 import useBreadcrumbs from 'use-react-router-breadcrumbs'
-import MainContext from '../../context'
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 
 export default function Breadcrumbs(props) {
     const {dashboard, instanceId } = props

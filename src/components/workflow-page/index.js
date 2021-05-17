@@ -1,21 +1,21 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react'
-import Breadcrumbs from '../breadcrumbs'
+import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
 import YAML from 'js-yaml'
 
 
-import TileTitle from '../tile-title'
+import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand } from 'react-icons/io5'
 import Modal from 'react-modal';
 
-import PieChart from '../charts/pie'
+import PieChart from '@bit/vorteil.direktiv-legacy.charts'
 import { useHistory, useParams } from 'react-router'
 import { Link } from "react-router-dom"
-import MainContext from '../../context'
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 import Sankey from './sankey'
-import {NoResults} from '../../util-funcs'
+import {NoResults} from '@bit/vorteil.direktiv-legacy.util-funcs'
 import Interactions from '../workflows-page/interactions'
 
 

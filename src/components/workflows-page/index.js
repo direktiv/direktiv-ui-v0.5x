@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import TileTitle from '../tile-title'
-import Breadcrumbs from '../breadcrumbs'
+import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
+import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
 import { useDropzone } from 'react-dropzone'
 
 import YAML from "js-yaml"
@@ -9,15 +9,15 @@ import YAMLtoString from "yaml"
 import { useCallback } from 'react'
 import { useState } from 'react'
 import { useContext } from 'react'
-import MainContext from '../../context'
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 import { useHistory } from 'react-router'
 import {Link} from 'react-router-dom'
 import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoCodeOutline } from 'react-icons/io5'
-import {NoResults} from '../../util-funcs'
+import {NoResults} from '@bit/vorteil.direktiv-legacy.util-funcs'
 import Modal from 'react-modal';
-import { ConfirmButton } from '../confirm-button'
-import { validateName } from "../../util-funcs"
-import { TemplateHighlighter } from '../instance-page/input-output'
+import { ConfirmButton } from '@bit/vorteil.direktiv-legacy.confirm-button'
+import { validateName } from "@bit/vorteil.direktiv-legacy.util-funcs"
+import { TemplateHighlighter } from '@bit/vorteil.direktiv-legacy.instance-page'
 import Interactions from './interactions'
 
 

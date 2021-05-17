@@ -1,11 +1,11 @@
 import React, { useContext, useState, useCallback } from 'react'
-import Breadcrumbs from '../breadcrumbs'
-import Editor from "../workflow-page/editor"
-import MainContext from '../../context'
+import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
+import Editor from "@bit/vorteil.direktiv-legacy.workflow-page"
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 
 
 
-import TileTitle from '../tile-title'
+import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
 import { IoInformationCircleSharp, IoPencil, IoChevronForwardOutline, IoCode } from 'react-icons/io5'
 
 

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react'
-import TileTitle from '../tile-title'
-import Breadcrumbs from '../breadcrumbs'
+import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
+import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
 import YAML from 'js-yaml'
 
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
@@ -8,11 +8,11 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import { useHistory, useParams } from 'react-router-dom'
 import Logs from './logs'
 import InputOutput from './input-output'
-import Diagram from '../workflow-page/diagram'
+import Diagram from '@bit/vorteil.direktiv-legacy.workflow-page'
 import Interactions from '../workflows-page/interactions'
 import Modal from 'react-modal';
 
-import MainContext from '../../context'
+import MainContext from '@bit/vorteil.direktiv-legacy.context'
 import { IoCode, IoEaselOutline, IoTerminal, IoCodeOutline } from 'react-icons/io5'
 
 
