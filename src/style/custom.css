@@ -893,3 +893,14 @@ pre {
     -webkit-transform:rotate(180deg);
     -o-transform:rotate(180deg);
 }
+
+.workflow-expand {
+    font-size: 13pt;
+    z-index: 101;
+    cursor: pointer;
+}
+
+.workflow-expand:hover {
+    color:#4497f5;
+
+}

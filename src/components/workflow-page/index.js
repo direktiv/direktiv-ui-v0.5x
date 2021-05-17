@@ -7,7 +7,7 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand } from 'react-icons/io5'
 import Modal from 'react-modal';
 
 import PieChart from '../charts/pie'
@@ -48,6 +48,7 @@ export default function WorkflowPage() {
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [executable, setExecutable] = useState(true)
+    const [fullscrenEditor, setFullScreenEditor] = useState(localStorage.getItem('fullscrenEditor') === "true")
     const [workflowInfo, setWorkflowInfo] = useState({ revision: 0, active: true, fetching: true })
 
     const [err, setErr] = useState("")
@@ -186,6 +187,10 @@ export default function WorkflowPage() {
         }
     }, [fetchWorkflow, namespace])
 
+    useEffect(() => {
+        localStorage.setItem('fullscrenEditor', fullscrenEditor);
+    }, [fullscrenEditor])
+
     let saveButton = (
         <div className={workflowValueOld !== workflowValue ? "editor-footer-button" : "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => { updateWorkflow() }}>
             <span style={{}} >Save</span>
@@ -267,6 +272,12 @@ export default function WorkflowPage() {
         }
     }
 
+    let WorkflowExpandButton = (
+        <div className={"workflow-expand "} onClick={() => { setFullScreenEditor(!fullscrenEditor) }} >
+            <IoExpand/>
+        </div>
+    )
+
     const Actions = [logButton, saveButton]
 
     return (
@@ -294,10 +305,10 @@ export default function WorkflowPage() {
                     </div>
                     <div id="workflows-page">
                         <div className="container" style={{ flexGrow: "2" }}>
-                            <div className="container" style={{ flexDirection: "row" }}>
+                            <div className="container" style={fullscrenEditor ? { flexDirection: "row", height: "100%"} : { flexDirection: "row"}}>
                                 <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "2", minWidth: "350px" }}>
-                                    <TileTitle name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
-                                        <IoPencil />
+                                    <TileTitle actionsDiv={WorkflowExpandButton} name={`Editor ${workflowValueOld !== workflowValue ? "*" : ""}`} >
+                                        <IoPencil/>
                                     </TileTitle>
                                     {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                                         {err}
@@ -312,6 +323,7 @@ export default function WorkflowPage() {
                                         </div>
                                     }
                                 </div>
+                                {!fullscrenEditor ?
                                 <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", minWidth: "350px" }}>
                                     <TileTitle name="Execute Workflow">
                                         <IoChevronForwardOutline />
@@ -328,8 +340,10 @@ export default function WorkflowPage() {
                                             You are unable to 'execute workflow', contact system admin to grant 'executeWorkflow'.
                             </div>
                                     }
-                                </div>
+                                </div> : <></>}
                             </div>
+                            {!fullscrenEditor ?
+                            <>
                             {viewSankey ?
                                 <div className="item-0 shadow-soft rounded tile">
                                     <TileTitle name="Sankey">
@@ -377,7 +391,7 @@ export default function WorkflowPage() {
                                         </div>
                                     }
                                 </div>
-                            }
+                            }</>  : <></>}
                         </div>
                         <div className="container graph-contents" style={{ width: "300px" }}>
                             <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
