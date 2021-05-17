@@ -21,11 +21,8 @@ export function CheckPerm() {
 const InstanceInteractions = (namespace, workflow, instance) => [
   {
     title: `Get details for '${namespace}/${workflow}/${instance}'`,
-    description: `The following endpoint allows you to get the details about a certain instance
-    
-${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}
-
-The request returns details about the instance. Input and Output are base64 encoded.
+    url: `${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}`,
+    description: `The request returns details about the instance. Input and Output are base64 encoded.
 
 {
   "id": "test/test/ikENVF",
@@ -51,11 +48,8 @@ The request returns details about the instance. Input and Output are base64 enco
   },
   {
     title: `Get logs for '${namespace}/${workflow}/${instance}'`,
-    description: `The following endpoint gets the logs for a certain instance
-    
-${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}/logs
-
-The request returns a list of logs
+    url: `${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}/logs`,
+    description: `The request returns a list of logs
 
 {
   "workflowInstanceLogs": [
@@ -96,9 +90,8 @@ The request returns a list of logs
   },
   {
     title: `Cancel '${namespace}/${workflow}/${instance}'`,
-    description: `The following endpoint allows you to cancel the instance currently running.
-    
-${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}`,
+    url: `${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}`,
+    description: `No description required.`,
     method: "DELETE"
   }
 ]
@@ -106,11 +99,8 @@ ${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}`,
 const WorkflowInteractions = (namespace, workflow) => [
   {
     title: `Get '${workflow}'`,
-    description: `The following endpoint allows you to get the yaml definition for a workflow.
-    
-${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}
-
-The request returns a json struct which contains 'workflow' which is a base64 encoded version of the YAML workflow.
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}`,
+    description: `The request returns a json struct which contains 'workflow' which is a base64 encoded version of the YAML workflow.
 
 {
   "name": "helloworld",
@@ -129,11 +119,8 @@ The request returns a json struct which contains 'workflow' which is a base64 en
   },
   {
     title: `Update '${workflow}'`,
-    description: `The following endpoint allows you to update the yaml definition of a workflow.
-    
-${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}
-
-The request requires a yaml definition of a new workflow to update the previous.
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}`,
+    description: `The request requires a yaml definition of a new workflow to update the previous.
 
 id: test
 description: "sssss"
@@ -159,11 +146,8 @@ The request returns the following JSON.
   },
   {
     title: `Execute '${workflow}'`,
-    description: `The following endpoint allows you to execute a workflow with a optional input.
-
-${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/execute
-
-The request has an optional input where you can provide any json data.
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/execute`,
+    description: `The request has an optional input where you can provide any json data.
 
 {
   "key": "value"
@@ -179,19 +163,14 @@ The request returns an instanceId to allow you to get details about the instance
   },
   {
     title: `Toggle '${workflow}'`,
-    description: `The following endpoint allows you to toggle a workflow from enabled to disabled. 
-        
-${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/toggle
-        `,
-        method: "PUT"
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/toggle`,
+    description: `No description required.`,
+    method: "PUT"
   },
   {
     title: `Get instances for '${workflow}'`,
-    description: `The following endpoint allows you to fetch the instances a workflow has created.
-    
-${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/instances/
-
-The request returns a list of instances 
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/instances/`,
+    description: `The request returns a list of instances 
 
 {
   "workflowInstances": [
@@ -220,11 +199,8 @@ const NamespaceInteractions = (namespace) => [
   // },
   {
     title: `List Workflows in '${namespace}'`,
-    description: `The following endpoint allows you to fetch a list workflows created for this namespace.
-    
-${window.location.origin}/api/namespaces/${namespace}
-
-The request returns a list of workflows.
+    url: `${window.location.origin}/api/namespaces/${namespace}`,
+    description: `The request returns a list of workflows.
 
 {
   "workflows": [
@@ -249,11 +225,8 @@ The request returns a list of workflows.
   },
   {
     title: `Send Event to '${namespace}'`,
-    description: `The following endpoint allows you to send cloud events to the namespace.
-    
-${window.location.origin}/api/namespaces/${namespace}/event.
-    
-The request requires a cloud event json.
+    url: `${window.location.origin}/api/namespaces/${namespace}/event`,
+    description: `The request requires a cloud event json.
 
 {
   "specversion": "1.0",
@@ -274,11 +247,8 @@ The request requires a cloud event json.
   },
   {
     title: `Create a new Workflow`,
-    description: `The following endpoint allows you to create a workflow.
-
-${window.location.origin}/api/namespaces/${namespace}/workflows
-
-The request requires a yaml definition of a workflow.
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows`,
+    description: `The request requires a yaml definition of a workflow.
 
 id: helloworld
 description: "A simple no-op workflow" 
@@ -291,20 +261,14 @@ states:
   },
   {
     title: `Delete a workflow`,
-    description: `The following endpoint allows you to delete a workflow. 
-Replace WORKFLOW_NAME with the workflow you wish to delete.
-
-${window.location.origin}/api/namespaces/${namespace}/workflows/WORKFLOW_NAME
-    `,
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/WORKFLOW_NAME`,
+    description: `Replace WORKFLOW_NAME with the workflow you wish to delete.`,
     method: "DELETE"
   },
   {
     title: `Toggle a workflow`,
-    description: `The following endpoint allows you to toggle a workflow from enabled to disabled. 
-Replace WORKFLOW_NAME with the workflow you wish to toggle.
-    
-${window.location.origin}/api/namespaces/${namespace}/workflows/WORKFLOW_NAME/toggle
-    `,
+    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/WORKFLOW_NAME/toggle`,
+    description: `Replace WORKFLOW_NAME with the workflow you wish to toggle.`,
     method: "PUT"
   }
 ]

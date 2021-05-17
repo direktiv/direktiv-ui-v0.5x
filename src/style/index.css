@@ -17,12 +17,54 @@ code {
 .api-item {
   margin-top: 10px
 }
+
 .api-title {
-  background: linear-gradient(145deg, #dadada, #f0f0f0);
   padding: 5px;
-  border-radius: 5px;
-  box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
 }
+
+.api-title.POST{
+  border: 1px solid #49cc90;
+  background: rgba(73,204,144,.1);
+}
+
+.api-title.DELETE{
+  background: rgba(249,62,62,.1);
+  border: 1px solid #f93e3e;
+}
+
+.api-title.PUT{
+  background: rgba(252,161,48,.1);
+  border: 1px solid #fca130;
+}
+
+.api-title.GET{
+  border: 1px solid #61affe;
+  background: rgba(97,175,254,.1);
+}
+
+
+.api-btn {
+  padding: 5px;
+  margin-right: 3px;
+  color: white;
+  border-radius: 5px;
+}
+.api-btn.PUT{
+  background: #fca130;
+}
+
+.api-btn.GET{
+  background: #61affe
+}
+
+.api-btn.POST{
+  background: #49cc90
+
+}
+.api-btn.DELETE{
+  background: #f93e3e;
+}
+
 .api-title:hover{
   cursor: pointer;
 }
