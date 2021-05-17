@@ -7,7 +7,8 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle } from 'react-icons/io5'
+import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline } from 'react-icons/io5'
+import Modal from 'react-modal';
 
 import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
@@ -15,6 +16,7 @@ import { Link } from "react-router-dom"
 import MainContext from '../../context'
 import Sankey from './sankey'
 import {NoResults} from '../../util-funcs'
+import Interactions from '../workflows-page/interactions'
 
 
 async function checkStartType(wf, setError) {
@@ -36,7 +38,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function WorkflowPage() {
-    const { fetch, namespace, handleError, attributeAdd, checkPerm, permissions } = useContext(MainContext)
+    const { fetch, namespace, handleError, attributeAdd, checkPerm, permissions, workflowInteractions } = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -55,6 +57,17 @@ export default function WorkflowPage() {
 
     const history = useHistory()
     const params = useParams()
+    const [modalOpen, setModalOpen] = useState(false)
+
+    function toggleModal() {
+        setModalOpen(!modalOpen)
+    }
+
+    function afterOpenModal(){
+        console.log('modal open')
+    }
+
+
 
     function setFetching(fetchState) {
         setWorkflowInfo((wfI) => {
@@ -169,6 +182,7 @@ export default function WorkflowPage() {
     useEffect(() => {
         if (namespace !== "") {
             fetchWorkflow()
+            
         }
     }, [fetchWorkflow, namespace])
 
@@ -259,6 +273,14 @@ export default function WorkflowPage() {
         <>
             {namespace !== "" ?
                 <div className="container" style={{ flex: "auto", padding: "10px" }}>
+                    <Modal 
+                        isOpen={modalOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={toggleModal}
+                        contentLabel="API Interactions"
+                    >
+                        <Interactions interactions={workflowInteractions(namespace, params.workflow)} type="Workflow" />
+                    </Modal>
                     <div className="flex-row" style={{ maxHeight: "64px" }}>
 
                         <div style={{ flex: "auto" }}>
@@ -268,7 +290,7 @@ export default function WorkflowPage() {
                             {toggleErr}
                         </div> : ""
                         }
-                        <WorkflowActions checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow} />
+                        <WorkflowActions toggleModal={toggleModal} checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow} />
                     </div>
                     <div id="workflows-page">
                         <div className="container" style={{ flexGrow: "2" }}>
@@ -507,12 +529,17 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const { checkPerm, permissions, active, toggleWorkflow } = props
+    const { checkPerm, permissions, active, toggleWorkflow, toggleModal } = props
 
     return (
         <div style={{ display: "flex", flexDirection: "row-reverse", alignItems: "center", marginRight: "12px" }}>
+            <div onClick={() => toggleModal()} title={"API Interactions"} className="circle button" style={{ position: "relative", zIndex: "5" }}>
+                    <span style={{ flex: "auto" }}>
+                        <IoCodeOutline style={{ fontSize: "12pt", marginBottom: "6px", fill: "green" }} />
+                    </span>
+            </div>
             {checkPerm(permissions, "toggleWorkflow") ?
-                <div onClick={() => toggleWorkflow()} title={active ? "Disable" : "Enable"} className="circle button" style={{ position: "relative", zIndex: "5" }}>
+                <div onClick={() => toggleWorkflow()} title={active ? "Disable" : "Enable"} className="circle button" style={{ position: "relative", zIndex: "5", marginRight:"10px" }}>
                     {
                         active ?
                             <span style={{ flex: "auto" }}>
@@ -525,6 +552,7 @@ function WorkflowActions(props) {
 
                     }
                 </div> : ""}
+
         </div>
 
     )

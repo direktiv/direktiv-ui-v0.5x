@@ -12,12 +12,13 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import {Link} from 'react-router-dom'
-import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
+import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoCodeOutline } from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
-
+import Modal from 'react-modal';
 import { ConfirmButton } from '../confirm-button'
 import { validateName } from "../../util-funcs"
 import { TemplateHighlighter } from '../instance-page/input-output'
+import Interactions from './interactions'
 
 
 const noopState = `id: noop
@@ -29,11 +30,21 @@ states:
 `
 
 export default function WorkflowsPage() {
-    const { fetch, namespace, handleError, checkPerm, permissions } = useContext(MainContext)
+    const { fetch, namespace, handleError, checkPerm, permissions, namespaceInteractions } = useContext(MainContext)
     const [workflows, setWorkflows] = useState([])
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
+    const [modalOpen, setModalOpen] = useState(false)
+
+    function toggleModal() {
+        setModalOpen(!modalOpen)
+    }
+
+    function afterOpenModal(){
+        console.log('modal open')
+    }
+
 
 
     const fetchWorkflows = useCallback(() => {
@@ -103,9 +114,24 @@ export default function WorkflowsPage() {
         <>
             {namespace !== "" ?
                 <div className="container" style={{ flex: "auto", padding: "10px" }}>
+                    <Modal 
+                        isOpen={modalOpen}
+                        onAfterOpen={afterOpenModal}
+                        onRequestClose={toggleModal}
+                        contentLabel="API Interactions"
+                    >
+                        <Interactions interactions={namespaceInteractions(namespace)} type="Namespace" />
+                    </Modal>
                     <div className="container">
-                        <div style={{ flex: "auto" }}>
+                        <div style={{ flex: "auto", display:"flex", width:"100%" }}>
                             <Breadcrumbs elements={["Workflows"]} />
+                            <div style={{ display: "flex", flex:2, flexDirection: "row-reverse", alignItems: "center", marginRight: "12px" }}>
+                                <div onClick={() => toggleModal()} title={"APIs"} className="circle button" style={{ position: "relative", zIndex: "5" }}>
+                                    <span style={{ flex: "auto" }}>
+                                        <IoCodeOutline className={"toggled-switch"} style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
+                                    </span>
+                                </div> 
+                            </div>
                         </div>
                     </div>
                     <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >

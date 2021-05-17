@@ -13,3 +13,45 @@ code {
 }
 
 
+/* API Interactions CSS */
+.api-item {
+  margin-top: 10px
+}
+.api-title {
+  background: linear-gradient(145deg, #dadada, #f0f0f0);
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+}
+.api-title:hover{
+  cursor: pointer;
+}
+
+.api-desc {
+  background: black;
+  padding: 5px;
+}
+.api-desc.hide {
+  display:none;
+}
+
+.ReactModal__Modal {
+  z-index: 10;
+}
+
+.ReactModal__Content {
+  background: linear-gradient(145deg, #dadada, #f0f0f0) !important;
+  overflow: auto !important;
+  top                   : 50% !important;
+  left                  : 50% !important;
+  right                 : auto !important;
+  bottom                : auto !important;
+  margin-right           :-50% !important;
+  transform             : translate(-50%, -50%) !important;
+  width: 800px !important;
+  height: 600px !important;
+}
+
+.ReactModal__Overlay {
+  z-index: 10;
+}
