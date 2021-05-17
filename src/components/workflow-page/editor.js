@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 
 // style editor
 import 'codemirror/lib/codemirror.css';
+import "../../style/editor-theme.css"
 
-// theme
-import '@bit/vorteil.direktiv-legacy.style'
 
 // linting yaml
 import "codemirror/mode/yaml/yaml.js";

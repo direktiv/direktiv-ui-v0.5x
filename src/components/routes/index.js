@@ -1,11 +1,11 @@
 import {Route, Redirect, useLocation, useHistory} from "react-router-dom"
-import  DashboardPage from '@bit/vorteil.direktiv-legacy.dashboard-page'
-import  EventsPage from '@bit/vorteil.direktiv-legacy.events-page'
-import  InstancePage from '@bit/vorteil.direktiv-legacy.instance-page'
-import  JQPlaygroundPage from '@bit/vorteil.direktiv-legacy.jqplayground'
-import  SettingsPage from '@bit/vorteil.direktiv-legacy.settings-page'
-import  WorkflowsPage from '@bit/vorteil.direktiv-legacy.workflows-page'
-import  WorkflowPage from '@bit/vorteil.direktiv-legacy.workflow-page'
+import  DashboardPage from '../dashboard-page'
+import  EventsPage from '../events-page'
+import  InstancePage from '../instance-page'
+import  JQPlaygroundPage from '../jqplayground'
+import  SettingsPage from '../settings-page'
+import  WorkflowsPage from '../workflows-page'
+import  WorkflowPage from '../workflow-page'
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props

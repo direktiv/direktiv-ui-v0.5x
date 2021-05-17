@@ -9,7 +9,7 @@ import './style/App.css';
 import './style/scrollbar.css';
 import './style/custom.css';
 import "./style/charts.css";
-import "./style/events.css"
+import "./style/events.css";
 
 import App from './App';
 

@@ -1,12 +1,12 @@
 import React, { useContext, useState,  useEffect } from 'react'
-import MainContext from '@bit/vorteil.direktiv-legacy.context'
+import MainContext from '../../context'
 import { useParams } from 'react-router'
-import PieChart from '@bit/vorteil.direktiv-legacy.charts'
-import TileTitle from '@bit/vorteil.direktiv-legacy.tile-title'
-import Breadcrumbs from '@bit/vorteil.direktiv-legacy.breadcrumbs'
+import PieChart from '../charts/pie'
+import TileTitle from '../tile-title'
+import Breadcrumbs from '../breadcrumbs'
 
 import { IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
-import {EventsPageBody} from '@bit/vorteil.direktiv-legacy.events-page'
+import {EventsPageBody} from '../events-page'
 
 
 

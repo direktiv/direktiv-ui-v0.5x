@@ -1,5 +1,5 @@
 import React from 'react'
-import Logo from '@bit/vorteil.direktiv-legacy.img'
+import Logo from '../../img/direktiv.svg'
 
 
 import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
@@ -7,7 +7,7 @@ import { Link, matchPath, useHistory, useLocation } from 'react-router-dom'
 import ArrowRightFill from 'react-bootstrap-icons/dist/icons/arrow-right-circle-fill'
 import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import { useContext } from 'react'
-import MainContext from '@bit/vorteil.direktiv-legacy.context'
+import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
 import { IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'

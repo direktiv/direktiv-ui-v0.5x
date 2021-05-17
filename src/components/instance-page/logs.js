@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useContext, useState } from "react"
-import MainContext from "@bit/vorteil.direktiv-legacy.context"
+import MainContext from "../../context"
 import * as dayjs from "dayjs"
 import { IoCopy } from "react-icons/io5"
-import { CopyToClipboard } from "@bit/vorteil.direktiv-legacy.util-funcs"
+import { CopyToClipboard } from "../../util-funcs"
 import { useRef } from "react"
 
 export default function Logs(props) {
