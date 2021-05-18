@@ -95,6 +95,12 @@ export default function JQPlaygroundPage() {
     const [fetching, setFetching] = useState(false)
     const [err, setErr] = useState("")
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            executeJQ(jqInput, jqFilter)
+        }
+    }
+
 
     const executeJQ = useCallback((input, filter) => {
         if (fetching) {
@@ -183,7 +189,7 @@ export default function JQPlaygroundPage() {
                             <div style={{ display: "flex", flexDirection:"column" }}>
                                 <div style={{display:"flex"}}>
 
-                                <input style={{ flexGrow: 7 }} type="text" placeholder="Enter JQ Filter Command" value={jqFilter} onChange={(e) => setJQFilter(e.target.value)} />
+                                <input style={{ flexGrow: 7 }} type="text" onKeyDown={handleKeyDown} placeholder="Enter JQ Filter Command" value={jqFilter} onChange={(e) => setJQFilter(e.target.value)} />
                                 <div style={{ flexGrow: 1 }} className="button jq-button" onClick={() => { executeJQ(jqInput, jqFilter) }}>
                                     Execute
                             </div>
