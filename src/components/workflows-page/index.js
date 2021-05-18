@@ -19,6 +19,7 @@ import { ConfirmButton } from '../confirm-button'
 import { validateName } from "../../util-funcs"
 import { TemplateHighlighter } from '../instance-page/input-output'
 import Interactions from './interactions'
+import {Searcher} from "fast-fuzzy"
 
 
 const noopState = `id: noop
@@ -31,11 +32,16 @@ states:
 
 export default function WorkflowsPage() {
     const { fetch, namespace, handleError, checkPerm, permissions, namespaceInteractions } = useContext(MainContext)
-    const [workflows, setWorkflows] = useState([])
-    // const [forbidden, setForbidden] = useState(false)
+    const [workflows, setWorkflows] = useState({})
+    const [workflowKeys, setWorkflowKeys] = useState([])
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
+
+    const [searchPattern, setSerachPattern] = useState("")
+    const [searchResults, setSearchResults] = useState([])
+    const [searcher, setSearcher] = useState(new Searcher(
+    [],))
 
     function toggleModal() {
         setModalOpen(!modalOpen)
@@ -64,9 +70,10 @@ export default function WorkflowsPage() {
                 if (resp.ok) {
                     let json = await resp.json()
                     if (json.workflows) {
-                        setWorkflows(json.workflows)
+                        let wfDictionary = Object.assign({}, ...json.workflows.map((x) => ({[x.id]: x})));
+                        setWorkflows(wfDictionary)
                     } else {
-                        setWorkflows([])
+                        setWorkflows({})
                     }
                 } else {
                     await handleError('fetch workflows', resp, 'listWorkflows')
@@ -107,7 +114,25 @@ export default function WorkflowsPage() {
     }
 
     useEffect(() => {
-        fetchWorkflows()
+        if (workflows !== undefined) {
+            const wfKeys = Object.keys(workflows)
+            setSearcher(new Searcher(
+                wfKeys,
+            ))
+            setWorkflowKeys(wfKeys)
+        }
+    }, [workflows])
+
+    useEffect(() => {
+        if (searchPattern !== "") {
+            setSearchResults(searcher.search(searchPattern))
+        } else {
+            setSearchResults(workflowKeys)
+        }
+    }, [searchPattern, workflowKeys, searcher])
+    
+    useEffect(() => {
+        fetchWorkflows()        
     }, [fetchWorkflows])
 
     return (
@@ -139,6 +164,16 @@ export default function WorkflowsPage() {
                             <TileTitle name="All workflows">
                                 <IoList />
                             </TileTitle>
+                            <div style={{ display: "flex", fontSize: "14pt", fontWeight: "bold", alignItems: "center", padding: "0px 20px 5px 10px"}}>
+                                <div style={{paddingRight: "12pt"}}>
+                                    Search:
+                                </div>
+                                <div style={{flexGrow: 1}}>
+                                    <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
+                                        setSerachPattern(ev.target.value)
+                                      }}></input>
+                                </div>
+                            </div>
 
                             <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
                                 {err ? 
@@ -152,25 +187,29 @@ export default function WorkflowsPage() {
                         </div>
                                 :""}
                                 <>
-                                {workflows.length > 0 ?
+                                {workflowKeys.length === 0 || (searchPattern !== "" && searchResults.length === 0) ?
+                                    <NoResults /> :
                                     <>
-                                        {workflows.map(function (obj, i) {
+                                        {searchResults.map(function (wfID) {
+                                            if (!(wfID in workflows)) {
+                                                return (<></>);
+                                            }
                                             return (
-                                                <Link key={`workflow-item-${obj.id}`} style={{ color: "inherit", textDecoration: "inherit" }} className="workflows-list-item" to={`/${namespace}/w/${obj.id}`}>
+                                                <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>
                                                     <div className="workflows-list-name">
-                                                        {obj.id}
+                                                        {wfID}
                                                     </div>
                                                     <div className="workflows-list-description">
-                                                        {obj.description === "" ? "No description has been provided." : obj.description}
+                                                        {workflows[wfID].description === "" ? "No description has been provided." : workflows[wfID].description}
                                                     </div>
                                                     <div style={{ flexGrow: "1", flexBasis: "0" }}>
                                                         <div className="actions-button-div">
                                                           {checkPerm(permissions, "toggleWorkflow") ?
                                                           <>
-                                                            {obj.active ?
+                                                            {workflows[wfID].active ?
                                                                 <div className="button circle success" onClick={(ev) => {
                                                                     ev.preventDefault();
-                                                                    toggleWorkflow(obj.id)
+                                                                    toggleWorkflow(wfID)
                                                                 }}>
                                                                     <span>
                                                                         <IoToggle />
@@ -179,7 +218,7 @@ export default function WorkflowsPage() {
                                                                 :
                                                                 <div className="button circle" onClick={(ev) => {
                                                                     ev.preventDefault();
-                                                                    toggleWorkflow(obj.id)
+                                                                    toggleWorkflow(wfID)
                                                                 }}>
                                                                     <span>
                                                                         <IoToggleOutline className={"toggled-switch"} />
@@ -191,15 +230,14 @@ export default function WorkflowsPage() {
                                                             
                                                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                                                                 ev.preventDefault();
-                                                                deleteWorkflow(obj.id)
+                                                                deleteWorkflow(wfID)
                                                             }} /> : ""}
                                                         </div>
                                                     </div>
                                                 </Link>
                                             )
                                         })}
-                                    </> :
-                                    <NoResults />
+                                    </>
                                 }
                                 </>
                                 </>
