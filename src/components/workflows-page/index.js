@@ -12,7 +12,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import {Link} from 'react-router-dom'
-import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
+import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoSettingsSharp } from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
 
 import { ConfirmButton } from '../confirm-button'
@@ -160,6 +160,17 @@ export default function WorkflowsPage() {
                                                                     </span>
                                                                 </div>
                                                             }
+                                                            </>: ""}
+                                                            {checkPerm(permissions, "executeWorkflow") ?
+                                                          <>
+                                                                <div className="button circle" onClick={(ev) => {
+                                                                    ev.preventDefault();
+                                                                    toggleWorkflow(obj.id)
+                                                                }}>
+                                                                    <span>
+                                                                        <IoSettingsSharp />
+                                                                    </span>
+                                                                </div>
                                                             </>: ""}
                                                             {checkPerm(permissions, "deleteWorkflow") ? 
                                                             
