@@ -38,6 +38,7 @@ export default function WorkflowsPage() {
     const [actionErr, setActionErr] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
 
+    // Search Engine States, TODO: Optimise for large workflows list
     const [searchPattern, setSerachPattern] = useState("")
     const [searchResults, setSearchResults] = useState([])
     const [searcher, setSearcher] = useState(new Searcher(
