@@ -248,10 +248,12 @@ option {
 
 .button.disabled {
     /* cursor: cursor; */
+    pointer-events: none;
     color: var(--secondary-font-light);
 }
 
 .button.disabled:hover {
+    pointer-events: none;
     cursor: default;
     color: var(--secondary-font-light);
 }
@@ -909,6 +911,9 @@ pre {
     color:#4497f5;
 }
 
+
+/* VARIABLE TABLE */
+
 .var-table {
     display: flex;
     flex-direction: column;
@@ -964,7 +969,9 @@ pre {
 .var-table-row-name{
     flex-grow: 2;
     flex-basis: 0px;
-    min-width: 60pt;
+    min-width: 130pt;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .var-table-row-value{
@@ -984,7 +991,7 @@ pre {
 .var-table-row-action{
     flex-grow: 1;
     flex-basis: 0px;
-    min-width: 60pt;
+    min-width: 90pt;
     display: flex;
     justify-content: center;
     padding: 5pt 10pt 5pt 4pt;

@@ -12,7 +12,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useHistory } from 'react-router'
 import {Link} from 'react-router-dom'
-import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash, IoSettingsSharp } from 'react-icons/io5'
+import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTrash } from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
 
 import { ConfirmButton } from '../confirm-button'
@@ -31,6 +31,8 @@ states:
 export default function WorkflowsPage() {
     const { fetch, namespace, handleError, checkPerm, permissions } = useContext(MainContext)
     const [workflows, setWorkflows] = useState([])
+    const history = useHistory()
+
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
@@ -138,7 +140,7 @@ export default function WorkflowsPage() {
                                                         {obj.description === "" ? "No description has been provided." : obj.description}
                                                     </div>
                                                     <div style={{ flexGrow: "1", flexBasis: "0" }}>
-                                                        <div className="actions-button-div">
+                                                        <div title="Toggle Workflow" className="actions-button-div">
                                                           {checkPerm(permissions, "toggleWorkflow") ?
                                                           <>
                                                             {obj.active ?
@@ -163,21 +165,23 @@ export default function WorkflowsPage() {
                                                             </>: ""}
                                                             {checkPerm(permissions, "executeWorkflow") ?
                                                           <>
-                                                                <div className="button circle" onClick={(ev) => {
+                                                          <div title="Workflow Variables" >
+                                                                <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                                                                     ev.preventDefault();
-                                                                    toggleWorkflow(obj.id)
+                                                                    history.push(`/${namespace}/w/${obj.id}/variables`)
                                                                 }}>
-                                                                    <span>
-                                                                        <IoSettingsSharp />
+                                                                    <span style={{fontWeight: "bold"}}>
+                                                                        VAR
                                                                     </span>
+                                                                </div>
                                                                 </div>
                                                             </>: ""}
                                                             {checkPerm(permissions, "deleteWorkflow") ? 
-                                                            
-                                                            <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                                            <div title="Delete Workflow"><ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                                                                 ev.preventDefault();
                                                                 deleteWorkflow(obj.id)
-                                                            }} /> : ""}
+                                                            }} /> </div>
+                                                            : ""}
                                                         </div>
                                                     </div>
                                                 </Link>

@@ -1,5 +1,5 @@
 import { Controlled as CodeMirror } from "react-codemirror2";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 
 // style editor
@@ -14,15 +14,6 @@ import "codemirror/addon/lint/yaml-lint";
 
 export default function ReactEditor(props) {
     const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err } = props;
-    const [height, setHeight] = useState("93%")
-
-    useEffect(() => {
-        if (showFooter) {
-            setHeight("93%")
-        } else {
-            setHeight("100%")
-        }
-    }, [showFooter]);
 
     function editorSave() {
         if (saveCallback) {
