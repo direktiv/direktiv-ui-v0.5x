@@ -9,9 +9,11 @@ import { useHistory, useParams } from 'react-router-dom'
 import Logs from './logs'
 import InputOutput from './input-output'
 import Diagram from '../workflow-page/diagram'
+import Interactions from '../workflows-page/interactions'
+import Modal from 'react-modal';
 
 import MainContext from '../../context'
-import { IoCode, IoEaselOutline, IoTerminal } from 'react-icons/io5'
+import { IoCode, IoEaselOutline, IoTerminal, IoCodeOutline } from 'react-icons/io5'
 
 
 async function checkStartType(wf, setError) {
@@ -33,7 +35,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function InstancePage() {
-    const {fetch, namespace, handleError, checkPerm, permissions} = useContext(MainContext)
+    const {fetch, namespace, handleError, checkPerm, permissions, instanceInteractions} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -48,6 +50,17 @@ export default function InstancePage() {
 
     const params = useParams()
     const history = useHistory()
+
+    const [modalOpen, setModalOpen] = useState(false)
+
+    function toggleModal() {
+        setModalOpen(!modalOpen)
+    }
+
+    function afterOpenModal(){
+        console.log('modal open')
+    }
+
     let instanceId = `${params.namespace}/${params.workflow}/${params.instance}`
    
     const fetchWf = useCallback(()=>{
@@ -112,6 +125,14 @@ export default function InstancePage() {
         <>
         {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
+            <Modal 
+                isOpen={modalOpen}
+                onAfterOpen={afterOpenModal}
+                onRequestClose={toggleModal}
+                contentLabel="API Interactions"
+            >
+                <Interactions interactions={instanceInteractions(params.namespace, params.workflow, params.instance)} type="Instance" />
+            </Modal>
             <div className="flex-row" style={{ maxHeight: "64px" }}>
                 <div style={{ flex: "auto", display: "flex" }}>
                     <div style={{ flex: "auto" }}>
@@ -189,6 +210,9 @@ export default function InstancePage() {
                             </span>
                         </div>
                     </div>
+                    <div onClick={() =>{toggleModal()}} title={"APIs"} className="shadow-soft rounded tile fit-content" style={{cursor:"pointer", zIndex: "5", maxHeight:"36px", display:"flex", alignItems:"center", height:"18px" }}>
+                            <IoCodeOutline className={"toggled-switch"} style={{ fontSize: "11pt",  marginLeft: "0px" }} />
+                    </div> 
                 </div>
             </div>
             {instanceDetails.errorMessage !== "" && instanceDetails.errorMessage !== undefined ?

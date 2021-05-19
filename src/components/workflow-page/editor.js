@@ -4,9 +4,8 @@ import React from "react";
 
 // style editor
 import 'codemirror/lib/codemirror.css';
+import "../../style/editor-theme.css"
 
-// theme
-import '../../style/editor-theme.css'
 
 // linting yaml
 import "codemirror/mode/yaml/yaml.js";

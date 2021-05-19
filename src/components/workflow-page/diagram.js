@@ -13,6 +13,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
         let v = YAML.load(value)
         if(v.states) {
             for(let i=0; i < v.states.length; i++) {
+                let transitions = false
 
                 // check if starting element
                 if (i === 0) {
@@ -37,6 +38,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                 if (v.states[i].events) {
                     for(let j=0; j < v.states[i].events.length; j++) {
                         if(v.states[i].events[j].transition) {
+                            transitions = true
                             newElements.push({
                                 id: `${v.states[i].id}-${v.states[i].events[j].transition}`,
                                 source: v.states[i].id,
@@ -59,6 +61,8 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                                 animated: false,
                                 type: 'bezier'
                             })
+                            transitions = true
+
                         }
                     }
                 }
@@ -67,6 +71,8 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                 if(v.states[i].catch) {
                     for(let x=0; x < v.states[i].catch.length; x++) {
                         if(v.states[i].catch[x].transition) {
+                            transitions = true
+
                             newElements.push({
                                 id: `${v.states[i].id}-${v.states[i].catch[x].transition}`,
                                 source: v.states[i].id,
@@ -80,6 +86,8 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
 
                 // check if transition and create edge to hit new state
                 if(v.states[i].transition) {
+                    transitions = true
+
                     newElements.push({
                         id: `${v.states[i].id}-${v.states[i].transition}`,
                         source: v.states[i].id,
@@ -88,6 +96,8 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         type: 'bezier'
                     })
                 } else if(v.states[i].defaultTransition) {
+                    transitions = true
+
                     newElements.push({
                         id: `${v.states[i].id}-${v.states[i].defaultTransition}`,
                         source: v.states[i].id,
@@ -95,7 +105,9 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         animated: false,
                         type: 'bezier'
                     })
-                } else {
+                } 
+
+                if(!transitions) {
                     // no transition add end state
                     newElements.push({
                         id: `${v.states[i].id}-endNode`,
@@ -130,13 +142,13 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                     let noTransition = false
                     for(let j=0; j < newElements.length; j++) {
                         
-                        if(newElements[j].target === flow[i]) {
+                        if(newElements[j].target === flow[i] && newElements[j].source === flow[i-1]) {
                             newElements[j].animated = true
-                        } else 
-                        
-                        if(newElements[j].id === flow[i]) {
+                        } else if(newElements[j].id === flow[i]) {
+                            
                             if(!newElements[j].data.state.transition || !newElements[j].data.state.defaultTransition ){
                                 noTransition = true
+                              
                                 if(newElements[j].data.state.catch) {
                                     for(let y=0; y < newElements[j].data.state.catch.length; y++) {
                                         if(newElements[j].data.state.catch[y].transition){
@@ -150,6 +162,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                             }
                         }
                     }
+
                     if(noTransition) {
                         // transition to end state
                         for(let j=0; j < newElements.length; j++) {
