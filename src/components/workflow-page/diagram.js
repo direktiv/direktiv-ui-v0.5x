@@ -142,6 +142,11 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                     let noTransition = false
                     for(let j=0; j < newElements.length; j++) {
                         
+                        // handle start node
+                        if(newElements[j].source === "startNode" && newElements[j].target === flow[i]){
+                            newElements[j].animated = true
+                        }
+                        
                         if(newElements[j].target === flow[i] && newElements[j].source === flow[i-1]) {
                             newElements[j].animated = true
                         } else if(newElements[j].id === flow[i]) {
