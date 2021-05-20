@@ -66,6 +66,19 @@
         "origin": "AUTHORED",
         "exported": true
     },
+    "vorteil.direktiv-legacy/environment-page@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/environment-page/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/environment-page/index.js",
+        "trackDir": "src/components/environment-page",
+        "origin": "AUTHORED",
+        "exported": true
+    },
     "vorteil.direktiv-legacy/events-page@1.0.1": {
         "files": [
             {
