@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import MainContext from '../../context'
-import { Plus, XCircle } from 'react-bootstrap-icons'
+import { Border, Plus, XCircle } from 'react-bootstrap-icons'
 import { useParams } from 'react-router'
 import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
@@ -126,6 +126,18 @@ const EnvTableAction = (props) => {
     )
 };
 
+const EnvRowEmpty = (props) => {
+    return (
+        <div className={`var-table-row new-entry new-entry-button`}>
+            <div style={{ flexGrow: "1", flexBasis: "0" }} />
+            <div style={{ flexGrow: "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
+                <span>No Variables</span>
+            </div>
+            <div style={{ flexGrow: "1", flexBasis: "0" }} />
+        </div>
+        )
+};
+
 const EnvTableNewEntry = (props) => {
     const { setVar } = props
     const [value, setValue] = useState("")
@@ -186,8 +198,24 @@ const EnvTableNewEntry = (props) => {
     )
 };
 
-
 export default function EnvrionmentPage(props) {
+    return (
+        <>
+            <div className="container" style={{ flex: "auto", padding: "10px" }}>
+                <div className="flex-row">
+                    <div style={{ flex: "auto" }}>
+                        <Breadcrumbs elements={["Namespace Settings"]} />
+                    </div>
+                </div>
+                <EnvrionmentContainer />
+            </div>
+        </>
+    )
+
+}
+
+
+export function EnvrionmentContainer(props) {
     const { namespace, fetch, handleError } = useContext(MainContext)
     const { mode } = props
     const [fetching, setFetching] = useState(false) // TODO fetching safety checks
@@ -312,32 +340,34 @@ export default function EnvrionmentPage(props) {
     }
 
     return (
-        <>
-            <div className="container" style={{ flex: "auto", padding: "10px" }}>
-                <div className="flex-row">
-                    <div style={{ flex: "auto" }}>
-                        <Breadcrumbs elements={["Namespace Settings"]} />
-                    </div>
-                </div>
-                <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
-                    <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
-                        <TileTitle name="Variables">
-                            <IoLockOpen />
-                        </TileTitle>
-                        <div style={{ display: "flex", alignItems: "center", flexDirection: "column", marginRight: "-10px", marginLeft: "-10px" }}>
-                            <div className={"var-table"}>
-                                <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
-                                <div className={`var-table-accent-header`}><EnvTableHeader /></div>
-                                {envList.map((env, index) => {
-                                    return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                        <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} /></div>)
-                                })}
-                                <div className={`var-table-accent-${envList.length % 2}`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
-                            </div>
-                        </div>
+        <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
+            <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
+                <TileTitle name="Variables">
+                    <IoLockOpen />
+                </TileTitle>
+                <div style={{ display: "flex", alignItems: "center", flexDirection: "column", marginRight: "-10px", marginLeft: "-10px" }}>
+                    <div className={"var-table"}>
+                        <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
+                        <div className={`var-table-accent-header`}><EnvTableHeader /></div>
+                        {envList.map((env, index) => {
+                            return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
+                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} /></div>)
+                        })}
+                        {
+                            envList.length === 0 ? (
+                                <>
+                                    <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
+                                    <div className={`var-table-accent-1 var-table-accent-end`}>
+                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable} />
+                                    </div>
+                                </>
+                            ):(
+                                <div className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }

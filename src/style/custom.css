@@ -953,12 +953,18 @@ pre {
 
 .var-table-accent-0{
     background-color: #eaeaea;
-    border-top: 1px solid #bbb;
+    box-shadow: inset 1px 4px 3px -4px var(--neumorph-shadow-dark);
+    /* border-top: 1px solid #bbb; */
 }
 
 .var-table-accent-1{
     background-color: var(--primary-light);
-    border-top: 1px solid #bbb;
+    /* border-top: 1px solid #bbb; */
+    box-shadow: inset 1px 4px 3px -4px var(--neumorph-shadow-dark);
+}
+
+.var-table-accent-end{
+    box-shadow: inset 1px 4px 3px -4px var(--neumorph-shadow-dark), inset 1px -4px 3px -4px var(--neumorph-shadow-dark);
 }
 
 .var-table-row.show-value{

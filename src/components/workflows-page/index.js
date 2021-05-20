@@ -233,7 +233,7 @@ export default function WorkflowsPage() {
                                                           <div title="Workflow Variables" >
                                                                 <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                                                                     ev.preventDefault();
-                                                                    history.push(`/${namespace}/w/${obj.id}/variables`)
+                                                                    history.push(`/${namespace}/w/${wfID}/variables`)
                                                                 }}>
                                                                     <span style={{fontWeight: "bold"}}>
                                                                         VAR
