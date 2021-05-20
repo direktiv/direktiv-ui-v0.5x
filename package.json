@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@react-keycloak/web": "^3.4.0",
+    "ansi-to-react": "^6.1.5",
+    "ansi_up": "^5.0.1",
     "codemirror": "^5.60.0",
     "customize-cra": "^1.0.0",
     "d3": "^6.7.0",

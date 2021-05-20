@@ -157,6 +157,9 @@ export default function InstancePage() {
                                 body: atob(instanceDetails.input)
                             })
                             if(resp.ok) {
+                                if(document.getElementById("logs-test")){
+                                    document.getElementById("logs-test").innerHTML = ""
+                                }
                                 let json = await resp.json()    
                                 history.push(`/i/${json.instanceId}`)
                             } else {
