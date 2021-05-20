@@ -35,15 +35,11 @@ export default function ReactEditor(props) {
                         lineNumbers: true,
                         lineWrapping: true,
                         readOnly: readOnly ? "nocursor" : false,
+                        indentWithTabs: false,
+                        indentUnit: 2,
                         extraKeys: {
                             "Ctrl-S": editorSave,
                             "Shift-Tab": "indentLess",
-                            Tab: function (cm) {
-                                var spaces = Array(cm.getOption("indentUnit") + 1).join(
-                                    " "
-                                );
-                                cm.replaceSelection(spaces);
-                            },
                         },
                     }}
                     onBeforeChange={(editor, data, val) => {
