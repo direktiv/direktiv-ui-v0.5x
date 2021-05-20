@@ -50,9 +50,8 @@ const EnvTableHeader = () => {
 };
 
 const EnvTableRow = (props) => {
-    const { env, index, setVar, getVar } = props
+    const { env, index, setVar, getVar, setError } = props
     const [localValue, setLocalValue] = useState("")
-    const [size, setSize] = useState(env.size)
     const [remoteValue, setRemoteValue] = useState("")
     const [show, setShow] = useState(false)
     const [isBinary, setIsBinary] = useState(false)
@@ -93,7 +92,7 @@ const EnvTableRow = (props) => {
                 {bytes(env.size)}
             </div>
             <div className={"var-table-row-action"} >
-                <EnvTableAction name={env.name} setVar={setVar} value={localValue} show={show} setSize={setSize} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
+                <EnvTableAction setError={setError} name={env.name} setVar={setVar} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
             </div>
         </div>
     )
@@ -113,15 +112,12 @@ function readFile(file) {
 }
 
 const EnvTableAction = (props) => {
-    const { value, show, hideEnv, name, setVar, edited, resetValue, setSize } = props
-    const [data, setData] = useState("")
-    const [files, setFiles] = useState([])
-    const [err, setErr] = useState("")
+    const { value, show, hideEnv, name, setVar, edited, resetValue, setError } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
             if (fileRejections.length > 0) {
-                console.log(`Invalid File: File: '${fileRejections[0].file.name}' is not supported, ${fileRejections[0].errors[0].message}`)
+                setError(`Could not read file ${fileRejections[0].file.name}: ${fileRejections[0].errors[0].message}`)
             } else {
                 setVar(name, await readFile(acceptedFiles[0]), true).then(()=>{
                     resetValue()
@@ -129,7 +125,7 @@ const EnvTableAction = (props) => {
 
             }
         },
-        [setData, setFiles, setErr]
+        [name, setVar, resetValue, setError]
     );
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -201,10 +197,36 @@ const EnvRowEmpty = (props) => {
 };
 
 const EnvTableNewEntry = (props) => {
-    const { setVar } = props
+    const { setVar, setError } = props
     const [value, setValue] = useState("")
     const [name, setName] = useState("")
     const [show, setShow] = useState(false)
+
+    const onDrop = useCallback(
+        async (acceptedFiles, fileRejections) => {
+            if (fileRejections.length > 0) {
+                setError(`Could not read file ${fileRejections[0].file.name}: ${fileRejections[0].errors[0].message}`)
+            } else {
+                if (name === "") {
+                    setError("Variable Name Required")
+                    return
+                }
+                setVar(name, await readFile(acceptedFiles[0])).then((ok)=>{
+                    if (ok) {
+                        cleanup()
+                    }
+                })
+
+            }
+        },
+        [name, setError, setVar]
+    );
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop,
+        maxFiles: 1,
+        multiple: false
+    });
 
     const cleanup = () => {
         setName("")
@@ -236,6 +258,12 @@ const EnvTableNewEntry = (props) => {
                     <div className={"var-table-row-size"} >
                     </div>
                     <div className={"var-table-row-action"} >
+                        <div key={`${name}-btn-upload`} {...getRootProps({ className: 'dropzone' })} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px", display: "flex", justifyContent: "center", alignItems: "center" }} title="Upload Variable" className={`circle button`}>
+                            <input {...getInputProps()} />
+                            <span>
+                                <IoCloudUploadOutline />
+                            </span>
+                        </div>
                         <div onClick={() => {
                             setVar(name, value).then((ok) => {
                                 if (ok) {
@@ -413,14 +441,14 @@ export function EnvrionmentContainer(props) {
                         <div className={`var-table-accent-header`}><EnvTableHeader /></div>
                         {envList.map((env, index) => {
                             return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} /></div>)
+                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError}/></div>)
                         })}
                         {
                             envList.length === 0 ? (
                                 <>
                                     <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
                                     <div className={`var-table-accent-1 var-table-accent-end`}>
-                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable} />
+                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable}/>
                                     </div>
                                 </>
                             ):(
