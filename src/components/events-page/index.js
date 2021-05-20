@@ -29,7 +29,9 @@ export default function EventsPage() {
                     <TileTitle name="Instances">
                         <IoList />
                     </TileTitle>
+                    <div style={{maxHeight:"785px", overflow:"auto"}}>
                     <EventsPageBody />
+                    </div>
                 </div>
             </div>
         </div>: ""}
@@ -68,7 +70,7 @@ export function EventsPageBody() {
     },[namespace, fetch, handleError])
 
     return(
-        <div id="events-table" style={{height:"785px", overflow:"auto"}}>
+        <div id="events-table" style={{overflow:"auto"}}>
             {
                         err !== "" ? 
                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
