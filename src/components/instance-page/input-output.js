@@ -58,13 +58,13 @@ function ReactSyntaxHighlighter(props) {
     }
 
     return(
-        <div className="input-output" style={{ maxHeight:"91%", height:"92%", minHeight:"300px", overflow:"auto", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
-            {!load ? 
+<>
+        {!load ? 
                 <Code id={id} language={"json"} code={data} />
                 :
                 ""
             }
-        </div>
+  </>
     )
 }
 
@@ -74,50 +74,60 @@ export default function InputOutput(props) {
 
     if (data !== undefined && data !== "") {
         return(
-            <div className="editor-wrapper" style={{display: "flex", boxShadow:"none", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
-                <div style={{width: "100%", height: "100%", position: "relative"}}>
-                    <div className="input-output" style={{borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+            <div id={"toggle"+id} className="editor-wrapper" style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight:"300px",  top:"-28px", position: "relative", boxShadow:"none"}}>
+            <div style={{width: "100%", height: "100%"}}>
+                <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
+                    <div id="logs" style={{ width:"100%", borderRadius:"8px", overflow: "auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a", position: "absolute", top:"28px", bottom:"30px", paddingBottom:"10px" }}>
                         <ReactSyntaxHighlighter id={id} code={data}/>
-                    </div>
-                </div>
-                <div id="test" className="editor-footer">
-                    <div className="editor-footer-buffer" />
-                    <div className="editor-footer-actions">
-                        <div>
-                        <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
-                            CopyToClipboard(atob(data), "", null)
-                         }}>
-                            <span style={{}} >Copy</span>
-                            <IoCopy style={{ marginLeft: "5px" }} />
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
+             </div>
+             </div>
+             </div>
+             <div id="test" className="editor-footer">
+                     <div className="editor-footer-buffer" />
+                     <div className="editor-footer-actions">
+                         <div>
+                         <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
+                             CopyToClipboard(atob(data), "", null)
+                          }}>
+                             <span style={{}} >Copy</span>
+                             <IoCopy style={{ marginLeft: "5px" }} />
+                         </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>                       
+
         )
     }
 
     if (status !== "pending" && status !== undefined) {
         return(
-            <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
-            <div style={{width: "100%", height: "100%", position: "relative"}}>
-                <div style={{borderRadius:"8px", padding:"5px", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+            <div id={"toggle"+id} className="editor-wrapper" style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight:"300px",  top:"-28px", position: "relative", boxShadow:"none"}}>
+            <div style={{width: "100%", height: "100%"}}>
+                <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
+                    <div id="logs" style={{ width:"100%", borderRadius:"8px", overflow: "auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt",  background:"#2a2a2a", position: "absolute", top:"28px", bottom:"30px",  padding:"1em" }}>
                     Unable to retrieve output. Workflow was cancelled or has crashed.
+
+            
+             </div>
+             </div>
+             </div>
                 </div>
-            </div>
-        </div>
         )
  
     }
 
     return(
-        <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%",  top:"-28px", position: "relative"}}>
-        <div style={{width: "100%", height: "100%", position: "relative"}}>
-            <div style={{borderRadius:"8px", padding:"5px", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", background:"#2a2a2a", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0}}>
+        <div id={"toggle"+id} className="editor-wrapper" style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight:"300px",  top:"-28px", position: "relative", boxShadow:"none"}}>
+        <div style={{width: "100%", height: "100%"}}>
+            <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
+                <div id="logs" style={{ width:"100%", borderRadius:"8px", overflow: "auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt",  background:"#2a2a2a", position: "absolute", top:"28px", bottom:"30px", padding:"1em" }}>
                 Loading...
-            </div>
+       </div>
         </div>
-    </div>
+        </div>
+        </div>
     )
 }
 

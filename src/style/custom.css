@@ -1064,8 +1064,12 @@ pre {
 }
 
 
-
-
+.language-json{
+    background: rgb(42, 42, 42) !important;
+}
+.hide{
+    display: none !important;
+}
 /* .var-table-divder{
     border-top: 1px solid #bbb;
     width: 100%;

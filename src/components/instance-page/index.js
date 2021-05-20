@@ -13,7 +13,7 @@ import Interactions from '../workflows-page/interactions'
 import Modal from 'react-modal';
 
 import MainContext from '../../context'
-import { IoCode, IoEaselOutline, IoTerminal, IoCodeOutline } from 'react-icons/io5'
+import { IoCode, IoEaselOutline, IoTerminal, IoCodeOutline, IoHardwareChipSharp } from 'react-icons/io5'
 
 
 async function checkStartType(wf, setError) {
@@ -39,7 +39,7 @@ export default function InstancePage() {
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
-
+    const [tab, setTab] = useState("logs")
     const [workflowErr, setWorkflowErr] = useState("")
     const [detailsErr, setDetailsErr] = useState("")
     const [actionErr, setActionErr] = useState("")
@@ -229,12 +229,23 @@ export default function InstancePage() {
             <div className="container" style={{ flexGrow: "1", flexDirection: "row" }}>
                 <div className="container" style={{ flexGrow: "inherit" }}>
                     <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
-                        <TileTitle name="Logs">
-                            <IoTerminal />
+                        <TileTitle actionsDiv={[<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "logs"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("logs") }} >
+                        <IoTerminal />  Logs
+        </div>,<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "input"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("input") }} >
+        <IoCode /> Input
+        </div>, <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "output"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("output") }} >
+        <IoCode /> Output
+        </div>]}>
+                            <IoHardwareChipSharp /> Instance Details
                         </TileTitle>
-                        <Logs instanceId={instanceId} status={instanceDetails.status} />
+                        {tab === "input" ?
+                        <InputOutput id="input" data={instanceDetails.input} status={instanceDetails.status} /> :""}
+                        {tab === "output" ? 
+                        <InputOutput id="output" data={instanceDetails.output} status={instanceDetails.status}/> :""}
+                        {tab === "logs" ?
+                        <Logs instanceId={instanceId} status={instanceDetails.status} />: ""}
                     </div>
-                    <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
+                    <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit", flex: 1 }}>
                         <TileTitle name="Graph">
                             <IoEaselOutline />
                         </TileTitle>
@@ -262,7 +273,7 @@ export default function InstancePage() {
                         </div>}
                     </div>
                 </div>
-                <div className="container" style={{ flexGrow: "inherit", maxWidth: "400px" }}>
+                {/* <div className="container" style={{ flexGrow: "inherit", maxWidth: "400px" }}>
                      <div className="shadow-soft rounded tile" style={{ flexGrow: "inherit" }}>
                         <TileTitle name="Input">
                             <IoCode />
@@ -289,7 +300,7 @@ export default function InstancePage() {
                         <InputOutput id="output" data={instanceDetails.output} status={instanceDetails.status}/>
                         }
                         </div>
-                </div>
+                </div> */}
             </div>
         </div>
         :
