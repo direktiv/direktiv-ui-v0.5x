@@ -4,8 +4,10 @@ import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { Plus, XCircle } from 'react-bootstrap-icons'
 import { useParams } from 'react-router'
-import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline } from 'react-icons/io5'
+import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
+import { useDropzone } from 'react-dropzone'
+
 
 const EnvTableError = (props) => {
     const { error, hideError } = props
@@ -59,7 +61,7 @@ const EnvTableRow = (props) => {
             </div>
             <div className={`var-table-row-value`} >
                 <div style={{ display: "flex", height: "100%", justifyContent: "center" }}>
-                    {show === true ?
+                    {env.size < 1000000 ? (<>{show === true ?
                         <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" onChange={(ev) => {
                             setLocalValue(ev.target.value)
                         }} />
@@ -74,11 +76,12 @@ const EnvTableRow = (props) => {
                                 setShow(true)
                             })
                         }}><span>Show Value</span></div>
-                    }
+                    }</>) : (<div className={"var-table-input show-button rounded button disabled"}><span>Variable is too large to preview</span></div>)}
+                    
                 </div>
             </div>
             <div className={"var-table-row-size"} >
-                {env.size}
+                {env.size} bytes
             </div>
             <div className={"var-table-row-action"} >
                 <EnvTableAction name={env.name} setVar={setVar} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
@@ -87,8 +90,53 @@ const EnvTableRow = (props) => {
     )
 };
 
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (res) => {
+            resolve(res.target.result)
+        }
+
+        reader.onerror = (err) => reject(err)
+        reader.readAsText(file)
+    })
+}
+
+function Basic(props) {
+    const { setData, files, setFiles, setErr, setVar, varName } = props
+
+    const onDrop = useCallback(
+        async (acceptedFiles, fileRejections) => {
+            if (fileRejections.length > 0) {
+                console.log(`Invalid File: File: '${fileRejections[0].file.name}' is not supported, ${fileRejections[0].errors[0].message}`)
+            } else {
+                setVar(varName, await readFile(acceptedFiles[0]), true)
+            }
+        },
+        [setData, setFiles, setErr]
+    );
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop,
+        maxFiles: 1,
+        multiple: false
+    });
+
+    return (
+            <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: "pointer", height: "36px", width: "36px" }}>
+                <input {...getInputProps()} />
+                <IoCloudUploadOutline/>
+            </div>
+    );
+}
+
 const EnvTableAction = (props) => {
     const { value, show, hideEnv, name, setVar, edited, resetValue } = props
+    const [data, setData] = useState("")
+    const [files, setFiles] = useState([])
+    const [err, setErr] = useState("")
+
     let buttons = [];
 
     // Show Hidden Button
@@ -109,6 +157,13 @@ const EnvTableAction = (props) => {
             <span style={{ flex: "auto" }}>
                 <IoSave style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
             </span>
+        </div>
+    )
+
+    buttons.push(
+        <div key={`${name}-btn-upload`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button`}>
+                            <Basic setErr={setErr} files={files} setFiles={setFiles} data={data} setData={setData} setVar={setVar} varName={name}/>
+
         </div>
     )
 
