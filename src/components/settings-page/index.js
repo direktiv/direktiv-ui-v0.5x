@@ -7,6 +7,7 @@ import XCircle from 'react-bootstrap-icons/dist/icons/x-circle'
 import { useHistory } from 'react-router'
 import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons/io5'
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
+import {EnvrionmentContainer} from "../environment-page"
 
 
 function SettingsAction(props) {
@@ -80,18 +81,19 @@ export default function SettingsPage() {
                         <SettingsAction />
                     </div>
                     <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
-                        <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
+                        <div className="item-0 shadow-soft rounded tile" style={{ }}>
                             <TileTitle name="Secrets">
                                 <IoLockOpen />
                             </TileTitle>
                             <Secrets />
                         </div>
-                        <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
+                        <div className="item-0 shadow-soft rounded tile" style={{ }}>
                             <TileTitle name="Container Registries">
                                 <IoLogoDocker />
                             </TileTitle>
                             <Registries />
                         </div>
+                        <EnvrionmentContainer mode={"namespace"}/>
                     </div>
                 </div>
                 : ""}
