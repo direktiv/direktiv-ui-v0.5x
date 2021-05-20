@@ -904,3 +904,20 @@ pre {
     color:#4497f5;
 
 }
+
+
+#input-toggle{
+    display: block;
+}
+
+#logs-toggle{
+    display: block;
+}
+
+#output-toggle{
+    display: block;
+}
+
+.hide {
+    display: none !important;
+}
