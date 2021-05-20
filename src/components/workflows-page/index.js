@@ -34,6 +34,7 @@ export default function WorkflowsPage() {
     const { fetch, namespace, handleError, checkPerm, permissions, namespaceInteractions } = useContext(MainContext)
     const [workflows, setWorkflows] = useState({})
     const [workflowKeys, setWorkflowKeys] = useState([])
+    const history = useHistory()
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
@@ -204,7 +205,7 @@ export default function WorkflowsPage() {
                                                         {workflows[wfID].description === "" ? "No description has been provided." : workflows[wfID].description}
                                                     </div>
                                                     <div style={{ flexGrow: "1", flexBasis: "0" }}>
-                                                        <div className="actions-button-div">
+                                                        <div title="Toggle Workflow" className="actions-button-div">
                                                           {checkPerm(permissions, "toggleWorkflow") ?
                                                           <>
                                                             {workflows[wfID].active ?
@@ -227,12 +228,25 @@ export default function WorkflowsPage() {
                                                                 </div>
                                                             }
                                                             </>: ""}
+                                                            {checkPerm(permissions, "executeWorkflow") ?
+                                                          <>
+                                                          <div title="Workflow Variables" >
+                                                                <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
+                                                                    ev.preventDefault();
+                                                                    history.push(`/${namespace}/w/${wfID}/variables`)
+                                                                }}>
+                                                                    <span style={{fontWeight: "bold"}}>
+                                                                        VAR
+                                                                    </span>
+                                                                </div>
+                                                                </div>
+                                                            </>: ""}
                                                             {checkPerm(permissions, "deleteWorkflow") ? 
-                                                            
-                                                            <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                                            <div title="Delete Workflow"><ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                                                                 ev.preventDefault();
                                                                 deleteWorkflow(wfID)
-                                                            }} /> : ""}
+                                                            }} /> </div>
+                                                            : ""}
                                                         </div>
                                                     </div>
                                                 </Link>
