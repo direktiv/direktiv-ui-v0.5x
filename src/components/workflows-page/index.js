@@ -228,7 +228,7 @@ export default function WorkflowsPage() {
                                                                 </div>
                                                             }
                                                             </>: ""}
-                                                            {checkPerm(permissions, "executeWorkflow") ?
+                                                            {checkPerm(permissions, "getWorkflow") ?
                                                           <>
                                                           <div title="Workflow Variables" >
                                                                 <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {

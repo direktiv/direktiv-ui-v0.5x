@@ -301,7 +301,8 @@ export default function WorkflowPage() {
                             {toggleErr}
                         </div> : ""
                         }
-                        <WorkflowActions toggleModal={toggleModal} checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow} />
+                        <WorkflowActions toggleModal={toggleModal} checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow} 
+                        namespace={namespace} workflowName={params.workflow}/>
                     </div>
                     <div id="workflows-page">
                         <div className="container" style={{ flexGrow: "2" }}>
@@ -543,7 +544,7 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const { checkPerm, permissions, active, toggleWorkflow, toggleModal } = props
+    const { checkPerm, permissions, active, toggleWorkflow, toggleModal, workflowName, namespace } = props
 
     return (
         <div style={{ display: "flex", flexDirection: "row-reverse", alignItems: "center", marginRight: "12px" }}>
@@ -552,6 +553,17 @@ function WorkflowActions(props) {
                         <IoCodeOutline style={{ fontSize: "12pt", marginBottom: "6px", fill: "green" }} />
                     </span>
             </div>
+            {checkPerm(permissions, "getWorkflow") ?
+            <>
+            <div title="Workflow Variables" >
+                <Link className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit", marginRight: "10px"}} 
+                to={`/${namespace}/w/${workflowName}/variables`}>
+                    <span style={{fontWeight: "bold"}}>
+                        VAR
+                    </span>
+                </Link>
+                </div>
+            </>: ""}
             {checkPerm(permissions, "toggleWorkflow") ?
                 <div onClick={() => toggleWorkflow()} title={active ? "Disable" : "Enable"} className="circle button" style={{ position: "relative", zIndex: "5", marginRight:"10px" }}>
                     {
