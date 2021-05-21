@@ -74,10 +74,8 @@ export default function Logs(props) {
                     } 
                 }
 
-                console.log(tailRef.current)
                 if (tailRef.current) {
                     if (document.getElementById('logs')) {
-                        console.log("setting scroll height")
                         document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
                     }
                 }

@@ -49,9 +49,6 @@ export default function WorkflowsPage() {
         setModalOpen(!modalOpen)
     }
 
-    function afterOpenModal(){
-        console.log('modal open')
-    }
 
 
 
@@ -143,7 +140,6 @@ export default function WorkflowsPage() {
                 <div className="container" style={{ flex: "auto", padding: "10px" }}>
                     <Modal 
                         isOpen={modalOpen}
-                        onAfterOpen={afterOpenModal}
                         onRequestClose={toggleModal}
                         contentLabel="API Interactions"
                     >
