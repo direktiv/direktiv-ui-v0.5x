@@ -36,10 +36,17 @@ export default function ReactEditor(props) {
                         lineWrapping: true,
                         readOnly: readOnly ? "nocursor" : false,
                         indentWithTabs: false,
-                        indentUnit: 2,
+                        smartIndent: true,
                         extraKeys: {
                             "Ctrl-S": editorSave,
-                            "Shift-Tab": "indentLess",
+                            Tab: (cm) => {
+                            if (cm.getMode().name === 'null') {
+                                cm.execCommand('insertTab');
+                            } else {
+                                cm.execCommand('indentMore');
+                            }
+                            },
+                            'Shift-Tab': (cm) => cm.execCommand('indentLess'),
                             "Ctrl-/": function (cm) {
                                 // Check if commentKey prop has been passed
                                 if (!commentKey || commentKey === "") {
