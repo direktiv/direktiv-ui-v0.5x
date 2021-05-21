@@ -12,7 +12,7 @@ import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
 export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err } = props;
+    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey } = props;
 
     function editorSave() {
         if (saveCallback) {
@@ -40,6 +40,59 @@ export default function ReactEditor(props) {
                         extraKeys: {
                             "Ctrl-S": editorSave,
                             "Shift-Tab": "indentLess",
+                            "Ctrl-/": function (cm) {
+                                // Check if commentKey prop has been passed
+                                if (!commentKey || commentKey === "") {
+                                    return
+                                }
+
+                                if (cm.somethingSelected()) {
+                                    let selections = cm.listSelections()
+                                    if (!selections) {
+                                        return
+                                    }
+
+                                    // Get selection lines
+                                    const head = selections[0].head.line
+                                    const anchor = selections[0].anchor.line
+
+                                    // Orientate lines
+                                    const start = head < anchor ? head : anchor
+                                    const end = head < anchor ? anchor : head
+
+                                    let positionList = []
+                                    let unsetComment = true
+
+                                    // Check if all lines start with comment key
+                                    for (let line = start; line <= end; line++) {
+                                        let position = {line: line, ch: 0};
+                                        if (cm.getRange(position, {...position, ch: commentKey.length}) !== commentKey) {
+                                            unsetComment = false
+                                        }
+                                        positionList.push(position)
+                                    }    
+
+                                    // set or unset comments
+                                    for (let i in positionList){
+                                        const startPos = positionList[i]
+                                        if (unsetComment){
+                                            cm.replaceRange("", startPos, {...startPos, ch: commentKey.length})
+                                        } else {
+                                            cm.replaceRange(commentKey, startPos)
+                                        }
+                                    }
+
+                                } else {
+                                    const startPos = {line: cm.getCursor().line, ch: 0}
+                                    const endPos =  {line: cm.getCursor().line, ch: commentKey.length}
+
+                                    if (cm.getRange(startPos, endPos) === commentKey) {
+                                        cm.replaceRange("", startPos, endPos)
+                                    } else {
+                                        cm.replaceRange(commentKey, startPos)
+                                    }
+                                }
+                            },
                         },
                     }}
                     onBeforeChange={(editor, data, val) => {
