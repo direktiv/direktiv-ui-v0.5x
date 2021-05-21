@@ -4,8 +4,11 @@ import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { Plus, XCircle } from 'react-bootstrap-icons'
 import { useParams } from 'react-router'
-import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline } from 'react-icons/io5'
+import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
+import { useDropzone } from 'react-dropzone'
+import bytes from 'bytes'
+
 
 const EnvTableError = (props) => {
     const { error, hideError } = props
@@ -47,10 +50,11 @@ const EnvTableHeader = () => {
 };
 
 const EnvTableRow = (props) => {
-    const { env, index, setVar, getVar } = props
+    const { env, index, setVar, getVar, setError } = props
     const [localValue, setLocalValue] = useState("")
     const [remoteValue, setRemoteValue] = useState("")
     const [show, setShow] = useState(false)
+    const [isBinary, setIsBinary] = useState(false)
 
     return (
         <div className={`var-table-row ${show === true ? "show-value" : ""}`}>
@@ -59,36 +63,77 @@ const EnvTableRow = (props) => {
             </div>
             <div className={`var-table-row-value`} >
                 <div style={{ display: "flex", height: "100%", justifyContent: "center" }}>
-                    {show === true ?
+                    {env.size < 1000000 ? (<>{show === true ?
                         <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" onChange={(ev) => {
                             setLocalValue(ev.target.value)
                         }} />
                         :
-                        <div className={"var-table-input show-button rounded button"} onClick={() => {
+                        <div className={`var-table-input show-button rounded button ${isBinary ? "disabled": ""}`} onClick={() => {
                             getVar(env.name).then((newVal) => {
                                 if (!newVal) {
                                     return // TODO: Throw error
                                 }
-                                setLocalValue(newVal)
-                                setRemoteValue(newVal)
-                                setShow(true)
+                                const string_to_test = newVal.substring(0, 50)
+                                if(/\ufffd/.test(string_to_test) === true){
+                                    setShow(false)
+                                    setIsBinary(true)
+                                }else{
+                                    setLocalValue(newVal)
+                                    setRemoteValue(newVal)
+                                    setShow(true)
+                                }
                             })
-                        }}><span>Show Value</span></div>
-                    }
+                        }}><span>{`${isBinary ? "Cannot Show Binary Variable": "Show Value"}`}</span></div>
+                    }</>) : (<div className={"var-table-input show-button rounded button disabled"}><span>Variable is too large to preview</span></div>)}
+                    
                 </div>
             </div>
             <div className={"var-table-row-size"} >
-                {env.size}
+                {bytes(env.size)}
             </div>
             <div className={"var-table-row-action"} >
-                <EnvTableAction name={env.name} setVar={setVar} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
+                <EnvTableAction setError={setError} name={env.name} setVar={setVar} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
             </div>
         </div>
     )
 };
 
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (res) => {
+            resolve(res.target.result)
+        }
+
+        reader.onerror = (err) => reject(err)
+        reader.readAsText(file)
+    })
+}
+
 const EnvTableAction = (props) => {
-    const { value, show, hideEnv, name, setVar, edited, resetValue } = props
+    const { value, show, hideEnv, name, setVar, edited, resetValue, setError } = props
+
+    const onDrop = useCallback(
+        async (acceptedFiles, fileRejections) => {
+            if (fileRejections.length > 0) {
+                setError(`Could not read file ${fileRejections[0].file.name}: ${fileRejections[0].errors[0].message}`)
+            } else {
+                setVar(name, await readFile(acceptedFiles[0]), true).then(()=>{
+                    resetValue()
+                })
+
+            }
+        },
+        [name, setVar, resetValue, setError]
+    );
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop,
+        maxFiles: 1,
+        multiple: false
+    });
+
     let buttons = [];
 
     // Show Hidden Button
@@ -102,15 +147,28 @@ const EnvTableAction = (props) => {
                 </span>
             </div>
         )
+
+        buttons.push(
+            <div key={`${name}-btn-save`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button ${edited && value !== "" ? "success" : "disabled"}`} onClick={() => { setVar(name, value, true).then(() => { resetValue() }) }} >
+                <span style={{ flex: "auto" }}>
+                    <IoSave style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
+                </span>
+            </div>
+        )
+    } else {
+        buttons.push(
+            <div key={`${name}-btn-upload`} {...getRootProps({ className: 'dropzone' })} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px", display: "flex", justifyContent: "center", alignItems: "center" }} title="Upload Variable" className={`circle button`}>
+                    <input {...getInputProps()} />
+                    <span>
+                    <IoCloudUploadOutline/>
+                    </span>
+            </div>
+        )
     }
 
-    buttons.push(
-        <div key={`${name}-btn-save`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button ${edited && value !== "" ? "success" : "disabled"}`} onClick={() => { setVar(name, value, true).then(() => { resetValue() }) }} >
-            <span style={{ flex: "auto" }}>
-                <IoSave style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
-            </span>
-        </div>
-    )
+    
+
+    
 
     buttons.push(
         <div title="Delete Variable" key={`${name}-btn-delete`}>
@@ -139,10 +197,36 @@ const EnvRowEmpty = (props) => {
 };
 
 const EnvTableNewEntry = (props) => {
-    const { setVar } = props
+    const { setVar, setError } = props
     const [value, setValue] = useState("")
     const [name, setName] = useState("")
     const [show, setShow] = useState(false)
+
+    const onDrop = useCallback(
+        async (acceptedFiles, fileRejections) => {
+            if (fileRejections.length > 0) {
+                setError(`Could not read file ${fileRejections[0].file.name}: ${fileRejections[0].errors[0].message}`)
+            } else {
+                if (name === "") {
+                    setError("Variable Name Required")
+                    return
+                }
+                setVar(name, await readFile(acceptedFiles[0])).then((ok)=>{
+                    if (ok) {
+                        cleanup()
+                    }
+                })
+
+            }
+        },
+        [name, setError, setVar]
+    );
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop,
+        maxFiles: 1,
+        multiple: false
+    });
 
     const cleanup = () => {
         setName("")
@@ -174,6 +258,12 @@ const EnvTableNewEntry = (props) => {
                     <div className={"var-table-row-size"} >
                     </div>
                     <div className={"var-table-row-action"} >
+                        <div key={`${name}-btn-upload`} {...getRootProps({ className: 'dropzone' })} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px", display: "flex", justifyContent: "center", alignItems: "center" }} title="Upload Variable" className={`circle button`}>
+                            <input {...getInputProps()} />
+                            <span>
+                                <IoCloudUploadOutline />
+                            </span>
+                        </div>
                         <div onClick={() => {
                             setVar(name, value).then((ok) => {
                                 if (ok) {
@@ -351,14 +441,14 @@ export function EnvrionmentContainer(props) {
                         <div className={`var-table-accent-header`}><EnvTableHeader /></div>
                         {envList.map((env, index) => {
                             return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} /></div>)
+                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError}/></div>)
                         })}
                         {
                             envList.length === 0 ? (
                                 <>
                                     <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
                                     <div className={`var-table-accent-1 var-table-accent-end`}>
-                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable} />
+                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable}/>
                                     </div>
                                 </>
                             ):(
