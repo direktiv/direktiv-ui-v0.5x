@@ -105,7 +105,16 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         animated: false,
                         type: 'bezier'
                     })
-                } 
+                } else {
+                        transitions = true
+                        newElements.push({
+                            id: `${v.states[i].id}-endNode`,
+                            source: v.states[i].id,
+                            target: `endNode`,
+                            animated: false,
+                            type: 'bezier'
+                        })
+                }
 
                 if(!transitions) {
                     // no transition add end state
@@ -169,6 +178,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                     }
 
                     if(noTransition) {
+                        console.log(flow[i])
                         // transition to end state
                         for(let j=0; j < newElements.length; j++) {
                             if(newElements[j].source === flow[i] && newElements[j].target === "endNode" && status === "complete"){
