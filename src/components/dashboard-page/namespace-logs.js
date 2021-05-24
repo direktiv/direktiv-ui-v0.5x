@@ -8,40 +8,40 @@ import * as dayjs from "dayjs"
 import AnsiUp from "ansi_up"
 
 var ansi_up = new AnsiUp();
-let json = {
-    "workflowInstanceLogs": [
-      {
-        "timestamp": {
-          "seconds": 1621558291,
-          "nanos": 82464266
-        },
-        "message": "Beginning workflow triggered by API."
-      },
-      {
-        "timestamp": {
-          "seconds": 1621558291,
-          "nanos": 87198677
-        },
-        "message": "Running state logic -- helloworld:1 (noop)"
-      },
-      {
-        "timestamp": {
-          "seconds": 1621558291,
-          "nanos": 87209753
-        },
-        "message": "Transforming state data."
-      },
-      {
-        "timestamp": {
-          "seconds": 1621558291,
-          "nanos": 92903162
-        },
-        "message": "Workflow completed."
-      }
-    ],
-    "offset": 0,
-    "limit": 300
-  }
+// let json = {
+//     "namespaceLogs": [
+//       {
+//         "timestamp": {
+//           "seconds": 1621558291,
+//           "nanos": 82464266
+//         },
+//         "message": "Beginning workflow triggered by API."
+//       },
+//       {
+//         "timestamp": {
+//           "seconds": 1621558291,
+//           "nanos": 87198677
+//         },
+//         "message": "Running state logic -- helloworld:1 (noop)"
+//       },
+//       {
+//         "timestamp": {
+//           "seconds": 1621558291,
+//           "nanos": 87209753
+//         },
+//         "message": "Transforming state data."
+//       },
+//       {
+//         "timestamp": {
+//           "seconds": 1621558291,
+//           "nanos": 92903162
+//         },
+//         "message": "Workflow completed."
+//       }
+//     ],
+//     "offset": 0,
+//     "limit": 300
+//   }
 
 export default function NamespaceLogs() {
 
@@ -58,42 +58,55 @@ export default function NamespaceLogs() {
 
     const fetchLogs = useCallback(()=>{
         async function getLogs() {
-            let newLogs = ""
-
-            if (json.workflowInstanceLogs && json.workflowInstanceLogs.length > 0) {
-                        
-                    offsetRef.current = offsetRef.current + json.workflowInstanceLogs.length
-
-                    for(var i=0; i < json.workflowInstanceLogs.length; i++) {
-                        let obj = json.workflowInstanceLogs[i]
-                        newLogs += `\u001b[38;5;248m[${dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
-                        newLogs += `${obj.message} `
-                        if(obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0){
-                            newLogs += `( `
-                            Object.keys(obj.context).map((k) => {
-                                return (
-                                    `${k}=${obj.context[k]} `
-                                )
-                            })
-                            newLogs += ` )`
-                        }
-                        newLogs += `\n`
+            try {
+                let newLogs = ""
+                let resp = await fetch(`/namespaces/${namespace}/logs?offset=${offsetRef.current}&limit=${limitRef.current}`, {
+                    method: "GET"
+                })
+                if(!resp.ok) {
+                        await handleError('fetch logs', resp, 'getNamespaceLogs')
+                } else {
+                    let json = await resp.json()
+                    if (json.namespaceLogs && json.namespaceLogs.length > 0) {
+                                
+                            offsetRef.current = offsetRef.current + json.namespaceLogs.length
+    
+                            for(var i=0; i < json.namespaceLogs.length; i++) {
+                                let obj = json.namespaceLogs[i]
+                                newLogs += `\u001b[38;5;248m[${dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
+                                newLogs += `${obj.message} `
+    
+                                console.log(obj.context)
+                                if(obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0){
+                                    newLogs += `\u001b[38;5;248m(`
+                                    newLogs += Object.keys(obj.context).map((k) => {
+                                        console.log(k, "KEY")
+                                        return (
+                                            `${k}=${obj.context[k]}`
+                                        )
+                                    })
+                                    newLogs += `)\u001b[0m `
+                                }
+                                newLogs += `\n`
+                            }
+                            let x = ansi_up.ansi_to_html(newLogs)
+                            document.getElementById("logs-test").innerHTML += x
+    
+                            // used for copying later
+                            setLogs((str) => {return str + newLogs})
+                        } 
                     }
-                    let x = ansi_up.ansi_to_html(newLogs)
-                    document.getElementById("logs-test").innerHTML += x
-
-                    // used for copying later
-                    setLogs((str) => {return str + newLogs})
-                } 
-            }
-            if (tailRef.current) {
-                if (document.getElementById('logs')) {
-                    document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
+                if (tailRef.current) {
+                    if (document.getElementById('logs')) {
+                        document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
+                    }
                 }
+            } catch(e) {
+                setErr(e.message)
             }
-
+        }
         getLogs()
-    }, [fetch, handleError])
+    }, [fetch, handleError, namespace])
 
     useEffect(()=>{
         if(timerRef.current === 0 && namespace !== "" && namespace !== undefined && namespace !== null) {
