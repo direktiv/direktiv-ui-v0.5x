@@ -314,6 +314,7 @@ function parseYaml(fetch, name, namespace, data, setErr, history, handleError) {
     try {
         let y = YAML.load(data, 'utf8')
         y.id = name
+        
         createWorkflow(fetch, YAMLtoString.stringify(y), namespace, setErr, undefined, history, handleError)
     } catch (e) {
         setErr(`Unable to parse YAML: ${e.message}`)
@@ -564,7 +565,8 @@ function NewWorkflowForm() {
                     ""
             }
             <div style={{ textAlign: "right" }}>
-                <input type="submit" value="Submit" onClick={() => { parseYaml(fetch, name, namespace, templateData, setErr, history) }} />
+                
+                <input type="submit" value="Submit" onClick={() => { parseYaml(fetch, name, namespace, templateData, setErr, history, handleError) }} />
             </div>
         </div>
     )
