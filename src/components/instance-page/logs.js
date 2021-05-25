@@ -56,13 +56,13 @@ export default function Logs(props) {
                             newLogs += `\u001b[38;5;248m[${dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
                             newLogs += `${obj.message} `
                             if(obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0){
-                                newLogs += `( `
-                                Object.keys(obj.context).map((k) => {
+                                newLogs += `\u001b[38;5;248m( `
+                                newLogs += Object.keys(obj.context).map((k) => {
                                     return (
                                         `${k}=${obj.context[k]} `
                                     )
                                 })
-                                newLogs += ` )`
+                                newLogs += ` )\u001b[0m`
                             }
                             newLogs += `\n`
                         }
@@ -74,10 +74,8 @@ export default function Logs(props) {
                     } 
                 }
 
-                console.log(tailRef.current)
                 if (tailRef.current) {
                     if (document.getElementById('logs')) {
-                        console.log("setting scroll height")
                         document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
                     }
                 }

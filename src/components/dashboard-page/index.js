@@ -5,8 +5,9 @@ import PieChart from '../charts/pie'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
 
-import { IoCodeSlashOutline, IoEllipse, IoList } from 'react-icons/io5'
+import { IoCodeSlashOutline, IoEllipse, IoList, IoTerminal } from 'react-icons/io5'
 import {EventsPageBody} from '../events-page'
+import NamespaceLogs from './namespace-logs'
 
 
 
@@ -79,29 +80,35 @@ export default function DashboardPage() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                <div className="shadow-soft rounded tile" style={{ flex: "auto", minWidth: "300px", maxWidth: "400px", maxHeight: "400px" }}>
-                    <TileTitle name="Recent Workflows">
-                        <IoCodeSlashOutline />
+                <div className="shadow-soft rounded tile" style={{flex: "auto"}}>
+                    <TileTitle name="Namespace Logs">
+                        <IoTerminal />
                     </TileTitle>
-                    {
-                        err === "" ? 
-                            <DashboardTotalExecutions metrics={metrics} />
-                            :
-                            <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                            {err}
-                        </div>
-                    }
-                </div>
-                <div className="shadow-soft rounded tile" style={{  flex: "auto", flexGrow: "1", maxHeight: "400px",  marginBottom:"10px" }}>
-                    <TileTitle name="Events">
-                        <IoList />
-                    </TileTitle>
-                    <div style={{maxHeight:"365px", overflow:"auto"}}>
-                        <EventsPageBody />
-                    </div>
+                    <NamespaceLogs />
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }}>
+                <div className="shadow-soft rounded tile" style={{ flex: "auto", minWidth: "300px", maxWidth: "400px", maxHeight: "400px" }}>
+                        <TileTitle name="Recent Workflows">
+                            <IoCodeSlashOutline />
+                        </TileTitle>
+                        {
+                            err === "" ? 
+                                <DashboardTotalExecutions metrics={metrics} />
+                                :
+                                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                {err}
+                            </div>
+                        }
+                    </div>
+                    <div className="shadow-soft rounded tile" style={{  flex: "auto", flexGrow: "1", maxHeight: "400px",  marginBottom:"10px" }}>
+                        <TileTitle name="Events">
+                            <IoList />
+                        </TileTitle>
+                        <div style={{maxHeight:"365px", overflow:"auto"}}>
+                            <EventsPageBody />
+                        </div>
+                    </div>
             </div>
         </div>
         :

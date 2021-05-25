@@ -11,7 +11,6 @@ import Modal from 'react-modal'
 import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
 
-console.log(window.location)
 Modal.setAppElement("#root")
 
 export function CheckPerm() {

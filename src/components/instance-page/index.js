@@ -58,9 +58,6 @@ export default function InstancePage() {
         setModalOpen(!modalOpen)
     }
 
-    function afterOpenModal(){
-        console.log('modal open')
-    }
 
     let instanceId = `${params.namespace}/${params.workflow}/${params.instance}`
    
@@ -185,7 +182,6 @@ export default function InstancePage() {
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <Modal 
                 isOpen={modalOpen}
-                onAfterOpen={afterOpenModal}
                 onRequestClose={toggleModal}
                 contentLabel="API Interactions"
             >
