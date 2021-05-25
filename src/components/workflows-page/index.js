@@ -38,6 +38,8 @@ export default function WorkflowsPage() {
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
+    const [tab, setTab] = useState("normal")
+
 
     // Search Engine States, TODO: Optimise for large workflows list
     const [searchPattern, setSerachPattern] = useState("")
@@ -137,10 +139,23 @@ export default function WorkflowsPage() {
         fetchWorkflows()        
     }, [fetchWorkflows])
 
+    let ac = []
+    if(tab === "normal") {
+        ac.push(<div onClick={()=>setTab("upload")} title="Upload Workflow">
+            <IoCloudUploadSharp/>
+        </div>)
+    } else if (tab === "upload"){
+        ac.push(
+            <div onClick={()=>setTab("normal")} title="Workflow from Template">
+                <IoAddSharp />
+            </div>
+        )
+    }
+
     return (
         <>
             {namespace !== "" ?
-                <div className="container" style={{ flex: "auto", padding: "10px" }}>
+                <div className="container" style={{ flex: "auto" }}>
                     <Modal 
                         isOpen={modalOpen}
                         onAfterOpen={afterOpenModal}
@@ -177,7 +192,7 @@ export default function WorkflowsPage() {
                                 </div>
                             </div>
 
-                            <div id="events-table" style={{ display: "flex", flexDirection: "column" }}>
+                            <div id="events-table" style={{ display: "flex", flexDirection: "column", gap:"15px", maxHeight:"770px", overflow:"auto", paddingBottom:"20px" }}>
                                 {err ? 
                                     <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                                     {err}
@@ -197,7 +212,7 @@ export default function WorkflowsPage() {
                                                 return (<></>);
                                             }
                                             return (
-                                                <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>
+                                                <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit", padding:"3px" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>
                                                     <div className="workflows-list-name">
                                                         {wfID}
                                                     </div>
@@ -263,21 +278,24 @@ export default function WorkflowsPage() {
                         <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
                             {checkPerm(permissions, "createWorkflow") ? 
                             <>
-                            <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
+                            {/* <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
                                 <TileTitle name="Upload workflow file">
                                     <IoCloudUploadSharp />
                                 </TileTitle>
                                 <UploadWorkflowForm />
-                            </div>
-                            <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
-                                <TileTitle name="Create new workflow">
+                            </div> */}
+                            <div className="shadow-soft rounded tile" style={{ minWidth: "350px"}}>
+                                <TileTitle name="Create new workflow" actionsDiv={ac}>
                                     <IoAddSharp />
                                 </TileTitle>
+                                {tab === "normal" ?
                                 <NewWorkflowForm />
+                                :
+                                <UploadWorkflowForm/>}
                             </div></>
                             : ""}
                             {checkPerm(permissions, "namespaceEvent") ?
-                            <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
+                            <div className="shadow-soft rounded tile" style={{ minWidth: "350px", maxHeight:"250px" }}>
                                 <TileTitle name="Send namespace event">
                                     <IoAddSharp />
                                 </TileTitle>
@@ -381,7 +399,7 @@ function APIInteractionTile() {
 
     return (
         <div>
-            <textarea value={val} onChange={(e) => setVal(e.target.value)} rows={13} style={{ width: "100%", height: "100%", resize: "none" }} />
+            <textarea value={val} onChange={(e) => setVal(e.target.value)} rows={11} style={{ width: "100%", height: "80%", resize: "none" }} />
             {err !== "" ?
                 <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                     {err}
@@ -510,8 +528,9 @@ function NewWorkflowForm() {
     }
 
     return (
-        <div style={{ fontSize: "12pt" }}>
-            <table>
+        <div style={{ fontSize: "12pt"}}>
+            <div style={{display:"flex", alignItems:"center" }}>
+            <table style={{flex: 1}}>
                 <tbody>
                     <tr>
                         <td style={{ textAlign: "left" }}>
@@ -539,6 +558,8 @@ function NewWorkflowForm() {
                     </tr>
                 </tbody>
             </table>
+            </div>
+
             <div className="divider-dark" />
             <div>
                 <div style={{ textAlign: "left", fontSize: "10pt" }}>
@@ -596,7 +617,7 @@ function Basic(props) {
 
     return (
         <section className="container">
-            <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: "pointer" }}>
+            <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: "pointer", height: "330px" }}>
                 <input {...getInputProps()} />
                 <p>Drag 'n' drop a file here, or click to select file</p>
                 <aside style={{ minHeight: "32px", textAlign: "center" }}>

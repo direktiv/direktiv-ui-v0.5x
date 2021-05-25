@@ -407,7 +407,7 @@ export default function WorkflowPage() {
                                 <TileTitle name="Instances">
                                     <IoList />
                                 </TileTitle>
-                                <div style={{ maxHeight: "450px", overflowY: "auto" }}>
+                                <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
                                     <div id="events-tile" className="tile-contents">
                                         <EventsList />
                                     </div>

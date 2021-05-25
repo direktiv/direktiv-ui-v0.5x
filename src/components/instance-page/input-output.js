@@ -9,7 +9,7 @@ import "prismjs/components/prism-yaml"
 import { CopyToClipboard } from '../../util-funcs';
 
 
-export function Code({ id, code, language }) {
+export function Code({ id, code, language, padding }) {
 
     const [load, setLoad] = useState(true)
     
@@ -25,7 +25,7 @@ export function Code({ id, code, language }) {
     return (
       <div style={{height:"99%"}} className="Code">
         <pre>
-          <code style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</code>
+          <code  style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</code>
         </pre>
       </div>
     );
@@ -35,8 +35,8 @@ export function TemplateHighlighter(props) {
     const {data, lang, id} = props
 
     return(
-        <div className="input-output" style={{ maxHeight:"300px", height:"300px", minHeight:"300px", overflow:"hidden", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
-            <Code  id={id} language={lang} code={data} />
+        <div className="input-output" style={{ maxHeight:"300px", padding:"10px", height:"300px", minHeight:"300px", overflow:"hidden", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0, top: "25px", bottom: 0}}>
+            <Code padding={"10px"} id={id} language={lang} code={data} />
         </div>
     )
 }

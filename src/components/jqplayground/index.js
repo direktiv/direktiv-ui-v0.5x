@@ -201,12 +201,12 @@ export default function JQPlaygroundPage() {
                             :""}
                             </div>
                         </div>
-                        <div className="container" style={{ flexDirection: "row", width: "100%" }}>
+                        <div className="container" id="input-output-jqplayground" style={{ flexDirection: "row", width: "100%" }}>
                             <div className="item-0 shadow-soft rounded tile" style={{ flexGrow: "1", flexBasis: 0 }}>
                                 <TileTitle name={`Input`} >
                                     <IoPencil />
                                 </TileTitle>
-                                <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
+                                <div className="jqeditor" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                     <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                         <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
                                             <Editor value={jqInput} setValue={setJQInput} />
@@ -218,7 +218,7 @@ export default function JQPlaygroundPage() {
                                 <TileTitle name="Output">
                                     <IoChevronForwardOutline />
                                 </TileTitle>
-                                <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
+                                <div className="jqeditor" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                     <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                         <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
                                             <Editor value={jqOutput} readOnly={true} />

@@ -186,7 +186,7 @@ const EnvTableAction = (props) => {
 
 const EnvRowEmpty = (props) => {
     return (
-        <div className={`var-table-row new-entry new-entry-button`}>
+        <div className={`var-table-row new-entry new-entry-button`} style={{minHeight:"183px"}}>
             <div style={{ flexGrow: "1", flexBasis: "0" }} />
             <div style={{ flexGrow: "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
                 <span>No Variables</span>
@@ -308,7 +308,7 @@ export default function EnvrionmentPage(props) {
 export function EnvrionmentContainer(props) {
     const { namespace, fetch, handleError } = useContext(MainContext)
     const { mode } = props
-    const [fetching, setFetching] = useState(false) // TODO fetching safety checks
+    const [, setFetching] = useState(false) // TODO fetching safety checks
     const [error, setError] = useState("")
     const [envList, setEnvList] = useState([])
 
@@ -431,7 +431,7 @@ export function EnvrionmentContainer(props) {
 
     return (
         <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
-            <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content" }}>
+            <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px" }}>
                 <TileTitle name="Variables">
                     <IoLockOpen />
                 </TileTitle>

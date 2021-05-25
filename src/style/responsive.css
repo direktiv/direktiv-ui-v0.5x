@@ -1,0 +1,32 @@
+pre[class*="language-"] {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+/* Instance page */
+.list-instance-page-item:hover{
+    color: #2396d8;
+}
+.list-instance-page-item:hover a {
+    color: #2396d8 !important;
+}
+
+
+/* Media Screens and responsive layouts */
+@media only screen and (max-width: 967px) {
+    #input-output-jqplayground {
+        flex-direction: column !important;
+    }
+    #input-output-jqplayground .jqeditor {
+        min-height: 200px !important; 
+    }
+    #workflow-page-events {
+        max-height: 252px !important;
+    }
+}
+
+@media only screen and (max-width: 799px) {
+    #instance-status-tile {
+        display: none !important;
+    }
+}

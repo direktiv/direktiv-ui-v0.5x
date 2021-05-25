@@ -13,7 +13,8 @@ import Interactions from '../workflows-page/interactions'
 import Modal from 'react-modal';
 
 import MainContext from '../../context'
-import { IoCode, IoEaselOutline, IoTerminal, IoCodeOutline, IoHardwareChipSharp } from 'react-icons/io5'
+import { IoCode, IoEaselOutline, IoTerminal, IoHardwareChipSharp } from 'react-icons/io5'
+import ButtonWithDropDownCmp from './actions-btn'
 
 
 async function checkStartType(wf, setError) {
@@ -42,7 +43,7 @@ export default function InstancePage() {
     const [tab, setTab] = useState("logs")
     const [workflowErr, setWorkflowErr] = useState("")
     const [detailsErr, setDetailsErr] = useState("")
-    const [actionErr, setActionErr] = useState("")
+    const [, setActionErr] = useState("")
     
     // true starts with default false any other start type
     const [startType, setStartType] = useState(true)
@@ -121,36 +122,20 @@ export default function InstancePage() {
         }
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
 
-    return(
-        <>
-        {namespace !== "" ?
-        <div className="container" style={{ flex: "auto", padding: "10px" }}>
-            <Modal 
-                isOpen={modalOpen}
-                onAfterOpen={afterOpenModal}
-                onRequestClose={toggleModal}
-                contentLabel="API Interactions"
-            >
-                <Interactions interactions={instanceInteractions(params.namespace, params.workflow, params.instance)} type="Instance" />
-            </Modal>
-            <div className="flex-row" style={{ maxHeight: "64px" }}>
-                <div style={{ flex: "auto", display: "flex" }}>
-                    <div style={{ flex: "auto" }}>
-                        <Breadcrumbs instanceId={instanceId} />
-                    </div>
-            <>
-                        {actionErr !== "" ? 
-                            <div style={{ display:"flex", alignItems:"center", marginRight:"15px", fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                            {actionErr}
-                            </div>
-                            :""
-                        }
-                    {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
-                    
-                    <>
-                    {startType && checkPerm(permissions, "executeWorkflow") ?
-                    <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
-                    onClick={async () => {
+
+    let listElements = [
+        {
+            name: "View Workflow",
+            link: true,
+            path: `/${params.namespace}/w/${params.workflow}`
+        }
+    ]
+    if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete"){
+        if(startType && checkPerm(permissions, "executeWorkflow")){
+            listElements.push(
+                {
+                    name: "Rerun Workflow",
+                    func: async ()=>{
                         try{
                             let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
                                 method: "POST",
@@ -168,44 +153,119 @@ export default function InstancePage() {
                         } catch(e) {
                             setActionErr(`Unable to execute workflow: ${e.message}`)
                         }
-                    }}>
-                        <div style={{ alignItems: "center" }}>
-                                Rerun Workflow
-                        </div>
-                    </div>:""}</> : 
-                    <>
-                    {checkPerm(permissions, "cancelInstance") ?
-
-  <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
-  onClick={async () => {
-    try {
-        let resp = await fetch(`/instances/${instanceId}`, {
-            method: "DELETE"
-        })
-        if(!resp.ok) {
-            await handleError('cancel instance', resp, 'cancelInstance')
+                    }
+                }
+            )
+          
         }
-    }  catch(e) {
-        setActionErr(`Instance cancelled error: ${e.message}`)
+    } else {
+        if(checkPerm(permissions, "cancelInstance")) {
+            listElements.push(
+              {
+                  name: "Cancel Instance",
+                  func: async ()=>{
+                        try {
+                            let resp = await fetch(`/instances/${instanceId}`, {
+                                method: "DELETE"
+                            })
+                            if(!resp.ok) {
+                                await handleError('cancel instance', resp, 'cancelInstance')
+                            }
+                        }  catch(e) {
+                            setActionErr(`Instance cancelled error: ${e.message}`)
+                        }
+                  }
+              }
+            )
+        }
     }
-  }}>
-      <div style={{ alignItems: "center" }}>
-              Cancel Execution
-      </div>
-  </div> :""}
-  </>
-                    }</>
-                    <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
+    return(
+        <>
+        {namespace !== "" ?
+        <div className="container" style={{ flex: "auto", padding: "10px" }}>
+            <Modal 
+                isOpen={modalOpen}
+                onAfterOpen={afterOpenModal}
+                onRequestClose={toggleModal}
+                contentLabel="API Interactions"
+            >
+                <Interactions interactions={instanceInteractions(params.namespace, params.workflow, params.instance)} type="Instance" />
+            </Modal>
+            <div className="flex-row" style={{ maxHeight: "64px" }}>
+                <div style={{ flex: "auto", display: "flex" }}>
+                    <div style={{ flex: "auto" }}>
+                        <Breadcrumbs instanceId={instanceId} />
+                    </div>
+                    <>
+                        {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
+                            <>
+                                {startType && checkPerm(permissions, "executeWorkflow") ?
+                                ""
+                               // <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
+                                    //     onClick={async () => {
+                                    //     try{
+                                    //         let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
+                                    //             method: "POST",
+                                    //             body: atob(instanceDetails.input)
+                                    //         })
+                                    //         if(resp.ok) {
+                                    //             if(document.getElementById("logs-test")){
+                                    //                 document.getElementById("logs-test").innerHTML = ""
+                                    //             }
+                                    //             let json = await resp.json()    
+                                    //             history.push(`/i/${json.instanceId}`)
+                                    //         } else {
+                                    //             await handleError('rerun workflow', resp, 'executeWorkflow')
+                                    //         }
+                                    //     } catch(e) {
+                                    //         setActionErr(`Unable to execute workflow: ${e.message}`)
+                                    //     }
+                                    // }}>
+                                    //     <div style={{ alignItems: "center" }}>
+                                    //             Rerun Workflow
+                                    //     </div>
+                                    // </div>
+                                    :
+                                    ""
+                                }
+                            </> 
+                            : 
+                            <>
+                                {/* {checkPerm(permissions, "cancelInstance") ?
+                                    <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
+                                     onClick={async () => {
+                                        try {
+                                            let resp = await fetch(`/instances/${instanceId}`, {
+                                                method: "DELETE"
+                                            })
+                                            if(!resp.ok) {
+                                                await handleError('cancel instance', resp, 'cancelInstance')
+                                            }
+                                        }  catch(e) {
+                                            setActionErr(`Instance cancelled error: ${e.message}`)
+                                        }
+                                    }}>
+                                        <div style={{ alignItems: "center" }}>
+                                                Cancel Execution
+                                        </div>
+                                    </div> 
+                                    :
+                                    ""
+                                } */}
+                            </>
+                        }
+                    </>
+                    {/* <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
                     onClick={() => {
                         history.push(`/${params.namespace}/w/${params.workflow}`)
                     }}>
                         <div style={{ alignItems: "center" }}>
                                 View Workflow
                         </div>
-                    </div>
-                    <div id="" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
+                    </div> */}
+                    <div id="instance-status-tile" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ display: "flex", alignItems: "center" }}>
-                            <span style={{ marginRight: "10px" }}>
+                            <span id="instance-status-text" style={{ marginRight: "10px" }}>
                                 Instance status: 
                             </span>
                             <span style={{display:"flex", alignItems:"center"}} title={instanceDetails.status}>
@@ -213,9 +273,10 @@ export default function InstancePage() {
                             </span>
                         </div>
                     </div>
-                    <div onClick={() =>{toggleModal()}} title={"APIs"} className="shadow-soft rounded tile fit-content" style={{cursor:"pointer", zIndex: "5", maxHeight:"36px", display:"flex", alignItems:"center", height:"18px" }}>
-                            <IoCodeOutline className={"toggled-switch"} style={{ fontSize: "11pt",  marginLeft: "0px" }} />
-                    </div> 
+                    <ButtonWithDropDownCmp data={listElements}/>
+                    {/* <div onClick={() =>{toggleModal()}} title={"APIs"} className="shadow-soft rounded tile fit-content" style={{cursor:"pointer", zIndex: "5", maxHeight:"36px", display:"flex", alignItems:"center", height:"18px" }}>
+                            <IoEllipsisVertical className={"toggled-switch"} style={{ fontSize: "11pt",  marginLeft: "0px" }} />
+                    </div>  */}
                 </div>
             </div>
             {instanceDetails.errorMessage !== "" && instanceDetails.errorMessage !== undefined ?

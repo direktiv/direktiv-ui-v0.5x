@@ -73,29 +73,32 @@ export default function SettingsPage() {
     return (
         <>
             {namespace !== "" ?
-                <div className="container" style={{ flex: "auto", padding: "10px" }}>
-                    <div className="flex-row">
+            <>
+                  <div className="flex-row" style={{ maxHeight: "64px" }}>
                         <div style={{ flex: "auto" }}>
-                            <Breadcrumbs elements={["Namespace Settings"]} />
+                            <Breadcrumbs elements={["Workflows", "Example"]} />
                         </div>
                         <SettingsAction />
-                    </div>
-                    <div className="container" style={{ flex: "auto", flexDirection: "row", flexWrap: "wrap" }}>
-                        <div className="item-0 shadow-soft rounded tile" style={{ }}>
+                  </div>
+                  <div style={{height:"100%", width:"100%", display:"flex", flexDirection:"column"}}>
+                      <div className="container" style={{height:"50%", flexDirection:"row"}}>
+                        <div className="item-0 shadow-soft rounded tile">
                             <TileTitle name="Secrets">
                                 <IoLockOpen />
                             </TileTitle>
                             <Secrets />
                         </div>
-                        <div className="item-0 shadow-soft rounded tile" style={{ }}>
+                        <div className="item-0 shadow-soft rounded tile">
                             <TileTitle name="Container Registries">
                                 <IoLogoDocker />
                             </TileTitle>
                             <Registries />
                         </div>
-                        <EnvrionmentContainer mode={"namespace"}/>
-                    </div>
-                </div>
+                      </div>
+                      <EnvrionmentContainer mode={"namespace"}/>
+
+                  </div>
+                    </>
                 : ""}
         </>
     )
