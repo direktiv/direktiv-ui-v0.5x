@@ -1,6 +1,6 @@
 mkfile_path_main := $(abspath $(lastword $(MAKEFILE_LIST)))
 mkfile_dir_main := $(dir $(mkfile_path_main))
-docker_repo = $(if $(DOCKER_REPO),$(DOCKER_REPO),localhost:5000)
+docker_repo = $(if $(DOCKER_REPO),$(DOCKER_REPO))
 docker_image = $(if $(DOCKER_IMAGE),$(DOCKER_IMAGE),direktiv-ui)
 docker_tag = $(if $(DOCKER_TAG),:$(DOCKER_TAG),)
 
@@ -13,3 +13,13 @@ server:
 	fi	
 	docker build . --tag ${docker_repo}/${docker_image}${docker_tag}
 	docker push ${docker_repo}/${docker_image}${docker_tag}
+
+.PHONY: update-containers
+update-containers:
+	if [ ! -d ${mkfile_dir_main}reactjs-embed ]; then \
+                git clone https://github.com/vorteil/reactjs-embed.git; \
+        fi 
+	docker build . --tag vorteil/direktiv-ui
+	docker tag vorteil/direktiv-ui:latest vorteil/direktiv-ui:${RV}
+	docker push vorteil/direktiv-ui
+	docker push vorteil/direktiv-ui:${RV}
