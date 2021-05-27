@@ -301,14 +301,21 @@ export const  bcRoutes = [
 
 function Content() {
   const context = useContext(MainContext)
-
   const [namespace, setNamespace] = useState("")
   const [load, setLoad] = useState(false)
   const [namespaces, setNamespaces] = useState(null)
+  const [initialized, setInitialized] = useState(false)
+  const [apiKey, setAPIKey] = useState(localStorage.getItem('apikey'))
+
 
   const netch = useCallback((path, opts) => {
+    if (!opts.headers) {
+      opts.headers = { Authorization: `apikey ${apiKey}` }
+    } else {
+      opts.headers =  {...opts.headers, Authorization: `apikey ${apiKey}`}
+    }
     return fetch(`${context.SERVER_BIND}${path}`, opts);
-  }, [context.SERVER_BIND])
+  }, [context.SERVER_BIND, apiKey])
 
 
   const fetchNamespaces = useCallback((loaded, val) => {
@@ -328,12 +335,43 @@ function Content() {
     fd()
   }, [netch])
 
+  // Check if api requires apikey by doing a simple namespace request
+  const checkAuth = useCallback(()=>{
+    async function fd() {
+      try {
+        let resp = await netch(`/namespaces/`, {
+          method: "GET"
+        })
+        if(resp.status === 401) {
+          const newAPIKey = prompt("Please Enter APIKey", "");
+          setAPIKey(newAPIKey)
+          localStorage.setItem('apikey', newAPIKey);
+        }
+      } catch(e) {
+        // ignore catch
+      }
+    }
+    return fd()
+  },[netch])
+
   // if namespaces is empty and keycloak has been initialized do things
   useEffect(() => {
+    if (!initialized){
+      return
+    }
+
     if (namespaces === null) {
       fetchNamespaces(true)
     }
-  }, [namespaces, fetchNamespaces])
+  }, [namespaces, fetchNamespaces, initialized])
+
+  useEffect(()=> {
+    if (!initialized){
+      checkAuth().finally(()=>{
+        setInitialized(true)
+      })
+    }
+  }, [checkAuth, initialized])
 
 
   return (

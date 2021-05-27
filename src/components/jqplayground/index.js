@@ -116,7 +116,7 @@ export default function JQPlaygroundPage() {
                     input: JSON.parse(input),
                 });
             } catch (e) {
-                setErr(`Invalid JQ Input: ${e.replace("SyntaxError: JSON.parse: ", "")}`)
+                setErr(`Invalid JQ Input: ${e.toString().replace("SyntaxError: JSON.parse: ", "")}`)
                 return
             }
 

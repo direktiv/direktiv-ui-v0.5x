@@ -55,8 +55,19 @@ const EnvTableRow = (props) => {
     const [remoteValue, setRemoteValue] = useState("")
     const [show, setShow] = useState(false)
     const [isBinary, setIsBinary] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
 
     return (
+        <>
+        {isLoading ? (<div className={"var-table-overlay"}>
+            <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%"}}>
+                <div class="loader"></div> 
+                <div style={{color: "white", fontWeight: "bold", paddingTop:"4px"}}>
+                    Setting Variable...
+                </div>
+            </div>
+        </div>) : <></>}
         <div className={`var-table-row ${show === true ? "show-value" : ""}`}>
             <div className={"var-table-row-name"} >
                 {env.name}
@@ -92,40 +103,30 @@ const EnvTableRow = (props) => {
                 {bytes(env.size)}
             </div>
             <div className={"var-table-row-action"} >
-                <EnvTableAction setError={setError} name={env.name} setVar={setVar} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
+                <EnvTableAction setError={setError} name={env.name} setVar={setVar} setLoading={setIsLoading} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
             </div>
         </div>
+        </>
     )
 };
 
-function readFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = (res) => {
-            resolve(res.target.result)
-        }
-
-        reader.onerror = (err) => reject(err)
-        reader.readAsText(file)
-    })
-}
-
 const EnvTableAction = (props) => {
-    const { value, show, hideEnv, name, setVar, edited, resetValue, setError } = props
+    const { value, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
             if (fileRejections.length > 0) {
                 setError(`Could not read file ${fileRejections[0].file.name}: ${fileRejections[0].errors[0].message}`)
             } else {
-                setVar(name, await readFile(acceptedFiles[0]), true).then(()=>{
+                setLoading(true)
+                setVar(name, acceptedFiles[0], true).then(()=>{
                     resetValue()
+                }).finally(()=>{
+                    setLoading(false)
                 })
-
             }
         },
-        [name, setVar, resetValue, setError]
+        [name, setVar, resetValue, setError, setLoading]
     );
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -149,7 +150,7 @@ const EnvTableAction = (props) => {
         )
 
         buttons.push(
-            <div key={`${name}-btn-save`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button ${edited && value !== "" ? "success" : "disabled"}`} onClick={() => { setVar(name, value, true).then(() => { resetValue() }) }} >
+            <div key={`${name}-btn-save`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button ${edited && value !== "" ? "success" : "disabled"}`} onClick={() => { setLoading(true); setVar(name, value, true).then(() => { resetValue() }).finally(()=>{setLoading(false)}) }} >
                 <span style={{ flex: "auto" }}>
                     <IoSave style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
                 </span>
@@ -201,6 +202,8 @@ const EnvTableNewEntry = (props) => {
     const [value, setValue] = useState("")
     const [name, setName] = useState("")
     const [show, setShow] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
@@ -211,10 +214,13 @@ const EnvTableNewEntry = (props) => {
                     setError("Variable Name Required")
                     return
                 }
-                setVar(name, await readFile(acceptedFiles[0])).then((ok)=>{
+                setIsLoading(true)
+                setVar(name, acceptedFiles[0]).then((ok)=>{
                     if (ok) {
                         cleanup()
                     }
+                }).finally(()=>{
+                    setIsLoading(false)
                 })
 
             }
@@ -237,6 +243,14 @@ const EnvTableNewEntry = (props) => {
 
     return (
         <>
+            {isLoading ? (<div className={"var-table-overlay"}>
+            <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%"}}>
+                <div class="loader"></div> 
+                <div style={{color: "white", fontWeight: "bold", paddingTop:"4px"}}>
+                    Setting Variable...
+                </div>
+            </div>
+            </div>) : <></>}
             {show ? (
                 <div className={`var-table-row new-entry`}>
                     <div className={"var-table-row-name"} style={{ height: "inherit" }}>
@@ -265,10 +279,13 @@ const EnvTableNewEntry = (props) => {
                             </span>
                         </div>
                         <div onClick={() => {
+                            setIsLoading(true)
                             setVar(name, value).then((ok) => {
                                 if (ok) {
                                     cleanup()
                                 }
+                            }).finally(()=>{
+                                setIsLoading(false)
                             })
                         }} title="Save New Variable" className={`circle button ${value !== "" && name !== "" ? "success" : "disabled"}`}>
                             <span style={{ flex: "auto" }}>
@@ -363,8 +380,11 @@ export function EnvrionmentContainer(props) {
         setError("")
         setFetching(true)
 
+        // EnvValue is a File
+        const isFile = envValue instanceof File
+
         // Name and Value cannot be empty strings
-        if (envName === "" || envValue === "") {
+        if (envName === "" || (envValue === "" && !isFile)) {
             setError("Failed To Create New Varaible: Variable Name and Value must not be empty...")
             setFetching(false)
             return ok

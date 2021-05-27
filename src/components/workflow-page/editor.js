@@ -30,11 +30,12 @@ export default function ReactEditor(props) {
                 <CodeMirror
                     value={value}
                     options={{
+                        cursorBlinkRate: readOnly ? 0 : 530,
                         theme: 'editor-theme',
                         mode: 'yaml',
                         lineNumbers: true,
                         lineWrapping: true,
-                        readOnly: readOnly ? "nocursor" : false,
+                        readOnly: readOnly ? "readOnly" : false,
                         indentWithTabs: false,
                         smartIndent: true,
                         extraKeys: {
