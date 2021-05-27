@@ -934,6 +934,19 @@ pre {
     overflow: hidden;
 }
 
+/* TODO: Better styling for overlay */
+.var-table-overlay {
+    z-index: 99999;
+    display: block;
+    position:absolute;
+    height:auto;
+    bottom:0;
+    top:0;
+    left:0;
+    right:0;
+    background-color: rgba(117, 117, 117, 0.74);
+}
+
 .var-table-row.header{
     height: 20pt;
     font-weight: bold;
@@ -954,11 +967,13 @@ pre {
 .var-table-accent-0{
     background-color: #eaeaea;
     box-shadow: inset 1px 4px 3px -4px var(--neumorph-shadow-dark);
+    position: relative;
     /* border-top: 1px solid #bbb; */
 }
 
 .var-table-accent-1{
     background-color: var(--primary-light);
+    position: relative;
     /* border-top: 1px solid #bbb; */
     box-shadow: inset 1px 4px 3px -4px var(--neumorph-shadow-dark);
 }
@@ -1077,3 +1092,17 @@ pre {
     padding: 0;
     margin: 0;
 } */
+
+.loader {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #525252; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
