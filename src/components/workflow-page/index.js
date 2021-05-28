@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react'
+import React, { useContext, useState, useCallback, useEffect, useRef } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "./editor"
 import Diagram from './diagram'
@@ -55,6 +55,7 @@ export default function WorkflowPage() {
     const [actionErr, setActionErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
+    const codemirrorRef = useRef();
 
     const history = useHistory()
     const params = useParams()
@@ -270,10 +271,19 @@ export default function WorkflowPage() {
     }
 
     let WorkflowExpandButton = (
-        <div className={"workflow-expand "} onClick={() => { setFullScreenEditor(!fullscrenEditor) }} >
+        <div className={"workflow-expand "} onClick={() => { 
+            setFullScreenEditor(!fullscrenEditor)
+            }} >
             <IoExpand/>
         </div>
     )
+
+    // Refresh editor whenever fullscreen is activated
+    useEffect(()=>{
+        if (codemirrorRef) {
+            codemirrorRef.current.editor.refresh()
+        }
+    }, [codemirrorRef, fullscrenEditor])
 
     const Actions = [logButton, saveButton]
 
@@ -314,7 +324,7 @@ export default function WorkflowPage() {
                                         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                             <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                                    <Editor err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={Actions} commentKey={"#"}/>
+                                                    <Editor editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={Actions} commentKey={"#"}/>
                                                 </div>
                                             </div>
                                         </div>
@@ -390,6 +400,7 @@ export default function WorkflowPage() {
                                 </div>
                             }</>  : <></>}
                         </div>
+                        {!fullscrenEditor ?
                         <div className="container graph-contents" style={{ width: "300px" }}>
                             <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
                                 <TileTitle name="Executed Workflows">
@@ -410,7 +421,7 @@ export default function WorkflowPage() {
                                 </div>
                             </div>
                             {attributeAdd ? attributeAdd : ""}
-                        </div>
+                        </div> : <></>}
                     </div>
                 </div> : ""}
         </>

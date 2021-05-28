@@ -12,7 +12,7 @@ import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
 export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey } = props;
+    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef } = props;
 
     function editorSave() {
         if (saveCallback) {
@@ -28,6 +28,7 @@ export default function ReactEditor(props) {
             {loading ? <div className="editor-loading"></div> : <></>}
             <div className={showFooter ? "editor-small" : "editor-full"}>
                 <CodeMirror
+                    ref={editorRef}
                     value={value}
                     options={{
                         cursorBlinkRate: readOnly ? 0 : 530,
