@@ -146,6 +146,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
 
             // Check flow array change edges to green if it passed 
             if(flow){
+                console.log(flow)
                 // check flow for transitions
                 for(let i=0; i < flow.length; i++) {
                     let noTransition = false
@@ -159,7 +160,6 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         if(newElements[j].target === flow[i] && newElements[j].source === flow[i-1]) {
                             newElements[j].animated = true
                         } else if(newElements[j].id === flow[i]) {
-                            
                             if(!newElements[j].data.state.transition || !newElements[j].data.state.defaultTransition ){
                                 noTransition = true
                               
@@ -180,11 +180,15 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                     if(noTransition) {
                         console.log(flow[i])
                         // transition to end state
-                        for(let j=0; j < newElements.length; j++) {
-                            if(newElements[j].source === flow[i] && newElements[j].target === "endNode" && status === "complete"){
-                                newElements[j].animated = true
+                        // check if theres more flow if not its the end node
+                        if(!flow[i+1]){
+                            for(let j=0; j < newElements.length; j++) {
+                                if(newElements[j].source === flow[i] && newElements[j].target === "endNode" && status === "complete"){
+                                    newElements[j].animated = true
+                                }
                             }
                         }
+                      
                     }
                 }
             }
