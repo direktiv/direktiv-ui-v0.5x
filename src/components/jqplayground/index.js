@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from 'react'
+import React, { useContext, useState, useCallback, useEffect } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "../workflow-page/editor"
 import MainContext from '../../context'
@@ -89,11 +89,37 @@ const cheatSheetMap = [
 
 export default function JQPlaygroundPage() {
     const { fetch, handleError } = useContext(MainContext)
-    const [jqInput, setJQInput] = useState("{\n  \n}")
-    const [jqFilter, setJQFilter] = useState(".")
+    const [jqInput, setJQInput] = useState(localStorage.getItem('jqInput'))
+    const [jqFilter, setJQFilter] = useState(localStorage.getItem('jqFilter'))
     const [jqOutput, setJQOutput] = useState("")
     const [fetching, setFetching] = useState(false)
     const [err, setErr] = useState("")
+
+    useEffect(() => {
+        if (jqInput === null ) {
+            setJQInput("{\n  \n}")
+        }
+
+        if (jqFilter === null ) {
+            setJQFilter(".")
+        }
+
+    }, [jqFilter, jqInput])
+
+    useEffect(()=>{
+        if (jqFilter == null || jqInput == null ) {
+            return
+        }
+        
+        let timer = setInterval(async ()=>{
+            localStorage.setItem('jqInput', jqInput)
+            localStorage.setItem('jqFilter', jqFilter)
+        }, 2000)
+
+        return function cleanup() {
+            clearInterval(timer)
+        }
+    },[jqFilter,jqInput])
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
@@ -107,6 +133,8 @@ export default function JQPlaygroundPage() {
             return
         }
         setFetching(true)
+        localStorage.setItem('jqInput', input)
+        localStorage.setItem('jqFilter', filter)
 
         async function execJQ() {
             let rBody;
@@ -175,10 +203,23 @@ export default function JQPlaygroundPage() {
     return (
         <>
             <div className="container" style={{ flex: "auto", padding: "10px" }}>
-                <div className="flex-row" style={{ maxHeight: "64px" }}>
-                    <div style={{ flex: "auto" }}>
-                        <Breadcrumbs />
-                    </div>
+                <div className="container">
+                        <div style={{ flex: "auto", display:"flex", width:"100%" }}>
+                            <Breadcrumbs elements={["Workflows"]} />
+                            <div style={{ display: "flex", flex:2, flexDirection: "row-reverse", alignItems: "center", margin: "10px 12px 20px 0px" }}>
+                                <div onClick={() => {
+                                    setJQInput("{\n \n}")
+                                    setJQFilter(".")
+
+                                    localStorage.setItem('jqInput', "{\n \n}")
+                                    localStorage.setItem('jqFilter', ".")
+                                }} title={"Clear JQ Input and Filter"} className="shadow-soft rounded button" style={{ position: "relative", zIndex: "5", display:"flex", justifyContent: "center", width: "inherit", alignItems: "center", padding: "0px 6px 0px 6px"}}>
+                                    <span >
+                                        Clear Inputs
+                                    </span>
+                                </div> 
+                        </div>
+                        </div>
                 </div>
                 <div id="jq-page">
                     <div className="container" style={{}}>

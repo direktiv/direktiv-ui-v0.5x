@@ -6,6 +6,11 @@ import React from "react";
 import 'codemirror/lib/codemirror.css';
 import "../../style/editor-theme.css"
 
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/indent-fold';
+import 'codemirror/addon/fold/comment-fold';
+import 'codemirror/addon/fold/foldgutter.css';
 
 // linting yaml
 import "codemirror/mode/yaml/yaml.js";
@@ -39,6 +44,8 @@ export default function ReactEditor(props) {
                         readOnly: readOnly ? "readOnly" : false,
                         indentWithTabs: false,
                         smartIndent: true,
+                        foldGutter: true,
+                        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
                         extraKeys: {
                             "Ctrl-S": editorSave,
                             Tab: (cm) => {
