@@ -82,7 +82,7 @@ export default function SettingsPage() {
                   </div>
                   <div style={{height:"100%", width:"100%", display:"flex", flexDirection:"column"}}>
                       <div className="container" style={{height:"50%", flexDirection:"row"}}>
-                        <div className="item-0 shadow-soft rounded tile">
+                        <div className="item-0 shadow-soft rounded tile" style={{minHeight:"300px"}}>
                             <TileTitle name="Secrets">
                                 <IoLockOpen />
                             </TileTitle>
@@ -183,7 +183,7 @@ function Secrets() {
     }
 
     return (
-        <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+        <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
          
             {actionErr !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                              {actionErr}
@@ -332,7 +332,7 @@ function Registries() {
     }
 
     return (
-        <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+        <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
        
             {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                 {actionErr}
