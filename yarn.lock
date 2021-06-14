@@ -10411,6 +10411,13 @@ react-flow-renderer@^9.4.4:
     react-redux "^7.2.3"
     redux "^4.0.5"
 
+react-hover@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/react-hover/-/react-hover-2.1.1.tgz#3bf3019f3982a8b295c785f670af78625b8a0ce2"
+  integrity sha512-V7SJplxf6yCIE4UnyIQQBwfr+x6B4nfEsdJ5mRI26I6dobb8joJumdFxfHbUdZanimpSMkw0U3i4aZJW2hyuqw==
+  dependencies:
+    prop-types "^15.5.10"
+
 react-icons@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.2.0.tgz#6dda80c8a8f338ff96a1851424d63083282630d0"

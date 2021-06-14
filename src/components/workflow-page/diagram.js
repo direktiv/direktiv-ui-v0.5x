@@ -1,8 +1,19 @@
 import YAML from 'js-yaml'
+import YAML2 from 'yaml'
 import { useEffect, useState } from 'react'
 import ReactFlow, { MiniMap, isNode, Handle, ReactFlowProvider, useZoomPanHelper } from 'react-flow-renderer';
 import dagre from 'dagre'
-import { IoChevronForwardSharp } from 'react-icons/io5';
+import { IoChevronForwardSharp, IoReorderFourOutline } from 'react-icons/io5';
+
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
+import yaml from "highlight.js/lib/languages/yaml";
+// import EditNode from './edit-node';
+hljs.registerLanguage("yaml", yaml);
+
+
+
+
 
 export const position = { x: 0, y: 0}
 
@@ -225,24 +236,44 @@ function End(props) {
 
 function State(props) {
     const {data} = props
+    console.log(data)
     return(
         <div title={`${data.label}-${data.type}`} className="state" style={{width:"80px", height:"30px"}}>
-               <Handle
-                    type="target"
-                    position="left"
-                    id="default"
-                />
-                <div style={{display:"flex", padding:"1px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                    <IoChevronForwardSharp/>
-                    {data.type}
-                </div>
-                <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.label}</h1>
-                <Handle
-                    type="source"
-                    position="right"
-                    id="default"
-                /> 
+
+                    <Handle
+                            type="target"
+                            position="left"
+                            id="default"
+                        />
+                        <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
+                            <IoChevronForwardSharp/>
+                            <div style={{flex:"auto"}}>
+                            {data.type}
+
+                            </div>
+                            <div style={{display:"flex", alignItems:"center", cursor: "pointer"}} onClick={(e)=>{
+                                hljs.highlightBlock(document.getElementById(`${data.label}-yaml`))
+                                document.getElementById(`state-${data.state.id}`).classList.toggle("hide")
+                            }}>
+                                <IoReorderFourOutline />
+                            </div>
+                        </div>
+                        <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.label}</h1>
+                        <Handle
+                            type="source"
+                            position="right"
+                            id="default"
+                        /> 
+            <div className="state hide" id={`state-${data.state.id}`}  style={{position:"absolute", top:"-30px", zIndex:100, cursor:"pointer"}} onClick={()=>{document.getElementById(`state-${data.state.id}`).classList.toggle("hide")}}>
+                <pre style={{textAlign:"left", fontSize:"6px", whiteSpace:""}}>
+                    <code id={`${data.label}-yaml`} style={{fontSize:"6px", color:"black", background: "transparent"}}>
+                        {YAML2.stringify(data.state)}
+                    </code>
+                </pre>
+            </div>
         </div>
+
+
     )
 }
 
@@ -259,7 +290,8 @@ function WorkflowDiagram(props) {
             state: State,
             start: Start,
             end: End
-        }} >
+        }} 
+        >
             <MiniMap 
                 nodeColor={()=>{
                     return '#4497f5'
