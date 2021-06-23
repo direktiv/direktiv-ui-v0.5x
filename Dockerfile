@@ -25,7 +25,11 @@ RUN go get -d -v
 RUN CGO_ENABLED=0 go build -o /server -ldflags="-s -w" main.go
 
 
-FROM scratch
+FROM alpine:latest
+
+RUN apk add shadow
+RUN /usr/sbin/groupadd -g 22222 direktivg && /usr/sbin/useradd -s /bin/sh -g 22222 -u 33333 direktivu
+
 COPY --from=server-build /server /
 CMD ["/server"]
 
