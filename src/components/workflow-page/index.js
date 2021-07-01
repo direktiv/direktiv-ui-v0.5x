@@ -7,7 +7,7 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand } from 'react-icons/io5'
+import { IoExitOutline, IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand } from 'react-icons/io5'
 import Modal from 'react-modal';
 
 import PieChart from '../charts/pie'
@@ -17,6 +17,7 @@ import MainContext from '../../context'
 import Sankey from './sankey'
 import {NoResults} from '../../util-funcs'
 import Interactions from '../workflows-page/interactions'
+import ExportWorkflow from './export'
 
 
 async function checkStartType(wf, setError) {
@@ -59,10 +60,16 @@ export default function WorkflowPage() {
 
     const history = useHistory()
     const params = useParams()
-    const [modalOpen, setModalOpen] = useState(false)
+    const [apiModalOpen, setAPIModalOpen] = useState(false)
+    const [exportModalOpen, setExportModalOpen] = useState(false)
 
-    function toggleModal() {
-        setModalOpen(!modalOpen)
+
+    function toggleAPIModal() {
+        setAPIModalOpen(!apiModalOpen)
+    }
+
+    function toggleExportModal() {
+        setExportModalOpen(!exportModalOpen)
     }
 
 
@@ -292,11 +299,18 @@ export default function WorkflowPage() {
             {namespace !== "" ?
                 <div className="container" style={{ flex: "auto", padding: "10px" }}>
                     <Modal 
-                        isOpen={modalOpen}
-                        onRequestClose={toggleModal}
+                        isOpen={apiModalOpen}
+                        onRequestClose={toggleAPIModal}
                         contentLabel="API Interactions"
                     >
                         <Interactions interactions={workflowInteractions(namespace, params.workflow)} type="Workflow" />
+                    </Modal>
+                    <Modal 
+                        isOpen={exportModalOpen}
+                        onRequestClose={toggleExportModal}
+                        contentLabel="Export Workflow"
+                    >
+                        <ExportWorkflow workflow={params.workflow} namespace={namespace} />
                     </Modal>
                     <div className="flex-row" style={{ maxHeight: "64px" }}>
 
@@ -307,7 +321,7 @@ export default function WorkflowPage() {
                             {toggleErr}
                         </div> : ""
                         }
-                        <WorkflowActions toggleModal={toggleModal} checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow} 
+                        <WorkflowActions toggleExportModal={toggleExportModal} toggleAPIModal={toggleAPIModal} checkPerm={checkPerm} permissions={permissions} viewSankey={viewSankey} setViewSankey={setViewSankey} fetchWorkflow={fetchWorkflow} active={workflowInfo.active} toggleWorkflow={toggleWorkflow} 
                         namespace={namespace} workflowName={params.workflow}/>
                     </div>
                     <div id="workflows-page">
@@ -551,11 +565,16 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
-    const { checkPerm, permissions, active, toggleWorkflow, toggleModal, workflowName, namespace } = props
+    const { checkPerm, permissions, active, toggleWorkflow, toggleAPIModal, toggleExportModal, workflowName, namespace } = props
 
     return (
         <div style={{ display: "flex", flexDirection: "row-reverse", alignItems: "center", marginRight: "12px" }}>
-            <div onClick={() => toggleModal()} title={"API Interactions"} className="circle button" style={{ position: "relative", zIndex: "5" }}>
+            <div onClick={() => toggleExportModal()} title={"Export Workflow"} className="circle button" style={{ position: "relative", zIndex: "5" }}>
+                    <span style={{ flex: "auto" }}>
+                        <IoExitOutline style={{ fontSize: "12pt", marginBottom: "6px", fill: "green" }} />
+                    </span>
+            </div>
+            <div onClick={() => toggleAPIModal()} title={"API Interactions"} className="circle button" style={{ position: "relative", zIndex: "5", marginRight: "10px" }}>
                     <span style={{ flex: "auto" }}>
                         <IoCodeOutline style={{ fontSize: "12pt", marginBottom: "6px", fill: "green" }} />
                     </span>
