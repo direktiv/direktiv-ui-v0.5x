@@ -310,7 +310,7 @@ export default function WorkflowPage() {
                         onRequestClose={toggleExportModal}
                         contentLabel="Export Workflow"
                     >
-                        <ExportWorkflow workflow={params.workflow} namespace={namespace} />
+                        <ExportWorkflow workflow={params.workflow} namespace={namespace} toggleModal={toggleExportModal}/>
                     </Modal>
                     <div className="flex-row" style={{ maxHeight: "64px" }}>
 

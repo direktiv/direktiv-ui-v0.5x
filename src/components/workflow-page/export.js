@@ -1,36 +1,65 @@
 
-import React, { useContext, useState, useCallback, useEffect, useRef } from 'react'
+import React, { useContext, useState, useCallback, useEffect } from 'react'
 import MainContext from '../../context'
 
+import { IoArrowForwardOutline,  IoDocumentTextOutline, IoCheckmarkCircleSharp,  IoInformationCircle, IoKey, IoWarning } from 'react-icons/io5'
+import { XCircle } from 'react-bootstrap-icons'
+import ContentLoader from 'react-content-loader'
 
-const debugNSLIST = [
-    "trent",
-    "james",
-    "prod"
-]
+const ExportError = (props) => {
+    const { error, hideError } = props
+    return (
+        <div className={`var-table-error rounded ${error !== "" ? "" : "hide"}`} >
+            <div style={{ flexGrow: 1 }}>
+                <span>
+                    {error}
+                </span>
+            </div>
+            <div style={{ marginRight: "6px", cursor: "pointer" }} onClick={() => {
+                hideError()
+            }}>
+                <span style={{ display: "flex", justifyContent: "center" }}>
+                    <XCircle />
+                </span>
+            </div>
+        </div>
+    )
+};
 
-const WarningBadge = (
-    <div>
-        not good
-    </div>
-)
-
-const OkBadge = (
-    <div>
-        good
-    </div>
-)
-
-const infoList = [
-    { message: "missing workflow varaible", Badge: WarningBadge },
-    { message: "missing workflow secret", Badge: WarningBadge },
-    { message: "all workflow secrets exist", Badge: OkBadge },
-]
-
+function TableLoader(props) {
+    return (
+        <ContentLoader
+            width={"100%"}
+            viewBox="0 0 700 450"
+            backgroundColor="#f5f5f5"
+            foregroundColor="#dbdbdb"
+            {...props}
+        >
+            <rect x="114" y="52" rx="6" ry="6" width="483" height="15" />
+            <circle cx="77" cy="60" r="15" />
+            <rect x="116" y="105" rx="6" ry="6" width="420" height="15" />
+            <circle cx="78" cy="113" r="15" />
+            <rect x="115" y="158" rx="6" ry="6" width="483" height="15" />
+            <circle cx="78" cy="166" r="15" />
+            <rect x="117" y="211" rx="6" ry="6" width="444" height="15" />
+            <circle cx="79" cy="219" r="15" />
+            <rect x="117" y="263" rx="6" ry="6" width="483" height="15" />
+            <circle cx="80" cy="271" r="15" />
+            <rect x="117" y="314" rx="6" ry="6" width="420" height="15" />
+            <circle cx="80" cy="323" r="15" />
+            <rect x="117" y="366" rx="6" ry="6" width="483" height="15" />
+            <circle cx="80" cy="375" r="15" />
+            <rect x="117" y="418" rx="6" ry="6" width="420" height="15" />
+            <circle cx="80" cy="427" r="15" />
+            <rect x="117" y="470" rx="6" ry="6" width="483" height="15" />
+            <circle cx="80" cy="479" r="15" />
+        </ContentLoader>
+    )
+}
 
 
 export default function ExportWorkflow(props) {
-    const { namespace, workflow } = props
+    const { namespace, workflow, toggleModal } = props
     const { fetch, handleError } = useContext(MainContext)
     const [availableNamespaces, setAvailableNamespaces] = useState(undefined)
 
@@ -41,13 +70,52 @@ export default function ExportWorkflow(props) {
     // Target Workflow
     const [targetNamespace, setTargetNamespace] = useState("")
     const [targetExists, setTargetExists] = useState(false)
-    const [targetRefs, setTargetRefs] = useState({ variables: {}, secrets: {} })
 
     const [exportReport, setExportReport] = useState({ variables: [], secrets: [] })
+    const [fetchingReport, setFetchingReport] = useState(false)
+    const [err, setErr] = useState("")
 
+    const exportWorkflow = useCallback(() => {
+        async function exportWf() {
+            try {
+                const workflowValue = atob(currentWorkflow.workflow)
+                if (targetExists) {
+                    // Update Workflow
+                    let resp = await fetch(`/namespaces/${targetNamespace}/workflows/${workflow}`, {
+                        method: "put",
+                        headers: {
+                            "Content-type": "text/yaml",
+                            "Content-Length": workflowValue.length,
+                        },
+                        body: workflowValue
+                    })
+                    if (resp.ok) {
+                    } else {
+                        await handleError('update workflow', resp, 'updateWorkflow')
+                    }
+                } else {
+                    // Create new workflow
+                    let resp = await fetch(`/namespaces/${targetNamespace}/workflows`, {
+                        method: "post",
+                        headers: {
+                            "Content-type": "text/yaml",
+                            "Content-Length": workflowValue.length,
+                        },
+                        body: workflowValue
+                    })
+                    if (resp.ok) {
+                    } else {
+                        await handleError('create workflow', resp, 'createWorkflow')
+                    }
+                }
+                toggleModal();
+            } catch (e) {
+                setErr(`Failed to export workflow: ${e.message}`)
+            }
+        }
+        exportWf().finally(() => { })
+    }, [fetch, handleError, targetExists, targetNamespace, currentWorkflow, workflow, toggleModal])
 
-
-    console.log(infoList)
 
     const fetchNamespaces = useCallback(() => {
         async function fetchNS() {
@@ -74,15 +142,12 @@ export default function ExportWorkflow(props) {
                         }
                     }
 
-                    console.log("nsList = ", nsList)
-
                     setAvailableNamespaces(nsList)
                 } else {
                     await handleError('fetch namespaces', resp, 'getNamespaces')
                 }
             } catch (e) {
-                // FIXME:
-                console.log(`Failed to fetch Namespaces: ${e.message}`)
+                setErr(`Failed to get target namespace: ${e.message}`)
             }
         }
         fetchNS().finally(() => { })
@@ -101,8 +166,7 @@ export default function ExportWorkflow(props) {
                     await handleError('fetch workflow', resp, 'getWorkflow')
                 }
             } catch (e) {
-                // FIXME:
-                console.log(`Failed to fetch Workflow: ${e.message}`)
+                setErr(`Failed to get current workflow: ${e.message}`)
             }
         }
         fetchWF().finally(() => { })
@@ -113,6 +177,7 @@ export default function ExportWorkflow(props) {
             try {
                 // Store aviable vars here
                 let targetReferences = { variables: {}, secrets: {} }
+                let targetWfExsits = false
 
                 // Check if workflow exists
                 let resp = await fetch(`/namespaces/${targetNS}/workflows/${workflow}`, {
@@ -120,9 +185,11 @@ export default function ExportWorkflow(props) {
                 })
                 if (!resp.ok) {
                     setTargetExists(false)
+                    targetWfExsits = false
                 } else {
                     setTargetExists(true)
-                    // Get Workflow Varaibles
+                    targetWfExsits = true
+                    // Get Workflow Variables
                     resp = await fetch(`/namespaces/${targetNS}/workflows/${workflow}/variables/`, {
                         method: "get",
                     })
@@ -131,28 +198,29 @@ export default function ExportWorkflow(props) {
                         let wfVars = await resp.json()
                         if (wfVars.variables) {
                             for (const wfVar of wfVars.variables) {
-                                targetReferences.variables[`${wfVar.key}-workflow`] = { key: wfVar.key, scope: "workflow" }
+                                targetReferences.variables[`${wfVar.name}-workflow`] = { key: wfVar.name, scope: "workflow" }
                             }
                         }
                     } else {
-                        // TODO: Error handle
+                        await handleError('workflow variables', resp, 'getVariables')
                     }
                 }
 
-                // Get Namespace Varaibles
+                // Get Namespace Variables
                 resp = await fetch(`/namespaces/${targetNS}/variables/`, {
                     method: "get",
                 })
 
                 if (resp.ok) {
                     let nsVars = await resp.json()
+                    console.log("nsVars = ", nsVars)
                     if (nsVars.variables) {
                         for (const nsVar of nsVars.variables) {
-                            targetReferences.variables[`${nsVar.key}-namespace`] = { key: nsVar.key, scope: "namespace" }
+                            targetReferences.variables[`${nsVar.name}-namespace`] = { key: nsVar.name, scope: "namespace" }
                         }
                     }
                 } else {
-                    // TODO: Error handle
+                    await handleError('namespace variables', resp, 'getVariables')
                 }
 
                 // Get Namespace Secrets
@@ -162,19 +230,15 @@ export default function ExportWorkflow(props) {
 
                 if (resp.ok) {
                     let nsSecrets = await resp.json()
+                    console.log("nsSecrets = ", nsSecrets)
                     if (nsSecrets.secrets) {
                         for (const nsSecret of nsSecrets.secrets) {
-                            targetReferences.secrets[nsSecret.key] = { key: nsSecret.key }
+                            targetReferences.secrets[nsSecret.name] = { key: nsSecret.name }
                         }
                     }
                 } else {
-                    // TODO: Error handle
+                    await handleError('namespace secrets', resp, 'getSecrets')
                 }
-
-                // Set refs
-                setTargetRefs(targetReferences)
-
-                console.log("currentWorkflow", currentWorkflow)
 
                 // Temporary Report var
                 let report = { variables: [], secrets: [] }
@@ -185,14 +249,14 @@ export default function ExportWorkflow(props) {
                     for (const currentVar of currentWorkflow.references.variables) {
                         if (targetReferences.variables[`${currentVar.key}-${currentVar.scope}`]) {
                             // Current workflow variable exists in target workflow
-                            if (!targetExists && currentVar.scope === "workflow") {
-                                report.variables.push({ code: 2, msg: `Variable ${currentVar.key} is referenced but does not exists in ${currentVar.scope} scope because workflow does not exist.` })
-                            } else {
-                                report.variables.push({ code: 1, msg: `Variable ${currentVar.key} is referenced but does not exists in ${currentVar.scope} scope` })
-                            }
+                            report.variables.push({ code: 0, scope: currentVar.scope, msg: `Variable '${currentVar.key}' exists in '${currentVar.scope}' scope.` })
                         } else {
                             // Current workflow variable does not exist in target workflow
-                            report.variables.push({ code: 0, msg: `Variable ${currentVar.key} exists in ${currentVar.scope} scope` })
+                            if (!targetWfExsits && currentVar.scope === "workflow") {
+                                report.variables.push({ code: 2, scope: currentVar.scope, msg: `Variable '${currentVar.key}' is referenced but does not exists because workflow does not exist.` })
+                            } else {
+                                report.variables.push({ code: 1, scope: currentVar.scope, msg: `Variable '${currentVar.key}' is referenced but does not exists.` })
+                            }
                         }
                     }
                 }
@@ -201,23 +265,26 @@ export default function ExportWorkflow(props) {
                 if (currentWorkflow.references && currentWorkflow.references.secrets) {
                     for (const currentSecret of currentWorkflow.references.secrets) {
                         if (targetReferences.secrets[`${currentSecret.key}`]) {
-                            report.variables.push({ code: 3, msg: `Secret ${currentSecret.key} is referenced but does not exists in ${targetNamespace} namespace` })
+                            report.secrets.push({ code: 0, msg: `Secret '${currentSecret.key}' exists in namespace.` })
                         } else {
                             // Current workflow secret does not exist in target workflow
-                            report.variables.push({ code: 0, msg: `Secret ${currentSecret.key} exists in ${targetNamespace} namespace` })
+                            report.secrets.push({ code: 3, msg: `Secret '${currentSecret.key}' is referenced but does not exists in '${targetNS}' namespace.` })
                         }
                     }
                 }
 
-                setExportReport(report)
+                setExportReport((exReport) => {
+                    exReport = report
+                    return { ...exReport }
+                })
 
             } catch (e) {
-                // FIXME:
-                console.log(`Failed to fetch Workflow: ${e.message}`)
+                console.log("e = ", e)
+                setErr(`Failed to get target detail: ${e.message}`)
             }
         }
-        fetchWFR().finally(() => { })
-    }, [fetch, handleError, targetNamespace, workflow])
+        fetchWFR().finally(() => { setFetchingReport(false) })
+    }, [fetch, handleError, workflow, currentWorkflow])
 
 
     // Fetch namespaces on mount
@@ -253,10 +320,12 @@ export default function ExportWorkflow(props) {
             return (
                 <>
                     <select value={targetNamespace} onChange={(e) => {
+                        setErr("")
+                        setFetchingReport(true)
                         setTargetNamespace(e.target.value)
                         fetchTargetWorkflowAndRefs(e.target.value)
                     }}>
-                        {targetNamespace == "" ? <option key="select-namespace">Select Namespace</option> : <></>}
+                        {targetNamespace === "" ? <option key="select-namespace">Select Namespace</option> : <></>}
                         {
                             availableNamespaces.map((obj) => <option key={obj} value={obj}>{obj}</option>)
                         }
@@ -269,62 +338,243 @@ export default function ExportWorkflow(props) {
 
     return (
         <div>
-            <h1 style={{ textAlign: "center" }}>Export Workflow: {workflow}</h1>
-            <div>
-                <div>
-                    <b>Target Namespace:</b>
+            <h1 style={{ textAlign: "center", marginTop: "0pt" }}>Export Workflow: {workflow}</h1>
+            <div><ExportError error={err} hideError={() => { setErr("") }} /></div>
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                borderBottom: "solid 1px rgba(0, 0, 0, 0.1)",
+                paddingBottom: "16pt"
+            }}>
+                <div style={{ color: "#4a4e4e", fontWeight: "bold", paddingBottom: "4px" }}>
+                    Target Namespace
                 </div>
-                <div>
+                <div style={{ width: "300px" }}>
                     <RenderAvailableNamespaces />
                 </div>
             </div>
-            <div>
-                <div>
-                    <b>Workflow Conflicts</b>
+            <div style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                paddingTop: "8pt"
+            }}>
+                <div style={{ color: "#4a4e4e", fontWeight: "bold", paddingBottom: "4px" }}>
+                    Export Report
                 </div>
-                <div>
-                    {
-                        targetExists ?
-                            <div>Yes workflow conflict</div>
-                            :
-                            <div>No workflow conflict</div>
-                    }
-                </div>
-            </div>
-            <div>
-                <div>
-                    <b>Export Information</b>
-                </div>
-                <div>
-                    {
-                        infoList.map((info) => {
-                            return (
-                                <div>
-                                    {info.Badge}
-                                    <div>
-                                        {info.message}
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
-                </div>
-            </div>
+                <div style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    width: "100%"
+                }}>
+                    <div className={"shadow-soft rounded tile"} style={{ flexGrow: 1, height: "300px", flexBasis: 0, margin: "8px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexGrow: 1 }}>
+                            <IoDocumentTextOutline style={{ fontSize: "20pt", color: "#4293c4" }} />
 
-            {/* {interactions.map((obj)=>
-                <div className="api-item">
-                    <div style={{display:"flex", alignItems:"center"}} className={"api-title " + obj.method} onClick={()=>document.getElementById(obj.title).classList.toggle('hide')}>
-                        <span style={{width:"55px", textAlign:"center", marginRight:"10px"}} className={"api-btn "+ obj.method}>{obj.method}</span>
-                        <span style={{marginRight:"10px", fontSize:"10pt"}}>{obj.url}</span>
-                        <span style={{fontStyle:"italic", fontSize:"10pt"}}>{obj.title}</span>
+                            <div style={{ fontSize: "12pt", color: "#4293c4" }}>
+                                Source: {namespace}/{workflow}
+                            </div>
+                            <div style={{ width: "100%" }}>
+                                {currentWorkflow ?
+                                    <>
+                                        <div>
+                                            <div style={{ paddingTop: "8px" }}>
+                                                <div className={"title"} style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
+                                                    Workflow Variable References
+                                                </div>
+                                                <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
+                                                    {
+                                                        currentWorkflow.references.variables.map((obj) => {
+                                                            if (obj.scope === "namespace") { return (<></>) }
+                                                            return (
+                                                                <div style={{ display: "flex", }}>
+                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                        <IoInformationCircle />
+                                                                    </div>
+                                                                    <div style={{ fontSize: "10pt" }}>
+                                                                        {obj.key}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div style={{ paddingTop: "8px" }}>
+                                                <div className={"title"} style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
+                                                    Namespace Variable References
+                                                </div>
+                                                <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
+                                                    {
+                                                        currentWorkflow.references.variables.map((obj) => {
+                                                            if (obj.scope === "workflow") { return (<></>) }
+                                                            return (
+                                                                <div style={{ display: "flex", }}>
+                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                        <IoInformationCircle />
+                                                                    </div>
+                                                                    <div style={{ fontSize: "10pt" }}>
+                                                                        {obj.key}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div style={{ paddingTop: "16px", paddingBottom: "4px" }}>
+                                                <div style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
+                                                    Secret References
+                                                </div>
+                                                <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
+                                                    {
+                                                        currentWorkflow.references.secrets.map((obj) => {
+                                                            return (
+                                                                <div style={{ display: "flex" }}>
+                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                        <IoKey />
+                                                                    </div>
+                                                                    <div style={{ fontSize: "10pt" }}>
+                                                                        {obj.key}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </>
+                                    :
+                                    <></>
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <pre className="api-desc" id={obj.title} >
-                        <code>
-                            {obj.description}
-                        </code>
-                    </pre>
+                    <div style={{ width: "30px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        <IoArrowForwardOutline style={{ fontSize: "20pt" }} />
+                    </div>
+                    <div className={"shadow-soft rounded tile"} style={{ flexGrow: 1, height: "300px", flexBasis: 0, margin: "8px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexGrow: 1 }}>
+                            {targetNamespace !== "" ?
+                                <>
+                                    <IoDocumentTextOutline style={{ fontSize: "20pt", color: "#4293c4" }} />
+
+                                    <div style={{ fontSize: "12pt", color: "#4293c4" }}>
+                                        {!targetExists ? "Create:" : "Override:"} {targetNamespace}/{workflow}
+                                    </div>
+                                </>
+                                : <div style={{ fontSize: "12pt" }}>
+                                    Please Select Target Namespace
+                                </div>
+                            }
+                            <div style={{ width: "100%" }}>
+                                {targetNamespace !== "" ?
+                                    <>
+                                        {fetchingReport ?
+                                            <TableLoader />
+                                            :
+                                            <div>
+                                                <div style={{ paddingTop: "8px" }}>
+                                                    <div className={"title"} style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
+                                                        Workflow Variables Info
+                                                    </div>
+                                                    <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
+                                                        {
+                                                            exportReport.variables.map((obj) => {
+                                                                if (obj.scope === "workflow") {
+                                                                    return (
+                                                                        <div style={{ display: "flex", }}>
+                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                {obj.code === 0 ?
+                                                                                    <IoCheckmarkCircleSharp className={"success"} />
+                                                                                    :
+                                                                                    <IoWarning style={{ color: "#e7b038" }} />
+                                                                                }
+                                                                            </div>
+                                                                            <div style={{ fontSize: "10pt" }}>
+                                                                                {obj.msg}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                return (<></>)
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div style={{ paddingTop: "8px" }}>
+                                                    <div className={"title"} style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
+                                                        Namespace Variables Info
+                                                    </div>
+                                                    <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
+                                                        {
+                                                            exportReport.variables.map((obj) => {
+                                                                if (obj.scope === "namespace") {
+                                                                    return (
+                                                                        <div style={{ display: "flex", }}>
+                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                {obj.code === 0 ?
+                                                                                    <IoCheckmarkCircleSharp className={"success"} />
+                                                                                    :
+                                                                                    <IoWarning style={{ color: "#e7b038" }} />
+                                                                                }
+                                                                            </div>
+                                                                            <div style={{ fontSize: "10pt" }}>
+                                                                                {obj.msg}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                return (<></>)
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div style={{ paddingTop: "16px", paddingBottom: "4px" }}>
+                                                    <div style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
+                                                        Secrets Info
+                                                    </div>
+                                                    <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
+                                                        {
+                                                            exportReport.secrets.map((obj) => {
+                                                                return (
+                                                                    <div style={{ display: "flex" }}>
+                                                                        <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                            {obj.code === 0 ?
+                                                                                <IoCheckmarkCircleSharp className={"success"} />
+                                                                                :
+                                                                                <IoWarning style={{ color: "#e7b038" }} />
+                                                                            }
+                                                                        </div>
+                                                                        <div style={{ fontSize: "10pt" }}>
+                                                                            {obj.msg}
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        }
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        }
+                                    </>
+                                    :
+                                    <></>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            )} */}
+                <div style={{ width: "180px", marginTop: "10pt" }} className="button jq-button" onClick={() => { exportWorkflow() }}>
+                    Export Workflow
+                </div>
+            </div>
         </div>
     )
 
