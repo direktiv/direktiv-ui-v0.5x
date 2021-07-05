@@ -2,7 +2,7 @@
 import React, { useContext, useState, useCallback, useEffect } from 'react'
 import MainContext from '../../context'
 
-import { IoArrowForwardOutline,  IoDocumentTextOutline, IoCheckmarkCircleSharp,  IoInformationCircle, IoKey, IoWarning } from 'react-icons/io5'
+import { IoArrowForwardOutline, IoDocumentTextOutline, IoCheckmarkCircleSharp, IoInformationCircle, IoKey, IoWarning } from 'react-icons/io5'
 import { XCircle } from 'react-bootstrap-icons'
 import ContentLoader from 'react-content-loader'
 
@@ -75,6 +75,8 @@ export default function ExportWorkflow(props) {
     const [fetchingReport, setFetchingReport] = useState(false)
     const [err, setErr] = useState("")
 
+    const [refCount, setRefCount] = useState({ workflowVar: 0, namespaceVar: 0, namespaceSecrets: 0 })
+
     const exportWorkflow = useCallback(() => {
         async function exportWf() {
             try {
@@ -127,7 +129,6 @@ export default function ExportWorkflow(props) {
                     let json = await resp.json()
                     let nsList = []
 
-
                     // trim self namespace from targets
                     const index = nsList.indexOf(namespace);
                     console.log(index)
@@ -154,6 +155,7 @@ export default function ExportWorkflow(props) {
     }, [fetch, handleError, namespace])
 
     const fetchWorkflow = useCallback(() => {
+        setRefCount({ workflowVar: 0, namespaceVar: 0, namespaceSecrets: 0 })
         async function fetchWF() {
             try {
                 let resp = await fetch(`/namespaces/${namespace}/workflows/${workflow}?get_refs=true`, {
@@ -162,6 +164,30 @@ export default function ExportWorkflow(props) {
                 if (resp.ok) {
                     let json = await resp.json()
                     setCurrentWorkflow(json)
+
+                    let wfVarCount = 0
+                    let nsVarCount = 0
+                    let nsSecretCount = 0
+
+                    // count references to variables
+                    if (json.references.variables) {
+                        for (const varRef of json.references.variables) {
+                            if (varRef.scope === "workflow") {
+                                wfVarCount++
+                            } else if (varRef.scope === "namespace") {
+                                nsVarCount++
+                            }
+                        }
+                    }
+
+                    // count references to secrets
+                    if (json.references.secrets) {
+                        for (const _ of json.references.secrets) {
+                            nsSecretCount++
+                        }
+                    }
+
+                    setRefCount({ workflowVar: wfVarCount, namespaceVar: nsVarCount, namespaceSecrets: nsSecretCount })
                 } else {
                     await handleError('fetch workflow', resp, 'getWorkflow')
                 }
@@ -175,7 +201,7 @@ export default function ExportWorkflow(props) {
     const fetchTargetWorkflowAndRefs = useCallback((targetNS) => {
         async function fetchWFR() {
             try {
-                // Store aviable vars here
+                // Store available vars here
                 let targetReferences = { variables: {}, secrets: {} }
                 let targetWfExsits = false
 
@@ -307,13 +333,13 @@ export default function ExportWorkflow(props) {
         if (availableNamespaces === undefined) {
             return (
                 <div>
-                    undefined
+
                 </div>
             );
         } else if (availableNamespaces.length === 0) {
             return (
-                <div>
-                    empty
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", color: "#4a4e4e" }}>
+                    No Additional Namespaces Available
                 </div>
             );
         } else {
@@ -386,20 +412,30 @@ export default function ExportWorkflow(props) {
                                                     Workflow Variable References
                                                 </div>
                                                 <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
-                                                    {
-                                                        currentWorkflow.references.variables.map((obj) => {
-                                                            if (obj.scope === "namespace") { return (<></>) }
-                                                            return (
-                                                                <div style={{ display: "flex", }}>
-                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
-                                                                        <IoInformationCircle />
-                                                                    </div>
-                                                                    <div style={{ fontSize: "10pt" }}>
-                                                                        {obj.key}
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })
+                                                    {refCount.workflowVar > 0 ?
+                                                        <>
+                                                            {
+                                                                currentWorkflow.references.variables.map((obj) => {
+                                                                    if (obj.scope === "namespace") { return (<></>) }
+                                                                    return (
+                                                                        <div style={{ display: "flex", }}>
+                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                <IoInformationCircle />
+                                                                            </div>
+                                                                            <div style={{ fontSize: "10pt" }}>
+                                                                                {obj.key}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })
+                                                            }
+                                                        </>
+                                                        :
+                                                        <div style={{ display: "flex", }}>
+                                                            <div style={{ fontSize: "10pt", fontStyle: "italic" }}>
+                                                                No References
+                                                            </div>
+                                                        </div>
                                                     }
                                                 </div>
                                             </div>
@@ -408,41 +444,62 @@ export default function ExportWorkflow(props) {
                                                     Namespace Variable References
                                                 </div>
                                                 <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
-                                                    {
-                                                        currentWorkflow.references.variables.map((obj) => {
-                                                            if (obj.scope === "workflow") { return (<></>) }
-                                                            return (
-                                                                <div style={{ display: "flex", }}>
-                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
-                                                                        <IoInformationCircle />
-                                                                    </div>
-                                                                    <div style={{ fontSize: "10pt" }}>
-                                                                        {obj.key}
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })
+                                                    {refCount.namespaceVar > 0 ?
+                                                        <>
+                                                            {
+                                                                currentWorkflow.references.variables.map((obj) => {
+                                                                    if (obj.scope === "workflow") { return (<></>) }
+                                                                    return (
+                                                                        <div style={{ display: "flex", }}>
+                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                <IoInformationCircle />
+                                                                            </div>
+                                                                            <div style={{ fontSize: "10pt" }}>
+                                                                                {obj.key}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })
+                                                            }
+                                                        </>
+                                                        :
+                                                        <div style={{ display: "flex", }}>
+                                                            <div style={{ fontSize: "10pt", fontStyle: "italic" }}>
+                                                                - No References
+                                                            </div>
+                                                        </div>
                                                     }
                                                 </div>
                                             </div>
+
                                             <div style={{ paddingTop: "16px", paddingBottom: "4px" }}>
                                                 <div style={{ paddingBottom: "4px", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)", fontSize: "10pt" }}>
                                                     Secret References
                                                 </div>
                                                 <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
-                                                    {
-                                                        currentWorkflow.references.secrets.map((obj) => {
-                                                            return (
-                                                                <div style={{ display: "flex" }}>
-                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
-                                                                        <IoKey />
-                                                                    </div>
-                                                                    <div style={{ fontSize: "10pt" }}>
-                                                                        {obj.key}
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })
+                                                    {refCount.namespaceSecrets > 0 ?
+                                                        <>
+                                                            {
+                                                                currentWorkflow.references.secrets.map((obj) => {
+                                                                    return (
+                                                                        <div style={{ display: "flex" }}>
+                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                <IoKey />
+                                                                            </div>
+                                                                            <div style={{ fontSize: "10pt" }}>
+                                                                                {obj.key}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })
+                                                            }
+                                                        </>
+                                                        :
+                                                        <div style={{ display: "flex", }}>
+                                                            <div style={{ fontSize: "10pt", fontStyle: "italic" }}>
+                                                                - No References
+                                                            </div>
+                                                        </div>
                                                     }
                                                 </div>
 
@@ -484,26 +541,39 @@ export default function ExportWorkflow(props) {
                                                         Workflow Variables Info
                                                     </div>
                                                     <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
-                                                        {
-                                                            exportReport.variables.map((obj) => {
-                                                                if (obj.scope === "workflow") {
-                                                                    return (
-                                                                        <div style={{ display: "flex", }}>
-                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
-                                                                                {obj.code === 0 ?
-                                                                                    <IoCheckmarkCircleSharp className={"success"} />
-                                                                                    :
-                                                                                    <IoWarning style={{ color: "#e7b038" }} />
-                                                                                }
-                                                                            </div>
-                                                                            <div style={{ fontSize: "10pt" }}>
-                                                                                {obj.msg}
-                                                                            </div>
-                                                                        </div>
-                                                                    );
+                                                        {refCount.workflowVar > 0 ?
+                                                            <>
+                                                                {
+                                                                    exportReport.variables.map((obj) => {
+                                                                        if (obj.scope === "workflow") {
+                                                                            return (
+                                                                                <div style={{ display: "flex", }}>
+                                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                        {obj.code === 0 ?
+                                                                                            <IoCheckmarkCircleSharp className={"success"} />
+                                                                                            :
+                                                                                            <IoWarning style={{ color: "#e7b038" }} />
+                                                                                        }
+                                                                                    </div>
+                                                                                    <div style={{ fontSize: "10pt" }}>
+                                                                                        {obj.msg}
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                        return (<></>)
+                                                                    })
                                                                 }
-                                                                return (<></>)
-                                                            })
+                                                            </>
+                                                            :
+                                                            <div style={{ display: "flex" }}>
+                                                                <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                    <IoCheckmarkCircleSharp className={"success"} />
+                                                                </div>
+                                                                <div style={{ fontSize: "10pt" }}>
+                                                                    No Referencesz
+                                                                </div>
+                                                            </div>
                                                         }
                                                     </div>
                                                 </div>
@@ -512,26 +582,39 @@ export default function ExportWorkflow(props) {
                                                         Namespace Variables Info
                                                     </div>
                                                     <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
-                                                        {
-                                                            exportReport.variables.map((obj) => {
-                                                                if (obj.scope === "namespace") {
-                                                                    return (
-                                                                        <div style={{ display: "flex", }}>
-                                                                            <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
-                                                                                {obj.code === 0 ?
-                                                                                    <IoCheckmarkCircleSharp className={"success"} />
-                                                                                    :
-                                                                                    <IoWarning style={{ color: "#e7b038" }} />
-                                                                                }
-                                                                            </div>
-                                                                            <div style={{ fontSize: "10pt" }}>
-                                                                                {obj.msg}
-                                                                            </div>
-                                                                        </div>
-                                                                    );
+                                                        {refCount.namespaceVar > 0 ?
+                                                            <>
+                                                                {
+                                                                    exportReport.variables.map((obj) => {
+                                                                        if (obj.scope === "namespace") {
+                                                                            return (
+                                                                                <div style={{ display: "flex", }}>
+                                                                                    <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                        {obj.code === 0 ?
+                                                                                            <IoCheckmarkCircleSharp className={"success"} />
+                                                                                            :
+                                                                                            <IoWarning style={{ color: "#e7b038" }} />
+                                                                                        }
+                                                                                    </div>
+                                                                                    <div style={{ fontSize: "10pt" }}>
+                                                                                        {obj.msg}
+                                                                                    </div>
+                                                                                </div>
+                                                                            );
+                                                                        }
+                                                                        return (<></>)
+                                                                    })
                                                                 }
-                                                                return (<></>)
-                                                            })
+                                                            </>
+                                                            :
+                                                            <div style={{ display: "flex" }}>
+                                                                <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                    <IoCheckmarkCircleSharp className={"success"} />
+                                                                </div>
+                                                                <div style={{ fontSize: "10pt" }}>
+                                                                    No References
+                                                                </div>
+                                                            </div>
                                                         }
                                                     </div>
                                                 </div>
@@ -540,23 +623,36 @@ export default function ExportWorkflow(props) {
                                                         Secrets Info
                                                     </div>
                                                     <div style={{ paddingLeft: "8px", paddingTop: "4px" }}>
-                                                        {
-                                                            exportReport.secrets.map((obj) => {
-                                                                return (
-                                                                    <div style={{ display: "flex" }}>
-                                                                        <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
-                                                                            {obj.code === 0 ?
-                                                                                <IoCheckmarkCircleSharp className={"success"} />
-                                                                                :
-                                                                                <IoWarning style={{ color: "#e7b038" }} />
-                                                                            }
-                                                                        </div>
-                                                                        <div style={{ fontSize: "10pt" }}>
-                                                                            {obj.msg}
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })
+                                                        {refCount.namespaceSecrets > 0 ?
+                                                            <>
+                                                                {
+                                                                    exportReport.secrets.map((obj) => {
+                                                                        return (
+                                                                            <div style={{ display: "flex" }}>
+                                                                                <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                                    {obj.code === 0 ?
+                                                                                        <IoCheckmarkCircleSharp className={"success"} />
+                                                                                        :
+                                                                                        <IoWarning style={{ color: "#e7b038" }} />
+                                                                                    }
+                                                                                </div>
+                                                                                <div style={{ fontSize: "10pt" }}>
+                                                                                    {obj.msg}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })
+                                                                }
+                                                            </>
+                                                            :
+                                                            <div style={{ display: "flex" }}>
+                                                                <div className={""} style={{ display: "flex", alignItems: "center", marginRight: "4px" }}>
+                                                                    <IoCheckmarkCircleSharp className={"success"} />
+                                                                </div>
+                                                                <div style={{ fontSize: "10pt" }}>
+                                                                    No References
+                                                                </div>
+                                                            </div>
                                                         }
                                                     </div>
 
@@ -571,7 +667,7 @@ export default function ExportWorkflow(props) {
                         </div>
                     </div>
                 </div>
-                <div style={{ width: "180px", marginTop: "10pt" }} className="button jq-button" onClick={() => { exportWorkflow() }}>
+                <div style={{ width: "180px", marginTop: "10pt" }} className={`button jq-button ${targetNamespace === "" ? "disabled" : ""}`} onClick={() => { exportWorkflow() }}>
                     Export Workflow
                 </div>
             </div>
