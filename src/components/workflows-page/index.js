@@ -23,11 +23,12 @@ import {Searcher} from "fast-fuzzy"
 
 
 const noopState = `id: noop
-description: ""
+description: A simple 'no-op' state that returns 'Hello world!'
 states:
-    - id: helloworld
-      type: noop
-      transform: '{ result: "Hello world!" }'
+- id: helloworld
+  type: noop
+  transform:
+    result: "Hello world!"
 `
 
 export default function WorkflowsPage() {
