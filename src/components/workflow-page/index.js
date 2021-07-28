@@ -565,6 +565,7 @@ function EventsList(props) {
 }
 
 function WorkflowActions(props) {
+    const { workflowButtons } = useContext(MainContext)
     const { checkPerm, permissions, active, toggleWorkflow, toggleAPIModal, toggleExportModal, workflowName, namespace } = props
 
     return (
@@ -604,7 +605,26 @@ function WorkflowActions(props) {
 
                     }
                 </div> : ""}
-
+            {workflowButtons.map((obj)=>{
+                switch (obj.type) {
+                    case "grafana-workflow":
+                        let url = `/grafana/explore?left=["now-1h","now","Loki-${namespace}",{"expr":"{workflow%3D\"${workflowName}\"}"}]`
+              
+                        return(
+                            <div title={obj.title} >
+                                <Link className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit", marginRight: "10px"}} 
+                                to={url}>
+                                    <span style={{fontWeight: "bold"}}>
+                                        graf
+                                    </span>
+                                </Link>
+                            </div>
+                        )
+                    default:
+                        return ""
+                }
+      
+            })}
         </div>
 
     )

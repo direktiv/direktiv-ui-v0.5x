@@ -36,7 +36,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function InstancePage() {
-    const {fetch, namespace, handleError, checkPerm, permissions, instanceInteractions} = useContext(MainContext)
+    const {fetch, namespace, handleError, checkPerm, permissions, instanceInteractions, instanceGrafEnabled} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -127,6 +127,17 @@ export default function InstancePage() {
             path: `/${params.namespace}/w/${params.workflow}`
         }
     ]
+
+
+    if (instanceGrafEnabled) {
+        listElements.push(
+            {
+                name: "View Grafana Instance",
+                link: true,
+                path: `/grafana/explore?left=["now-1h","now","Loki-${params.namespace}",{"expr":"{instance%3D\"${params.namespace}%2F${params.workflow}%2F${params.instance}\"}"}]`
+            }
+        )
+    }
     if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete"){
         if(startType && checkPerm(permissions, "executeWorkflow")){
             listElements.push(
