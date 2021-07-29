@@ -605,9 +605,7 @@ function WorkflowActions(props) {
 
                     }
                 </div> : ""}
-            {workflowButtons.map((obj)=>{
-                return obj      
-            })}
+            {workflowButtons.map((obj)=>obj)}
         </div>
 
     )

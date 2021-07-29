@@ -128,7 +128,7 @@ export default function InstancePage() {
         }
     ]
     listElements.concat(listElements, extraLinks)
-
+    console.log("new list elements", listElements)
     if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete"){
         if(startType && checkPerm(permissions, "executeWorkflow")){
             listElements.push(
