@@ -608,11 +608,11 @@ function WorkflowActions(props) {
             {workflowButtons.map((obj)=>{
                 let url = obj.url
                 for (var i=0; i < obj.replace.length; i++) {
-                    if (replace[i].key == "namespace") {
-                        url.replaceAll(replace[i].val, namespace)
+                    if (obj.replace[i].key == "namespace") {
+                        url.replaceAll(obj.replace[i].val, namespace)
                     }
-                    if (replace[i].key == "workflow") {
-                        url.replaceAll(replace[i].val, workflowName)
+                    if (obj.replace[i].key == "workflow") {
+                        url.replaceAll(obj.replace[i].val, workflowName)
                     }
                 }
                 return obj.element(url)
