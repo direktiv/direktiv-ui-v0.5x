@@ -607,7 +607,7 @@ function WorkflowActions(props) {
                 </div> : ""}
             {workflowButtons.map((obj)=>{
                 let url = obj.url
-                for (var i=0; i < replace.length; i++) {
+                for (var i=0; i < obj.replace.length; i++) {
                     if (replace[i].key == "namespace") {
                         url.replaceAll(replace[i].val, namespace)
                     }
