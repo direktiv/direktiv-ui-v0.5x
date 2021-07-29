@@ -127,7 +127,8 @@ export default function InstancePage() {
             path: `/${params.namespace}/w/${params.workflow}`
         }
     ]
-    listElements.concat(listElements, extraLinks)
+    console.log(extraLinks, "inside")
+    listElements = listElements.concat(listElements, extraLinks)
     console.log("new list elements", listElements)
     if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete"){
         if(startType && checkPerm(permissions, "executeWorkflow")){
