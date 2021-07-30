@@ -609,10 +609,10 @@ function WorkflowActions(props) {
                 let url = obj.url
                 for (var i=0; i < obj.replace.length; i++) {
                     if (obj.replace[i].key == "namespace") {
-                        url.replaceAll(obj.replace[i].val, namespace)
+                        url = url.replaceAll(obj.replace[i].val, namespace)
                     }
                     if (obj.replace[i].key == "workflow") {
-                        url.replaceAll(obj.replace[i].val, workflowName)
+                        url = url.replaceAll(obj.replace[i].val, workflowName)
                     }
                 }
                 return obj.element(url)
