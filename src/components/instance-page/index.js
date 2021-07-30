@@ -121,16 +121,22 @@ export default function InstancePage() {
 
     for (var i=0; i < extraLinks.length; i++) {
         let x = extraLinks[i]
+        console.log("x,", x)
+        console.log(params, "PARAMS")
         let path ="" 
         for (var j=0; j < x.replace.length; j++) {
             if(x.replace[j].key === "namespace") {
                 path = x.path.replaceAll(x.replace[j].val, params.namespace)
+                console.log("replace namespace", path)
             }
             if(x.replace[j].key === "workflow") {
                 path = x.path.replaceAll(x.replace[j].val, params.workflow)
+                console.log("replacewf", path)
             }
             if(x.replace[j].key === "instance") {
+
                 path = x.path.replaceAll(x.replace[j].val, params.instance)
+                console.log("replace, instance", path)
             }
         }
         console.log(path)
