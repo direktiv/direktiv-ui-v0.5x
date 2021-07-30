@@ -387,6 +387,8 @@ function Content() {
       handleError: HandleError,
       bcRoutes: bcRoutes,
       checkPerm: CheckPerm,
+      workflowButtons: [],
+      extraLinks: [],
       namespaceInteractions: NamespaceInteractions,
       workflowInteractions: WorkflowInteractions,
       instanceInteractions: InstanceInteractions,
