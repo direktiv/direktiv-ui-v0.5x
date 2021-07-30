@@ -120,19 +120,22 @@ export default function InstancePage() {
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
 
     for (var i=0; i < extraLinks.length; i++) {
+        let x = extraLinks[i]
         let path ="" 
-        for (var j=0; j < extraLinks[i].replace.length; j++) {
-            if(extraLinks[i].replace[j].key === "namespace") {
-                path = extraLinks[i].path.replaceAll(extraLinks[i].replace[j].val, params.namespace)
+        for (var j=0; j < x.replace.length; j++) {
+            if(x.replace[j].key === "namespace") {
+                path = x.path.replaceAll(x.replace[j].val, params.namespace)
             }
-            if(extraLinks[i].replace[j].key === "workflow") {
-                path = extraLinks[i].path.replaceAll(extraLinks[i].replace[j].val, params.workflow)
+            if(x.replace[j].key === "workflow") {
+                path = x.path.replaceAll(x.replace[j].val, params.workflow)
             }
-            if(extraLinks[i].replace[j].key === "instance") {
-                path = extraLinks[i].path.replaceAll(extraLinks[i].replace[j].val, params.instance)
+            if(x.replace[j].key === "instance") {
+                path = x.path.replaceAll(x.replace[j].val, params.instance)
             }
         }
-        extraLinks[i].path = path
+        console.log(path)
+        x.path = path
+        extraLinks[i] = x
     }
 
     console.log(extraLinks, "edited extra links")
