@@ -327,22 +327,42 @@ export default function Navbar(props) {
                         <>
                         {navItems.map((obj)=> {
                 
-                return(   <> {obj.nsRequired ?    <>  {namespace !== "" ? <li key={obj.title}>
-                        <Link style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
-                            if (document.getElementById("namespaces-ul").classList.contains("active")){
-                                toggleNamespaceSelector()
-                            }
-                        }} to={obj.path} className="nav-link">
-                            <div>
-                                {obj.icon}
-                                <span>{obj.title}</span>
-                            </div>
-                        </Link>
-                    </li>: <li key={obj.title}><div style={{color:"#b5b5b5", cursor: "default"}}>
-                                {obj.icon}
-                                <span>{obj.title}</span>
-                            </div></li>}</> : "" }</>
-                )
+                if (obj.hreflink) {
+                    return(   <> {obj.nsRequired ?    <>  {namespace !== "" ? <li key={obj.title}>
+                    <a style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
+                        if (document.getElementById("namespaces-ul").classList.contains("active")){
+                            toggleNamespaceSelector()
+                        }
+                    }} href={obj.path} className="nav-link">
+                        <div>
+                            {obj.icon}
+                            <span>{obj.title}</span>
+                        </div>
+                    </a>
+                </li>: <li key={obj.title}><div style={{color:"#b5b5b5", cursor: "default"}}>
+                            {obj.icon}
+                            <span>{obj.title}</span>
+                        </div></li>}</> : "" }</>
+            )
+                } else {
+                    return(   <> {obj.nsRequired ?    <>  {namespace !== "" ? <li key={obj.title}>
+                    <Link style={{color: navItemMap[obj.path] !== null ? "#4497f5": ""}} onClick={()=>{
+                        if (document.getElementById("namespaces-ul").classList.contains("active")){
+                            toggleNamespaceSelector()
+                        }
+                    }} to={obj.path} className="nav-link">
+                        <div>
+                            {obj.icon}
+                            <span>{obj.title}</span>
+                        </div>
+                    </Link>
+                </li>: <li key={obj.title}><div style={{color:"#b5b5b5", cursor: "default"}}>
+                            {obj.icon}
+                            <span>{obj.title}</span>
+                        </div></li>}</> : "" }</>
+            )
+                }
+ 
                 })}
                         
                         </> : ''

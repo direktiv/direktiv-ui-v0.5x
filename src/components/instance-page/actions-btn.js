@@ -7,6 +7,13 @@ const DropDownCard = ({ data = [], setOpen }) => (
       <ul style={{textAlign:"center"}}>
         {data.map((item, i) => 
             {
+                if (item.hreflink) {
+                    return(
+                        <li style={{padding:"0px"}} key={i} className="list-instance-page-item">
+                            <a style={{textDecoration:"none", color:"var(--font-dark)"}} href={item.path}>{item.name}</a>
+                        </li>
+                    )   
+                }
                 if (item.link) {
                     return(
                         <li style={{padding:"0px"}} key={i} className="list-instance-page-item">
