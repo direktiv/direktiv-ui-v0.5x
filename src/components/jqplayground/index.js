@@ -132,6 +132,7 @@ export default function JQPlaygroundPage() {
         if (fetching) {
             return
         }
+        setErr("")
         setFetching(true)
         localStorage.setItem('jqInput', input)
         localStorage.setItem('jqFilter', filter)

@@ -4,7 +4,7 @@ import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { Plus, XCircle } from 'react-bootstrap-icons'
 import { useParams } from 'react-router'
-import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline } from 'react-icons/io5'
+import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline, IoCloudDownloadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
 import { useDropzone } from 'react-dropzone'
 import bytes from 'bytes'
@@ -50,21 +50,21 @@ const EnvTableHeader = () => {
 };
 
 const EnvTableRow = (props) => {
-    const { env, index, setVar, getVar, setError } = props
+    const { env, index, setVar, getVar, downloadVar, setError } = props
     const [localValue, setLocalValue] = useState("")
     const [remoteValue, setRemoteValue] = useState("")
     const [show, setShow] = useState(false)
     const [isBinary, setIsBinary] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-
+    const [isDownloading, setIsDownloading] = useState(false)
 
     return (
         <>
-        {isLoading ? (<div className={"var-table-overlay"}>
+        {isLoading || isDownloading ? (<div className={"var-table-overlay"}>
             <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%"}}>
                 <div class="loader"></div> 
                 <div style={{color: "white", fontWeight: "bold", paddingTop:"4px"}}>
-                    Setting Variable...
+                    {isLoading ? "Setting Variable...": " Downloading Variable..."}
                 </div>
             </div>
         </div>) : <></>}
@@ -103,7 +103,10 @@ const EnvTableRow = (props) => {
                 {bytes(env.size)}
             </div>
             <div className={"var-table-row-action"} >
-                <EnvTableAction setError={setError} name={env.name} setVar={setVar} setLoading={setIsLoading} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
+                <EnvTableAction setError={setError} downloadVar={(vName) => {
+                    setIsDownloading(true)
+                    downloadVar(vName, setIsDownloading)
+                }} name={env.name} setVar={setVar} setLoading={setIsLoading} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
             </div>
         </div>
         </>
@@ -111,7 +114,7 @@ const EnvTableRow = (props) => {
 };
 
 const EnvTableAction = (props) => {
-    const { value, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading } = props
+    const { value, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading, downloadVar } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
@@ -157,6 +160,16 @@ const EnvTableAction = (props) => {
             </div>
         )
     } else {
+        buttons.push(
+            <div key={`${name}-btn-download`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px", display: "flex", justifyContent: "center", alignItems: "center" }} title="Download Variable" className={`circle button`} onClick={() => { 
+                    downloadVar(name)
+                }}>
+                    <span>
+                    <IoCloudDownloadOutline/>
+                    </span>
+            </div>
+        )
+
         buttons.push(
             <div key={`${name}-btn-upload`} {...getRootProps({ className: 'dropzone' })} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px", display: "flex", justifyContent: "center", alignItems: "center" }} title="Upload Variable" className={`circle button`}>
                     <input {...getInputProps()} />
@@ -369,6 +382,46 @@ export function EnvrionmentContainer(props) {
         fetchVars().finally(() => { setFetching(false) })
     }, [fetch, handleError, getPath, setFetching])
 
+    const downloadVaraible = useCallback((varName, setIsDownloading) => {
+        setError("")
+        setFetching(true)
+        async function fetchVars() {
+            try {
+                let resp = await fetch(`${getPath()}/variables/${varName}`, {
+                    method: "get",
+                })
+                if (resp.ok) {
+                    let blob = await resp.blob()
+
+                    // Create blob link to download
+                    const url = window.URL.createObjectURL(
+                        new Blob([blob]),
+                    );
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute(
+                        'download',
+                        `${varName}`,
+                    );
+                
+                    // Append to html link element page
+                    document.body.appendChild(link);
+                
+                    // Start download
+                    link.click();
+                
+                    // Clean up and remove the link
+                    link.parentNode.removeChild(link);
+                } else {
+                    await handleError('fetch variables', resp, 'getVariables')
+                }
+            } catch (e) {
+                setError(`Failed to fetch variables: ${e.message}`)
+            }
+        }
+        fetchVars().finally(() => { setFetching(false); setIsDownloading(false)})
+    }, [fetch, handleError, getPath, setFetching])
+
     useEffect(() => {
         if (namespace !== "") {
             fetchVariables()
@@ -461,7 +514,7 @@ export function EnvrionmentContainer(props) {
                         <div className={`var-table-accent-header`}><EnvTableHeader /></div>
                         {envList.map((env, index) => {
                             return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError}/></div>)
+                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVaraible}/></div>)
                         })}
                         {
                             envList.length === 0 ? (
