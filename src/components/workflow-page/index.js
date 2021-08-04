@@ -7,7 +7,7 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoExitOutline, IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand } from 'react-icons/io5'
+import { IoExitOutline, IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand, IoCodeWorkingOutline, IoFlash } from 'react-icons/io5'
 import Modal from 'react-modal';
 
 import PieChart from '../charts/pie'
@@ -57,6 +57,8 @@ export default function WorkflowPage() {
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
     const codemirrorRef = useRef();
+    const [tab, setTab] = useState("events")
+    const [functions, setFunctions] = useState(null)
 
     const history = useHistory()
     const params = useParams()
@@ -81,6 +83,36 @@ export default function WorkflowPage() {
             return { ...wfI }
         })
     }
+
+    const fetchKnativeFunctions = useCallback(()=>{
+        setFetching(true)
+        async function fetchKnativeFuncs() {
+            try {
+                let resp = await fetch(`/functions/`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        workflow: params.workflow,
+                        namespace: namespace
+                    })
+                })
+                if(resp.ok) {
+                    let arr = await resp.json()
+                    if (arr.length > 0) {
+                        setFunctions(arr)
+                    } else {
+                        setFunctions([])
+                    }
+                } else {
+                    await handleError('fetch knative functions', resp, "fetchKnativeFunctions")
+                }
+            } catch(e) {
+                setErr(`Unable to fetch knative functions: ${e.message}`)
+            }
+        }
+        if (functions === null) {
+            fetchKnativeFuncs().finally(()=>{setFetching(false)})
+        }
+    },[fetch, namespace, params.workflow, functions, handleError])
 
     const fetchWorkflow = useCallback(() => {
         setFetching(true)
@@ -188,7 +220,7 @@ export default function WorkflowPage() {
     useEffect(() => {
         if (namespace !== "") {
             fetchWorkflow()
-            
+            fetchKnativeFunctions()
         }
     }, [fetchWorkflow, namespace])
 
@@ -403,8 +435,8 @@ export default function WorkflowPage() {
 
                                                 <div style={{ flex: "auto" }}>
                                                     {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
-                                                    {workflowValueOld !== "" ?
-                                                        <Diagram value={workflowValueOld} />
+                                                    {workflowValueOld !== "" && functions !== null ?
+                                                        <Diagram functions={functions} value={workflowValueOld} />
                                                         :
                                                         ""
                                                     }
@@ -425,14 +457,27 @@ export default function WorkflowPage() {
                                 </div>
                             </div>
                             <div className="item-0 shadow-soft rounded tile">
-                                <TileTitle name="Instances">
-                                    <IoList />
+                                <TileTitle actionsDiv={[<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("events") }} >
+                        <IoFlash />  Instances
+        </div>,<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "functions"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("functions") }} >
+        <IoCodeWorkingOutline /> Functions
+        </div>]}>
+                                    <IoList /> Details
                                 </TileTitle>
-                                <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
-                                    <div id="events-tile" className="tile-contents">
-                                        <EventsList />
-                                    </div>
-                                </div>
+                                {tab === "events"?
+                                    <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                        <div id="events-tile" className="tile-contents">
+                                            <EventsList />
+                                        </div>
+                                    </div>:""
+                                }
+                                {tab === "functions" ?
+                                     <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                     <div id="events-tile" className="tile-contents">
+                                         <FuncComponent functions={functions}/>
+                                     </div>
+                                 </div>:""
+                                }
                             </div>
                             {attributeAdd ? attributeAdd : ""}
                         </div> : <></>}
@@ -441,6 +486,8 @@ export default function WorkflowPage() {
         </>
     )
 }
+
+
 
 function PieComponent() {
     const { fetch, namespace, handleError } = useContext(MainContext)
@@ -495,6 +542,37 @@ function PieComponent() {
 
     return (
         <PieChart lineWidth={40} data={metrics} />
+    )
+}
+
+function FuncComponent(props) {
+    const {functions} = props
+
+    return(
+      <div>
+              <ul style={{margin:"0px"}}>
+                {functions !== null ?
+                    <>
+                        {functions.length > 0 ?
+                            <>
+                                {functions.map((obj) => {
+                                    console.log("knative func", obj)
+                                    return(
+                                        <li title={obj.statusMessage}  className="event-list-item">
+                                            <div>
+                                                <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                                                <span>
+                                                    {obj.info.name}({obj.info.image})
+                                                </span>
+                                            </div>
+                                        </li>
+                                    )
+                                })}
+                            </>
+                            : <NoResults />}
+                    </> : ""}
+              </ul>
+      </div>
     )
 }
 

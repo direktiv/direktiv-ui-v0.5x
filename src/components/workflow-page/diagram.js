@@ -234,11 +234,25 @@ function End(props) {
     )
 }
 
-function State(props) {
+function State(props, functions) {
     const {data} = props
-    console.log(data)
+    console.log(data, functions)
+
+    let funcFailed = false
+    let titleMsg = `${data.label}-${data.type}`
+    if (functions.length > 0 && data.state.type === "action") {
+        for(var i=0; i < functions.length; i++){
+            if(functions[i].info.name === data.state.action.function) {
+                if (functions[i].status === "False") {
+                    titleMsg = functions[i].statusMessage
+                    funcFailed = true
+                }
+            }
+        }
+    } 
+
     return(
-        <div title={`${data.label}-${data.type}`} className="state" style={{width:"80px", height:"30px"}}>
+        <div title={titleMsg} className="state" style={{width:"80px", height:"30px", backgroundColor: funcFailed? "rgb(204,115,115)": ""}}>
 
                     <Handle
                             type="target"
@@ -278,7 +292,7 @@ function State(props) {
 }
 
 function WorkflowDiagram(props) {
-    const { elements } = props
+    const { elements, functions } = props
     const { fitView } = useZoomPanHelper();
     
     useEffect(()=>{
@@ -287,7 +301,7 @@ function WorkflowDiagram(props) {
 
     return(
         <ReactFlow elements={elements} nodeTypes={{
-            state: State,
+            state: (data)=>State(data, functions),
             start: Start,
             end: End
         }} 
@@ -302,7 +316,7 @@ function WorkflowDiagram(props) {
 }
 
 export default function Diagram(props) {
-    const {value, flow, status} = props
+    const {value, functions, flow, status} = props
 
     const [elements, setElements] = useState([])
 
@@ -361,7 +375,7 @@ export default function Diagram(props) {
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
             <ReactFlowProvider>
-                <WorkflowDiagram elements={elements} />
+                <WorkflowDiagram functions={functions} elements={elements} />
             </ReactFlowProvider>
         </div>
 
