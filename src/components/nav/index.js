@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
 
 export default function Navbar(props) {
 
@@ -367,6 +367,25 @@ export default function Navbar(props) {
                         
                         </> : ''
                     }
+                    <li>
+                        {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor:"default"}}>
+                                <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
+                                <span>Functions</span>
+                            </div>
+                            :
+                            <Link style={{color: matchSettings !== null ? "#4497f5": ""}} onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/k/functions`} className="nav-link">
+                                <div>
+                                <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
+                                <span>Functions</span>
+                                </div>
+                            </Link>
+                        }
+                    </li>
                     <li>
                     {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor: "default"}}>

@@ -7,6 +7,7 @@ import  SettingsPage from '../settings-page'
 import  WorkflowsPage from '../workflows-page'
 import  WorkflowPage from '../workflow-page'
 import EnvrionmentPage from "../environment-page"
+import Functions from "../functions"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -24,6 +25,7 @@ export default function Routes(props) {
 
     return(
         <>
+            <Route path="/k/functions" component={Functions}/>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
             <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
             <Route exact path="/">
