@@ -188,7 +188,7 @@ export default function WorkflowsPage() {
                                     </div>
                                     <div style={{flexGrow: 1}}>
                                         <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
-                                            setSerachPattern(ev.target.value)
+                                            setSearchPattern(ev.target.value)
                                         }}></input>
                                     </div>
                                 </div>
