@@ -88,7 +88,7 @@ export default function Services() {
                         <CreateRevision fetch={fetch} getService={getService} service={service}/>
                     </div>
                 </div>
-                <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1"}}>
+                <div className="shadow-soft rounded tile" style={{ flex: 2 }}>
                     <TileTitle name={`Revisions for ${service}`}>
                         <IoList />
                     </TileTitle>
@@ -284,12 +284,12 @@ function EditRevision(props) {
         <div style={{fontSize:"14px"}}>
             <div style={{display:"flex", alignItems:"center", gap:"5px"}}>
                 <div style={{display:"flex", alignItems:'center'}}>Revision 1:</div> 
-                <input type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
+                <input style={{width:"205px"}} type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
             </div>
 
             <div style={{display:"flex", alignItems:"center", gap:"5px", paddingTop:"10px"}}>
                 <div style={{display:"flex", alignItems:'center'}}>Revision 2:</div> 
-                <input placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/>
+                <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/>
             </div>
             <hr style={{marginTop:"10px"}}/>
             <div style={{display:"flex",  gap:"5px", paddingTop:"10px"}}>

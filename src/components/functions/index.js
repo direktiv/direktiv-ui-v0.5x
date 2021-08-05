@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState} from 'react'
+import React, { useCallback, useContext, useEffect, useState} from 'react'
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
@@ -14,7 +14,7 @@ export default function Functions() {
     console.log('hello functions component')
     const [functions, setFunctions] = useState(null)
 
-    useEffect(()=>{
+    const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
             try {
                 let resp = await fetch(`/functions/`, {
@@ -40,10 +40,14 @@ export default function Functions() {
             }
         }
         console.log("namespace", namespace)
-        if (namespace !== "" && functions === null) {
-            fetchFunctions()
-        }
+        fetchFunctions()
     },[namespace, functions])
+
+    useEffect(()=>{
+        if (namespace !== "" && functions === null) {
+            fetchServices()
+        }
+    },[])
     return(
         <>
         {namespace !== "" ?
@@ -95,7 +99,7 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            <CreateKnativeFunc/>
+                            <CreateKnativeFunc fetchServices={fetchServices} namespace={namespace} fetch={fetch}/>
                         </div>
                     </div>
                 </div>
@@ -106,13 +110,36 @@ export default function Functions() {
 }
 
 function CreateKnativeFunc(props) {
+    const {fetch, namespace, fetchServices} = props
     const [name, setName] = useState("")
     const [image, setImage] = useState("")
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
 
-
+    const createService = async () => {
+        try {
+            let resp = await fetch(`/functions/new`, {
+                method: "POST",
+                body: JSON.stringify({
+                    name: name,
+                    image: image,
+                    minScale: parseInt(scale),
+                    size: parseInt(size),
+                    cmd: cmd,
+                    namespace: namespace,
+                })
+            })
+            if (resp.ok) {
+                // fetch functions
+                fetchServices()
+            } else {
+                console.log('handle resp not ok, createService', resp)
+            }
+        } catch(e) {
+            console.log('handle todo err, createservice', e)
+        }
+    }
     return(
         <div style={{ fontSize: "12pt"}}>
             <div style={{display:"flex", alignItems:"center" }}>
@@ -162,7 +189,7 @@ function CreateKnativeFunc(props) {
             </table>
             </div>
         <div style={{ textAlign: "right" }}>
-            <input type="submit" value="Create Service" onClick={() => { console.log('create' )}} />
+            <input type="submit" value="Create Service" onClick={() => { createService() }} />
         </div>
     </div>
     )
