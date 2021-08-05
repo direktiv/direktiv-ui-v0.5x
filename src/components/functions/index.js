@@ -58,7 +58,7 @@ export default function Functions() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flex: "auto" }}>
-                <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "1", maxWidth: "1100px" }}>
+                <div className="shadow-soft rounded tile" style={{ flex: 3, flexGrow: "2", maxWidth: "1100px" }}>
                     <TileTitle name="Knative function services">
                         <IoList />
                     </TileTitle>
@@ -82,7 +82,7 @@ export default function Functions() {
                                             <>
                                                 {functions.map((obj) => {
                                                     return (
-                                                        <KnativeFunc serviceName={obj.serviceName} namespace={namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                        <KnativeFunc fetch={fetch} fetchServices={fetchServices} serviceName={obj.serviceName} namespace={namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                                     )
                                                 })}
                                             </>
@@ -92,7 +92,7 @@ export default function Functions() {
                         </table>
                     </div>
                 </div>
-                <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
+                <div className="container" style={{  flex: 1 }}>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
 
                         <TileTitle name="Create knative service">
@@ -197,11 +197,26 @@ function CreateKnativeFunc(props) {
 
 function KnativeFunc(props) {
     console.log(props)
-    const {name, size, workflow, serviceName, namespace, image, cmd, status, statusMessage} = props
+    const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, status, statusMessage} = props
+
+    const deleteService = async () => {
+        try {
+            let resp = await fetch(`/functions/${serviceName}`, {
+                method:"DELETE"
+            })
+            if (resp.ok) {
+                fetchServices()
+            } else {
+                console.log(resp, "handle delete service resp")
+            }
+        } catch(e) {
+            console.log(e, "handle delete service")
+        }
+    }
 
     return(
         <tr>
-            <Link key={serviceName} to={`/${namespace}/functions/${serviceName}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
+            <Link  key={serviceName} to={`/${namespace}/functions/${serviceName}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
                 <td>
                     <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                 </td> 
@@ -218,6 +233,12 @@ function KnativeFunc(props) {
                 </td>
                 <td>
                     {image}
+                </td>
+                <td >
+                    <div onClick={(e)=>{
+                        e.preventDefault()
+                        deleteService()
+                    }} style={{zIndex:100}}>Delete me</div>
                 </td>
                 {/* <td>
                     {cmd}

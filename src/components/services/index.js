@@ -232,10 +232,10 @@ function CreateRevision(props) {
 function EditRevision(props) {
     const {traffic, fetch, service, getService} = props
 
-    const [rev1Name, setRev1Name] = useState(traffic[0].name)
+    const [rev1Name, setRev1Name] = useState(traffic[0]? traffic[0].name: "")
     const [rev2Name, setRev2Name] = useState(traffic[1]? traffic[1].name: "")
 
-    const [rev1Percentage, setRev1Percentage] = useState(traffic[0].value)
+    const [rev1Percentage, setRev1Percentage] = useState(traffic[0]? traffic[0].value: 0)
 
 
     const updateTraffic = async (rev1, rev2, val) => {
@@ -300,7 +300,7 @@ function EditRevision(props) {
                         Revision 1: {rev1Percentage}%
                     </div>
                     <div style={{color:"#b5b5b5", padding:'5px'}}>
-                        Revision 2: {100-rev1Percentage}%
+                        Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 0}%
                     </div>
                 </div>
             </div>
