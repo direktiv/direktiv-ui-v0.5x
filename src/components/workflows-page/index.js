@@ -180,15 +180,17 @@ export default function WorkflowsPage() {
                         <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
                             <TileTitle name="All workflows">
                                 <IoList />
-                            </TileTitle>
-                            <div style={{ display: "flex", fontSize: "14pt", fontWeight: "bold", alignItems: "center", padding: "0px 20px 5px 10px"}}>
-                                <div style={{paddingRight: "12pt"}}>
-                                    Search:
-                                </div>
-                                <div style={{flexGrow: 1}}>
-                                    <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
-                                        setSearchPattern(ev.target.value)
-                                      }}></input>
+                            </TileTitle >
+                            <LoadingWrapper waitCount={waitCount} waitGroup={1} text={"Loading Workflow List"}>
+                                <div style={{ display: "flex", fontSize: "14pt", fontWeight: "bold", alignItems: "center", padding: "0px 20px 5px 10px"}}>
+                                    <div style={{paddingRight: "12pt"}}>
+                                        Search:
+                                    </div>
+                                    <div style={{flexGrow: 1}}>
+                                        <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
+                                            setSerachPattern(ev.target.value)
+                                        }}></input>
+                                    </div>
                                 </div>
                                 <div id="events-table" style={{ display: "flex", flexDirection: "column", gap:"15px", maxHeight:"770px", overflow:"auto", paddingBottom:"20px" }}>
                                     {err ? 
