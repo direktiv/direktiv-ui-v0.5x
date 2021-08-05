@@ -240,7 +240,7 @@ function State(props, functions) {
 
     let funcFailed = false
     let titleMsg = `${data.label}-${data.type}`
-    if (functions.length > 0 && data.state.type === "action") {
+    if (functions && functions.length > 0 && data.state.type === "action") {
         for(var i=0; i < functions.length; i++){
             if(functions[i].info.name === data.state.action.function) {
                 if (functions[i].status === "False") {

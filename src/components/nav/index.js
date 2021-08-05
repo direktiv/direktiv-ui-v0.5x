@@ -102,6 +102,10 @@ export default function Navbar(props) {
     }
     
 
+    let matchFunctions = matchPath(location.pathname, {
+        path: "/:namespace/functions"
+    })
+    
     let matchInstanceL = matchPath(location.pathname,  {
         path: "/:namespace/i"
     })
@@ -374,11 +378,11 @@ export default function Navbar(props) {
                                 <span>Functions</span>
                             </div>
                             :
-                            <Link style={{color: matchSettings !== null ? "#4497f5": ""}} onClick={()=>{
+                            <Link style={{color: matchFunctions !== null ? "#4497f5": ""}} onClick={()=>{
                                 if (document.getElementById("namespaces-ul").classList.contains("active")){
                                     toggleNamespaceSelector()
                                 }
-                            }} to={`/k/functions`} className="nav-link">
+                            }} to={`/${namespace}/functions`} className="nav-link">
                                 <div>
                                 <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
                                 <span>Functions</span>

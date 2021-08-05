@@ -347,6 +347,7 @@ ul li div {
     display: flex;
     width: 100%;
     height: fit-content;
+    z-index: 300;
 }
 
 #breadcrumbs {
