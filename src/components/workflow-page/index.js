@@ -18,6 +18,7 @@ import Sankey from './sankey'
 import {NoResults} from '../../util-funcs'
 import Interactions from '../workflows-page/interactions'
 import ExportWorkflow from './export'
+import {LoadingPage} from '../loading'
 
 
 async function checkStartType(wf, setError) {
@@ -64,6 +65,7 @@ export default function WorkflowPage() {
     const params = useParams()
     const [apiModalOpen, setAPIModalOpen] = useState(false)
     const [exportModalOpen, setExportModalOpen] = useState(false)
+    const [waitCount, setWaitCount] = useState(0)
 
 
     function toggleAPIModal() {
@@ -110,10 +112,9 @@ export default function WorkflowPage() {
                 setErr(`Unable to fetch knative functions: ${e.message}`)
             }
         }
-        if (functions === null) {
-            fetchKnativeFuncs().finally(()=>{setFetching(false)})
-        }
-    },[fetch, namespace, params.workflow, functions, handleError])
+
+        return fetchKnativeFuncs().finally(()=>{setFetching(false)})
+    },[fetch, namespace, params.workflow, handleError])
 
     const fetchWorkflow = useCallback(() => {
         setFetching(true)
@@ -146,7 +147,7 @@ export default function WorkflowPage() {
                 setErr(`Failed to fetch workflow: ${e.message}`)
             }
         }
-        fetchWf().finally(() => { setFetching(false) })
+        return fetchWf().finally(() => { setFetching(false);})
     }, [namespace, fetch, params.workflow, handleError])
 
     const updateWorkflow = useCallback(() => {
@@ -218,12 +219,19 @@ export default function WorkflowPage() {
         return postLogEvent().finally(() => { setFetching(false) })
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
 
+    // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
-        if (namespace !== "") {
-            fetchWorkflow()
-            fetchKnativeFunctions()
+        if (namespace !== "" && functions === null) {
+            fetchKnativeFunctions().finally(()=> {setWaitCount((wc)=>{return wc +1})})
         }
-    }, [fetchWorkflow, namespace])
+    }, [fetchKnativeFunctions, namespace, functions])
+
+    // Initial fetchWorkflow Fetch
+    useEffect(() => {
+        if (namespace !== "" && workflowValue === "") {
+            fetchWorkflow().finally(()=> {setWaitCount((wc)=>{return wc +1})})
+        }
+    }, [fetchWorkflow, namespace, workflowValue])
 
     useEffect(() => {
         localStorage.setItem('fullscrenEditor', fullscrenEditor);
@@ -329,6 +337,7 @@ export default function WorkflowPage() {
 
     return (
         <>
+            <LoadingPage waitCount={waitCount} waitGroup={2} text={`Loading Workflow ${params.workflow}`}/>
             {namespace !== "" ?
                 <div className="container" style={{ flex: "auto", padding: "10px" }}>
                     <Modal 

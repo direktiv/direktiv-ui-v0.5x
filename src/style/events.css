@@ -17,6 +17,7 @@
 
 #events-table {
     font-size: 11pt;
+    min-height: 200px;
 }
 
 #events-table table thead tr th {

@@ -20,6 +20,7 @@ import { validateName } from "../../util-funcs"
 import { TemplateHighlighter } from '../instance-page/input-output'
 import Interactions from './interactions'
 import {Searcher} from "fast-fuzzy"
+import LoadingWrapper from "../loading"
 
 
 const noopState = `id: noop
@@ -40,6 +41,8 @@ export default function WorkflowsPage() {
     const [actionErr, setActionErr] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
     const [tab, setTab] = useState("normal")
+    const [waitCount, setWaitCount] = useState(0)
+
 
 
     // Search Engine States, TODO: Optimise for large workflows list
@@ -84,7 +87,7 @@ export default function WorkflowsPage() {
                 setErr(`Failed to fetch workflows: ${e.message}`)
             }
         }
-        fetchWfs()
+        return fetchWfs()
     }, [namespace, fetch, handleError])
 
     const deleteWorkflow = async (id) => {
@@ -134,7 +137,7 @@ export default function WorkflowsPage() {
     }, [searchPattern, workflowKeys, searcher])
     
     useEffect(() => {
-        fetchWorkflows()        
+        fetchWorkflows().finally(()=> {setWaitCount((wc)=>{return wc +1})})        
     }, [fetchWorkflows])
 
     let ac = []
@@ -177,99 +180,100 @@ export default function WorkflowsPage() {
                         <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
                             <TileTitle name="All workflows">
                                 <IoList />
-                            </TileTitle>
-                            <div style={{ display: "flex", fontSize: "14pt", fontWeight: "bold", alignItems: "center", padding: "0px 20px 5px 10px"}}>
-                                <div style={{paddingRight: "12pt"}}>
-                                    Search:
+                            </TileTitle >
+                            <LoadingWrapper waitCount={waitCount} waitGroup={1} text={"Loading Workflow List"}>
+                                <div style={{ display: "flex", fontSize: "14pt", fontWeight: "bold", alignItems: "center", padding: "0px 20px 5px 10px"}}>
+                                    <div style={{paddingRight: "12pt"}}>
+                                        Search:
+                                    </div>
+                                    <div style={{flexGrow: 1}}>
+                                        <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
+                                            setSearchPattern(ev.target.value)
+                                        }}></input>
+                                    </div>
                                 </div>
-                                <div style={{flexGrow: 1}}>
-                                    <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
-                                        setSearchPattern(ev.target.value)
-                                      }}></input>
-                                </div>
-                            </div>
-
-                            <div id="events-table" style={{ display: "flex", flexDirection: "column", gap:"15px", maxHeight:"770px", overflow:"auto", paddingBottom:"20px" }}>
-                                {err ? 
-                                    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                                    {err}
-                                </div>
-                                :
-                                <>
-                                {actionErr !== "" ?  <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                            {actionErr}
-                        </div>
-                                :""}
-                                <>
-                                {workflowKeys.length === 0 || (searchPattern !== "" && searchResults.length === 0) ?
-                                    <NoResults /> :
+                                <div id="events-table" style={{ display: "flex", flexDirection: "column", gap:"15px", maxHeight:"770px", overflow:"auto", paddingBottom:"20px" }}>
+                                    {err ? 
+                                        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                        {err}
+                                    </div>
+                                    :
                                     <>
-                                        {searchResults.map(function (wfID) {
-                                            if (!(wfID in workflows)) {
-                                                return (<></>);
-                                            }
-                                            return (
-                                                <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit", padding:"3px" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>
-                                                    <div className="workflows-list-name">
-                                                        {wfID}
-                                                    </div>
-                                                    <div className="workflows-list-description">
-                                                        {workflows[wfID].description === "" ? "No description has been provided." : workflows[wfID].description}
-                                                    </div>
-                                                    <div style={{ flexGrow: "1", flexBasis: "0" }}>
-                                                        <div title="Toggle Workflow" className="actions-button-div">
-                                                          {checkPerm(permissions, "toggleWorkflow") ?
-                                                          <>
-                                                            {workflows[wfID].active ?
-                                                                <div className="button circle success" onClick={(ev) => {
-                                                                    ev.preventDefault();
-                                                                    toggleWorkflow(wfID)
-                                                                }}>
-                                                                    <span>
-                                                                        <IoToggle />
-                                                                    </span>
-                                                                </div>
-                                                                :
-                                                                <div className="button circle" onClick={(ev) => {
-                                                                    ev.preventDefault();
-                                                                    toggleWorkflow(wfID)
-                                                                }}>
-                                                                    <span>
-                                                                        <IoToggleOutline className={"toggled-switch"} />
-                                                                    </span>
-                                                                </div>
-                                                            }
-                                                            </>: ""}
-                                                            {checkPerm(permissions, "getWorkflow") ?
-                                                          <>
-                                                          <div title="Workflow Variables" >
-                                                                <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
-                                                                    ev.preventDefault();
-                                                                    history.push(`/${namespace}/w/${wfID}/variables`)
-                                                                }}>
-                                                                    <span style={{fontWeight: "bold"}}>
-                                                                        VAR
-                                                                    </span>
-                                                                </div>
-                                                                </div>
-                                                            </>: ""}
-                                                            {checkPerm(permissions, "deleteWorkflow") ? 
-                                                            <div title="Delete Workflow"><ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
-                                                                ev.preventDefault();
-                                                                deleteWorkflow(wfID)
-                                                            }} /> </div>
-                                                            : ""}
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            )
-                                        })}
-                                    </>
-                                }
-                                </>
-                                </>
-}
+                                    {actionErr !== "" ?  <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                {actionErr}
                             </div>
+                                    :""}
+                                    <>
+                                    {workflowKeys.length === 0 || (searchPattern !== "" && searchResults.length === 0) ?
+                                        <NoResults /> :
+                                        <>
+                                            {searchResults.map(function (wfID) {
+                                                if (!(wfID in workflows)) {
+                                                    return (<></>);
+                                                }
+                                                return (
+                                                    <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit", padding:"3px" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>
+                                                        <div className="workflows-list-name">
+                                                            {wfID}
+                                                        </div>
+                                                        <div className="workflows-list-description">
+                                                            {workflows[wfID].description === "" ? "No description has been provided." : workflows[wfID].description}
+                                                        </div>
+                                                        <div style={{ flexGrow: "1", flexBasis: "0" }}>
+                                                            <div title="Toggle Workflow" className="actions-button-div">
+                                                            {checkPerm(permissions, "toggleWorkflow") ?
+                                                            <>
+                                                                {workflows[wfID].active ?
+                                                                    <div className="button circle success" onClick={(ev) => {
+                                                                        ev.preventDefault();
+                                                                        toggleWorkflow(wfID)
+                                                                    }}>
+                                                                        <span>
+                                                                            <IoToggle />
+                                                                        </span>
+                                                                    </div>
+                                                                    :
+                                                                    <div className="button circle" onClick={(ev) => {
+                                                                        ev.preventDefault();
+                                                                        toggleWorkflow(wfID)
+                                                                    }}>
+                                                                        <span>
+                                                                            <IoToggleOutline className={"toggled-switch"} />
+                                                                        </span>
+                                                                    </div>
+                                                                }
+                                                                </>: ""}
+                                                                {checkPerm(permissions, "getWorkflow") ?
+                                                            <>
+                                                            <div title="Workflow Variables" >
+                                                                    <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
+                                                                        ev.preventDefault();
+                                                                        history.push(`/${namespace}/w/${wfID}/variables`)
+                                                                    }}>
+                                                                        <span style={{fontWeight: "bold"}}>
+                                                                            VAR
+                                                                        </span>
+                                                                    </div>
+                                                                    </div>
+                                                                </>: ""}
+                                                                {checkPerm(permissions, "deleteWorkflow") ? 
+                                                                <div title="Delete Workflow"><ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                                                    ev.preventDefault();
+                                                                    deleteWorkflow(wfID)
+                                                                }} /> </div>
+                                                                : ""}
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                )
+                                            })}
+                                        </>
+                                    }
+                                    </>
+                                    </>
+    }
+                                </div>
+                            </LoadingWrapper>
                         </div>
                         {checkPerm(permissions, "createWorkflow") || checkPerm(permissions, "namespaceEvent") ? 
                         <div className="container" style={{ flexWrap: "wrap", flex: "auto" }}>
