@@ -7,6 +7,7 @@ import { useParams } from 'react-router'
 import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline, IoCloudDownloadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
 import { useDropzone } from 'react-dropzone'
+import LoadingWrapper from "../loading"
 import bytes from 'bytes'
 
 
@@ -341,6 +342,7 @@ export function EnvrionmentContainer(props) {
     const [, setFetching] = useState(false) // TODO fetching safety checks
     const [error, setError] = useState("")
     const [envList, setEnvList] = useState([])
+    const [waitCount, setWaitCount] = useState(0)
 
     const params = useParams()
 
@@ -379,7 +381,7 @@ export function EnvrionmentContainer(props) {
                 setError(`Failed to fetch variables: ${e.message}`)
             }
         }
-        fetchVars().finally(() => { setFetching(false) })
+        return fetchVars().finally(() => { setFetching(false) })
     }, [fetch, handleError, getPath, setFetching])
 
     const downloadVaraible = useCallback((varName, setIsDownloading) => {
@@ -424,7 +426,7 @@ export function EnvrionmentContainer(props) {
 
     useEffect(() => {
         if (namespace !== "") {
-            fetchVariables()
+            fetchVariables().finally(() => { setWaitCount((wc) => { return wc + 1 }) })
         }
     }, [fetchVariables, namespace])
 
@@ -503,34 +505,36 @@ export function EnvrionmentContainer(props) {
     }
 
     return (
-        <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
-            <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px" }}>
-                <TileTitle name="Variables">
-                    <IoLockOpen />
-                </TileTitle>
-                <div style={{ display: "flex", alignItems: "center", flexDirection: "column", marginRight: "-10px", marginLeft: "-10px" }}>
-                    <div className={"var-table"}>
-                        <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
-                        <div className={`var-table-accent-header`}><EnvTableHeader /></div>
-                        {envList.map((env, index) => {
-                            return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVaraible}/></div>)
-                        })}
-                        {
-                            envList.length === 0 ? (
-                                <>
-                                    <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
-                                    <div className={`var-table-accent-1 var-table-accent-end`}>
-                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable}/>
-                                    </div>
-                                </>
-                            ):(
-                                <div className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
-                            )
-                        }
+        <LoadingWrapper waitCount={waitCount} waitGroup={1} text={`Loading ${mode === "namespace" ? "Namespace" : "Workflow"} Variables`}>
+            <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px" }}>
+                    <TileTitle name="Variables">
+                        <IoLockOpen />
+                    </TileTitle>
+                    <div style={{ display: "flex", alignItems: "center", flexDirection: "column", marginRight: "-10px", marginLeft: "-10px" }}>
+                        <div className={"var-table"}>
+                            <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
+                            <div className={`var-table-accent-header`}><EnvTableHeader /></div>
+                            {envList.map((env, index) => {
+                                return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
+                                    <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVaraible}/></div>)
+                            })}
+                            {
+                                envList.length === 0 ? (
+                                    <>
+                                        <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
+                                        <div className={`var-table-accent-1 var-table-accent-end`}>
+                                            <EnvTableNewEntry setError={setError} setVar={setRemoteVariable}/>
+                                        </div>
+                                    </>
+                                ):(
+                                    <div className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
+                                )
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </LoadingWrapper>
     )
 }

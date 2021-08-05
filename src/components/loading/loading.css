@@ -1,0 +1,138 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f2f2f2;
+    text-align: center;
+}
+
+.case__loading {
+    position: relative;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.big__circle {
+    position: relative;
+    margin: 0 auto;
+    width: 90pt;
+    height: 90pt;
+    border-radius: 100% !important;
+    box-shadow: inset -4px -4px 8px 0px white, inset 4px 4px 8px 0px #ddd8d4;
+}
+
+.inner__circle {
+    z-index: 2;
+    position: absolute;
+    top: calc(50% - 35%);
+    left: calc(50% - 35%);
+    width: 70%;
+    height: 70%;
+    border-radius: 100% !important;
+    background: #f2f2f2;
+    box-shadow: -4px -4px 8px 0px white, 4px 4px 8px 0px #cecece, inset 0px 0px 0px 0px white, inset 0px 0px 0px 0px #cecece;
+}
+
+.page-loader {
+    z-index: 1;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 105%;
+    height: 105%;
+}
+
+.page-loader svg {
+    width: 100%;
+    height: 100%;
+}
+
+.circular {
+    height: 100%;
+    width: 100%;
+    animation: rotate 4s linear infinite;
+    transform-origin: center center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: -2.5%;
+}
+
+.path {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: dash 3s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35px;
+    }
+    100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124px;
+    }
+}
+
+/* Loader */
+
+.loading-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    background: #ff000024;
+    left: 180px;
+    z-index: 100;
+    right: 0;
+}
+
+.loading {
+    height: 100%;
+    width: 100%;
+    background: var(--primary-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.loading-inner {
+    font-style: italic;
+    padding: 50px;
+    color: var(--secondary-font-light);
+    font-size: 16pt;
+}
+
+.loading-wrapper {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.loading-overlay {
+    height: 100%;
+    position: absolute;
+    display: block;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    padding-top: 20px;
+    font-style: italic;
+    color: var(--secondary-font-light);
+    font-size: 16pt;
+}
