@@ -92,7 +92,8 @@ export default function WorkflowPage() {
                     method: "POST",
                     body: JSON.stringify({
                         workflow: params.workflow,
-                        namespace: namespace
+                        namespace: namespace, 
+                        scope: "w"
                     })
                 })
                 if(resp.ok) {

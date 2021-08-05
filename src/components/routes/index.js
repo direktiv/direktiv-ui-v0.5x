@@ -8,6 +8,7 @@ import  WorkflowsPage from '../workflows-page'
 import  WorkflowPage from '../workflow-page'
 import EnvrionmentPage from "../environment-page"
 import Functions from "../functions"
+import Services from "../services"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -20,12 +21,12 @@ export default function Routes(props) {
 
     if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
+        console.log('triggered')
         history.push("/")
     } 
-
+    console.log(namespace, namespaces, "checking routes namespace")
     return(
         <>
-            <Route path="/k/functions" component={Functions}/>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
             <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
             <Route exact path="/">
@@ -41,6 +42,8 @@ export default function Routes(props) {
               }
             </Route>
             <Route exact path="/:namespace" component={DashboardPage} />
+            <Route exact path="/:namespace/functions" component={Functions}/>
+            <Route exact path="/:namespace/functions/:service" component={Services}/>
             <Route exact path="/:namespace/w" component={WorkflowsPage} />
             <Route exact path="/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
             <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />

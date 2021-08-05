@@ -43,7 +43,7 @@ export default function WorkflowsPage() {
 
 
     // Search Engine States, TODO: Optimise for large workflows list
-    const [searchPattern, setSerachPattern] = useState("")
+    const [searchPattern, setSearchPattern] = useState("")
     const [searchResults, setSearchResults] = useState([])
     const [searcher, setSearcher] = useState(new Searcher(
     [],))
@@ -184,7 +184,7 @@ export default function WorkflowsPage() {
                                 </div>
                                 <div style={{flexGrow: 1}}>
                                     <input value={searchPattern} style={{width: "100%"}} type="text" placeholder={"Workflow Search Query"} onChange={(ev) => {
-                                        setSerachPattern(ev.target.value)
+                                        setSearchPattern(ev.target.value)
                                       }}></input>
                                 </div>
                             </div>

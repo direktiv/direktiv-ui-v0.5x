@@ -1,0 +1,21 @@
+.service-list-item {
+
+}
+.service-list-item:hover{
+    cursor: pointer;
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+}
+
+.service-list-item-panel{
+    border-radius: 10px;
+    border: 1px solid #b4b4b4;
+    /* box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light); */
+}
+
+.rc-slider-track {
+    background-color: #2396d8 !important;
+}
+
+.rc-slider-handle {
+    border: solid 2px #2396d8 !important;
+}

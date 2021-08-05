@@ -11,6 +11,7 @@ import './style/custom.css';
 import "./style/charts.css";
 import "./style/events.css";
 import "./style/responsive.css"
+import "./style/services.css"
 
 import App from './App';
 
