@@ -404,6 +404,16 @@ export default function Navbar(props) {
                             </div>
                         </Link>
 }
+                    </li>                    
+                </ul>
+            </div>
+            <div className="nav-section divider"> 
+                <ul>
+                    <li>
+                        <div style={{color:"#b5b5b5", cursor:"default"}}>
+                            <IoSettingsSharp style={{marginRight:"10px"}}/>
+                            <span>Global Settings</span>
+                        </div>
                     </li>
                 </ul>
             </div>
