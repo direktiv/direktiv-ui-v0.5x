@@ -342,7 +342,7 @@ export function EnvrionmentContainer(props) {
     const [, setFetching] = useState(false) // TODO fetching safety checks
     const [error, setError] = useState("")
     const [envList, setEnvList] = useState([])
-    const [waitCount, setWaitCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(true)
 
     const params = useParams()
 
@@ -426,7 +426,7 @@ export function EnvrionmentContainer(props) {
 
     useEffect(() => {
         if (namespace !== "") {
-            fetchVariables().finally(() => { setWaitCount((wc) => { return wc + 1 }) })
+            fetchVariables().finally(() => { setIsLoading(false)})
         }
     }, [fetchVariables, namespace])
 
@@ -505,7 +505,7 @@ export function EnvrionmentContainer(props) {
     }
 
     return (
-        <LoadingWrapper waitCount={waitCount} waitGroup={1} text={`Loading ${mode === "namespace" ? "Namespace" : "Workflow"} Variables`}>
+        <LoadingWrapper isLoading={isLoading} text={`Loading ${mode === "namespace" ? "Namespace" : "Workflow"} Variables`}>
             <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
                 <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px" }}>
                     <TileTitle name="Variables">

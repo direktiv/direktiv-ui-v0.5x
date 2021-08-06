@@ -115,7 +115,7 @@ function Secrets() {
     const [actionErr, setActionErr] = useState("")
 
     // Loading 
-    const [waitCount, setWaitCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(true)
     const [opacity, setOpacity] = useState(null)
     const [loadingText, setLoadingText] = useState("Loading Namespace Secrets")
 
@@ -143,7 +143,7 @@ function Secrets() {
     }, [fetch, namespace, handleError])
 
     useEffect(() => {
-        fetchS().finally(() => { setWaitCount((wc) => { return wc + 1 }); setOpacity(30) })
+        fetchS().finally(() => { setIsLoading(false); setOpacity(30) })
     }, [fetchS])
 
     async function createSecret() {
@@ -189,7 +189,7 @@ function Secrets() {
     }
 
     return (
-        <LoadingWrapper waitCount={waitCount} waitGroup={1} text={loadingText} opacity={opacity}>
+        <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
             <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight: "370px", overflow: "auto", minHeight: "300px" }}>
 
                 {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
@@ -229,8 +229,8 @@ function Secrets() {
                                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                                             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                                 setLoadingText("Deleteing Secret")
-                                                                setWaitCount(0)
-                                                                deleteSecret(obj.name).finally(() => { setWaitCount((wc) => { return wc + 1 }) })
+                                                                setIsLoading(true)
+                                                                deleteSecret(obj.name).finally(() => { setIsLoading(false)})
                                                             }} />
                                                         </div> : ""}
                                                 </div>
@@ -248,8 +248,8 @@ function Secrets() {
                                         <input type="text" style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
                                         <div className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
                                             setLoadingText("Creating Secret")
-                                            setWaitCount(0)
-                                            createSecret().finally(() => { setWaitCount((wc) => { return wc + 1 }) })
+                                            setIsLoading(true)
+                                            createSecret().finally(() => { setIsLoading(false)})
                                         }}>
                                             <span style={{ flex: "auto" }}>
                                                 <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
@@ -276,7 +276,7 @@ function Registries() {
     const [actionErr, setActionErr] = useState("")
 
     // Loading 
-    const [waitCount, setWaitCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(true)
     const [opacity, setOpacity] = useState(null)
     const [loadingText, setLoadingText] = useState("Loading Registries")
 
@@ -305,7 +305,7 @@ function Registries() {
     }, [fetch, namespace, handleError])
 
     useEffect(() => {
-        fetchR().finally(() => { setWaitCount((wc) => { return wc + 1 }); setOpacity(30) })
+        fetchR().finally(() => { setIsLoading(false); setOpacity(30) })
     }, [fetchR])
 
     async function createRegistry() {
@@ -352,7 +352,7 @@ function Registries() {
     }
 
     return (
-        <LoadingWrapper waitCount={waitCount} waitGroup={1} text={loadingText} opacity={opacity}>
+        <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
             <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
         
                 {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
@@ -398,8 +398,8 @@ function Registries() {
                                             <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                                 <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
                                                     setLoadingText("Deleting Registry")
-                                                    setWaitCount(0)
-                                                    deleteRegistry(obj.name).finally(() => { setWaitCount((wc) => { return wc + 1 }) })
+                                                    setIsLoading(true)
+                                                    deleteRegistry(obj.name).finally(() => { setIsLoading(false) })
                                                 }} />
                                             </div>: ""}
                                         </div>
@@ -421,8 +421,8 @@ function Registries() {
                                     <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e) => setToken(e.target.value)} />
                                     <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
                                         setLoadingText("Creating Registry")
-                                        setWaitCount(0)
-                                        createRegistry().finally(() => { setWaitCount((wc) => { return wc + 1 }) })
+                                        setIsLoading(true)
+                                        createRegistry().finally(() => { setIsLoading(false) })
                                         }}>
                                         <span style={{ flex: "auto" }}>
                                             <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />

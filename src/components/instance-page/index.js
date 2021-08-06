@@ -15,6 +15,8 @@ import Modal from 'react-modal';
 import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal, IoHardwareChipSharp } from 'react-icons/io5'
 import ButtonWithDropDownCmp from './actions-btn'
+import {LoadingPage} from '../loading'
+
 
 
 async function checkStartType(wf, setError) {
@@ -44,6 +46,7 @@ export default function InstancePage() {
     const [workflowErr, setWorkflowErr] = useState("")
     const [detailsErr, setDetailsErr] = useState("")
     const [, setActionErr] = useState("")
+    const [isLoading, setIsLoading] = useState(true)
     
     // true starts with default false any other start type
     const [startType, setStartType] = useState(true)
@@ -84,7 +87,7 @@ export default function InstancePage() {
             }
         }
         if(namespace !== ""){
-        fetchWorkflow()
+            return fetchWorkflow()
         }
     },[init, fetch, params.namespace, params.workflow, namespace, handleError])
 
@@ -118,6 +121,26 @@ export default function InstancePage() {
             clearInterval(timer)
         }
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
+
+    // Wait for instanceDetails to be populated
+    useEffect(()=>{
+        if (instanceDetails && Object.keys(instanceDetails).length > 0 && isLoading) {
+            setIsLoading(false)
+        }
+        
+    }, [instanceDetails, isLoading])
+
+    // Emergency timeout for loader if backend is misbehaving
+    useEffect(
+        () => {
+          let loadingTimer = setTimeout(() => {
+              setIsLoading(false); 
+              console.warn("Loader timeout, something is probably broken in backend")
+            }, 60 * 1000);
+          return () => {
+            clearTimeout(loadingTimer);
+          };
+    },[]);
 
     for (var i=0; i < extraLinks.length; i++) {
         let x = extraLinks[i]
@@ -205,6 +228,7 @@ export default function InstancePage() {
     }
     return(
         <>
+        <LoadingPage isLoading={isLoading} text={`Loading Workflow ${params.workflow}`}/>
         {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <Modal 
