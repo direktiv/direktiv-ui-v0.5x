@@ -300,6 +300,10 @@ export const  bcRoutes = [
   {
       path: "/:namespace/functions",
       breadcrumb: "Knative Services"
+  },
+  {
+      path: "/functions/global",
+      breadcrumb: "Knative Services"
   }
 ]
 

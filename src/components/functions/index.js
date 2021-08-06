@@ -2,16 +2,20 @@ import React, { useCallback, useContext, useEffect, useState} from 'react'
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
-import { IoAdd, IoList} from 'react-icons/io5'
+import { IoAdd, IoList, IoTrash} from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
+import { ConfirmButton } from '../confirm-button'
 
 import Breadcrumbs from '../breadcrumbs'
 import MainContext from '../../context'
-import { Link, useParams } from 'react-router-dom'
+import LoadingWrapper from "../loading"
+import { Link, useHistory, useParams } from 'react-router-dom'
+import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
 
 export default function Functions() {
-    const {fetch} = useContext(MainContext)
+    const {fetch, namespace} = useContext(MainContext)
     const params = useParams()
+    const [isLoading, setIsLoading] = useState(true)
     console.log('hello functions component')
     const [functions, setFunctions] = useState(null)
 
@@ -44,12 +48,13 @@ export default function Functions() {
                 console.log(e, "TODO Handle error")
             }
         }
-        fetchFunctions()
-    },[ functions])
+        console.log("namespace", namespace)
+        return fetchFunctions()
+    },[functions])
 
     useEffect(()=>{
         if (functions === null) {
-            fetchServices()
+            fetchServices().finally(()=> {setIsLoading(false)}) 
         }
     },[])
     return(
@@ -65,35 +70,24 @@ export default function Functions() {
                     <TileTitle name="Knative function services">
                         <IoList />
                     </TileTitle>
+                    <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
                     <div style={{maxHeight:"785px", overflow:"auto"}}>
-                        <table style={{fontSize:'12px', width:"100%"}}>
-                            <thead>
-                                <tr>
-                                    <th>status</th>
-                                    <th>name</th>
-                                    <th>message</th>
-                                    <th>used by</th>
-                                    <th>image</th>
-                                    {/* <th>cmd</th>
-                                    <th>size</th> */}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                    {functions !== null ?
+                        {functions !== null ?
                                     <>
                                         {functions.length > 0 ?
-                                            <>
+                                            <div >
+                                            <Accordion>
                                                 {functions.map((obj) => {
                                                     return (
                                                         <KnativeFunc fetch={fetch} fetchServices={fetchServices} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                                     )
                                                 })}
-                                            </>
+                                            </Accordion>
+                                            </div>
                                             : <NoResults />}
                                     </> : ""}
-                            </tbody>
-                        </table>
                     </div>
+                    </LoadingWrapper>
                 </div>
                 <div className="container" style={{  flex: 1 }}>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
@@ -119,6 +113,7 @@ function CreateKnativeFunc(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
     const createService = async () => {
         try {
@@ -138,7 +133,7 @@ function CreateKnativeFunc(props) {
             })
             if (resp.ok) {
                 // fetch functions
-                fetchServices()
+                await fetchServices()
             } else {
                 console.log('handle resp not ok, createService', resp)
             }
@@ -147,6 +142,7 @@ function CreateKnativeFunc(props) {
         }
     }
     return(
+        <LoadingWrapper isLoading={isLoading} text={"Creating Service"}>
         <div style={{ fontSize: "12pt"}}>
             <div style={{display:"flex", alignItems:"center" }}>
             <table style={{flex: 1}}>
@@ -194,15 +190,22 @@ function CreateKnativeFunc(props) {
                 </tbody>
             </table>
             </div>
+        <hr/>
         <div style={{ textAlign: "right", padding:"5px" }}>
-            <input type="submit" value="Create Service" onClick={() => { createService() }} />
+            <input type="submit" value="Create Service" onClick={() => {
+                setIsLoading(true)
+                createService().finally(()=> {setIsLoading(false)})
+            }} />
         </div>
     </div>
+    </LoadingWrapper>
     )
 }
 
 function KnativeFunc(props) {
     console.log(props)
+    const history = useHistory()
+
     const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, status, statusMessage} = props
 
     const deleteService = async () => {
@@ -221,38 +224,92 @@ function KnativeFunc(props) {
     }
 
     return(
-        <tr>
-            <Link  key={serviceName} to={`/${namespace}/functions/${serviceName}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
-                <td>
-                    <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
-                </td> 
-                <td>
-                    {name}
-                </td>
-                <td>
-                    {statusMessage !== "" ? statusMessage : <>{status === "True" ? "Service is currently available" : "Service is currently unavailable"}</>}
-                </td>
-                <td>
-                    <Link to={`/${namespace}/w/${workflow}`}>
-                        {workflow}
-                    </Link>
-                </td>
-                <td>
-                    {image}
-                </td>
-                <td >
-                    <div onClick={(e)=>{
-                        e.preventDefault()
-                        deleteService()
-                    }} style={{zIndex:100}}>Delete me</div>
-                </td>
-                {/* <td>
-                    {cmd}
-                </td>
-                <td>
-                    {size}
-                </td> */}
-            </Link>
-        </tr>
+        <AccordionItem>
+            <AccordionItemHeading>
+                <AccordionItemButton>
+                    <div className="service-list-item" style={{fontSize:"16px", padding:"10px", borderRadius:"10px", textAlign:"left"}}>
+                        <div style={{display:'flex', alignItems:"center"}}>
+
+                        <div style={{maxWidth:"100px"}}>
+                           <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                        </div>
+                        <div style={{flex:"auto"}}>
+                         <b>{name}</b> <i style={{fontSize:"12px"}}>{image}</i>
+                        </div>
+                        <div style={{minWidth:"200px", display:"flex", justifyContent:"flex-end", gap:"10px"}}>
+                            <div style={{position:"relative"}} title="Delete Service">
+                                <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                    ev.preventDefault()
+                                    deleteService()
+                                }} /> 
+                            </div>
+                            <div title="View Services" >
+                                <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
+                                    ev.preventDefault();
+                                    if (namespace !== undefined) {
+                                        history.push(`/${namespace}/functions/${serviceName}`)
+                                    } else {
+                                        history.push(`/functions/global/${serviceName}`)
+                                    }
+                                }}>
+                                    <IoList/>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+
+                    </div>
+                </AccordionItemButton>
+            </AccordionItemHeading>
+            <AccordionItemPanel>
+                <div className="service-list-item-panel" style={{fontSize:'14px'}}>
+                    <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
+                        <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                            <p><b>Image:</b> {image}</p>
+                        </div>
+                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                            <p><b>Status:</b> {status}</p>
+                            {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
+                        </div>
+                    </div>
+                </div>
+            </AccordionItemPanel>
+        </AccordionItem>
     )
+
+    // return(
+    //     <tr>
+    //         <Link  key={serviceName} to={namespace !== undefined ? `/${namespace}/functions/${serviceName}`:`/functions/global/${serviceName}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
+    //             <td>
+    //                 <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+    //             </td> 
+    //             <td>
+    //                 {name}
+    //             </td>
+    //             <td>
+    //                 {statusMessage !== "" ? statusMessage : <>{status === "True" ? "Service is currently available" : "Service is currently unavailable"}</>}
+    //             </td>
+    //             {/* <td>
+    //                 <Link to={`/${namespace}/w/${workflow}`}>
+    //                     {workflow}
+    //                 </Link>
+    //             </td> */}
+    //             <td>
+    //                 {image}
+    //             </td>
+    //             <td >
+    //                         <div style={{position:"relative"}} title="Delete Service"><ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+    //                             ev.preventDefault()
+    //                             deleteService()
+    //                         }} /> </div>
+    //             </td>
+    //             {/* <td>
+    //                 {cmd}
+    //             </td>
+    //             <td>
+    //                 {size}
+    //             </td> */}
+    //         </Link>
+    //     </tr>
+    // )
 }
