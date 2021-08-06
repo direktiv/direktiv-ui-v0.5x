@@ -297,7 +297,7 @@ function EditRevision(props) {
         <div style={{fontSize:"14px"}}>
             <div style={{display:"flex", alignItems:"center", gap:"5px"}}>
                 <div style={{display:"flex", alignItems:'center'}}>Revision 1:</div> 
-                <input style={{width:"205px"}} type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
+                <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
             </div>
 
             <div style={{display:"flex", alignItems:"center", gap:"5px", paddingTop:"10px"}}>

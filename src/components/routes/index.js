@@ -19,7 +19,7 @@ export default function Routes(props) {
       return ""
     }
 
-    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground") {
+    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/global/functions") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
         console.log('triggered')
         history.push("/")
@@ -27,6 +27,8 @@ export default function Routes(props) {
     console.log(namespace, namespaces, "checking routes namespace")
     return(
         <>
+            <Route exact path="/functions/global" component={Functions}/>
+            <Route exact path="/functions/global/:service" component={Services}/>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
             <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
             <Route exact path="/">
