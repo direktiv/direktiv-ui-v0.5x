@@ -52,10 +52,14 @@
     margin-right: 8px;
     transition: height 1s;
     height: 0px;
-    maxHeight: 120px;
+    maxHeight: 150px;
     overflow: hidden;
 }
 
 .expanded div.services-list-contents {
     height: 100px;
+}
+
+.expanded div.services-list-contents.singular {
+    height: 135px;
 }

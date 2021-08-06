@@ -118,13 +118,11 @@ function ListRevisions(props) {
     const {revisions} = props
     return(
         <div>
-            <Accordion>
-                {revisions.map((obj)=>{
-                    return(
-                        <Revision name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
-                    )
-                })}
-            </Accordion>
+            {revisions.map((obj)=>{
+                return(
+                    <Revision name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                )
+            })}
         </div>
     )
 }
@@ -132,33 +130,48 @@ function ListRevisions(props) {
 function Revision(props) {
     const {name, image, generation, created, statusMessage, status, traffic} = props
 
-    return(
-        <AccordionItem>
-            <AccordionItemHeading>
-                <AccordionItemButton>
-                    <div className="service-list-item" style={{fontSize:"16px", borderRadius:"10px", textAlign:"left", padding:"10px"}}>
-                    <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+    let panelID = name;
+    function toggleItem(){
+        let x = document.getElementById(panelID);
+        x.classList.toggle("expanded");
+    }
+
+
+    return (
+        <div id={panelID} className="neumorph-hover" style={{marginBottom: "10px"}} onClick={() => {
+            toggleItem();
+        }}>
+            <div className="services-list-div ">
+                <div>
+                    <div style={{display: "inline"}}>
+                        <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                    </div>
+                    <div style={{display: "inline"}}>
                         <b>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
-                </AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-                <div className="service-list-item-panel" style={{fontSize:'14px'}}>
-                    <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
-                        <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-                            <p><b>Image:</b> {image}</p>
-                            <p><b>Generation:</b> {generation}</p>
-                            <p><b>Traffic:</b> {traffic} </p>
-                        </div>
-                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-                            <p><b>Created:</b> {dayjs.unix(created).format()}</p>
-                            <p><b>Status:</b> {status}</p>
-                            {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
-                        </div>
+                </div>
+                <div style={{flex: "auto", textAlign: "right"}}>
+                    <div className="buttons">
                     </div>
                 </div>
-            </AccordionItemPanel>
-        </AccordionItem>
+            </div>
+            <div className="services-list-contents singular">
+            <div className="service-list-item-panel" style={{fontSize:'14px'}}>
+                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
+                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                             <p><b>Image:</b> {image}</p>
+                             <p><b>Generation:</b> {generation}</p>
+                             <p><b>Traffic:</b> {traffic} </p>
+                         </div>
+                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                             <p><b>Created:</b> {dayjs.unix(created).format()}</p>
+                             <p><b>Status:</b> {status}</p>
+                             {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </div>
     )
 }
 

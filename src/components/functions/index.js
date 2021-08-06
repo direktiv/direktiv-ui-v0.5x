@@ -303,57 +303,5 @@ function KnativeFunc(props) {
                  </div>
             </div>
         </div>
-
-        // <AccordionItem>
-        //     <AccordionItemHeading>
-        //         <AccordionItemButton>
-        //             <div className="service-list-item" style={{fontSize:"16px", padding:"10px", borderRadius:"10px", textAlign:"left"}}>
-        //                 <div style={{display:'flex', alignItems:"center"}}>
-
-        //                 <div style={{maxWidth:"100px"}}>
-        //                    <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
-        //                 </div>
-        //                 <div style={{flex:"auto"}}>
-        //                  <b>{name}</b> <i style={{fontSize:"12px"}}>{image}</i>
-        //                 </div>
-        //                 <div style={{minWidth:"200px", display:"flex", justifyContent:"flex-end", gap:"10px"}}>
-        //                     <div style={{position:"relative"}} title="Delete Service">
-        //                         <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
-        //                             ev.preventDefault()
-        //                             deleteService()
-        //                         }} /> 
-        //                     </div>
-        //                     <div title="View Services" >
-        //                         <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
-        //                             ev.preventDefault();
-        //                             if (namespace !== undefined) {
-        //                                 history.push(`/${namespace}/functions/${serviceName}`)
-        //                             } else {
-        //                                 history.push(`/functions/global/${serviceName}`)
-        //                             }
-        //                         }}>
-        //                             <IoList/>
-        //                         </div>
-        //                     </div>
-        //                 </div>
-        //                 </div>
-
-        //             </div>
-        //         </AccordionItemButton>
-        //     </AccordionItemHeading>
-        //     <AccordionItemPanel>
-        //         <div className="service-list-item-panel" style={{fontSize:'14px'}}>
-        //             <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
-        //                 <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-        //                     <p><b>Image:</b> {image}</p>
-        //                 </div>
-        //                 <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-        //                     <p><b>Status:</b> {status}</p>
-        //                     {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     </AccordionItemPanel>
-        // </AccordionItem>
     )
 }
