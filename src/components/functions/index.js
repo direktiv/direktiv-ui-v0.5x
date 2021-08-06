@@ -7,22 +7,27 @@ import {NoResults} from '../../util-funcs'
 
 import Breadcrumbs from '../breadcrumbs'
 import MainContext from '../../context'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 export default function Functions() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch} = useContext(MainContext)
+    const params = useParams()
     console.log('hello functions component')
     const [functions, setFunctions] = useState(null)
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
+            let body = {
+                scope: "g"
+            }
+            if(params.namespace) {
+                body.scope = "ns"
+                body["namespace"] = params.namespace
+            }
             try {
                 let resp = await fetch(`/functions/`, {
                     method: "POST",
-                    body: JSON.stringify({
-                        namespace: namespace,
-                        scope: "ns",
-                    })
+                    body: JSON.stringify(body)
                 })
                 if(resp.ok) {
                     let arr = await resp.json()
@@ -39,18 +44,16 @@ export default function Functions() {
                 console.log(e, "TODO Handle error")
             }
         }
-        console.log("namespace", namespace)
         fetchFunctions()
-    },[namespace, functions])
+    },[ functions])
 
     useEffect(()=>{
-        if (namespace !== "" && functions === null) {
+        if (functions === null) {
             fetchServices()
         }
     },[])
     return(
         <>
-        {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
@@ -82,7 +85,7 @@ export default function Functions() {
                                             <>
                                                 {functions.map((obj) => {
                                                     return (
-                                                        <KnativeFunc fetch={fetch} fetchServices={fetchServices} serviceName={obj.serviceName} namespace={namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                        <KnativeFunc fetch={fetch} fetchServices={fetchServices} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                                     )
                                                 })}
                                             </>
@@ -99,12 +102,12 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            <CreateKnativeFunc fetchServices={fetchServices} namespace={namespace} fetch={fetch}/>
+                            <CreateKnativeFunc fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>: ""}
+        </div>
         </>
     )
 }
@@ -119,16 +122,19 @@ function CreateKnativeFunc(props) {
 
     const createService = async () => {
         try {
+            let body = {
+                name: name,
+                image: image,
+                minScale: parseInt(scale),
+                size: parseInt(size),
+                cmd: cmd,
+            }
+            if (namespace) {
+                body["namespace"] = namespace
+            }
             let resp = await fetch(`/functions/new`, {
                 method: "POST",
-                body: JSON.stringify({
-                    name: name,
-                    image: image,
-                    minScale: parseInt(scale),
-                    size: parseInt(size),
-                    cmd: cmd,
-                    namespace: namespace,
-                })
+                body: JSON.stringify(body)
             })
             if (resp.ok) {
                 // fetch functions
@@ -188,7 +194,7 @@ function CreateKnativeFunc(props) {
                 </tbody>
             </table>
             </div>
-        <div style={{ textAlign: "right" }}>
+        <div style={{ textAlign: "right", padding:"5px" }}>
             <input type="submit" value="Create Service" onClick={() => { createService() }} />
         </div>
     </div>

@@ -27,6 +27,7 @@ export default function Routes(props) {
     console.log(namespace, namespaces, "checking routes namespace")
     return(
         <>
+            <Route path="/functions/global" component={Functions}/>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
             <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
             <Route exact path="/">
