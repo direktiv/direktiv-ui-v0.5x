@@ -70,7 +70,8 @@ export default function Functions() {
                         <IoList />
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
-                    <div style={{maxHeight:"785px", overflow:"visible"}}>
+                    <div style={{maxHeight:"785px", overflow:"auto"}}>
+                    <div style={{ overflow:"visible"}}>
                         {fetchServiceErr !== "" ?
                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                             {fetchServiceErr}
@@ -92,6 +93,7 @@ export default function Functions() {
                                             : <NoResults />}
                                     </> : ""}
                         </>}
+                    </div>
                     </div>
                     </LoadingWrapper>
                 </div>
@@ -232,6 +234,7 @@ function KnativeFunc(props) {
 
     const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, status, statusMessage} = props
 
+    console.log('status message', statusMessage)
     const deleteService = async () => {
         try {
             let resp = await fetch(`/functions/${serviceName}`, {
@@ -297,7 +300,7 @@ function KnativeFunc(props) {
                          </div>
                          <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
                              <p><b>Status:</b> {status}</p>
-                             {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
+                             {statusMessage !== "" ? <p><b>Message:</b> {statusMessage}</p> : "" }
                          </div>
                      </div>
                  </div>
