@@ -13,11 +13,11 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
 
 export default function Functions() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
     const params = useParams()
     const [isLoading, setIsLoading] = useState(true)
-    console.log('hello functions component')
     const [functions, setFunctions] = useState(null)
+    const [fetchServiceErr, setFetchServiceErr] = useState("")
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
@@ -41,11 +41,10 @@ export default function Functions() {
                         setFunctions([])
                     }
                 } else {
-                    console.log(resp, "HANDLE resp is not ok")
-                    // await handleError('fetch knative functions', resp, "fetchKnativeFunctions")
+                    await handleError('fetch services', resp, 'listServices')
                 }
             } catch(e) {
-                console.log(e, "TODO Handle error")
+                setFetchServiceErr(`Error fetching services: ${e.message}`)
             }
         }
         console.log("namespace", namespace)
@@ -72,6 +71,12 @@ export default function Functions() {
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
                     <div style={{maxHeight:"785px", overflow:"visible"}}>
+                        {fetchServiceErr !== "" ?
+                        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                            {fetchServiceErr}
+                        </div>
+                        :
+                        <>
                         {functions !== null ?
                                     <>
                                         {functions.length > 0 ?
@@ -86,6 +91,7 @@ export default function Functions() {
                                             </div>
                                             : <NoResults />}
                                     </> : ""}
+                        </>}
                     </div>
                     </LoadingWrapper>
                 </div>
@@ -96,7 +102,7 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            <CreateKnativeFunc fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
+                            <CreateKnativeFunc handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
                         </div>
                     </div>
                 </div>
@@ -107,7 +113,8 @@ export default function Functions() {
 }
 
 function CreateKnativeFunc(props) {
-    const {fetch, namespace, fetchServices} = props
+    const {fetch, namespace, fetchServices, handleError} = props
+    const [err, setErr] = useState("")
     const [name, setName] = useState("")
     const [image, setImage] = useState("")
     const [scale, setScale] = useState(0)
@@ -133,12 +140,19 @@ function CreateKnativeFunc(props) {
             })
             if (resp.ok) {
                 // fetch functions
+                setErr("")
+                setName("")
+                setImage("")
+                setScale(0)
+                setSize(0)
+                setCmd("")
                 await fetchServices()
             } else {
-                console.log('handle resp not ok, createService', resp)
+                await handleError('create service', resp, 'createService')
+
             }
         } catch(e) {
-            console.log('handle todo err, createservice', e)
+            setErr(`Error creating service: ${e.message}`)
         }
     }
     return(
@@ -176,7 +190,11 @@ function CreateKnativeFunc(props) {
                             <b>Size:</b>
                         </td>
                         <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={size}  onChange={(e) => setSize(e.target.value)} type="text" placeholder="Size" />
+                        <select defaultValue="0" style={{width:"191px"}} onChange={(e)=>setSize(e.target.value)}>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -191,6 +209,13 @@ function CreateKnativeFunc(props) {
             </table>
             </div>
         <hr/>
+        {err !== ""?
+       <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+       {err}
+   </div>
+    :
+    ""    
+    }
         <div style={{ textAlign: "right", padding:"5px" }}>
             <input type="submit" value="Create Service" onClick={() => {
                 setIsLoading(true)
@@ -203,7 +228,6 @@ function CreateKnativeFunc(props) {
 }
 
 function KnativeFunc(props) {
-    console.log(props)
     const history = useHistory()
 
     const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, status, statusMessage} = props
@@ -332,40 +356,4 @@ function KnativeFunc(props) {
         //     </AccordionItemPanel>
         // </AccordionItem>
     )
-
-    // return(
-    //     <tr>
-    //         <Link  key={serviceName} to={namespace !== undefined ? `/${namespace}/functions/${serviceName}`:`/functions/global/${serviceName}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
-    //             <td>
-    //                 <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
-    //             </td> 
-    //             <td>
-    //                 {name}
-    //             </td>
-    //             <td>
-    //                 {statusMessage !== "" ? statusMessage : <>{status === "True" ? "Service is currently available" : "Service is currently unavailable"}</>}
-    //             </td>
-    //             {/* <td>
-    //                 <Link to={`/${namespace}/w/${workflow}`}>
-    //                     {workflow}
-    //                 </Link>
-    //             </td> */}
-    //             <td>
-    //                 {image}
-    //             </td>
-    //             <td >
-    //                         <div style={{position:"relative"}} title="Delete Service"><ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
-    //                             ev.preventDefault()
-    //                             deleteService()
-    //                         }} /> </div>
-    //             </td>
-    //             {/* <td>
-    //                 {cmd}
-    //             </td>
-    //             <td>
-    //                 {size}
-    //             </td> */}
-    //         </Link>
-    //     </tr>
-    // )
 }
