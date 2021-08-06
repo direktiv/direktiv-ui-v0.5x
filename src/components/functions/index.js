@@ -223,10 +223,19 @@ function KnativeFunc(props) {
         }
     }
 
+
+    let panelID = name;
+    function toggleItem(){
+        let x = document.getElementById(panelID);
+        x.classList.toggle("expanded");
+    }
+
     return(
         
-        <div style={{marginBottom: "10px"}}>
-            <div className="services-list-div neumorph-hover">
+        <div id={panelID} className="neumorph-hover" style={{marginBottom: "10px"}} onClick={() => {
+            toggleItem();
+        }}>
+            <div className="services-list-div ">
                 <div>
                     <div style={{display: "inline"}}>
                         <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
@@ -257,7 +266,17 @@ function KnativeFunc(props) {
                 </div>
             </div>
             <div className="services-list-contents">
-                
+            <div className="service-list-item-panel" style={{fontSize:'14px'}}>
+                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
+                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                             <p><b>Image:</b> {image}</p>
+                         </div>
+                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                             <p><b>Status:</b> {status}</p>
+                             {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
+                         </div>
+                     </div>
+                 </div>
             </div>
         </div>
 
