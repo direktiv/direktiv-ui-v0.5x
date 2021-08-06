@@ -16,7 +16,7 @@ import { IoAddSharp, IoCloudUploadSharp, IoList, IoToggle, IoToggleOutline, IoTr
 import {NoResults} from '../../util-funcs'
 import Modal from 'react-modal';
 import { ConfirmButton } from '../confirm-button'
-import { validateName } from "../../util-funcs"
+import { validateAgainstPrimaryRegex } from "../../util-funcs"
 import { TemplateHighlighter } from '../instance-page/input-output'
 import Interactions from './interactions'
 import {Searcher} from "fast-fuzzy"
@@ -324,7 +324,7 @@ function readFile(file) {
 }
 
 function parseYaml(fetch, name, namespace, data, setErr, history, handleError) {
-    const invalidNameErr = validateName(name, "workflow name")
+    const invalidNameErr = validateAgainstPrimaryRegex(name, "workflow name")
     if (invalidNameErr) {
         setErr(`Name is invalid: ${invalidNameErr}`)
         return
@@ -441,7 +441,7 @@ function UploadWorkflowForm() {
                     try {
                         // Check if file is a valid yaml
                         const y = YAML.load(data, 'utf8')
-                        invalidNameErr = validateName(y.id, "id")
+                        invalidNameErr = validateAgainstPrimaryRegex(y.id, "id")
                     } catch (e) {
                         setErr(`File is not a valid: ${e.reason}`)
                         return
