@@ -54,12 +54,19 @@
     height: 0px;
     maxHeight: 150px;
     overflow: hidden;
+
 }
 
 .expanded div.services-list-contents {
-    height: 100px;
+    display: flex;
+    padding-bottom: 8px;
+    height: 135px;
 }
 
 .expanded div.services-list-contents.singular {
     height: 135px;
+}
+
+.service-list-item-panel {
+    flex: auto;
 }
