@@ -117,12 +117,14 @@ export default function Services() {
 function ListRevisions(props) {
     const {revisions} = props
     return(
-        <div>
+        <div style={{maxHeight:"785px", overflow:"auto", padding:"20px"}}>
+            <div style={{overflow:"visible"}}>
             {revisions.map((obj)=>{
                 return(
                     <Revision name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
+            </div>
         </div>
     )
 }

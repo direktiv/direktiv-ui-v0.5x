@@ -70,7 +70,7 @@ export default function Functions() {
                         <IoList />
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
-                    <div style={{maxHeight:"785px", overflow:"auto"}}>
+                    <div style={{maxHeight:"785px", overflow:"auto", padding:"20px"}}>
                     <div style={{ overflow:"visible"}}>
                         {fetchServiceErr !== "" ?
                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
