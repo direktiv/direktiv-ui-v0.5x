@@ -15,6 +15,8 @@ import TileTitle from '../tile-title'
 import {useParams} from "react-router-dom"
 import { IoAdd, IoClipboardSharp, IoList} from 'react-icons/io5'
 import MainContext from "../../context";
+import LoadingWrapper from "../loading"
+
 
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -25,6 +27,9 @@ export default function Services() {
     let { service } = useParams();
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
+
+    const [isLoading, setIsLoading] = useState(true)
+
 
     const getService = useCallback(()=>{
         async function getServices() {
@@ -52,14 +57,14 @@ export default function Services() {
                 console.log("TODO handle err get service", e)
             }
         }
-        if (srvice === null) {
-            getServices()
-        }
+        return getServices()
     },[service])
 
     useEffect(()=>{
-        getService()    
-    },[service])
+        if (srvice === null) {
+            getService().finally(()=> {setIsLoading(false)})     
+        }
+    },[srvice])
 
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -92,11 +97,9 @@ export default function Services() {
                     <TileTitle name={`Revisions for ${service}`}>
                         <IoList />
                     </TileTitle>
-                    {srvice !== null ? 
-                        <ListRevisions revisions={srvice.revisions}/>
-                        :
-                        ""
-                    }
+                    <LoadingWrapper isLoading={isLoading} text={"Loading Revisions List"}>
+                        <ListRevisions revisions={srvice ? srvice.revisions : []}/>
+                    </LoadingWrapper>
                 </div>
             </div>
         </div>
@@ -158,6 +161,8 @@ function CreateRevision(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
+
 
     const createRevision = async () => {
         try {
@@ -171,7 +176,7 @@ function CreateRevision(props) {
                 })
             })
             if (resp.ok) {
-                getService()
+                await getService()
             } else {
                 console.log('handle create revision resp not ok todo', resp)
             }
@@ -182,6 +187,7 @@ function CreateRevision(props) {
 
 
     return(
+        <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
         <div style={{ fontSize: "12pt"}}>
             <div style={{display:"flex", alignItems:"center" }}>
             <table style={{flex: 1}}>
@@ -223,9 +229,13 @@ function CreateRevision(props) {
             </div>
         <hr />
         <div style={{ textAlign: "right" }}>
-            <input type="submit" value="Create Service" onClick={() => { createRevision() }} />
+            <input type="submit" value="Create Service" onClick={() => { 
+                setIsLoading(true)
+                createRevision().finally(()=> {setIsLoading(false)})
+                 }} />
         </div>
     </div>
+    </LoadingWrapper>
     )
 }
 
@@ -236,6 +246,8 @@ function EditRevision(props) {
     const [rev2Name, setRev2Name] = useState(traffic[1]? traffic[1].name: "")
 
     const [rev1Percentage, setRev1Percentage] = useState(traffic[0]? traffic[0].value: 0)
+
+    const [isLoading, setIsLoading] = useState(false)
 
 
     const updateTraffic = async (rev1, rev2, val) => {
@@ -251,7 +263,7 @@ function EditRevision(props) {
                 }]})
             })
             if (resp.ok) {
-                getService()
+                await getService()
             } else {
                 console.log("todo handle traffic update", resp)
             }
@@ -281,6 +293,7 @@ function EditRevision(props) {
     }
 
     return(
+        <LoadingWrapper isLoading={isLoading} text={"Updating Usage"}>
         <div style={{fontSize:"14px"}}>
             <div style={{display:"flex", alignItems:"center", gap:"5px"}}>
                 <div style={{display:"flex", alignItems:'center'}}>Revision 1:</div> 
@@ -306,8 +319,12 @@ function EditRevision(props) {
             </div>
             <hr style={{marginTop:"10px"}}/>
             <div style={{ textAlign: "right" }}>
-                <input onClick={() => {updateTraffic(rev1Name, rev2Name, rev1Percentage)}} type="submit" value="Save" />
+                <input onClick={() => {
+                    setIsLoading(true)
+                    updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {setIsLoading(false)})
+                }} type="submit" value="Save" />
             </div>
         </div>
+        </LoadingWrapper>
     )
 }

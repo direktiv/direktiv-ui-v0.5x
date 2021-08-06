@@ -45,11 +45,11 @@ export function LoadingPage(props) {
 
 
 export default function LoadingWrapper(props) {
-    const { waitGroup, waitCount, text, opacity } = props
+    const { waitGroup, waitCount, isLoading, text, opacity } = props
 
     return (
         <>
-            {((!waitGroup || !waitCount) || (waitCount < waitGroup)) ?
+            {( (isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading == true) ) ?
                 <div class={"loading-wrapper"}>
                     <div style={{ opacity: opacity ? `${opacity}%` : "0%" }}>
                         {props.children}

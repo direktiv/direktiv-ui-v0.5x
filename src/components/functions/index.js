@@ -7,10 +7,12 @@ import {NoResults} from '../../util-funcs'
 
 import Breadcrumbs from '../breadcrumbs'
 import MainContext from '../../context'
+import LoadingWrapper from "../loading"
 import { Link } from 'react-router-dom'
 
 export default function Functions() {
     const {fetch, namespace} = useContext(MainContext)
+    const [isLoading, setIsLoading] = useState(true)
     console.log('hello functions component')
     const [functions, setFunctions] = useState(null)
 
@@ -40,12 +42,12 @@ export default function Functions() {
             }
         }
         console.log("namespace", namespace)
-        fetchFunctions()
+        return fetchFunctions()
     },[namespace, functions])
 
     useEffect(()=>{
         if (namespace !== "" && functions === null) {
-            fetchServices()
+            fetchServices().finally(()=> {setIsLoading(false)}) 
         }
     },[])
     return(
@@ -62,6 +64,7 @@ export default function Functions() {
                     <TileTitle name="Knative function services">
                         <IoList />
                     </TileTitle>
+                    <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
                     <div style={{maxHeight:"785px", overflow:"auto"}}>
                         <table style={{fontSize:'12px', width:"100%"}}>
                             <thead>
@@ -91,6 +94,7 @@ export default function Functions() {
                             </tbody>
                         </table>
                     </div>
+                    </LoadingWrapper>
                 </div>
                 <div className="container" style={{  flex: 1 }}>
                     <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
@@ -116,6 +120,7 @@ function CreateKnativeFunc(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
     const createService = async () => {
         try {
@@ -132,7 +137,7 @@ function CreateKnativeFunc(props) {
             })
             if (resp.ok) {
                 // fetch functions
-                fetchServices()
+                await fetchServices()
             } else {
                 console.log('handle resp not ok, createService', resp)
             }
@@ -141,6 +146,7 @@ function CreateKnativeFunc(props) {
         }
     }
     return(
+        <LoadingWrapper isLoading={isLoading} text={"Creating Service"}>
         <div style={{ fontSize: "12pt"}}>
             <div style={{display:"flex", alignItems:"center" }}>
             <table style={{flex: 1}}>
@@ -189,9 +195,13 @@ function CreateKnativeFunc(props) {
             </table>
             </div>
         <div style={{ textAlign: "right" }}>
-            <input type="submit" value="Create Service" onClick={() => { createService() }} />
+            <input type="submit" value="Create Service" onClick={() => {
+                setIsLoading(true)
+                createService().finally(()=> {setIsLoading(false)})
+            }} />
         </div>
     </div>
+    </LoadingWrapper>
     )
 }
 
