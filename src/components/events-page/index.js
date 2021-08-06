@@ -44,7 +44,7 @@ export default function EventsPage() {
 export function EventsPageBody() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const [instances, setInstances] = useState([])
-    const [waitCount, setWaitCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(true)
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
 
@@ -69,11 +69,11 @@ export function EventsPageBody() {
                 setErr(`Failed to fetch instances: ${e.message}`)
             }
         }
-        fetchI().finally(()=> {setWaitCount((wc)=>{return wc +1})})
+        fetchI().finally(()=> {setIsLoading(false)})
     },[namespace, fetch, handleError])
 
     return(
-        <LoadingWrapper waitCount={waitCount} waitGroup={1} text={"Loading Instance List"}>
+        <LoadingWrapper isLoading={isLoading} text={"Loading Instance List"}>
             <div id="events-table" style={{overflow:"auto"}}>
                 {
                             err !== "" ? 

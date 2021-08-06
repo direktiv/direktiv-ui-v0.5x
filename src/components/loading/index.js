@@ -1,17 +1,14 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React from 'react'
 import "./loading.css";
 
 
 export function LoadingPage(props) {
-    const { waitGroup, waitCount, text, mode } = props
-
-    console.log("waitGroup = ", waitGroup)
-    console.log("waitCount = ", waitCount)
+    const { waitGroup, waitCount, text, isLoading } = props
 
 
     return (
         <>
-            {((!waitGroup || !waitCount) || (waitCount < waitGroup)) ?
+            {( (isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading === true) ) ?
                 <div class={"loading-container"}>
                     <div class={"loading"}>
                         <div class={"loading-inner"}>
@@ -49,7 +46,7 @@ export default function LoadingWrapper(props) {
 
     return (
         <>
-            {( (isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading == true) ) ?
+            {( (isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading === true) ) ?
                 <div class={"loading-wrapper"}>
                     <div style={{ opacity: opacity ? `${opacity}%` : "0%" }}>
                         {props.children}

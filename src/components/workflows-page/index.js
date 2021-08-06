@@ -41,7 +41,7 @@ export default function WorkflowsPage() {
     const [actionErr, setActionErr] = useState("")
     const [modalOpen, setModalOpen] = useState(false)
     const [tab, setTab] = useState("normal")
-    const [waitCount, setWaitCount] = useState(0)
+    const [isLoading, setIsLoading] = useState(true)
 
 
 
@@ -137,7 +137,7 @@ export default function WorkflowsPage() {
     }, [searchPattern, workflowKeys, searcher])
     
     useEffect(() => {
-        fetchWorkflows().finally(()=> {setWaitCount((wc)=>{return wc +1})})        
+        fetchWorkflows().finally(()=> {setIsLoading(false)})        
     }, [fetchWorkflows])
 
     let ac = []
@@ -181,7 +181,7 @@ export default function WorkflowsPage() {
                             <TileTitle name="All workflows">
                                 <IoList />
                             </TileTitle >
-                            <LoadingWrapper waitCount={waitCount} waitGroup={1} text={"Loading Workflow List"}>
+                            <LoadingWrapper isLoading={isLoading} text={"Loading Workflow List"}>
                                 <div style={{ display: "flex", fontSize: "14pt", fontWeight: "bold", alignItems: "center", padding: "0px 20px 5px 10px"}}>
                                     <div style={{paddingRight: "12pt"}}>
                                         Search:
