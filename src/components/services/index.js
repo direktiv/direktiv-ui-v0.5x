@@ -23,8 +23,9 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 export default function Services() {
-    const {fetch} = useContext(MainContext)
+    const {fetch, handleError} = useContext(MainContext)
     let { service } = useParams();
+    const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
 
@@ -51,10 +52,10 @@ export default function Services() {
                     setService(json)
                     setTraffic(tr)
                 } else {
-                    console.log("Handle resp not being ok", resp)
+                    await handleError('fetch revisions', resp, 'fetchService')
                 }
             } catch(e) {
-                console.log("TODO handle err get service", e)
+                setErrFetchRev(`Error fetching service: ${e.message}`)
             }
         }
         return getServices()
@@ -73,32 +74,39 @@ export default function Services() {
                     <Breadcrumbs elements={["Events / Logs"]} />
                 </div>
             </div>
-            <div className="container" style={{ flexDirection: "row", flex: "auto" }}>
-                <div className="container" style={{ flexDirection: "column", flex:"auto", maxWidth: "400px"}}>
+            <div className="container" style={{ flexDirection: "row", flex: "auto", gap:"40px" }}>
+                <div className="container" style={{ flexDirection: "column", flex:1, maxWidth: "400px"}}>
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
                         <TileTitle name="Edit revision usage">
                              <IoClipboardSharp />
                         </TileTitle>
                         {
                             traffic !== null ?
-                            <EditRevision traffic={traffic} fetch={fetch} getService={getService} service={service}/>
+                            <EditRevision handleError={handleError} traffic={traffic} fetch={fetch} getService={getService} service={service}/>
                             :
                             ""
                         }
                     </div>
-                    <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
+                    <div className="shadow-soft rounded tile" style={{  maxWidth: "400px"}}>
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                        <CreateRevision fetch={fetch} getService={getService} service={service}/>
+                        <CreateRevision handleError={handleError} fetch={fetch} getService={getService} service={service}/>
                     </div>
                 </div>
-                <div className="shadow-soft rounded tile" style={{ flex: 2 }}>
+                <div className="shadow-soft rounded tile" style={{ flex: 1 }}>
                     <TileTitle name={`Revisions for ${service}`}>
                         <IoList />
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Revisions List"}>
-                        <ListRevisions revisions={srvice ? srvice.revisions : []}/>
+                        {errFetchRev !== ""?
+     <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+     {errFetchRev}
+ </div>                    
+                    :
+                    <ListRevisions revisions={srvice ? srvice.revisions : []}/>
+
+}
                     </LoadingWrapper>
                 </div>
             </div>
@@ -155,8 +163,8 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, fetch} = props
-
+    const {service, getService, fetch, handleError} = props
+    const [err, setErr] = useState("")
     const [image, setImage] = useState("")
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
@@ -176,12 +184,17 @@ function CreateRevision(props) {
                 })
             })
             if (resp.ok) {
+                setErr("")
+                setImage("")
+                setScale(0)
+                setSize(0)
+                setCmd("")
                 await getService()
             } else {
-                console.log('handle create revision resp not ok todo', resp)
+                await handleError('update service', resp, 'updateService')
             }
         } catch(e) {
-            console.log("todo create revision", e)
+            setErr(`Error updating service: ${e.message}`)
         }
     }
 
@@ -213,7 +226,11 @@ function CreateRevision(props) {
                             <b>Size:</b>
                         </td>
                         <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={size}  onChange={(e) => setSize(e.target.value)} type="text" placeholder="Size" />
+                            <select defaultValue="0" style={{width:"191px"}} onChange={(e)=>setSize(e.target.value)}>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -228,6 +245,13 @@ function CreateRevision(props) {
             </table>
             </div>
         <hr />
+        {err !== ""?
+       <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+       {err}
+   </div>
+    :
+    ""    
+    }
         <div style={{ textAlign: "right" }}>
             <input type="submit" value="Create Service" onClick={() => { 
                 setIsLoading(true)
@@ -240,8 +264,9 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {traffic, fetch, service, getService} = props
+    const {traffic, fetch, service, getService,handleError} = props
 
+    const [err, setErr] = useState("")
     const [rev1Name, setRev1Name] = useState(traffic[0]? traffic[0].name: "")
     const [rev2Name, setRev2Name] = useState(traffic[1]? traffic[1].name: "")
 
@@ -252,6 +277,9 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
+            if (rev2 === "") {
+                throw new Error("Revision 2 must be filled out to change traffic")
+            }
             let resp = await fetch(`/functions/${service}`, {
                 method: "PATCH",
                 body: JSON.stringify({values:[{
@@ -263,12 +291,13 @@ function EditRevision(props) {
                 }]})
             })
             if (resp.ok) {
+                setErr('')
                 await getService()
             } else {
-                console.log("todo handle traffic update", resp)
+                await handleError("set traffic", resp, "updateTraffic")
             }
         } catch(e) {
-            console.log("todo handle err update traffic", e)
+            setErr(`Error setting traffic: ${e.message}'`)
         }
     }
 
@@ -318,6 +347,13 @@ function EditRevision(props) {
                 </div>
             </div>
             <hr style={{marginTop:"10px"}}/>
+            {err !== ""?
+       <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+       {err}
+   </div>
+    :
+    ""    
+    }
             <div style={{ textAlign: "right" }}>
                 <input onClick={() => {
                     setIsLoading(true)
