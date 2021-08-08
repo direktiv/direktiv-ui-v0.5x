@@ -1,5 +1,5 @@
-import { Controlled as CodeMirror } from "react-codemirror2";
-import React from "react";
+import { Controlled as CodeMirror, Controlled } from "react-codemirror2";
+import React, {  useEffect, useState   } from 'react'
 
 
 // style editor
@@ -16,10 +16,117 @@ import 'codemirror/addon/fold/foldgutter.css';
 import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
-export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef } = props;
+function getFunctionLines(str){
+    var arr = str.split("\n");
+    var fLines = {};
+    var inF = false;
+    var fTabs = 0
+    var fChildTabs = 0;
 
-    function editorSave() {
+    for (var i = 0; i < arr.length; i++)
+    {
+        if (inF){
+            var numberOfTabs = arr[i].match(/^[\s-]*/)[0].length
+            
+            if (numberOfTabs <= fTabs) {
+                break // Left function 
+            }
+
+            if (fChildTabs === 0){
+                fChildTabs = numberOfTabs
+            } else if(numberOfTabs < fChildTabs){
+                break // Left function
+            }
+
+            // Check if this line contains id
+            var fID = arr[i].replace(/^[\s-]*id:/, "")
+            if (fID !== arr[i]) {
+                // If id was extracted from line, push it
+                let startPos = arr[i].match(/^[\s-]*id:\s*/)[0].length
+                let endPos = arr[i].match(/^[\s-]*id:\s*\w*/)[0].length
+                fLines[fID.trim()] =  {line: i, start: startPos, end: endPos}
+            }
+
+        } else if (/^\s*functions:/.test(arr[i])){
+            inF  = true; // Entered Function
+            // console.log("/^s*/.match(arr[i])" , /^\s*/.match())
+            fTabs = arr[i].match(/^\s*/)[0].length
+        }
+    }
+
+    return fLines
+}
+
+function makeGutterError(msg) {
+    var tooltip = document.createElement("div");
+    var tooltipText = document.createElement("span");
+    tooltip.style.color = "#FF4040";
+    tooltip.innerHTML = "●";
+    tooltip.setAttribute('class', 'tooltip')
+
+    tooltipText.setAttribute('class', 'tooltiptext')
+    tooltipText.innerHTML = msg
+
+    tooltip.appendChild(tooltipText)
+    return tooltip;
+}
+
+function makeLineError(msg) {
+    var tooltip = document.createElement("div");
+    var tooltipText = document.createElement("span");
+    tooltip.style.color = "#FF4040";
+    tooltip.innerHTML = "  Bad Function";
+    tooltip.setAttribute('class', 'tooltip')
+
+    tooltipText.setAttribute('class', 'tooltiptext')
+    tooltipText.innerHTML = msg
+
+    tooltip.appendChild(tooltipText)
+    return tooltip;
+}
+
+export default function ReactEditor(props) {
+    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
+    const [cmEditor, setCMEditor] = useState(null)
+    const [marks, setMarks] = useState([])
+
+
+    function setFunctionErrors(cm) {
+        console.log("functions", functions)
+        let fLines = null;
+        let markedTexts = []
+        cm.clearGutter('Custom-Errors');
+        for (var i = 0; i < functions.length; i++)
+        {
+            if (functions[i].status === "False"){
+
+                // Get functions lines on first error
+                if (fLines === null){
+                    fLines = getFunctionLines(value);
+                }
+
+                let invalidFunc = fLines[functions[i].info.name]
+                cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(`${functions[i].statusMessage}`));
+                // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
+                markedTexts.push(cm.markText({ch: invalidFunc.start, line: invalidFunc.line}, {ch: invalidFunc.end, line: invalidFunc.line}, {className: 'line-error'}))
+            }
+        }
+
+        // Clear old marks
+        for (var i = 0; i < marks.length; i++){
+            marks[i].clear()
+        }
+        
+        // Save new marks
+        setMarks(markedTexts)
+    }
+
+
+    function editorSave(cm) {
+        if (functions) {
+            setFunctionErrors(cm)
+        }
+
         if (saveCallback) {
             saveCallback()
             return
@@ -28,11 +135,19 @@ export default function ReactEditor(props) {
         console.warn("Editor: saveCallback not set")
     }
 
+    useEffect(() => {
+        if (functions && cmEditor && value && value.length > 0) {
+            setFunctionErrors(cmEditor)
+        }
+    }, [functions])
+
     return (
         <div className="editor-wrapper">
             {loading ? <div className="editor-loading"></div> : <></>}
             <div className={showFooter ? "editor-small" : "editor-full"}>
                 <CodeMirror
+                    editorDidMount={(cm)=>{
+                    }}
                     ref={editorRef}
                     value={value}
                     options={{
@@ -45,15 +160,15 @@ export default function ReactEditor(props) {
                         indentWithTabs: false,
                         smartIndent: true,
                         foldGutter: true,
-                        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "Custom-Errors"],
                         extraKeys: {
                             "Ctrl-S": editorSave,
                             Tab: (cm) => {
-                            if (cm.getMode().name === 'null') {
-                                cm.execCommand('insertTab');
-                            } else {
-                                cm.execCommand('indentMore');
-                            }
+                                if (cm.getMode().name === 'null') {
+                                    cm.execCommand('insertTab');
+                                } else {
+                                    cm.execCommand('indentMore');
+                                }
                             },
                             'Shift-Tab': (cm) => cm.execCommand('indentLess'),
                             "Ctrl-/": function (cm) {
@@ -113,6 +228,9 @@ export default function ReactEditor(props) {
                     }}
                     onBeforeChange={(editor, data, val) => {
                         setValue(val)
+                    }}
+                    editorDidMount={(cm, val)=>{
+                        setCMEditor(cm)
                     }}
                 />
             </div>
