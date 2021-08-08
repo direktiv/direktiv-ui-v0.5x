@@ -124,6 +124,10 @@ export default function Navbar(props) {
         path: "/jq/playground"
     })
 
+    let matchGlobal = matchPath(location.pathname, {
+        path: "/functions/global"
+    })
+
     let navItemMap = {}
     if(navItems){
         for(var i=0; i < navItems.length; i++) {
@@ -408,18 +412,23 @@ export default function Navbar(props) {
                             </div>
                         </Link>
 }
-                    </li>                    
+                    </li>         
+        
                 </ul>
-            </div>
-            <div className="nav-section divider"> 
-                <ul>
-                    <li>
-                        <div style={{color:"#b5b5b5", cursor:"default"}}>
-                            <IoSettingsSharp style={{marginRight:"10px"}}/>
-                            <span>Global Settings</span>
-                        </div>
-                    </li>
-                </ul>
+                <div className="nav-section divider"> 
+                    <ul>
+                        <li>
+                        <Link style={{color: matchGlobal !== null ? "#4497f5": "", display:"flex", alignItems:"center"}} onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/functions/global`} className="nav-link">
+                                <IoSettingsSharp style={{marginRight:"10px"}}/>
+                                <span>Global Settings</span>
+                            </Link>
+                        </li>
+                    </ul>
+                </div>      
             </div>
             {footer ? footer : "" }
         </div>

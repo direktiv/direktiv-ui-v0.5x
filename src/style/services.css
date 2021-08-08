@@ -1,7 +1,7 @@
 .service-list-item {
 
 }
-.service-list-item:hover{
+.service-list-item > div:hover {
     cursor: pointer;
     box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
 }
@@ -18,4 +18,55 @@
 
 .rc-slider-handle {
     border: solid 2px #2396d8 !important;
+}
+
+
+.services-list-div {
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    line-height: 46px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.services-list-div:hover {
+
+}
+
+.services-list-div .buttons {
+    float: right;
+    margin-top: 4px;
+    margin-right: 4px;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.services-list-div .buttons > div {
+    margin-left: 10px;
+}
+
+.services-list-contents {
+    margin-left: 8px;
+    margin-right: 8px;
+    transition: height 1s;
+    height: 0px;
+    maxHeight: 150px;
+    overflow: hidden;
+
+}
+
+.expanded div.services-list-contents {
+    display: flex;
+    padding-bottom: 8px;
+    height: 135px;
+}
+
+.expanded div.services-list-contents.singular {
+    height: 135px;
+}
+
+.service-list-item-panel {
+    flex: auto;
 }
