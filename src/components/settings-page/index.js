@@ -83,7 +83,7 @@ export default function SettingsPage() {
                         <SettingsAction />
                     </div>
                     <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-                        <div className="container" style={{ height: "50%", flexDirection: "row" }}>
+                        <div className="container" style={{ flexDirection: "row" }}>
                             <div className="item-0 shadow-soft rounded tile" style={{ minHeight: "300px" }}>
                                 <TileTitle name="Secrets">
                                     <IoLockOpen />
