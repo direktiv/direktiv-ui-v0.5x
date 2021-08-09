@@ -366,9 +366,6 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            if (rev2 === "") {
-                throw new Error("Revision 2 must be filled out to change traffic")
-            }
             let resp = await fetch(`/functions/${service}`, {
                 method: "PATCH",
                 body: JSON.stringify({values:[{
@@ -386,7 +383,7 @@ function EditRevision(props) {
                 await handleError("set traffic", resp, "updateTraffic")
             }
         } catch(e) {
-            setErr(`Error setting traffic: ${e.message}'`)
+            setErr(`Error setting traffic: ${e.message}`)
         }
     }
 

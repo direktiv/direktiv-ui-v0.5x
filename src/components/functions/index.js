@@ -212,7 +212,7 @@ function CreateKnativeFunc(props) {
                         Name:
                     </div>
                     <div>
-                        <input value={name}  onChange={(e) => setName(e.target.value)} type="text" placeholder="Enter service name" />
+                        <input value={name} style={{width:"100%"}}  onChange={(e) => setName(e.target.value)} type="text" placeholder="Enter service name" />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
