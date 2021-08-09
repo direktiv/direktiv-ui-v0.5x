@@ -104,7 +104,7 @@ export default function Services() {
                         </TileTitle>
                         {
                             traffic !== null ?
-                            <EditRevision handleError={handleError} traffic={traffic} fetch={fetch} getService={getService} service={service}/>
+                            <EditRevision revisions={srvice ? srvice.revisions : []} handleError={handleError} traffic={traffic} fetch={fetch} getService={getService} service={service}/>
                             :
                             ""
                         }
@@ -329,7 +329,7 @@ function CreateRevision(props) {
     :
     ""    
     }
-        <div style={{ textAlign: "right" }}>
+        <div title="Create Revision" style={{ textAlign: "right" }}>
             <input type="submit" value="Create Revision" onClick={() => { 
                 setIsLoading(true)
                 createRevision().finally(()=> {setIsLoading(false)})
@@ -341,7 +341,7 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {traffic, fetch, service, getService,handleError} = props
+    const {traffic, fetch, service, getService,handleError, revisions} = props
 
     const [err, setErr] = useState("")
     const [rev1Name, setRev1Name] = useState(traffic[0]? traffic[0].name: "")
@@ -407,7 +407,17 @@ function EditRevision(props) {
                         Rev 1:
                     </div>
                     <div>
-                        <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
+                        <select style={{width:"220px"}} defaultValue={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
+                            <option value="">Please choose a service hash</option>
+                            {
+                                revisions.map((obj)=>{
+                                    return(
+                                        <option value={obj.name}>{obj.name}</option>
+                                    )
+                                })
+                            }
+                        </select>
+                        {/* <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/> */}
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -415,7 +425,18 @@ function EditRevision(props) {
                         Rev 2:
                     </div>
                     <div>
-                        <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/>
+                    <select style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}>
+                    <option value="">Please choose a service hash</option>
+                          
+                            {
+                                revisions.map((obj)=>{
+                                    return(
+                                        <option value={obj.name}>{obj.name}</option>
+                                    )
+                                })
+                            }
+                        </select>
+                        {/* <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/> */}
                     </div>
                 </div>
                 <div style={{display:'flex', gap:"10px"}}>
@@ -426,7 +447,7 @@ function EditRevision(props) {
                             Revision 1: {rev1Percentage}%
                         </div>
                         <div style={{color:"#b5b5b5", padding:'5px'}}>
-                            Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 0}%
+                            Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 100}%
                         </div>
                     </div>
                     
@@ -440,7 +461,7 @@ function EditRevision(props) {
     :
     ""    
     }
-            <div style={{ textAlign: "right" }}>
+            <div title="Set Traffic" style={{ textAlign: "right" }}>
                 <input onClick={() => {
                     setIsLoading(true)
                     updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {setIsLoading(false)})
