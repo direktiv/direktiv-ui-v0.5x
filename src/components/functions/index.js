@@ -224,19 +224,19 @@ function CreateKnativeFunc(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"24px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
                         Scale:
                     </div>
-                    <div style={{width:"180px"}}>
-                        <Slider handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
+                    <div style={{display: "flex", flex: "auto", justifyContent: "center", paddingRight: "15px"}}>
+                        <Slider style={{width:"160px"}} handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"24px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
                         Size:
                     </div>
-                    <div style={{width:"180px"}}>
-                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: 0, 1: 1, 2:2}} step={null}/>
+                    <div style={{display: "flex", flex: "auto", justifyContent: "center", paddingRight: "15px"}}>
+                        <Slider style={{width: "160px"}} handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
