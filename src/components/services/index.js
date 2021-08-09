@@ -114,9 +114,9 @@ export default function Services() {
                              <IoAdd />
                         </TileTitle>
                         {latestRevision !== "" ?
-                        <CreateRevision latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
-                        :
-                        ""
+                            <CreateRevision setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
+                            :
+                            ""
                         }
                     </div>
                 </div>
@@ -209,9 +209,8 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, fetch, handleError, latestRevision} = props
+    const {service, getService, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
-    const [image, setImage] = useState(latestRevision)
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
@@ -223,7 +222,7 @@ function CreateRevision(props) {
             let resp = await fetch(`/functions/${service}`, {
                 method: "POST",
                 body: JSON.stringify({
-                    image: image,
+                    image: latestRevision,
                     cmd: cmd,
                     size: parseInt(size),
                     minScale: parseInt(scale),
@@ -231,7 +230,6 @@ function CreateRevision(props) {
             })
             if (resp.ok) {
                 setErr("")
-                setImage("")
                 setScale(0)
                 setSize(0)
                 setCmd("")
@@ -293,7 +291,7 @@ function CreateRevision(props) {
                         Image:
                     </div>
                     <div>
-                        <input style={{width:"205px"}} value={image}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Enter image used by service" />
+                        <input style={{width:"205px"}} value={latestRevision}  onChange={(e) => setLatestRevision(e.target.value)} type="text" placeholder="Enter image used by service" />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
