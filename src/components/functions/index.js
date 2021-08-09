@@ -220,7 +220,7 @@ function CreateKnativeFunc(props) {
                         Image:
                     </div>
                     <div>
-                        <input value={image}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Enter image used by service" />
+                        <input value={image} style={{width:"100%"}}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Enter image used by service" />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -244,7 +244,7 @@ function CreateKnativeFunc(props) {
                         Cmd:
                     </div>
                     <div>
-                        <input value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
+                        <input value={cmd} style={{width:"100%"}}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
                     </div>
                 </div>
             </div>

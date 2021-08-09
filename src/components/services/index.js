@@ -417,7 +417,7 @@ function EditRevision(props) {
                     </div>
                     <div>
                         <select style={{width:"220px"}} defaultValue={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
-                            <option value="">Please choose a service hash</option>
+                            <option value="">None Selected.</option>
                             {
                                 revisions.map((obj)=>{
                                     return(
@@ -435,7 +435,7 @@ function EditRevision(props) {
                     </div>
                     <div>
                     <select style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}>
-                    <option value="">Please choose a service hash</option>
+                    <option value="">None Selected.</option>
                           
                             {
                                 revisions.map((obj)=>{
