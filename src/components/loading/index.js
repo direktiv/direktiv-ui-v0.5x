@@ -1,14 +1,31 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+
 import "./loading.css";
+
+// Default wind up time is 250(ms). This means the loader component wont appear until 250ms after its been mounted.
+//  Can be overwritten with the windUpTime prop
+const DEFAULT_WINDUP_TIME = 250;
 
 
 export function LoadingPage(props) {
-    const { waitGroup, waitCount, text, isLoading } = props
+    const { waitGroup, waitCount, text, isLoading, windUpTime } = props
+    const [ready, setReady] = useState(false) // State to track if loader is ready to be displayed
+
+    // Wind up timeout
+    useEffect(
+        () => {
+            let loadingTimer = setTimeout(() => {
+                setReady(true); // loader is ready
+            }, windUpTime ? windUpTime : DEFAULT_WINDUP_TIME);
+            return () => {
+                clearTimeout(loadingTimer);
+            };
+        }, []);
 
 
     return (
         <>
-            {( (isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading === true) ) ?
+            {(ready && ((isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading === true))) ?
                 <div className={"loading-container"}>
                     <div className={"loading"}>
                         <div className={"loading-inner"}>
@@ -42,11 +59,24 @@ export function LoadingPage(props) {
 
 
 export default function LoadingWrapper(props) {
-    const { waitGroup, waitCount, isLoading, text, opacity } = props
+    const { waitGroup, waitCount, isLoading, text, opacity, windUpTime } = props
+    const [ready, setReady] = useState(false) // State to track if loader is ready to be displayed
+
+
+    // Wind up timeout
+    useEffect(
+        () => {
+            let loadingTimer = setTimeout(() => {
+                setReady(true); // loader is ready
+            }, windUpTime ? windUpTime : DEFAULT_WINDUP_TIME);
+            return () => {
+                clearTimeout(loadingTimer);
+            };
+        }, []);
 
     return (
         <>
-            {( (isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading === true) ) ?
+            {(ready && ((isLoading === undefined && ((!waitGroup || !waitCount) || (waitCount < waitGroup))) || (isLoading !== null && isLoading === true))) ?
                 <div className={"loading-wrapper"}>
                     <div style={{ opacity: opacity ? `${opacity}%` : "0%" }}>
                         {props.children}
