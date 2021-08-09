@@ -10,10 +10,12 @@ import {
     AccordionItemButton,
     AccordionItemPanel,
 } from 'react-accessible-accordion';
+import { ConfirmButton } from '../confirm-button'
+
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import {useParams} from "react-router-dom"
-import { IoAdd, IoClipboardSharp, IoList} from 'react-icons/io5'
+import { IoAdd, IoClipboardSharp, IoList, IoTrash} from 'react-icons/io5'
 import MainContext from "../../context";
 import LoadingWrapper from "../loading"
 
@@ -28,6 +30,8 @@ export default function Services() {
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
+
+    const [latestRevision, setLatestRevision] = useState("")
 
     const [isLoading, setIsLoading] = useState(true)
 
@@ -49,6 +53,7 @@ export default function Services() {
                             })
                         }
                     }
+                    setLatestRevision(json.revisions[0].image)
                     setService(json)
                     setTraffic(tr)
                 } else {
@@ -75,7 +80,24 @@ export default function Services() {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flex: "auto", gap:"40px" }}>
-                <div className="container" style={{ flexDirection: "column", flex:1, maxWidth: "400px"}}>
+                <div className="container" style={{ flexDirection: "row", flex:1}}>
+                <div className="shadow-soft rounded tile" style={{ flex: 1, overflowX:"auto" }}>
+                    <TileTitle name={`Revisions for ${service}`}>
+                        <IoList />
+                    </TileTitle>
+                    <LoadingWrapper isLoading={isLoading} text={"Loading Revisions List"}>
+                        {errFetchRev !== ""?
+     <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+     {errFetchRev}
+ </div>                    
+                    :
+                    <ListRevisions fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
+
+}
+                    </LoadingWrapper>
+                </div>
+                <div className="container" style={{ flexDirection: "column"}}>
+
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
                         <TileTitle name="Edit revision usage">
                              <IoClipboardSharp />
@@ -91,23 +113,13 @@ export default function Services() {
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                        <CreateRevision handleError={handleError} fetch={fetch} getService={getService} service={service}/>
+                        {latestRevision !== "" ?
+                            <CreateRevision setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
+                            :
+                            ""
+                        }
                     </div>
                 </div>
-                <div className="shadow-soft rounded tile" style={{ flex: 1 }}>
-                    <TileTitle name={`Revisions for ${service}`}>
-                        <IoList />
-                    </TileTitle>
-                    <LoadingWrapper isLoading={isLoading} text={"Loading Revisions List"}>
-                        {errFetchRev !== ""?
-     <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-     {errFetchRev}
- </div>                    
-                    :
-                    <ListRevisions revisions={srvice ? srvice.revisions : []}/>
-
-}
-                    </LoadingWrapper>
                 </div>
             </div>
         </div>
@@ -115,27 +127,40 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions} = props
+    const {revisions, getService, fetch} = props
     return(
-        <div style={{maxHeight:"785px", overflow:"auto", padding:"20px"}}>
-            <div style={{overflow:"visible"}}>
+            <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj)=>{
                 return(
-                    <Revision name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
-            </div>
-        </div>
+            </div> 
     )
 }
 
 function Revision(props) {
-    const {name, image, generation, created, statusMessage, status, traffic} = props
+    const {name, fetch, fetchServices, image, generation, created, statusMessage, status, traffic} = props
 
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
         x.classList.toggle("expanded");
+    }
+
+    const deleteRevision = async () => {
+        try {
+            let resp = await fetch(`/functionrevisions/${name}`,{
+                method: "DELETE"
+            })
+            if (resp.ok) {
+                fetchServices()
+            } else {
+                console.log(resp, "handle delete revision resp not ok")
+            }
+        } catch(e) {
+            console.log(e, "handle delete revision")
+        }
     }
 
 
@@ -154,6 +179,12 @@ function Revision(props) {
                 </div>
                 <div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">
+                        <div style={{position:"relative"}} title="Delete Service">
+                            <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                                ev.preventDefault()
+                                deleteRevision()
+                            }} /> 
+                        </div>
                     </div>
                 </div>
             </div>
@@ -178,9 +209,8 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, fetch, handleError} = props
+    const {service, getService, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
-    const [image, setImage] = useState("")
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
@@ -192,7 +222,7 @@ function CreateRevision(props) {
             let resp = await fetch(`/functions/${service}`, {
                 method: "POST",
                 body: JSON.stringify({
-                    image: image,
+                    image: latestRevision,
                     cmd: cmd,
                     size: parseInt(size),
                     minScale: parseInt(scale),
@@ -200,7 +230,6 @@ function CreateRevision(props) {
             })
             if (resp.ok) {
                 setErr("")
-                setImage("")
                 setScale(0)
                 setSize(0)
                 setCmd("")
@@ -213,51 +242,83 @@ function CreateRevision(props) {
         }
     }
 
+    const handleScale = props => {
+        const {value, dragging, index, ...restProps} = props;
+
+        if (!dragging) {
+            setScale(value)
+        }
+
+        return(
+            <SliderTooltip
+            prefixCls="rc-slider-tooltip"
+            overlay={`${value}`}
+            visible={dragging}
+            placement="top"
+            key={index}
+          >
+            <Handle value={value} {...restProps} />
+          </SliderTooltip>
+        )
+    }
+
+    const handleSize = props => {
+        const {value, dragging, index, ...restProps} = props;
+
+        if (!dragging) {
+            setSize(value)
+        }
+
+        return(
+            <SliderTooltip
+            prefixCls="rc-slider-tooltip"
+            overlay={`${value}`}
+            visible={dragging}
+            placement="top"
+            key={index}
+          >
+            <Handle value={value} {...restProps} />
+          </SliderTooltip>
+        )
+    }
 
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
         <div style={{ fontSize: "12pt"}}>
-            <div style={{display:"flex", alignItems:"center" }}>
-            <table style={{flex: 1}}>
-                <tbody>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Image:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={image}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Image used" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Scale:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={scale}  onChange={(e) => setScale(e.target.value)} type="text" placeholder="Scale" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Size:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <select defaultValue="0" style={{width:"191px"}} onChange={(e)=>setSize(e.target.value)}>
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Cmd:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Cmd values" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div style={{display:"flex", flexDirection:"column" }}>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Image:
+                    </div>
+                    <div>
+                        <input style={{width:"205px"}} value={latestRevision}  onChange={(e) => setLatestRevision(e.target.value)} type="text" placeholder="Enter image used by service" />
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                        Scale:
+                    </div>
+                    <div style={{width:"190px"}}>
+                        <Slider handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                        Size:
+                    </div>
+                    <div style={{width:"190px"}}>
+                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Cmd:
+                    </div>
+                    <div>
+                        <input style={{width:"205px"}} value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
+                    </div>
+                </div>
+
             </div>
         <hr />
         {err !== ""?
@@ -268,7 +329,7 @@ function CreateRevision(props) {
     ""    
     }
         <div style={{ textAlign: "right" }}>
-            <input type="submit" value="Create Service" onClick={() => { 
+            <input type="submit" value="Create Revision" onClick={() => { 
                 setIsLoading(true)
                 createRevision().finally(()=> {setIsLoading(false)})
                  }} />
@@ -338,7 +399,39 @@ function EditRevision(props) {
 
     return(
         <LoadingWrapper isLoading={isLoading} text={"Updating Usage"}>
-        <div style={{fontSize:"14px"}}>
+        <div style={{fontSize:"12pt"}}>
+        <div style={{display:"flex", flexDirection:"column" }}>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Rev 1:
+                    </div>
+                    <div>
+                        <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Rev 2:
+                    </div>
+                    <div>
+                        <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/>
+                    </div>
+                </div>
+                <div style={{display:'flex', gap:"10px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>Ratio:</div> 
+                    <div style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px'}}>
+                        <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
+                        <div style={{color:"#b5b5b5", padding:'5px'}}>
+                            Revision 1: {rev1Percentage}%
+                        </div>
+                        <div style={{color:"#b5b5b5", padding:'5px'}}>
+                            Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 0}%
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+{/*                 
             <div style={{display:"flex", alignItems:"center", gap:"5px"}}>
                 <div style={{display:"flex", alignItems:'center'}}>Revision 1:</div> 
                 <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
@@ -360,7 +453,7 @@ function EditRevision(props) {
                         Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 0}%
                     </div>
                 </div>
-            </div>
+            </div> */}
             <hr style={{marginTop:"10px"}}/>
             {err !== ""?
        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
