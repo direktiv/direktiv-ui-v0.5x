@@ -219,6 +219,17 @@ export default function WorkflowPage() {
         return postLogEvent().finally(() => { setFetching(false) })
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
 
+    // polling knative functions
+    useEffect(()=>{
+            let interval = setInterval(()=>{
+                console.log('polling knative funcs')
+                fetchKnativeFunctions()
+            }, 3000)
+        return () => {
+            clearInterval(interval)
+        }
+    },[fetchKnativeFunctions, namespace, functions])
+
     // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
         if (namespace !== "" && functions === null) {

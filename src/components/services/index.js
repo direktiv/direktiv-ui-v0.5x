@@ -36,7 +36,7 @@ export default function Services() {
     const [isLoading, setIsLoading] = useState(true)
 
 
-    const getService = useCallback(()=>{
+    const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
             try {
                 let tr = []
@@ -53,7 +53,9 @@ export default function Services() {
                             })
                         }
                     }
-                    setLatestRevision(json.revisions[0].image)
+                    if(!dontChangeRev) {
+                        setLatestRevision(json.revisions[0].image)
+                    }
                     setService(json)
                     setTraffic(tr)
                 } else {
@@ -65,6 +67,16 @@ export default function Services() {
         }
         return getServices()
     },[service])
+
+    useEffect(()=>{
+            let interval = setInterval(()=>{
+                console.log('polling knative funcs')
+                getService(true)
+            }, 3000)
+            return () => {
+                clearInterval(interval)
+            }
+    },[srvice])
 
     useEffect(()=>{
         if (srvice === null) {
@@ -354,9 +366,6 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            if (rev2 === "") {
-                throw new Error("Revision 2 must be filled out to change traffic")
-            }
             let resp = await fetch(`/functions/${service}`, {
                 method: "PATCH",
                 body: JSON.stringify({values:[{
@@ -374,7 +383,7 @@ function EditRevision(props) {
                 await handleError("set traffic", resp, "updateTraffic")
             }
         } catch(e) {
-            setErr(`Error setting traffic: ${e.message}'`)
+            setErr(`Error setting traffic: ${e.message}`)
         }
     }
 

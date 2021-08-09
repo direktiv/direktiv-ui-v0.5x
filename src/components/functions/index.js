@@ -54,6 +54,18 @@ export default function Functions() {
 
     useEffect(()=>{
         if (functions === null) {
+            let interval = setInterval(()=>{
+                console.log('polling knative funcs')
+                fetchServices()
+            }, 3000)
+            return () => {
+                clearInterval(interval)
+            }
+        }
+    },[])
+
+    useEffect(()=>{
+        if (functions === null) {
             fetchServices().finally(()=> {setIsLoading(false)}) 
         }
     },[])
@@ -94,7 +106,7 @@ export default function Functions() {
                     </div>
                     </LoadingWrapper>
                 </div>
-                    <div className="shadow-soft rounded tile" style={{ maxWidth: "300px", maxHeight:"380px", flex: 1 }}>
+                    <div className="shadow-soft rounded tile" style={{ maxWidth: "300px", height:"fit-content", flex: 1 }}>
                         <TileTitle name="Create knative service">
                             <IoAdd />
                         </TileTitle>
