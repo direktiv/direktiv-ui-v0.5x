@@ -60,11 +60,11 @@
 .expanded div.services-list-contents {
     display: flex;
     padding-bottom: 8px;
-    height: 135px;
+    height: 155px;
 }
 
 .expanded div.services-list-contents.singular {
-    height: 135px;
+    height: 155px;
 }
 
 .service-list-item-panel {
