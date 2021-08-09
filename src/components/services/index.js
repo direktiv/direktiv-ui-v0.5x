@@ -206,7 +206,7 @@ function Revision(props) {
                          <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
                              <p><b>Image:</b> {image}</p>
                              <p><b>Generation:</b> {generation}</p>
-                             <p><b>Traffic:</b> {traffic} </p>
+                             {traffic !== undefined ?<p><b>Traffic:</b> {traffic} </p>:""}
                          </div>
                          <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
                              <p><b>Created:</b> {dayjs.unix(created).format()}</p>
@@ -417,7 +417,7 @@ function EditRevision(props) {
                     </div>
                     <div>
                         <select style={{width:"220px"}} defaultValue={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
-                            <option value="">Please choose a service hash</option>
+                            <option value="">None Selected.</option>
                             {
                                 revisions.map((obj)=>{
                                     return(
@@ -435,7 +435,7 @@ function EditRevision(props) {
                     </div>
                     <div>
                     <select style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}>
-                    <option value="">Please choose a service hash</option>
+                    <option value="">None Selected.</option>
                           
                             {
                                 revisions.map((obj)=>{
