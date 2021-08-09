@@ -90,7 +90,7 @@ export default function Functions() {
                                                 })}
                                             </Accordion>
                                             </div>
-                                            : <NoResults />}
+                                            : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
                                     </> : ""}
                         </>}
                     </div>
