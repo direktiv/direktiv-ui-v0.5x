@@ -299,7 +299,7 @@ function KnativeFunc(props) {
 
     return(
         
-        <Link  to={namespace !== undefined ? `/${namespace}/functions/${serviceName}`: `/functions/global/${serviceName}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
+        <Link  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
             <div className="services-list-div neumorph-hover">
                 <div>
                     <div style={{display: "inline"}}>
