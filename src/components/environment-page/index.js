@@ -241,7 +241,6 @@ const EnvTableAction = (props) => {
 const EnvRowEmpty = (props) => {
     return (
         <div className={`var-table-row new-entry new-entry-button`} style={{minHeight:"183px"}}>
-            <div style={{ flexGrow: "1", flexBasis: "0" }} />
             <div style={{ flexGrow: "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
                 <div style={{ fontSize: "12pt", fontWeight: "normal" }}>List is empty.</div>
             </div>
