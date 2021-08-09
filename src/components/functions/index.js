@@ -88,7 +88,7 @@ export default function Functions() {
                                                     )
                                                 })}
                                             </div>
-                                            : <NoResults />}
+                                            : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
                                     </> : ""}
                         </>}
                     </div>
