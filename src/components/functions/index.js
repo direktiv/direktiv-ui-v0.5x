@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState} from 'react'
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
+import Slider, { SliderTooltip, Handle } from 'rc-slider';
 
 import { IoAdd, IoList, IoTrash} from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
@@ -64,14 +65,13 @@ export default function Functions() {
                     <Breadcrumbs elements={["Events / Logs"]} />
                 </div>
             </div>
-            <div className="container" style={{ flexDirection: "row", flex: "auto" }}>
-                <div className="shadow-soft rounded tile" style={{ flex: 3, flexGrow: "2", maxWidth: "1100px" }}>
+            <div className="container" style={{ flexDirection: "row", flex: "auto"}}>
+                <div className="shadow-soft rounded tile" style={{ flex: 1, overflowX:"auto"}}>
                     <TileTitle name="Knative function services">
                         <IoList />
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
-                    <div style={{maxHeight:"785px", overflow:"auto", padding:"20px"}}>
-                    <div style={{ overflow:"visible"}}>
+                    <div style={{maxHeight:"785px", overflow:"visible"}}>
                         {fetchServiceErr !== "" ?
                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                             {fetchServiceErr}
@@ -82,24 +82,19 @@ export default function Functions() {
                                     <>
                                         {functions.length > 0 ?
                                             <div >
-                                            <Accordion>
                                                 {functions.map((obj) => {
                                                     return (
-                                                        <KnativeFunc fetch={fetch} fetchServices={fetchServices} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                        <KnativeFunc fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                                     )
                                                 })}
-                                            </Accordion>
                                             </div>
                                             : <NoResults />}
                                     </> : ""}
                         </>}
                     </div>
-                    </div>
                     </LoadingWrapper>
                 </div>
-                <div className="container" style={{  flex: 1 }}>
-                    <div className="shadow-soft rounded tile" style={{ minWidth: "350px" }}>
-
+                    <div className="shadow-soft rounded tile" style={{ maxWidth: "300px", maxHeight:"380px", flex: 1 }}>
                         <TileTitle name="Create knative service">
                             <IoAdd />
                         </TileTitle>
@@ -107,7 +102,6 @@ export default function Functions() {
                             <CreateKnativeFunc handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
         </>
@@ -123,6 +117,46 @@ function CreateKnativeFunc(props) {
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+
+    const handleScale = props => {
+        const {value, dragging, index, ...restProps} = props;
+
+        if (!dragging) {
+            setScale(value)
+        }
+
+        return(
+            <SliderTooltip
+            prefixCls="rc-slider-tooltip"
+            overlay={`${value}`}
+            visible={dragging}
+            placement="top"
+            key={index}
+          >
+            <Handle value={value} {...restProps} />
+          </SliderTooltip>
+        )
+    }
+
+    const handleSize = props => {
+        const {value, dragging, index, ...restProps} = props;
+
+        if (!dragging) {
+            setSize(value)
+        }
+
+        return(
+            <SliderTooltip
+            prefixCls="rc-slider-tooltip"
+            overlay={`${value}`}
+            visible={dragging}
+            placement="top"
+            key={index}
+          >
+            <Handle value={value} {...restProps} />
+          </SliderTooltip>
+        )
+    }
 
     const createService = async () => {
         try {
@@ -160,55 +194,47 @@ function CreateKnativeFunc(props) {
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Service"}>
         <div style={{ fontSize: "12pt"}}>
-            <div style={{display:"flex", alignItems:"center" }}>
-            <table style={{flex: 1}}>
-                <tbody>
-                    <tr>
-                        <td style={{ textAlign: "left" }}>
-                            <b>Name:</b>
-                        </td>
-                        <td style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={name}  onChange={(e) => setName(e.target.value)} type="text" placeholder="Service name" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Image:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={image}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Image used" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Scale:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={scale}  onChange={(e) => setScale(e.target.value)} type="text" placeholder="Scale" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Size:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                        <select defaultValue="0" style={{width:"191px"}} onChange={(e)=>setSize(e.target.value)}>
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style={{textAlign:"left"}}>
-                            <b>Cmd:</b>
-                        </td>
-                        <td  style={{ paddingLeft: "10px", textAlign: "left" }}>
-                            <input value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Cmd values" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div style={{display:"flex",  flexDirection:"column" }}>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Name:
+                    </div>
+                    <div>
+                        <input value={name}  onChange={(e) => setName(e.target.value)} type="text" placeholder="Enter service name" />
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Image:
+                    </div>
+                    <div>
+                        <input value={image}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Enter image used by service" />
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                        Scale:
+                    </div>
+                    <div style={{width:"165px"}}>
+                        <Slider handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                        Size:
+                    </div>
+                    <div style={{width:"165px"}}>
+                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
+                    </div>
+                </div>
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                        Cmd:
+                    </div>
+                    <div>
+                        <input value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
+                    </div>
+                </div>
             </div>
         <hr/>
         {err !== ""?
@@ -232,7 +258,7 @@ function CreateKnativeFunc(props) {
 function KnativeFunc(props) {
     const history = useHistory()
 
-    const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, status, statusMessage} = props
+    const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, minScale, status, statusMessage} = props
 
     console.log('status message', statusMessage)
     const deleteService = async () => {
@@ -297,8 +323,11 @@ function KnativeFunc(props) {
                      <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                          <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
                              <p><b>Image:</b> {image}</p>
+                             <p><b>Size:</b>  {size}</p>
+                             <p><b>Scale:</b> {minScale}</p>
                          </div>
                          <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                            {cmd !== "" ? <p><b>Cmd:</b> {cmd}</p> : "" }
                              <p><b>Status:</b> {status}</p>
                              {statusMessage !== "" ? <p><b>Message:</b> {statusMessage}</p> : "" }
                          </div>
