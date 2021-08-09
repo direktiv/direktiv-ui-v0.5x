@@ -245,7 +245,7 @@ function CreateKnativeFunc(props) {
     :
     ""    
     }
-        <div style={{ textAlign: "right", padding:"5px" }}>
+        <div title="Create Service" style={{ textAlign: "right", padding:"5px" }}>
             <input type="submit" value="Create Service" onClick={() => {
                 setIsLoading(true)
                 createService().finally(()=> {setIsLoading(false)})
@@ -306,7 +306,7 @@ function KnativeFunc(props) {
                                 deleteService()
                             }} /> 
                         </div>
-                        <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
+                        <div title="View Details" className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                             ev.preventDefault();
                             if (namespace !== undefined) {
                                 history.push(`/${namespace}/functions/${serviceName}`)
