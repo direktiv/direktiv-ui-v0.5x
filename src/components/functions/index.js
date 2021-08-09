@@ -236,7 +236,8 @@ function CreateKnativeFunc(props) {
                     </div>
                 </div>
             </div>
-        <hr/>
+            <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
+
         {err !== ""?
        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
        {err}

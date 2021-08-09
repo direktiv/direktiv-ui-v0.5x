@@ -320,7 +320,8 @@ function CreateRevision(props) {
                 </div>
 
             </div>
-        <hr />
+            <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
+
         {err !== ""?
        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
        {err}
@@ -431,30 +432,7 @@ function EditRevision(props) {
                     
                 </div>
             </div>
-{/*                 
-            <div style={{display:"flex", alignItems:"center", gap:"5px"}}>
-                <div style={{display:"flex", alignItems:'center'}}>Revision 1:</div> 
-                <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev1Name} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}/>
-            </div>
-
-            <div style={{display:"flex", alignItems:"center", gap:"5px", paddingTop:"10px"}}>
-                <div style={{display:"flex", alignItems:'center'}}>Revision 2:</div> 
-                <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/>
-            </div>
-            <hr style={{marginTop:"10px"}}/>
-            <div style={{display:"flex",  gap:"5px", paddingTop:"10px"}}>
-                <div style={{display:"flex",  minWidth:"67px"}}>Ratio:</div> 
-                <div style={{minWidth:"191px", paddingLeft:"5px"}}>
-                    <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
-                    <div style={{color:"#b5b5b5", padding:'5px', marginTop:"30px"}}>
-                        Revision 1: {rev1Percentage}%
-                    </div>
-                    <div style={{color:"#b5b5b5", padding:'5px'}}>
-                        Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 0}%
-                    </div>
-                </div>
-            </div> */}
-            <hr style={{marginTop:"10px"}}/>
+            <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
             {err !== ""?
        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
        {err}
