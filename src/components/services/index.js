@@ -206,7 +206,7 @@ function Revision(props) {
                          <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
                              <p><b>Image:</b> {image}</p>
                              <p><b>Generation:</b> {generation}</p>
-                             <p><b>Traffic:</b> {traffic} </p>
+                             {traffic !== undefined ?<p><b>Traffic:</b> {traffic} </p>:""}
                          </div>
                          <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
                              <p><b>Created:</b> {dayjs.unix(created).format()}</p>

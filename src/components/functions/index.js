@@ -211,23 +211,23 @@ function CreateKnativeFunc(props) {
                     <div style={{textAlign:"right", minWidth:"60px"}}>
                         Name:
                     </div>
-                    <div>
-                        <input value={name} style={{width:"100%"}}  onChange={(e) => setName(e.target.value)} type="text" placeholder="Enter service name" />
+                    <div style={{flex: "auto"}}>
+                        <input style={{width: "180px"}} value={name}  onChange={(e) => setName(e.target.value)} type="text" placeholder="Enter service name" />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
                     <div style={{textAlign:"right", minWidth:"60px"}}>
                         Image:
                     </div>
-                    <div>
-                        <input value={image} style={{width:"100%"}}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Enter image used by service" />
+                    <div style={{flex: "auto"}}>
+                        <input style={{width: "180px"}} value={image}  onChange={(e) => setImage(e.target.value)} type="text" placeholder="Enter image used by service" />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
                     <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
                         Scale:
                     </div>
-                    <div style={{width:"165px"}}>
+                    <div style={{width:"180px"}}>
                         <Slider handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
                     </div>
                 </div>
@@ -235,7 +235,7 @@ function CreateKnativeFunc(props) {
                     <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
                         Size:
                     </div>
-                    <div style={{width:"165px"}}>
+                    <div style={{width:"180px"}}>
                         <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
                     </div>
                 </div>
@@ -243,8 +243,8 @@ function CreateKnativeFunc(props) {
                     <div style={{textAlign:"right", minWidth:"60px"}}>
                         Cmd:
                     </div>
-                    <div>
-                        <input value={cmd} style={{width:"100%"}}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
+                    <div style={{flex: "auto"}}>
+                        <input style={{width: "180px"}} value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
                     </div>
                 </div>
             </div>
