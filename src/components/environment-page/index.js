@@ -553,7 +553,7 @@ export function EnvrionmentContainer(props) {
     return (
         <LoadingWrapper isLoading={isLoading} text={`Loading ${mode === "namespace" ? "Namespace" : "Workflow"} Variables`}>
             <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
-                <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px", flexGrow: "unset" }}>
                     <TileTitle name="Variables">
                         <IoLockOpen />
                     </TileTitle>
@@ -574,7 +574,7 @@ export function EnvrionmentContainer(props) {
                                         </div>
                                     </>
                                 ):(
-                                    <div className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
+                                    <div style={{ borderBottomRightRadius: "5px", borderBottomLeftRadius: "5px" }} className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
                                 )
                             }
                         </div>
