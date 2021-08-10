@@ -41,6 +41,8 @@ export default function Services() {
                     method:"GET"
                 })
                 if (resp.ok) {
+                    let blue = false
+                    let red = false
                     let json = await resp.json()
                     for(var i=0; i < json.revisions.length; i++) {
                         if (json.revisions[i].traffic > 0) {
@@ -86,7 +88,6 @@ export default function Services() {
         }
     },[srvice])
 
-    console.log(latestRevision, "latestRevision")
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
@@ -106,7 +107,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
+                    <ListRevisions traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
 
 }
                     </LoadingWrapper>
@@ -119,7 +120,7 @@ export default function Services() {
                         </TileTitle>
                         {
                             traffic !== null ?
-                            <EditRevision revisions={srvice ? srvice.revisions : []} handleError={handleError} traffic={traffic} fetch={fetch} getService={getService} service={service}/>
+                            <EditRevision revisions={srvice ? srvice.revisions : []} handleError={handleError} traffic={traffic} fetch={fetch} getService={getService} namespace={namespace} service={service}/>
                             :
                             ""
                         }
@@ -142,10 +143,11 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, getService, fetch} = props
+    const {revisions, getService, fetch, traffic} = props
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj)=>{
+                let titleColor = "var(--font-dark)"
                 let sizeTxt = "small"
                 if (obj.size === 1) {
                     sizeTxt = "medium"
@@ -153,8 +155,22 @@ function ListRevisions(props) {
                 if (obj.size === 2){
                     sizeTxt = "large"
                 }
+                console.log(traffic, "TRAFFIC")
+                if (traffic) {
+                    if (traffic.length > 0) {
+                        if (traffic[0].name == obj.name){
+                            titleColor = "#2396d8"
+                        }
+                        if (traffic[1]) {
+                            if (traffic[1].name == obj.name){
+                                titleColor = "rgb(219, 58, 58)"
+                            }
+                        }
+                    }
+                }
+ 
                 return(
-                    <Revision cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -162,7 +178,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {name, fetch, size, cmd, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic} = props
+    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic} = props
 
     let panelID = name;
     function toggleItem(){
@@ -204,7 +220,7 @@ function Revision(props) {
                         <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                     </div>
                     <div style={{display: "inline"}}>
-                        <b>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
+                        <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
                 </div>
                 <div style={{flex: "auto", textAlign: "right"}}>
@@ -282,11 +298,11 @@ function Revision(props) {
 
 function CreateRevision(props) {
     const {service, getService, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
-    console.log(latestRevision, "cr comp")
     const [err, setErr] = useState("")
     // const [scale, setScale] = useState(0)
     // const [size, setSize] = useState(0)
     // const [cmd, setCmd] = useState("")
+    const [traffic, setTraffic] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
 
 
@@ -303,10 +319,12 @@ function CreateRevision(props) {
                     cmd: latestRevision.cmd,
                     size: parseInt(latestRevision.size),
                     minScale: parseInt(latestRevision.scale),
+                    trafficPercent: parseInt(traffic),
                 })
             })
             if (resp.ok) {
                 setErr("")
+                setTraffic(0)
                 await getService()
             } else {
                 await handleError('update service', resp, 'updateService')
@@ -316,7 +334,7 @@ function CreateRevision(props) {
         }
     }
 
-    const handleScale = props => {
+    const handle = props => {
         const {value, dragging, index, ...restProps} = props;
 
         // if (!dragging) {
@@ -335,26 +353,7 @@ function CreateRevision(props) {
           </SliderTooltip>
         )
     }
-
-    const handleSize = props => {
-        const {value, dragging, index, ...restProps} = props;
-
-        // if (!dragging) {
-        //     setLatestRevision((prevState)=>{return {...prevState, size: value}})
-        // }
-
-        return(
-            <SliderTooltip
-            prefixCls="rc-slider-tooltip"
-            overlay={`${value}`}
-            visible={dragging}
-            placement="top"
-            key={index}
-          >
-            <Handle value={value} {...restProps} />
-          </SliderTooltip>
-        )
-    }
+    
     console.log(latestRevision.scale, latestRevision.size)
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
@@ -373,7 +372,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={latestRevision.scale} />
+                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={latestRevision.scale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -381,7 +380,7 @@ function CreateRevision(props) {
                         Size:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={latestRevision.size} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, size: e}})} handle={handleSize} min={0} max={2} defaultValue={latestRevision.size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
+                        <Slider value={latestRevision.size} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, size: e}})} handle={handle} min={0} max={2} defaultValue={latestRevision.size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -392,7 +391,14 @@ function CreateRevision(props) {
                         <input style={{width:"205px"}} value={latestRevision.cmd}  onChange={(e) => setLatestRevision((prevState)=>{return {...prevState, cmd:e.target.value}})} type="text" placeholder="Enter the CMD for the service" />
                     </div>
                 </div>
-
+                <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px", paddingRight:"14px"}}>
+                        Traffic:
+                    </div>
+                    <div style={{width:"190px"}}>
+                        <Slider value={traffic} onChange={(e)=>setTraffic(e)} handle={handle} min={0} max={100} defaultValue={traffic} />
+                    </div>
+                </div>
             </div>
             <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
 
@@ -429,6 +435,7 @@ function EditRevision(props) {
     const updateTraffic = async (rev1, rev2, val) => {
         try {
             let x = "g"
+            console.log(namespace, "NAMESPACE CHECK")
             if (namespace) {
                 x = `ns-${namespace}`
             }

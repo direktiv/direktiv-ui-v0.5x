@@ -379,7 +379,7 @@ export default function Navbar(props) {
                         {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor:"default"}}>
                                 <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
-                                <span>Functions</span>
+                                <span>Services</span>
                             </div>
                             :
                             <Link style={{color: matchFunctions !== null ? "#4497f5": ""}} onClick={()=>{
@@ -389,7 +389,7 @@ export default function Navbar(props) {
                             }} to={`/${namespace}/functions`} className="nav-link">
                                 <div>
                                 <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
-                                <span>Functions</span>
+                                <span>Services</span>
                                 </div>
                             </Link>
                         }
@@ -424,7 +424,7 @@ export default function Navbar(props) {
                                 }
                             }} to={`/functions/global`} className="nav-link">
                                 <IoSettingsSharp style={{marginRight:"10px"}}/>
-                                <span>Global Settings</span>
+                                <span>Global Services</span>
                             </Link>
                         </li>
                     </ul>
