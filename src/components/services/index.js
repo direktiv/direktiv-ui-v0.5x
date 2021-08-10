@@ -26,7 +26,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 export default function Services() {
     const {fetch, handleError} = useContext(MainContext)
-    let { service } = useParams();
+    let { service, namespace } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
@@ -38,9 +38,13 @@ export default function Services() {
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
+            let x = "g"
+            if (namespace) {
+                x = `ns-${namespace}`
+            }
             try {
                 let tr = []
-                let resp = await fetch(`/functions/${service}`, {
+                let resp = await fetch(`/functions/${x}-${service}`, {
                     method:"GET"
                 })
                 if (resp.ok) {
