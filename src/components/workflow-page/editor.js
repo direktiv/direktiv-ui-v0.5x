@@ -59,7 +59,7 @@ function getFunctionLines(str){
 
 function makeGutterError(msg) {
     var tooltip = document.createElement("div");
-    var tooltipText = document.createElement("span");
+    var tooltipText = document.createElement("div");
     tooltip.style.color = "#FF4040";
     tooltip.innerHTML = "●";
     tooltip.setAttribute('class', 'tooltip')
@@ -98,15 +98,25 @@ export default function ReactEditor(props) {
         cm.clearGutter('Custom-Errors');
         for (var i = 0; i < functions.length; i++)
         {
-            if (functions[i].status === "False"){
+            var errorMsg = ""
+            for (const fCondition of functions[i].conditions) {
+                if (errorMsg !== "") {
+                    errorMsg += "<br>"
+                }
 
+                if (fCondition.status === "False"){
+                    errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>└─Reason: ${fCondition.reason}`
+                }
+            }
+            
+            if (errorMsg != "") {
                 // Get functions lines on first error
                 if (fLines === null){
                     fLines = getFunctionLines(value);
                 }
 
                 let invalidFunc = fLines[functions[i].info.name]
-                cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(`${functions[i].statusMessage}`));
+                cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(errorMsg));
                 // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
                 markedTexts.push(cm.markText({ch: invalidFunc.start, line: invalidFunc.line}, {ch: invalidFunc.end, line: invalidFunc.line}, {className: 'line-error'}))
             }
@@ -227,6 +237,7 @@ export default function ReactEditor(props) {
                         },
                     }}
                     onBeforeChange={(editor, data, val) => {
+                        console.log("val = ", val)
                         setValue(val)
                     }}
                     editorDidMount={(cm, val)=>{
