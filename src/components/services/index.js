@@ -111,7 +111,7 @@ export default function Services() {
                 <div className="container" style={{ flexDirection: "column"}}>
 
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
-                        <TileTitle name="Edit revision usage">
+                        <TileTitle name="Traffic Management">
                              <IoClipboardSharp />
                         </TileTitle>
                         {
@@ -310,7 +310,7 @@ function CreateRevision(props) {
         <div style={{ fontSize: "12pt"}}>
             <div style={{display:"flex", flexDirection:"column" }}>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Image:
                     </div>
                     <div>
@@ -318,7 +318,7 @@ function CreateRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px", paddingRight:"14px"}}>
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
@@ -326,7 +326,7 @@ function CreateRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px", paddingRight:"14px"}}>
                         Size:
                     </div>
                     <div style={{width:"190px"}}>
@@ -334,7 +334,7 @@ function CreateRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Cmd:
                     </div>
                     <div>
@@ -423,7 +423,7 @@ function EditRevision(props) {
         <div style={{fontSize:"12pt"}}>
         <div style={{display:"flex", flexDirection:"column" }}>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Rev 1:
                     </div>
                     <div>
@@ -441,7 +441,7 @@ function EditRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Rev 2:
                     </div>
                     <div>
@@ -459,34 +459,48 @@ function EditRevision(props) {
                         {/* <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/> */}
                     </div>
                 </div>
-                <div style={{display:'flex', gap:"10px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>Ratio:</div> 
-                    <div style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px'}}>
-                        <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
-                        <div style={{color:"#b5b5b5", padding:'5px'}}>
-                            Revision 1: {rev1Percentage}%
-                        </div>
-                        <div style={{color:"#b5b5b5", padding:'5px'}}>
-                            Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 100}%
-                        </div>
+                { (rev1Name && rev2Name) ? 
+                    <>
+                    <div style={{display:'flex', gap:"10px"}}>
+                        <div className="block-slider" style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px', flex: "auto"}}>
+                            <div style={{position: "relative", width: "100%", padding: "0px"}}>
+                                <div style={{position: "relative", bottom: "6px"}}>
+                                    <div style={{display: "flex", width: "100%"}}>
+                                        <div style={{textAlign: "left", flex: "auto", fontSize: "8pt", fontWeight: "bold", color: "#4293c4"}}>Rev 1</div>
+                                        <div style={{textAlign: "right", flex: "auto", fontSize: "8pt", fontWeight: "bold", color: "rgb(219, 58, 58)"}}>Rev 2</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
+                            <div style={{position: "relative", width: "100%", padding: "0px"}}>
+                                <div style={{position: "relative", top: "4px"}}>
+                                    <div style={{display: "flex", width: "100%"}}>
+                                        <div style={{textAlign: "left", flex: "auto", fontSize: "8pt"}}>{rev1Percentage}%</div>
+                                        <div style={{textAlign: "right", flex: "auto", fontSize: "8pt"}}>{rev1Percentage !== 0? 100-rev1Percentage: 100}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
                     </div>
-                    
-                </div>
+                    <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
+                    </>
+                : "" }                    
             </div>
-            <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
             {err !== ""?
-       <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-       {err}
-   </div>
-    :
-    ""    
-    }
+                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {err}
+                </div>
+            :
+                <></>    
+            }
+            { (rev1Name && rev2Name) ? 
             <div title="Set Traffic" style={{ textAlign: "right" }}>
                 <input onClick={() => {
                     setIsLoading(true)
                     updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {setIsLoading(false)})
                 }} type="submit" value="Save" />
             </div>
+            : <></> }
         </div>
         </LoadingWrapper>
     )
