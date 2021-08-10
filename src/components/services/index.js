@@ -24,7 +24,7 @@ export default function Services() {
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
 
-    const [latestRevision, setLatestRevision] = useState("")
+    const [latestRevision, setLatestRevision] = useState(null)
 
     const [isLoading, setIsLoading] = useState(true)
 
@@ -51,7 +51,12 @@ export default function Services() {
                         }
                     }
                     if(!dontChangeRev) {
-                        setLatestRevision(json.revisions[0].image)
+                        setLatestRevision({
+                            image: json.revisions[0].image,
+                            scale: json.revisions[0].minScale ? json.revisions[0].minScale : 0,
+                            size: json.revisions[0].size ? json.revisions[0].size : 0,
+                            cmd: json.revisions[0].cmd ? json.revisions[0].cmd : ""
+                        })
                     }
                     setService(json)
                     setTraffic(tr)
@@ -81,6 +86,7 @@ export default function Services() {
         }
     },[srvice])
 
+    console.log(latestRevision, "latestRevision")
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
@@ -122,7 +128,7 @@ export default function Services() {
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                        {latestRevision !== "" ?
+                        {latestRevision !== null ?
                             <CreateRevision namespace={namespace} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
                             :
                             ""
@@ -265,7 +271,7 @@ function Revision(props) {
                         </ul>
                         </div>
                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                            <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> 
+                            {cmd !== undefined ? <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> : "" }
                         </div>
                     </div>
                  </div>
@@ -276,10 +282,11 @@ function Revision(props) {
 
 function CreateRevision(props) {
     const {service, getService, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
+    console.log(latestRevision, "cr comp")
     const [err, setErr] = useState("")
-    const [scale, setScale] = useState(0)
-    const [size, setSize] = useState(0)
-    const [cmd, setCmd] = useState("")
+    // const [scale, setScale] = useState(0)
+    // const [size, setSize] = useState(0)
+    // const [cmd, setCmd] = useState("")
     const [isLoading, setIsLoading] = useState(false)
 
 
@@ -292,17 +299,14 @@ function CreateRevision(props) {
             let resp = await fetch(`/functions/${x}-${service}`, {
                 method: "POST",
                 body: JSON.stringify({
-                    image: latestRevision,
-                    cmd: cmd,
-                    size: parseInt(size),
-                    minScale: parseInt(scale),
+                    image: latestRevision.image,
+                    cmd: latestRevision.cmd,
+                    size: parseInt(latestRevision.size),
+                    minScale: parseInt(latestRevision.scale),
                 })
             })
             if (resp.ok) {
                 setErr("")
-                setScale(0)
-                setSize(0)
-                setCmd("")
                 await getService()
             } else {
                 await handleError('update service', resp, 'updateService')
@@ -315,9 +319,9 @@ function CreateRevision(props) {
     const handleScale = props => {
         const {value, dragging, index, ...restProps} = props;
 
-        if (!dragging) {
-            setScale(value)
-        }
+        // if (!dragging) {
+        //     setLatestRevision((prevState)=>{return {...prevState, scale:value}})
+        // }
 
         return(
             <SliderTooltip
@@ -335,9 +339,9 @@ function CreateRevision(props) {
     const handleSize = props => {
         const {value, dragging, index, ...restProps} = props;
 
-        if (!dragging) {
-            setSize(value)
-        }
+        // if (!dragging) {
+        //     setLatestRevision((prevState)=>{return {...prevState, size: value}})
+        // }
 
         return(
             <SliderTooltip
@@ -351,7 +355,7 @@ function CreateRevision(props) {
           </SliderTooltip>
         )
     }
-
+    console.log(latestRevision.scale, latestRevision.size)
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
         <div style={{ fontSize: "12pt"}}>
@@ -361,7 +365,7 @@ function CreateRevision(props) {
                         Image:
                     </div>
                     <div>
-                        <input style={{width:"205px"}} value={latestRevision}  onChange={(e) => setLatestRevision(e.target.value)} type="text" placeholder="Enter image used by service" />
+                        <input style={{width:"205px"}} value={latestRevision.image}  onChange={(e) => setLatestRevision((prevState)=>{return {...prevState, image:e.target.value}})} type="text" placeholder="Enter image used by service" />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -369,7 +373,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
+                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={latestRevision.scale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -377,7 +381,7 @@ function CreateRevision(props) {
                         Size:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
+                        <Slider value={latestRevision.size} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, size: e}})} handle={handleSize} min={0} max={2} defaultValue={latestRevision.size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -385,7 +389,7 @@ function CreateRevision(props) {
                         Cmd:
                     </div>
                     <div>
-                        <input style={{width:"205px"}} value={cmd}  onChange={(e) => setCmd(e.target.value)} type="text" placeholder="Enter the CMD for the service" />
+                        <input style={{width:"205px"}} value={latestRevision.cmd}  onChange={(e) => setLatestRevision((prevState)=>{return {...prevState, cmd:e.target.value}})} type="text" placeholder="Enter the CMD for the service" />
                     </div>
                 </div>
 
