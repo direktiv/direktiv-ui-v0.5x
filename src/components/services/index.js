@@ -26,7 +26,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 export default function Services() {
     const {fetch, handleError} = useContext(MainContext)
-    let { service } = useParams();
+    let { service, namespace } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
@@ -38,9 +38,13 @@ export default function Services() {
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
+            let x = "g"
+            if (namespace) {
+                x = `ns-${namespace}`
+            }
             try {
                 let tr = []
-                let resp = await fetch(`/functions/${service}`, {
+                let resp = await fetch(`/functions/${x}-${service}`, {
                     method:"GET"
                 })
                 if (resp.ok) {
@@ -111,7 +115,7 @@ export default function Services() {
                 <div className="container" style={{ flexDirection: "column"}}>
 
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
-                        <TileTitle name="Edit revision usage">
+                        <TileTitle name="Traffic Management">
                              <IoClipboardSharp />
                         </TileTitle>
                         {
@@ -144,7 +148,7 @@ function ListRevisions(props) {
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj)=>{
                 return(
-                    <Revision fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision size={obj.size} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -152,7 +156,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {name, fetch, fetchServices, image, generation, created, statusMessage, status, traffic} = props
+    const {name, fetch, size, minScale, fetchServices, image, generation, created, statusMessage, status, traffic} = props
 
     let panelID = name;
     function toggleItem(){
@@ -175,6 +179,14 @@ function Revision(props) {
         }
     }
 
+    let circleFill = "success"
+    if (status === "False") {
+        circleFill = "failed"
+    }
+    if (status === "Unknown"){
+        circleFill = "crashed"
+    }
+
 
     return (
         <div id={panelID} className="neumorph-hover" style={{marginBottom: "10px"}} onClick={() => {
@@ -183,7 +195,7 @@ function Revision(props) {
             <div className="services-list-div ">
                 <div>
                     <div style={{display: "inline"}}>
-                        <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                     </div>
                     <div style={{display: "inline"}}>
                         <b>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
@@ -203,17 +215,20 @@ function Revision(props) {
             <div className="services-list-contents singular">
             <div className="service-list-item-panel" style={{fontSize:'14px'}}>
                      <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
-                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
+                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
                              <p><b>Image:</b> {image}</p>
-                             <p><b>Generation:</b> {generation}</p>
-                             {traffic !== undefined ?<p><b>Traffic:</b> {traffic} </p>:""}
+                             {size !== undefined ?  <p><b>Size:</b> {size}</p> : ""}
+                             {traffic !== undefined ?<p style={{marginBottom:"0px"}}><b>Traffic:</b> {traffic} </p>:<p style={{marginBottom:"0px"}}><b>Traffic:</b> 0 </p>}
                          </div>
-                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-                             <p><b>Created:</b> {dayjs.unix(created).format()}</p>
-                             <p><b>Status:</b> {status}</p>
-                             {statusMessage !== undefined ? <p><b>Message:</b> {statusMessage}</p> : "" }
+                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+                             <p><b>Generation:</b> {generation}</p>
+                             {minScale !== undefined ?  <p><b>Scale:</b> {minScale}</p> : ""}
+                             <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format()}</p>
                          </div>
                      </div>
+                    <div style={{textAlign:"left", padding:"10px", width:"100%"}}>
+                        {statusMessage !== undefined ? <p style={{marginTop:"0px"}}><b>Message:</b> {statusMessage}</p> : "" }
+                    </div>
                  </div>
             </div>
         </div>
@@ -299,7 +314,7 @@ function CreateRevision(props) {
         <div style={{ fontSize: "12pt"}}>
             <div style={{display:"flex", flexDirection:"column" }}>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Image:
                     </div>
                     <div>
@@ -307,7 +322,7 @@ function CreateRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px", paddingRight:"14px"}}>
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
@@ -315,15 +330,15 @@ function CreateRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px", paddingRight:"14px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px", paddingRight:"14px"}}>
                         Size:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
+                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: 0, 1: 1, 2:2}} step={null}/>
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Cmd:
                     </div>
                     <div>
@@ -412,7 +427,7 @@ function EditRevision(props) {
         <div style={{fontSize:"12pt"}}>
         <div style={{display:"flex", flexDirection:"column" }}>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Rev 1:
                     </div>
                     <div>
@@ -430,7 +445,7 @@ function EditRevision(props) {
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>
+                    <div style={{textAlign:"left", minWidth:"60px"}}>
                         Rev 2:
                     </div>
                     <div>
@@ -448,34 +463,48 @@ function EditRevision(props) {
                         {/* <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/> */}
                     </div>
                 </div>
-                <div style={{display:'flex', gap:"10px"}}>
-                    <div style={{textAlign:"right", minWidth:"60px"}}>Ratio:</div> 
-                    <div style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px'}}>
-                        <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
-                        <div style={{color:"#b5b5b5", padding:'5px'}}>
-                            Revision 1: {rev1Percentage}%
-                        </div>
-                        <div style={{color:"#b5b5b5", padding:'5px'}}>
-                            Revision 2: {rev1Percentage !== 0? 100-rev1Percentage: 100}%
-                        </div>
+                { (rev1Name && rev2Name) ? 
+                    <>
+                    <div style={{display:'flex', gap:"10px"}}>
+                        <div className="block-slider" style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px', flex: "auto"}}>
+                            <div style={{position: "relative", width: "100%", padding: "0px"}}>
+                                <div style={{position: "relative", bottom: "6px"}}>
+                                    <div style={{display: "flex", width: "100%"}}>
+                                        <div style={{textAlign: "left", flex: "auto", fontSize: "8pt", fontWeight: "bold", color: "#4293c4"}}>Rev 1</div>
+                                        <div style={{textAlign: "right", flex: "auto", fontSize: "8pt", fontWeight: "bold", color: "rgb(219, 58, 58)"}}>Rev 2</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
+                            <div style={{position: "relative", width: "100%", padding: "0px"}}>
+                                <div style={{position: "relative", top: "4px"}}>
+                                    <div style={{display: "flex", width: "100%"}}>
+                                        <div style={{textAlign: "left", flex: "auto", fontSize: "8pt"}}>{rev1Percentage}%</div>
+                                        <div style={{textAlign: "right", flex: "auto", fontSize: "8pt"}}>{rev1Percentage !== 0? 100-rev1Percentage: 100}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
                     </div>
-                    
-                </div>
+                    <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
+                    </>
+                : "" }                    
             </div>
-            <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
             {err !== ""?
-       <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-       {err}
-   </div>
-    :
-    ""    
-    }
+                <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {err}
+                </div>
+            :
+                <></>    
+            }
+            { (rev1Name && rev2Name) ? 
             <div title="Set Traffic" style={{ textAlign: "right" }}>
                 <input onClick={() => {
                     setIsLoading(true)
                     updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {setIsLoading(false)})
                 }} type="submit" value="Save" />
             </div>
+            : <></> }
         </div>
         </LoadingWrapper>
     )

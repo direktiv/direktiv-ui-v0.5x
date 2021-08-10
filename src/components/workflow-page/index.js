@@ -58,7 +58,7 @@ export default function WorkflowPage() {
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
     const codemirrorRef = useRef();
-    const [tab, setTab] = useState("events")
+    const [tab, setTab] = useState("functions")
     const [functions, setFunctions] = useState(null)
 
     const history = useHistory()

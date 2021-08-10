@@ -282,29 +282,28 @@ function KnativeFunc(props) {
             if (resp.ok) {
                 fetchServices()
             } else {
-                console.log(resp, "handle delete service resp")
+                console.log(resp, "todo handle delete service resp")
             }
         } catch(e) {
             console.log(e, "handle delete service")
         }
     }
 
-
-    let panelID = name;
-    function toggleItem(){
-        let x = document.getElementById(panelID);
-        x.classList.toggle("expanded");
+    let circleFill = "success"
+    if (status === "False") {
+        circleFill = "failed"
+    }
+    if (status === "Unknown"){
+        circleFill = "crashed"
     }
 
     return(
         
-        <div id={panelID} className="neumorph-hover" style={{marginBottom: "10px"}} onClick={() => {
-            toggleItem();
-        }}>
-            <div className="services-list-div ">
+        <Link  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
+            <div className="services-list-div neumorph-hover">
                 <div>
                     <div style={{display: "inline"}}>
-                        <CircleFill className={status === "True" ? "success":"failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                     </div>
                     <div style={{display: "inline"}}>
                         <b>{name}</b> <i style={{fontSize:"12px"}}>{image}</i>
@@ -318,35 +317,9 @@ function KnativeFunc(props) {
                                 deleteService()
                             }} /> 
                         </div>
-                        <div title="View Details" className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
-                            ev.preventDefault();
-                            if (namespace !== undefined) {
-                                history.push(`/${namespace}/functions/${serviceName}`)
-                            } else {
-                                history.push(`/functions/global/${serviceName}`)
-                            }
-                        }}>
-                            <IoList/>
-                        </div>
                     </div>
                 </div>
             </div>
-            <div className="services-list-contents">
-            <div className="service-list-item-panel" style={{fontSize:'14px'}}>
-                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
-                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-                             <p><b>Image:</b> {image}</p>
-                             <p><b>Size:</b>  {size}</p>
-                             <p><b>Scale:</b> {minScale}</p>
-                         </div>
-                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px"}}>
-                            {cmd !== "" ? <p><b>Cmd:</b> {cmd}</p> : "" }
-                             <p><b>Status:</b> {status}</p>
-                             {statusMessage !== "" ? <p><b>Message:</b> {statusMessage}</p> : "" }
-                         </div>
-                     </div>
-                 </div>
-            </div>
-        </div>
+        </Link>
     )
 }
