@@ -148,7 +148,7 @@ function ListRevisions(props) {
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj)=>{
                 return(
-                    <Revision size={obj.size} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision conditions={obj.conditions} size={obj.size} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -156,7 +156,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {name, fetch, size, minScale, fetchServices, image, generation, created, statusMessage, status, traffic} = props
+    const {name, fetch, size, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic} = props
 
     let panelID = name;
     function toggleItem(){
@@ -216,18 +216,50 @@ function Revision(props) {
             <div className="service-list-item-panel" style={{fontSize:'14px'}}>
                      <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                          <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                             <p><b>Image:</b> {image}</p>
-                             {size !== undefined ?  <p><b>Size:</b> {size}</p> : ""}
-                             {traffic !== undefined ?<p style={{marginBottom:"0px"}}><b>Traffic:</b> {traffic} </p>:<p style={{marginBottom:"0px"}}><b>Traffic:</b> 0 </p>}
+                             <p><div style={{width:"100px", display:"inline-block"}}><b>Image:</b></div> {image}</p>
+                             {size !== undefined ? 
+                                <p><div style={{width:"100px", display:"inline-block"}}><b>Size:</b></div> {size}</p> 
+                                :
+                                <p><div style={{width:"100px", display:"inline-block"}}><b>Size:</b></div> 0</p>
+                             }
+                             {traffic !== undefined  ?
+                                <p><div style={{width:"100px", display:"inline-block"}}><b>Traffic:</b></div> {traffic}%</p> 
+                                :
+                                <p><div style={{width:"100px", display:"inline-block"}}><b>Traffic:</b></div> 0%</p> 
+                             }
                          </div>
                          <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                             <p><b>Generation:</b> {generation}</p>
-                             {minScale !== undefined ?  <p><b>Scale:</b> {minScale}</p> : ""}
-                             <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format()}</p>
+                            <p><div style={{width:"100px", display:"inline-block"}}><b>Generation:</b></div> {generation}</p>
+                             {minScale !== undefined ?
+                                <p><div style={{width:"100px", display:"inline-block"}}><b>Scale:</b></div> {minScale}</p> 
+                                : 
+                                <p><div style={{width:"100px", display:"inline-block"}}><b>Scale:</b></div> 0</p> 
+                             }
+                            <p><div style={{width:"100px", display:"inline-block"}}><b>Created:</b></div> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> 
+
+                             {/* <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> */}
                          </div>
                      </div>
                     <div style={{textAlign:"left", padding:"10px", width:"100%"}}>
-                        {statusMessage !== undefined ? <p style={{marginTop:"0px"}}><b>Message:</b> {statusMessage}</p> : "" }
+                        <p style={{marginTop:"0px"}}><b>Conditions:</b></p>
+                        <ul>
+                            {conditions.map((obj)=>{
+                                let circleFill = "success"
+                                if (obj.status === "False") {
+                                    circleFill = "failed"
+                                }
+                                if (obj.status === "Unknown"){
+                                    circleFill = "crashed"
+                                }
+                                return(
+                                    <li>
+                                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                                        <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                        {/* {statusMessage !== undefined ? <p style={{marginTop:"0px"}}><b>Message:</b> {statusMessage}</p> : "" } */}
                     </div>
                  </div>
             </div>
