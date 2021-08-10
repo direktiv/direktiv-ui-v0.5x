@@ -3,13 +3,6 @@ import Slider, { SliderTooltip, Handle } from 'rc-slider';
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import 'rc-slider/assets/index.css';
-import {
-    Accordion,
-    AccordionItem,
-    AccordionItemHeading,
-    AccordionItemButton,
-    AccordionItemPanel,
-} from 'react-accessible-accordion';
 import { ConfirmButton } from '../confirm-button'
 
 import Breadcrumbs from '../breadcrumbs'
@@ -130,7 +123,7 @@ export default function Services() {
                              <IoAdd />
                         </TileTitle>
                         {latestRevision !== "" ?
-                            <CreateRevision setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
+                            <CreateRevision namespace={namespace} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
                             :
                             ""
                         }
@@ -147,8 +140,15 @@ function ListRevisions(props) {
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj)=>{
+                let sizeTxt = "small"
+                if (obj.size === 1) {
+                    sizeTxt = "medium"
+                }
+                if (obj.size === 2){
+                    sizeTxt = "large"
+                }
                 return(
-                    <Revision conditions={obj.conditions} size={obj.size} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -156,7 +156,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {name, fetch, size, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic} = props
+    const {name, fetch, size, cmd, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic} = props
 
     let panelID = name;
     function toggleItem(){
@@ -240,9 +240,12 @@ function Revision(props) {
                              {/* <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> */}
                          </div>
                      </div>
-                    <div style={{textAlign:"left", padding:"10px", width:"100%"}}>
+                    <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
+                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+
                         <p style={{marginTop:"0px"}}><b>Conditions:</b></p>
                         <ul>
+                            {conditions ? <>
                             {conditions.map((obj)=>{
                                 let circleFill = "success"
                                 if (obj.status === "False") {
@@ -257,9 +260,13 @@ function Revision(props) {
                                         <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
                                     </li>
                                 )
-                            })}
+                            })}</>
+                            :""}
                         </ul>
-                        {/* {statusMessage !== undefined ? <p style={{marginTop:"0px"}}><b>Message:</b> {statusMessage}</p> : "" } */}
+                        </div>
+                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+                            <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> 
+                        </div>
                     </div>
                  </div>
             </div>
@@ -268,7 +275,7 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, fetch, handleError, latestRevision, setLatestRevision} = props
+    const {service, getService, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
@@ -278,7 +285,11 @@ function CreateRevision(props) {
 
     const createRevision = async () => {
         try {
-            let resp = await fetch(`/functions/${service}`, {
+            let x = "g"
+            if (namespace) {
+                x = `ns-${namespace}`
+            }
+            let resp = await fetch(`/functions/${x}-${service}`, {
                 method: "POST",
                 body: JSON.stringify({
                     image: latestRevision,
@@ -366,7 +377,7 @@ function CreateRevision(props) {
                         Size:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: 0, 1: 1, 2:2}} step={null}/>
+                        <Slider handle={handleSize} min={0} max={2} defaultValue={size} marks={{ 0: "small", 1: "medium", 2:"large"}} step={null}/>
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -400,28 +411,38 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {traffic, fetch, service, getService,handleError, revisions} = props
+    const {traffic, fetch, service, getService,handleError, revisions, namespace} = props
 
     const [err, setErr] = useState("")
     const [rev1Name, setRev1Name] = useState(traffic[0]? traffic[0].name: "")
     const [rev2Name, setRev2Name] = useState(traffic[1]? traffic[1].name: "")
 
-    const [rev1Percentage, setRev1Percentage] = useState(traffic[0]? traffic[0].value: 0)
+    const [rev1Percentage, setRev1Percentage] = useState(traffic[0]? traffic[0].value:  rev2Name === "" ? 100 : 0)
 
     const [isLoading, setIsLoading] = useState(false)
 
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            let resp = await fetch(`/functions/${service}`, {
-                method: "PATCH",
-                body: JSON.stringify({values:[{
-                    revision: rev1,
-                    percent: val
-                },{
+            let x = "g"
+            if (namespace) {
+                x = `ns-${namespace}`
+            }
+
+            let body = [{
+                revision: rev1,
+                percent: val
+            }]
+            if (rev2 !== "") {
+                body.push({
                     revision: rev2,
                     percent: 100-val
-                }]})
+                })
+            }
+
+            let resp = await fetch(`/functions/${x}-${service}`, {
+                method: "PATCH",
+                body: JSON.stringify({values:body})
             })
             if (resp.ok) {
                 setErr('')
@@ -437,10 +458,6 @@ function EditRevision(props) {
     const handle = props => {
         const {value, dragging, index, ...restProps} = props;
 
-        if (!dragging) {
-            setRev1Percentage(value)
-        }
-
         return(
             <SliderTooltip
             prefixCls="rc-slider-tooltip"
@@ -452,6 +469,11 @@ function EditRevision(props) {
             <Handle value={value} {...restProps} />
           </SliderTooltip>
         )
+    }
+
+    let dis = false
+    if (rev2Name === "") {
+        dis = true
     }
 
     return(
@@ -481,7 +503,12 @@ function EditRevision(props) {
                         Rev 2:
                     </div>
                     <div>
-                    <select style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}>
+                    <select style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>{
+                        if (e.target.value === "") {
+                            setRev1Percentage(100)
+                        }
+                        setRev2Name(e.target.value)
+                    }}>
                     <option value="">None Selected.</option>
                           
                             {
@@ -495,8 +522,8 @@ function EditRevision(props) {
                         {/* <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/> */}
                     </div>
                 </div>
-                { (rev1Name && rev2Name) ? 
-                    <>
+            { (rev1Name) ? 
+
                     <div style={{display:'flex', gap:"10px"}}>
                         <div className="block-slider" style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px', flex: "auto"}}>
                             <div style={{position: "relative", width: "100%", padding: "0px"}}>
@@ -507,7 +534,7 @@ function EditRevision(props) {
                                     </div>
                                 </div>
                             </div>
-                            <Slider handle={handle} min={0} max={100} defaultValue={rev1Percentage} />
+                            <Slider disabled={dis} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
                             <div style={{position: "relative", width: "100%", padding: "0px"}}>
                                 <div style={{position: "relative", top: "4px"}}>
                                     <div style={{display: "flex", width: "100%"}}>
@@ -517,10 +544,9 @@ function EditRevision(props) {
                                 </div>
                             </div>
                         </div>  
-                    </div>
+                    </div>:""}
+
                     <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
-                    </>
-                : "" }                    
             </div>
             {err !== ""?
                 <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
@@ -529,7 +555,7 @@ function EditRevision(props) {
             :
                 <></>    
             }
-            { (rev1Name && rev2Name) ? 
+            { (rev1Name) ? 
             <div title="Set Traffic" style={{ textAlign: "right" }}>
                 <input onClick={() => {
                     setIsLoading(true)
