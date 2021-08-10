@@ -18,6 +18,7 @@ export default function Functions() {
     const params = useParams()
     const [isLoading, setIsLoading] = useState(true)
     const [functions, setFunctions] = useState(null)
+    const [config, setConfig] = useState(null)
     const [fetchServiceErr, setFetchServiceErr] = useState("")
 
     const fetchServices = useCallback(()=>{
@@ -36,8 +37,9 @@ export default function Functions() {
                 })
                 if(resp.ok) {
                     let arr = await resp.json()
-                    if (arr.length > 0) {
-                        setFunctions(arr)
+                    setConfig(arr.config)
+                    if (arr.services.length > 0) {
+                        setFunctions(arr.services)
                     } else {
                         setFunctions([])
                     }
@@ -48,7 +50,6 @@ export default function Functions() {
                 setFetchServiceErr(`Error fetching services: ${e.message}`)
             }
         }
-        console.log("namespace", namespace)
         return fetchFunctions()
     },[functions])
 
@@ -91,17 +92,17 @@ export default function Functions() {
                         :
                         <>
                         {functions !== null ?
-                                    <>
-                                        {functions.length > 0 ?
-                                            <div >
-                                                {functions.map((obj) => {
-                                                    return (
-                                                        <KnativeFunc fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
-                                                    )
-                                                })}
-                                            </div>
-                                            : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
-                                    </> : ""}
+                            <>
+                                {functions.length > 0 ?
+                                    <div >
+                                        {functions.map((obj) => {
+                                            return (
+                                                <KnativeFunc fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                            )
+                                        })}
+                                    </div>
+                                    : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
+                            </> : ""}
                         </>}
                     </div>
                     </LoadingWrapper>
@@ -111,7 +112,7 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            <CreateKnativeFunc handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
+                            <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
                         </div>
                     </div>
             </div>
@@ -121,7 +122,8 @@ export default function Functions() {
 }
 
 function CreateKnativeFunc(props) {
-    const {fetch, namespace, fetchServices, handleError} = props
+    const {fetch, namespace, fetchServices, handleError, config} = props
+    console.log(config, "CONFIG")
     const [err, setErr] = useState("")
     const [name, setName] = useState("")
     const [image, setImage] = useState("")
@@ -228,7 +230,7 @@ function CreateKnativeFunc(props) {
                         Scale:
                     </div>
                     <div style={{display: "flex", flex: "auto", justifyContent: "center", paddingRight: "15px"}}>
-                        <Slider style={{width:"160px"}} handle={handleScale} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={scale} />
+                        <Slider style={{width:"160px"}} handle={handleScale} min={0} max={config.maxscale}   defaultValue={scale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
