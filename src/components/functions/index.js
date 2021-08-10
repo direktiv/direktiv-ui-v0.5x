@@ -112,8 +112,11 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
+                            {config !== null ?
                             <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
-                        </div>
+                                :
+                                ""}
+                            </div>
                     </div>
             </div>
         </div>
@@ -123,7 +126,6 @@ export default function Functions() {
 
 function CreateKnativeFunc(props) {
     const {fetch, namespace, fetchServices, handleError, config} = props
-    console.log(config, "CONFIG")
     const [err, setErr] = useState("")
     const [name, setName] = useState("")
     const [image, setImage] = useState("")

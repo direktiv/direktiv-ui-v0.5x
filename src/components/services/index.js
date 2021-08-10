@@ -23,6 +23,7 @@ export default function Services() {
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
+    const [config, setConfig] = useState(null)
 
     const [latestRevision, setLatestRevision] = useState(null)
 
@@ -41,8 +42,6 @@ export default function Services() {
                     method:"GET"
                 })
                 if (resp.ok) {
-                    let blue = false
-                    let red = false
                     let json = await resp.json()
                     for(var i=0; i < json.revisions.length; i++) {
                         if (json.revisions[i].traffic > 0) {
@@ -72,6 +71,35 @@ export default function Services() {
         return getServices()
     },[service])
 
+    // get config
+    
+    const fetchServices = useCallback(()=>{
+        async function fetchFunctions() {
+            let body = {
+                scope: "g"
+            }
+            if(namespace) {
+                body.scope = "ns"
+                body["namespace"] = namespace
+            }
+            try {
+                let resp = await fetch(`/functions/`, {
+                    method: "POST",
+                    body: JSON.stringify(body)
+                })
+                if(resp.ok) {
+                    let arr = await resp.json()
+                    setConfig(arr.config)
+                } else {
+                    await handleError('fetch services', resp, 'listServices')
+                }
+            } catch(e) {
+                setErrFetchRev(`Error fetching services: ${e.message}`)
+            }
+        }
+        return fetchFunctions()
+    },[])
+
     useEffect(()=>{
             let interval = setInterval(()=>{
                 console.log('polling knative funcs')
@@ -81,6 +109,13 @@ export default function Services() {
                 clearInterval(interval)
             }
     },[srvice])
+
+
+    useEffect(()=>{
+        if (config === null) {
+            fetchServices().finally(()=> {setIsLoading(false)})     
+        }
+    },[config])
 
     useEffect(()=>{
         if (srvice === null) {
@@ -129,8 +164,8 @@ export default function Services() {
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                        {latestRevision !== null ?
-                            <CreateRevision namespace={namespace} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
+                        {latestRevision !== null && config !== null ?
+                            <CreateRevision namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
                             :
                             ""
                         }
@@ -297,7 +332,7 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
+    const {service, getService, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
     // const [scale, setScale] = useState(0)
     // const [size, setSize] = useState(0)
@@ -372,7 +407,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={10} marks={{0:0, 5:5, 10:10}}  defaultValue={latestRevision.scale} />
+                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={config.maxscale}  defaultValue={latestRevision.scale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
