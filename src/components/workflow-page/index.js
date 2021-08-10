@@ -46,7 +46,7 @@ export default function WorkflowPage() {
     const [showLogEvent, setShowLogEvent] = useState(false)
     const [logEvent, setLogEvent] = useState("hello-world")
 
-    const [workflowValue, setWorkflowValue] = useState("")
+    const [workflowValue, setWorkflowValue] = useState(null)
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [executable, setExecutable] = useState(true)
@@ -239,7 +239,7 @@ export default function WorkflowPage() {
 
     // Initial fetchWorkflow Fetch
     useEffect(() => {
-        if (namespace !== "" && workflowValue === "") {
+        if (namespace !== "" && workflowValue === null) {
             fetchWorkflow().finally(()=> {setWaitCount((wc)=>{return wc +1})})
         }
     }, [fetchWorkflow, namespace, workflowValue])
@@ -456,7 +456,7 @@ export default function WorkflowPage() {
 
                                                 <div style={{ flex: "auto" }}>
                                                     {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
-                                                    {workflowValueOld !== "" && functions !== null ?
+                                                    {workflowValueOld !== null && functions !== null ?
                                                         <Diagram functions={functions} value={workflowValueOld} />
                                                         :
                                                         ""

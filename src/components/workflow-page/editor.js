@@ -115,11 +115,17 @@ export default function ReactEditor(props) {
                     fLines = getFunctionLines(value);
                 }
 
-                let invalidFunc = fLines[functions[i].info.name]
-                cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(errorMsg));
-                // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
-                markedTexts.push(cm.markText({ch: invalidFunc.start, line: invalidFunc.line}, {ch: invalidFunc.end, line: invalidFunc.line}, {className: 'line-error'}))
-            }
+                // Extra check to make sure that value still has function
+                console.log("fLines=", fLines)
+                console.log("functions=", functions)
+                if (fLines[functions[i].info.name] !== undefined) {
+                    console.log("fLines[functions[i].info.name]", fLines[functions[i].info.name])
+                    let invalidFunc = fLines[functions[i].info.name]
+                    cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(errorMsg));
+                    // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
+                    markedTexts.push(cm.markText({ch: invalidFunc.start, line: invalidFunc.line}, {ch: invalidFunc.end, line: invalidFunc.line}, {className: 'line-error'}))    
+                }
+           }
         }
 
         // Clear old marks
@@ -237,7 +243,6 @@ export default function ReactEditor(props) {
                         },
                     }}
                     onBeforeChange={(editor, data, val) => {
-                        console.log("val = ", val)
                         setValue(val)
                     }}
                     editorDidMount={(cm, val)=>{
