@@ -20,7 +20,7 @@ export function LoadingPage(props) {
             return () => {
                 clearTimeout(loadingTimer);
             };
-        }, []);
+        }, [windUpTime]);
 
 
     return (
@@ -72,7 +72,7 @@ export default function LoadingWrapper(props) {
             return () => {
                 clearTimeout(loadingTimer);
             };
-        }, []);
+        }, [windUpTime]);
 
     return (
         <>

@@ -260,7 +260,7 @@ function WorkflowDiagram(props) {
                     if (funcRef.current[i].serviceName === data.functions[y].service && data.state.action.function === data.functions[y].id) {
                         if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
                             let title = ""
-                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                            for(  x=0; x < funcRef.current[i].conditions.length; x++) {
                                 title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
                             }
                             titleMsg = title
@@ -309,7 +309,7 @@ function WorkflowDiagram(props) {
     
     
         )
-    },[functions])
+    },[])
 
     return(
         <ReactFlow elements={elements} nodeTypes={{
