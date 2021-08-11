@@ -569,13 +569,6 @@ function EditRevision(props) {
         )
     }
 
-    let dis = false
-    if (rev2Name === "") {
-        dis = true
-    }
-    if (!editable){
-        dis = true
-    }
     return(
         <LoadingWrapper isLoading={isLoading} text={"Updating Usage"}>
         <div style={{fontSize:"12pt"}}>
@@ -633,7 +626,7 @@ function EditRevision(props) {
                                     </div>
                                 </div>
                             </div>
-                            <Slider disabled={dis} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
+                            <Slider disabled={!editable} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
                             <div style={{position: "relative", width: "100%", padding: "0px"}}>
                                 <div style={{position: "relative", top: "4px"}}>
                                     <div style={{display: "flex", width: "100%"}}>
