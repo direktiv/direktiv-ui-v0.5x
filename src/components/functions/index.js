@@ -97,7 +97,7 @@ export default function Functions() {
                                     <div >
                                         {functions.map((obj) => {
                                             return (
-                                                <KnativeFunc fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                <KnativeFunc conditions={obj.conditions} fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )
                                         })}
                                     </div>
@@ -114,7 +114,7 @@ export default function Functions() {
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
                             {config !== null ?
                             <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
-                                :
+                                : 
                                 ""}
                             </div>
                     </div>
@@ -275,7 +275,7 @@ function CreateKnativeFunc(props) {
 function KnativeFunc(props) {
     const history = useHistory()
 
-    const {fetch, name, size, fetchServices, workflow, serviceName, namespace, image, cmd, minScale, status, statusMessage} = props
+    const {fetch, name, size, fetchServices, workflow, conditions, serviceName, namespace, image, cmd, minScale, status, statusMessage} = props
 
     console.log('status message', statusMessage)
     const deleteService = async () => {
@@ -304,7 +304,8 @@ function KnativeFunc(props) {
     return(
         
         <Link  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
-            <div className="services-list-div neumorph-hover">
+            <div className="neumorph-hover">
+            <div className="services-list-div">
                 <div>
                     <div style={{display: "inline"}}>
                         <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
@@ -324,6 +325,40 @@ function KnativeFunc(props) {
                     </div>
                 </div>
             </div>
+            <div style={{fontSize:'14px', display:"flex"}}>
+            <div className="services-list-contents singular" style={{height:"fit-content", overflow:"visible", width:"100%", paddingBottom:"10px"}}>
+            <div className="service-list-item-panel" style={{fontSize:'14px'}}>
+                    <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
+                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+
+                        <ul style={{margin:"0px"}}>
+                            {conditions ? <>
+                            {conditions.map((obj)=>{
+                                let circleFill = "success"
+                                if (obj.status === "False") {
+                                    circleFill = "failed"
+                                }
+                                if (obj.status === "Unknown"){
+                                    circleFill = "crashed"
+                                }
+                                return(
+                                    <li>
+                                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                                        <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
+                                    </li>
+                                )
+                            })}</>
+                            :""}
+                        </ul>
+                        </div>
+                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+            </div>
+            </div>
+
         </Link>
     )
 }

@@ -27,6 +27,12 @@ export default function Services() {
 
     const [latestRevision, setLatestRevision] = useState(null)
 
+    const [editable, setEditable] = useState(false)
+    const [rev1Name, setRev1Name] = useState("")
+    const [rev2Name, setRev2Name] = useState("")
+
+    const [rev1Percentage, setRev1Percentage] = useState(0)
+
     const [isLoading, setIsLoading] = useState(true)
 
 
@@ -51,6 +57,19 @@ export default function Services() {
                             })
                         }
                     }
+
+                    if (!editable) {
+                        if (tr){
+                            if (tr.length > 0) {
+                                setRev1Name(tr[0].name)
+                                setRev1Percentage(tr[0].value)
+                                if(tr[1]) {
+                                    setRev2Name(tr[1].name)
+                                }
+                            }
+                        }
+                    }
+
                     if(!dontChangeRev) {
                         setLatestRevision({
                             image: json.revisions[0].image,
@@ -69,7 +88,7 @@ export default function Services() {
             }
         }
         return getServices()
-    },[service])
+    },[service,editable])
 
     // get config
     
@@ -102,7 +121,6 @@ export default function Services() {
 
     useEffect(()=>{
             let interval = setInterval(()=>{
-                console.log('polling knative funcs')
                 getService(true)
             }, 3000)
             return () => {
@@ -155,7 +173,23 @@ export default function Services() {
                         </TileTitle>
                         {
                             traffic !== null ?
-                            <EditRevision revisions={srvice ? srvice.revisions : []} handleError={handleError} traffic={traffic} fetch={fetch} getService={getService} namespace={namespace} service={service}/>
+                            <EditRevision 
+                                setRev1Percentage={setRev1Percentage} 
+                                rev1Percentage={rev1Percentage} 
+                                setRev2Name={setRev2Name} 
+                                setEditable={setEditable} 
+                                editable={editable}
+                                rev1Name={rev1Name} 
+                                rev2Name={rev2Name} 
+                                setRev1Name={setRev1Name} 
+                                revisions={srvice ? srvice.revisions : []} 
+                                handleError={handleError} 
+                                traffic={traffic} 
+                                fetch={fetch} 
+                                getService={getService} 
+                                namespace={namespace} 
+                                service={service}
+                                />
                             :
                             ""
                         }
@@ -181,7 +215,8 @@ function ListRevisions(props) {
     const {revisions, getService, fetch, traffic} = props
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
-            {revisions.map((obj)=>{
+            {revisions.map((obj, i)=>{
+                let hideDelete = false
                 let titleColor = "var(--font-dark)"
                 let sizeTxt = "small"
                 if (obj.size === 1) {
@@ -190,7 +225,10 @@ function ListRevisions(props) {
                 if (obj.size === 2){
                     sizeTxt = "large"
                 }
-                console.log(traffic, "TRAFFIC")
+
+                if (i===0) {
+                    hideDelete = true
+                }
                 if (traffic) {
                     if (traffic.length > 0) {
                         if (traffic[0].name == obj.name){
@@ -205,7 +243,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -213,7 +251,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic} = props
+    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic, hideDelete} = props
 
     let panelID = name;
     function toggleItem(){
@@ -258,7 +296,7 @@ function Revision(props) {
                         <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
                 </div>
-                <div style={{flex: "auto", textAlign: "right"}}>
+               {!hideDelete ? <div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
@@ -267,7 +305,7 @@ function Revision(props) {
                             }} /> 
                         </div>
                     </div>
-                </div>
+                </div>:""}
             </div>
             <div className="services-list-contents singular">
             <div className="service-list-item-panel" style={{fontSize:'14px'}}>
@@ -337,7 +375,7 @@ function CreateRevision(props) {
     // const [scale, setScale] = useState(0)
     // const [size, setSize] = useState(0)
     // const [cmd, setCmd] = useState("")
-    const [traffic, setTraffic] = useState(0)
+    const [traffic, setTraffic] = useState(100)
     const [isLoading, setIsLoading] = useState(false)
 
 
@@ -359,7 +397,7 @@ function CreateRevision(props) {
             })
             if (resp.ok) {
                 setErr("")
-                setTraffic(0)
+                setTraffic(100)
                 await getService()
             } else {
                 await handleError('update service', resp, 'updateService')
@@ -369,6 +407,25 @@ function CreateRevision(props) {
         }
     }
 
+    const handleTraffic = props => {
+        const {value, dragging, index, ...restProps} = props;
+
+        // if (!dragging) {
+        //     setLatestRevision((prevState)=>{return {...prevState, scale:value}})
+        // }
+
+        return(
+            <SliderTooltip
+            prefixCls="rc-slider-tooltip"
+            overlay={`${value}%`}
+            visible={dragging}
+            placement="top"
+            key={index}
+          >
+            <Handle value={value} {...restProps} />
+          </SliderTooltip>
+        )
+    }
     const handle = props => {
         const {value, dragging, index, ...restProps} = props;
 
@@ -389,7 +446,6 @@ function CreateRevision(props) {
         )
     }
     
-    console.log(latestRevision.scale, latestRevision.size)
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
         <div style={{ fontSize: "12pt"}}>
@@ -431,7 +487,7 @@ function CreateRevision(props) {
                         Traffic:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={traffic} onChange={(e)=>setTraffic(e)} handle={handle} min={0} max={100} defaultValue={traffic} />
+                        <Slider value={traffic} onChange={(e)=>setTraffic(e)} handle={handleTraffic} min={0} max={100} defaultValue={traffic} />
                     </div>
                 </div>
             </div>
@@ -456,13 +512,10 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {traffic, fetch, service, getService,handleError, revisions, namespace} = props
+    const {traffic, fetch, service, getService,handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
 
     const [err, setErr] = useState("")
-    const [rev1Name, setRev1Name] = useState(traffic[0]? traffic[0].name: "")
-    const [rev2Name, setRev2Name] = useState(traffic[1]? traffic[1].name: "")
 
-    const [rev1Percentage, setRev1Percentage] = useState(traffic[0]? traffic[0].value:  rev2Name === "" ? 100 : 0)
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -470,7 +523,6 @@ function EditRevision(props) {
     const updateTraffic = async (rev1, rev2, val) => {
         try {
             let x = "g"
-            console.log(namespace, "NAMESPACE CHECK")
             if (namespace) {
                 x = `ns-${namespace}`
             }
@@ -521,7 +573,9 @@ function EditRevision(props) {
     if (rev2Name === "") {
         dis = true
     }
-
+    if (!editable){
+        dis = true
+    }
     return(
         <LoadingWrapper isLoading={isLoading} text={"Updating Usage"}>
         <div style={{fontSize:"12pt"}}>
@@ -531,7 +585,7 @@ function EditRevision(props) {
                         Rev 1:
                     </div>
                     <div>
-                        <select style={{width:"220px"}} defaultValue={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
+                        <select disabled={!editable} style={{width:"220px"}} defaultValue={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
                             <option value="">None Selected.</option>
                             {
                                 revisions.map((obj)=>{
@@ -549,7 +603,7 @@ function EditRevision(props) {
                         Rev 2:
                     </div>
                     <div>
-                    <select style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>{
+                    <select disabled={!editable} style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>{
                         if (e.target.value === "") {
                             setRev1Percentage(100)
                         }
@@ -568,7 +622,6 @@ function EditRevision(props) {
                         {/* <input style={{width:"205px"}} placeholder="Enter revision hash" type="text" defaultValue={rev2Name} value={rev2Name} onChange={(e)=>setRev2Name(e.target.value)}/> */}
                     </div>
                 </div>
-            { (rev1Name) ? 
 
                     <div style={{display:'flex', gap:"10px"}}>
                         <div className="block-slider" style={{minWidth:"200px", paddingLeft:'5px', paddingTop:'5px', flex: "auto"}}>
@@ -590,8 +643,7 @@ function EditRevision(props) {
                                 </div>
                             </div>
                         </div>  
-                    </div>:""}
-
+                    </div>
                     <div style={{marginTop:"10px", marginBottom:"10px", color:"#b5b5b5", borderBottom: "1px solid #b5b5b5"}}/>
             </div>
             {err !== ""?
@@ -601,11 +653,21 @@ function EditRevision(props) {
             :
                 <></>    
             }
-            { (rev1Name) ? 
+            {!editable?
+            <div title="Edit Traffic" style={{ textAlign: "right" }}>
+                <input onClick={() => {
+                    console.log('setting editable to ', !editable, setEditable)
+                    setEditable(!editable)
+                }} type="submit" value="Edit Traffic" />
+            </div>:""}
+            { (rev1Name && editable) ? 
             <div title="Set Traffic" style={{ textAlign: "right" }}>
                 <input onClick={() => {
                     setIsLoading(true)
-                    updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {setIsLoading(false)})
+                    updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {
+                        setIsLoading(false)
+                        setEditable(false)
+                    })
                 }} type="submit" value="Save" />
             </div>
             : <></> }

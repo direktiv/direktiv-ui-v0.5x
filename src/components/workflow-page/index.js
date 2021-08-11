@@ -100,8 +100,8 @@ export default function WorkflowPage() {
                 })
                 if(resp.ok) {
                     let arr = await resp.json()
-                    if (arr.length > 0) {
-                        setFunctions(arr)
+                    if (arr.services.length > 0) {
+                        setFunctions(arr.services)
                     } else {
                         setFunctions([])
                     }
