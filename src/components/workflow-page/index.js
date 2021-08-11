@@ -579,8 +579,12 @@ function FuncComponent(props) {
                             <>
                                 {functions.map((obj) => {
                                     console.log(obj, "function object")
+    let statusMessage = ""
+    for(var x=0; x < obj.conditions.length; x++) {
+        statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
+    }
                                     return(
-                                        <li title={obj.statusMessage}  className="event-list-item">
+                                        <li title={statusMessage}  className="event-list-item">
                                             <div>
                                                 <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                 <span>
