@@ -1,6 +1,6 @@
 import YAML from 'js-yaml'
 import YAML2 from 'yaml'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import ReactFlow, { MiniMap, isNode, Handle, ReactFlowProvider, useZoomPanHelper } from 'react-flow-renderer';
 import dagre from 'dagre'
 import { IoChevronForwardSharp, IoReorderFourOutline } from 'react-icons/io5';
@@ -10,10 +10,6 @@ import "highlight.js/styles/github.css";
 import yaml from "highlight.js/lib/languages/yaml";
 // import EditNode from './edit-node';
 hljs.registerLanguage("yaml", yaml);
-
-
-
-
 
 export const position = { x: 0, y: 0}
 
@@ -41,7 +37,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                 newElements.push({
                     id: v.states[i].id,
                     position: position,
-                    data: {label: v.states[i].id, type: v.states[i].type, state: v.states[i]},
+                    data: {label: v.states[i].id, type: v.states[i].type, state: v.states[i], functions: v.functions},
                     type: 'state'
                 })
 
@@ -157,7 +153,6 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
 
             // Check flow array change edges to green if it passed 
             if(flow){
-                console.log(flow)
                 // check flow for transitions
                 for(let i=0; i < flow.length; i++) {
                     let noTransition = false
@@ -189,7 +184,6 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                     }
 
                     if(noTransition) {
-                        console.log(flow[i])
                         // transition to end state
                         // check if theres more flow if not its the end node
                         if(!flow[i+1]){
@@ -234,74 +228,92 @@ function End(props) {
     )
 }
 
-function State(props, functions) {
-    const {data} = props
-    console.log(data, functions)
 
-    let funcFailed = false
-    let titleMsg = `${data.label}-${data.type}`
-    if (functions && functions.length > 0 && data.state.type === "action") {
-        for(var i=0; i < functions.length; i++){
-            if(functions[i].info.name === data.state.action.function) {
-                if (functions[i].status === "False") {
-                    titleMsg = functions[i].statusMessage
-                    funcFailed = true
-                }
-            }
-        }
-    } 
-
-    return(
-        <div title={titleMsg} className="state" style={{width:"80px", height:"30px", backgroundColor: funcFailed? "rgb(204,115,115)": ""}}>
-
-                    <Handle
-                            type="target"
-                            position="left"
-                            id="default"
-                        />
-                        <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                            <IoChevronForwardSharp/>
-                            <div style={{flex:"auto"}}>
-                            {data.type}
-
-                            </div>
-                            <div style={{display:"flex", alignItems:"center", cursor: "pointer"}} onClick={(e)=>{
-                                hljs.highlightBlock(document.getElementById(`${data.label}-yaml`))
-                                document.getElementById(`state-${data.state.id}`).classList.toggle("hide")
-                            }}>
-                                <IoReorderFourOutline />
-                            </div>
-                        </div>
-                        <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.label}</h1>
-                        <Handle
-                            type="source"
-                            position="right"
-                            id="default"
-                        /> 
-            <div className="state hide" id={`state-${data.state.id}`}  style={{position:"absolute", top:"-30px", zIndex:100, cursor:"pointer"}} onClick={()=>{document.getElementById(`state-${data.state.id}`).classList.toggle("hide")}}>
-                <pre style={{textAlign:"left", fontSize:"6px", whiteSpace:""}}>
-                    <code id={`${data.label}-yaml`} style={{fontSize:"6px", color:"black", background: "transparent"}}>
-                        {YAML2.stringify(data.state)}
-                    </code>
-                </pre>
-            </div>
-        </div>
-
-
-    )
-}
 
 function WorkflowDiagram(props) {
     const { elements, functions } = props
+    const funcRef = useRef()
+    funcRef.current = functions
     const { fitView } = useZoomPanHelper();
-    
+
     useEffect(()=>{
         fitView()
     },[fitView])
 
+    const State = useCallback((props) => {
+        const {data} = props
+        let funcFailed = "var(--primary-light)"
+        let titleMsg = `${data.label}-${data.type}`
+        if (funcRef.current && funcRef.current.length > 0 && data.state.type === "action") {
+            for(var i=0; i < funcRef.current.length; i++){
+                if(funcRef.current[i].info.name === data.state.action.function) {
+                    if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                        let title = ""
+                        for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                            title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                        }
+                        titleMsg = title
+                        funcFailed = "rgb(204,115,115)"
+                    }
+                }
+                for(var y=0; y < data.functions.length; y++) {
+                    if (funcRef.current[i].serviceName === data.functions[y].service && data.state.action.function === data.functions[y].id) {
+                        if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                            let title = ""
+                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                            }
+                            titleMsg = title
+                            funcFailed = "rgb(204,115,115)"
+                        }
+                    }
+                }
+            }
+        }
+    
+        return(
+            <div title={titleMsg} className="state" style={{width:"80px", height:"30px", backgroundColor: funcFailed}}>
+    
+                        <Handle
+                                type="target"
+                                position="left"
+                                id="default"
+                            />
+                            <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
+                                <IoChevronForwardSharp/>
+                                <div style={{flex:"auto"}}>
+                                {data.type}
+    
+                                </div>
+                                <div style={{display:"flex", alignItems:"center", cursor: "pointer"}} onClick={(e)=>{
+                                    hljs.highlightBlock(document.getElementById(`${data.label}-yaml`))
+                                    document.getElementById(`state-${data.state.id}`).classList.toggle("hide")
+                                }}>
+                                    <IoReorderFourOutline />
+                                </div>
+                            </div>
+                            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.label}</h1>
+                            <Handle
+                                type="source"
+                                position="right"
+                                id="default"
+                            /> 
+                <div className="state hide" id={`state-${data.state.id}`}  style={{position:"absolute", top:"-30px", zIndex:100, cursor:"pointer"}} onClick={()=>{document.getElementById(`state-${data.state.id}`).classList.toggle("hide")}}>
+                    <pre style={{textAlign:"left", fontSize:"6px", whiteSpace:""}}>
+                        <code id={`${data.label}-yaml`} style={{fontSize:"6px", color:"black", background: "transparent"}}>
+                            {YAML2.stringify(data.state)}
+                        </code>
+                    </pre>
+                </div>
+            </div>
+    
+    
+        )
+    },[functions])
+
     return(
         <ReactFlow elements={elements} nodeTypes={{
-            state: (data)=>State(data, functions),
+            state: State,
             start: Start,
             end: End
         }} 
@@ -364,6 +376,7 @@ export default function Diagram(props) {
             })
         }
 
+
         let saveElements = generateElements(getLayoutedElements, value, flow, status)
 
         // Keep old elements until the yaml is parsable. Try and catch in func
@@ -372,10 +385,16 @@ export default function Diagram(props) {
         }
     },[setElements, value, flow, status])
 
+
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
             <ReactFlowProvider>
-                <WorkflowDiagram functions={functions} elements={elements} />
+                {
+                     elements !== null ?                    
+                    <WorkflowDiagram functions={functions} elements={elements} />
+                    :
+                    ""
+                }
             </ReactFlowProvider>
         </div>
 

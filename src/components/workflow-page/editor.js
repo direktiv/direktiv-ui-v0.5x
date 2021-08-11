@@ -49,7 +49,6 @@ function getFunctionLines(str){
 
         } else if (/^\s*functions:/.test(arr[i])){
             inF  = true; // Entered Function
-            // console.log("/^s*/.match(arr[i])" , /^\s*/.match())
             fTabs = arr[i].match(/^\s*/)[0].length
         }
     }
@@ -92,7 +91,6 @@ export default function ReactEditor(props) {
 
 
     function setFunctionErrors(cm) {
-        console.log("functions", functions)
         let fLines = null;
         let markedTexts = []
         cm.clearGutter('Custom-Errors');
@@ -116,10 +114,7 @@ export default function ReactEditor(props) {
                 }
 
                 // Extra check to make sure that value still has function
-                console.log("fLines=", fLines)
-                console.log("functions=", functions)
                 if (fLines[functions[i].info.name] !== undefined) {
-                    console.log("fLines[functions[i].info.name]", fLines[functions[i].info.name])
                     let invalidFunc = fLines[functions[i].info.name]
                     cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(errorMsg));
                     // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});

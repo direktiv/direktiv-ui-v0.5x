@@ -90,18 +90,20 @@ export default function WorkflowPage() {
         setFetching(true)
         async function fetchKnativeFuncs() {
             try {
-                let resp = await fetch(`/functions/`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        workflow: params.workflow,
-                        namespace: namespace, 
-                        scope: "w"
-                    })
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/functions`, {
+                    method: "GET",
                 })
                 if(resp.ok) {
                     let arr = await resp.json()
-                    if (arr.services.length > 0) {
-                        setFunctions(arr.services)
+                    if (arr.length > 0) {
+                        let exec = true
+                        for (var i=0; i < arr.length; i++) {
+                            if (arr[i].status === "False" || arr[i].status === "Unknown") {
+                                exec = false
+                            }
+                        }
+                        setExecutable(exec)
+                        setFunctions(arr)
                     } else {
                         setFunctions([])
                     }
@@ -222,7 +224,6 @@ export default function WorkflowPage() {
     // polling knative functions
     useEffect(()=>{
             let interval = setInterval(()=>{
-                console.log('polling knative funcs')
                 fetchKnativeFunctions()
             }, 3000)
         return () => {
@@ -577,13 +578,13 @@ function FuncComponent(props) {
                         {functions.length > 0 ?
                             <>
                                 {functions.map((obj) => {
-                                    console.log("knative func", obj)
+                                    console.log(obj, "function object")
                                     return(
                                         <li title={obj.statusMessage}  className="event-list-item">
                                             <div>
                                                 <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                 <span>
-                                                    {obj.info.name}({obj.info.image})
+                                                    {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
                                                 </span>
                                             </div>
                                         </li>
