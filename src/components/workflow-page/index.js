@@ -111,7 +111,8 @@ export default function WorkflowPage() {
                     await handleError('fetch knative functions', resp, "fetchKnativeFunctions")
                 }
             } catch(e) {
-                setErr(`Unable to fetch knative functions: ${e.message}`)
+                console.log(e)
+                // setErr(`Unable to fetch knative functions: ${e.message}`)
             }
         }
 
