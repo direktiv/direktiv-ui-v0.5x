@@ -3,7 +3,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function createNotification(title, msg, level){
     //TODO handle level of error perhaps?
-    console.log(level)
 
     // Do Whatever you want here
     return ({ closeToast, toastProps }) => (

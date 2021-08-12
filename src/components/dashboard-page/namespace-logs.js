@@ -76,11 +76,9 @@ export default function NamespaceLogs() {
                                 newLogs += `\u001b[38;5;248m[${dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
                                 newLogs += `${obj.message} `
     
-                                console.log(obj.context)
                                 if(obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0){
                                     newLogs += `\u001b[38;5;248m(`
                                     newLogs += Object.keys(obj.context).map((k) => {
-                                        console.log(k, "KEY")
                                         return (
                                             `${k}=${obj.context[k]}`
                                         )

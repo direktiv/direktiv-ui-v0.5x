@@ -8,6 +8,7 @@ import { IoChevronForwardSharp, IoReorderFourOutline } from 'react-icons/io5';
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 import yaml from "highlight.js/lib/languages/yaml";
+import { useParams } from 'react-router';
 // import EditNode from './edit-node';
 hljs.registerLanguage("yaml", yaml);
 
@@ -231,8 +232,8 @@ function End(props) {
 
 
 function WorkflowDiagram(props) {
-    const { elements, functions } = props
-    const funcRef = useRef()
+    const { elements, functions,params } = props
+    const funcRef = useRef() 
     funcRef.current = functions
     const { fitView } = useZoomPanHelper();
 
@@ -246,6 +247,8 @@ function WorkflowDiagram(props) {
         let titleMsg = `${data.label}-${data.type}`
         if (funcRef.current && funcRef.current.length > 0 && data.state.type === "action") {
             for(var i=0; i < funcRef.current.length; i++){
+
+                
                 if(funcRef.current[i].info.name === data.state.action.function) {
                     if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
                         let title = ""
@@ -254,19 +257,59 @@ function WorkflowDiagram(props) {
                         }
                         titleMsg = title
                         funcFailed = "rgb(204,115,115)"
+                        break
                     }
                 }
                 for(var y=0; y < data.functions.length; y++) {
-                    if (funcRef.current[i].serviceName === data.functions[y].service && data.state.action.function === data.functions[y].id) {
-                        if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                    if (data.functions[y].type === "knative-global" && data.state.action.function === data.functions[y].id) {
+                        // global func
+                    if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+
+                        if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace === "") {
                             let title = ""
-                            for(  x=0; x < funcRef.current[i].conditions.length; x++) {
+                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
                                 title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
                             }
                             titleMsg = title
                             funcFailed = "rgb(204,115,115)"
+                        break
+
+                        } else if (funcRef.current[i].serviceName === `g-${data.functions[y].service}` && funcRef.current[i].info.namespace === "") {
+                            let title = ""
+                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                            }
+                            titleMsg = title
+                            funcFailed = "rgb(204,115,115)"
+                        break
+
                         }
                     }
+                    }else if (data.functions[y].type === "knative-namespace" && data.state.action.function === data.functions[y].id) {
+                    if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                       
+                        // namespace func
+                        if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace !== "") {
+                            let title = ""
+                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                            }
+                            titleMsg = title
+                            funcFailed = "rgb(204,115,115)"
+                            break
+
+                        }else if (funcRef.current[i].serviceName === `ns-${params.namespace}-${data.functions[y].service}` && funcRef.current[i].info.namespace !== "") {
+                            let title = ""
+                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                            }
+                            titleMsg = title
+                            funcFailed = "rgb(204,115,115)"
+                        break
+
+                        }
+                    }
+                }
                 }
             }
         }
@@ -309,7 +352,7 @@ function WorkflowDiagram(props) {
     
     
         )
-    },[])
+    },[functions])
 
     return(
         <ReactFlow elements={elements} nodeTypes={{
@@ -329,6 +372,7 @@ function WorkflowDiagram(props) {
 
 export default function Diagram(props) {
     const {value, functions, flow, status} = props
+    const params = useParams()
 
     const [elements, setElements] = useState([])
 
@@ -391,7 +435,7 @@ export default function Diagram(props) {
             <ReactFlowProvider>
                 {
                      elements !== null ?                    
-                    <WorkflowDiagram functions={functions} elements={elements} />
+                    <WorkflowDiagram params={params} functions={functions} elements={elements} />
                     :
                     ""
                 }

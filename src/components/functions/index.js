@@ -54,7 +54,6 @@ export default function Functions() {
     useEffect(()=>{
         if (functions === null) {
             let interval = setInterval(()=>{
-                console.log('polling knative funcs')
                 fetchServices()
             }, 3000)
             return () => {
@@ -274,7 +273,6 @@ function KnativeFunc(props) {
 
     const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage} = props
 
-    console.log('status message', statusMessage)
     const deleteService = async () => {
         try {
             let resp = await fetch(`/functions/${serviceName}`, {
