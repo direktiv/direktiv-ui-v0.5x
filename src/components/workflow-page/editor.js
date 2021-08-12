@@ -22,6 +22,7 @@ function getFunctionLines(str){
     var inF = false;
     var fTabs = 0
     var fChildTabs = 0;
+    var fInfoSink = {id: null, type: null, service: null}
 
     for (var i = 0; i < arr.length; i++)
     {
@@ -38,15 +39,34 @@ function getFunctionLines(str){
                 break // Left function
             }
 
-            // Check if this line contains id
+            // Check if this line contains id, service, type
             var fID = arr[i].replace(/^[\s-]*id:/, "")
+            var fService = arr[i].replace(/^[\s-]*service:/, "")
+            var fType = arr[i].replace(/^[\s-]*type:/, "")
             if (fID !== arr[i]) {
                 // If id was extracted from line, push it
                 let startPos = arr[i].match(/^[\s-]*id:\s*/)[0].length
-                let endPos = arr[i].match(/^[\s-]*id:\s*\w*/)[0].length
+                let endPos = arr[i].match(/^[\s-]*id:\s*[\w-]*/)[0].length
                 fLines[fID.trim()] =  {line: i, start: startPos, end: endPos}
+                fInfoSink.id = fID.trim()
+            } else if (fService !== arr[i]) {
+                fInfoSink.service = fService.trim()
+            } else if (fType !== arr[i]) {
+                fInfoSink.type = fType.trim()
             }
 
+            // Set Type
+            if (fInfoSink.id && fInfoSink.type) {
+                if (fInfoSink.type !== "knative-namespace" && fInfoSink.type !== "knative-global") {
+                    fLines[fInfoSink.id].type = fInfoSink.type
+                    fInfoSink = {id: null, type: null, service: null}
+                } else if (fInfoSink.service){
+                    fLines[fInfoSink.id].type = fInfoSink.type
+                    fLines[fInfoSink.id].service = fInfoSink.service
+                    fInfoSink = {id: null, type: null, service: null}
+                }
+
+            }
         } else if (/^\s*functions:/.test(arr[i])){
             inF  = true; // Entered Function
             fTabs = arr[i].match(/^\s*/)[0].length
@@ -103,10 +123,12 @@ export default function ReactEditor(props) {
                 }
 
                 if (fCondition.status === "False"){
-                    errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>└─Reason: ${fCondition.reason}`
+                    errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>${fCondition.reason ? `├─Reason: ${fCondition.reason}<br>` : ""}`
+                    errorMsg += `└─Message: ${fCondition.message.length < 60 ? fCondition.message : "Too large to preview"}<br>`
                 }
             }
-            
+
+            let foundFunction = false
             if (errorMsg != "") {
                 // Get functions lines on first error
                 if (fLines === null){
@@ -114,11 +136,31 @@ export default function ReactEditor(props) {
                 }
 
                 // Extra check to make sure that value still has function
-                if (fLines[functions[i].info.name] !== undefined) {
-                    let invalidFunc = fLines[functions[i].info.name]
-                    cm.setGutterMarker(invalidFunc.line, 'Custom-Errors', makeGutterError(errorMsg));
+                let invalidF = fLines[functions[i].info.name]
+                if (invalidF !== undefined && invalidF.type == "reusable") {
+                    cm.setGutterMarker(invalidF.line, 'Custom-Errors', makeGutterError(errorMsg));
                     // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
-                    markedTexts.push(cm.markText({ch: invalidFunc.start, line: invalidFunc.line}, {ch: invalidFunc.end, line: invalidFunc.line}, {className: 'line-error'}))    
+                    markedTexts.push(cm.markText({ch: invalidF.start, line: invalidF.line}, {ch: invalidF.end, line: invalidF.line}, {className: 'line-error'}))
+                    foundFunction = true
+                }
+
+                // Did not find function, look for global / namespace services
+                if (!foundFunction) {
+                    for (const [key, val] of Object.entries(fLines)) {
+                        if (val.type === "knative-namespace" && functions[i].info.namespace !== "" && (val.service === functions[i].serviceName || `ns-${functions[i].info.namespace}-${val.service}` === functions[i].serviceName)) {
+                            // found namespace service
+                            cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
+                            markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
+                            foundFunction = true
+                            break
+                        } else if (val.type === "knative-global" && functions[i].info.namespace === ""  && (val.service === functions[i].serviceName || `g-${val.service}` === functions[i].serviceName)) {
+                            // found global service
+                            cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
+                            markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
+                            foundFunction = true
+                            break
+                        }
+                    }
                 }
            }
         }
