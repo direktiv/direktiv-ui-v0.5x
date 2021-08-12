@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState} from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState} from 'react'
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Slider, { SliderTooltip, Handle } from 'rc-slider';
@@ -18,6 +18,7 @@ export default function Functions() {
     const [functions, setFunctions] = useState(null)
     const [config, setConfig] = useState(null)
     const [fetchServiceErr, setFetchServiceErr] = useState("")
+  
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {

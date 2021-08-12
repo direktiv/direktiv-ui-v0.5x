@@ -67,7 +67,9 @@ export default function WorkflowPage() {
     const [exportModalOpen, setExportModalOpen] = useState(false)
     const [waitCount, setWaitCount] = useState(0)
 
+    const workflowRef = useRef()
 
+    workflowRef.current = params.workflow
     function toggleAPIModal() {
         setAPIModalOpen(!apiModalOpen)
     }
@@ -90,7 +92,7 @@ export default function WorkflowPage() {
         setFetching(true)
         async function fetchKnativeFuncs() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/functions`, {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowRef.current}/functions`, {
                     method: "GET",
                 })
                 if(resp.ok) {
@@ -112,7 +114,7 @@ export default function WorkflowPage() {
                 }
             } catch(e) {
                 console.log(e)
-                // setErr(`Unable to fetch knative functions: ${e.message}`)
+                setErr(`Unable to fetch knative functions: ${e.message}`)
             }
         }
 
