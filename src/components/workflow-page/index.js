@@ -116,7 +116,7 @@ export default function WorkflowPage() {
         }
 
         return fetchKnativeFuncs().finally(()=>{setFetching(false)})
-    },[fetch, namespace, params.workflow, handleError])
+    },[functions])
 
     const fetchWorkflow = useCallback(() => {
         setFetching(true)
@@ -578,7 +578,6 @@ function FuncComponent(props) {
                         {functions.length > 0 ?
                             <>
                                 {functions.map((obj) => {
-                                    console.log(obj, "function object")
     let statusMessage = ""
     for(var x=0; x < obj.conditions.length; x++) {
         statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`

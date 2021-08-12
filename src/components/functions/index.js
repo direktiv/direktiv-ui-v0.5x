@@ -4,17 +4,15 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Slider, { SliderTooltip, Handle } from 'rc-slider';
 
 import { IoAdd, IoList, IoTrash} from 'react-icons/io5'
-import {NoResults} from '../../util-funcs'
 import { ConfirmButton } from '../confirm-button'
 
 import Breadcrumbs from '../breadcrumbs'
 import MainContext from '../../context'
 import LoadingWrapper from "../loading"
-import { Link, useHistory, useParams } from 'react-router-dom'
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from 'react-accessible-accordion'
+import { Link,  useParams } from 'react-router-dom'
 
 export default function Functions() {
-    const {fetch, namespace, handleError} = useContext(MainContext)
+    const {fetch,  handleError} = useContext(MainContext)
     const params = useParams()
     const [isLoading, setIsLoading] = useState(true)
     const [functions, setFunctions] = useState(null)
@@ -51,25 +49,24 @@ export default function Functions() {
             }
         }
         return fetchFunctions()
-    },[functions])
+    },[fetch, handleError, params.namespace])
 
     useEffect(()=>{
         if (functions === null) {
             let interval = setInterval(()=>{
-                console.log('polling knative funcs')
                 fetchServices()
             }, 3000)
             return () => {
                 clearInterval(interval)
             }
         }
-    },[])
+    },[fetchServices, functions])
 
     useEffect(()=>{
         if (functions === null) {
             fetchServices().finally(()=> {setIsLoading(false)}) 
         }
-    },[])
+    },[fetchServices, functions])
     return(
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -273,11 +270,9 @@ function CreateKnativeFunc(props) {
 }
 
 function KnativeFunc(props) {
-    const history = useHistory()
 
-    const {fetch, name, size, fetchServices, workflow, conditions, serviceName, namespace, image, cmd, minScale, status, statusMessage} = props
+    const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage} = props
 
-    console.log('status message', statusMessage)
     const deleteService = async () => {
         try {
             let resp = await fetch(`/functions/${serviceName}`, {

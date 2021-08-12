@@ -1,4 +1,4 @@
-import { Controlled as CodeMirror, Controlled } from "react-codemirror2";
+import { Controlled as CodeMirror} from "react-codemirror2";
 import React, {  useEffect, useState   } from 'react'
 
 
@@ -90,19 +90,19 @@ function makeGutterError(msg) {
     return tooltip;
 }
 
-function makeLineError(msg) {
-    var tooltip = document.createElement("div");
-    var tooltipText = document.createElement("span");
-    tooltip.style.color = "#FF4040";
-    tooltip.innerHTML = "  Bad Function";
-    tooltip.setAttribute('class', 'tooltip')
+// function makeLineError(msg) {
+//     var tooltip = document.createElement("div");
+//     var tooltipText = document.createElement("span");
+//     tooltip.style.color = "#FF4040";
+//     tooltip.innerHTML = "  Bad Function";
+//     tooltip.setAttribute('class', 'tooltip')
 
-    tooltipText.setAttribute('class', 'tooltiptext')
-    tooltipText.innerHTML = msg
+//     tooltipText.setAttribute('class', 'tooltiptext')
+//     tooltipText.innerHTML = msg
 
-    tooltip.appendChild(tooltipText)
-    return tooltip;
-}
+//     tooltip.appendChild(tooltipText)
+//     return tooltip;
+// }
 
 export default function ReactEditor(props) {
     const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
@@ -129,7 +129,7 @@ export default function ReactEditor(props) {
             }
 
             let foundFunction = false
-            if (errorMsg != "") {
+            if (errorMsg !== "") {
                 // Get functions lines on first error
                 if (fLines === null){
                     fLines = getFunctionLines(value);
@@ -166,7 +166,7 @@ export default function ReactEditor(props) {
         }
 
         // Clear old marks
-        for (var i = 0; i < marks.length; i++){
+        for (i = 0; i < marks.length; i++){
             marks[i].clear()
         }
         
@@ -192,7 +192,7 @@ export default function ReactEditor(props) {
         if (functions && cmEditor && value && value.length > 0) {
             setFunctionErrors(cmEditor)
         }
-    }, [functions])
+    }, [functions, cmEditor, value])
 
     return (
         <div className="editor-wrapper">

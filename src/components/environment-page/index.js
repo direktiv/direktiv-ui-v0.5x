@@ -8,7 +8,6 @@ import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloud
 import { MiniConfirmButton } from '../confirm-button'
 import { useDropzone } from 'react-dropzone'
 import LoadingWrapper from "../loading"
-import bytes from 'bytes'
 
 
 const EnvTableError = (props) => {

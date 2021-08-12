@@ -21,7 +21,6 @@ export default function Routes(props) {
 
     if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/global/functions") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
-        console.log('triggered')
         history.push("/")
     } 
     console.log(namespace, namespaces, "checking routes namespace")

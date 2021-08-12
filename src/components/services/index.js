@@ -88,7 +88,7 @@ export default function Services() {
             }
         }
         return getServices()
-    },[service,editable])
+    },[fetch, handleError, namespace, editable, service])
 
     // get config
     
@@ -117,7 +117,7 @@ export default function Services() {
             }
         }
         return fetchFunctions()
-    },[])
+    },[fetch, handleError, namespace])
 
     useEffect(()=>{
             let interval = setInterval(()=>{
@@ -126,20 +126,20 @@ export default function Services() {
             return () => {
                 clearInterval(interval)
             }
-    },[srvice])
+    },[getService])
 
 
     useEffect(()=>{
         if (config === null) {
             fetchServices().finally(()=> {setIsLoading(false)})     
         }
-    },[config])
+    },[fetchServices, config])
 
     useEffect(()=>{
         if (srvice === null) {
             getService().finally(()=> {setIsLoading(false)})     
         }
-    },[srvice])
+    },[getService, srvice])
 
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -231,11 +231,11 @@ function ListRevisions(props) {
                 }
                 if (traffic) {
                     if (traffic.length > 0) {
-                        if (traffic[0].name == obj.name){
+                        if (traffic[0].name === obj.name){
                             titleColor = "#2396d8"
                         }
                         if (traffic[1]) {
-                            if (traffic[1].name == obj.name){
+                            if (traffic[1].name === obj.name){
                                 titleColor = "rgb(219, 58, 58)"
                             }
                         }
@@ -251,7 +251,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created, statusMessage, conditions, status, traffic, hideDelete} = props
+    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete} = props
 
     let panelID = name;
     function toggleItem(){
@@ -512,7 +512,7 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {traffic, fetch, service, getService,handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
+    const {fetch, service, getService,handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
 
     const [err, setErr] = useState("")
 
