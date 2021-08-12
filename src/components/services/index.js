@@ -61,6 +61,7 @@ export default function Services() {
                     if (!editable) {
                         if (tr){
                             if (tr.length > 0) {
+                                console.log("tr is greater than 0")
                                 setRev1Name(tr[0].name)
                                 setRev1Percentage(tr[0].value)
                                 if(tr[1]) {
@@ -578,7 +579,7 @@ function EditRevision(props) {
                         Rev 1:
                     </div>
                     <div>
-                        <select disabled={!editable} style={{width:"220px"}} defaultValue={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
+                        <select disabled={!editable} style={{width:"220px"}} value={rev1Name} onChange={(e)=>setRev1Name(e.target.value)}>
                             <option value="">None Selected.</option>
                             {
                                 revisions.map((obj)=>{
@@ -596,7 +597,7 @@ function EditRevision(props) {
                         Rev 2:
                     </div>
                     <div>
-                    <select disabled={!editable} style={{width:"220px"}} defaultValue={rev2Name} onChange={(e)=>{
+                    <select disabled={!editable} style={{width:"220px"}} value={rev2Name} onChange={(e)=>{
                         if (e.target.value === "") {
                             setRev1Percentage(100)
                         }
