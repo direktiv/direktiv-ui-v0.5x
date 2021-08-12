@@ -52,15 +52,13 @@ export default function Functions() {
     },[fetch, handleError, params.namespace])
 
     useEffect(()=>{
-        if (functions === null) {
             let interval = setInterval(()=>{
                 fetchServices()
             }, 3000)
             return () => {
                 clearInterval(interval)
             }
-        }
-    },[fetchServices, functions])
+    },[ functions])
 
     useEffect(()=>{
         if (functions === null) {
