@@ -10,6 +10,8 @@ import MainContext from '../../context'
 import { Link } from 'react-router-dom'
 import { IoList } from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
+import LoadingWrapper from "../loading"
+
 dayjs.extend(relativeTime);
 
 export default function EventsPage() {
@@ -42,6 +44,7 @@ export default function EventsPage() {
 export function EventsPageBody() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const [instances, setInstances] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
     // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
 
@@ -66,45 +69,47 @@ export function EventsPageBody() {
                 setErr(`Failed to fetch instances: ${e.message}`)
             }
         }
-        fetchI()
+        fetchI().finally(()=> {setIsLoading(false)})
     },[namespace, fetch, handleError])
 
     return(
-        <div id="events-table" style={{overflow:"auto"}}>
-            {
-                        err !== "" ? 
-                        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                        {err}
-                    </div>:
-            <>
-            {instances.length > 0 ?
-            <table style={{ width: "100%" }}>
-                {/* <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Instance ID</th>
-                        <th>Time</th>
-                    </tr>
-                </thead> */}
-                <tbody>
-                    {
-                        instances.map((obj)=>{
-                            return (
-                                <Link key={obj.id} to={`/i/${obj.id}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
-                                    <tr className="event-list-item">
-                                        <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
-                                        <td style={{ textAlign: "left" }}>{obj.id}</td>
-                                        <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
-                                    </tr>
-                                </Link>
-                            )
-                        })
-                    }
-                </tbody>
-            </table> :
-            <NoResults/>}
-            </>}
-        </div>
+        <LoadingWrapper isLoading={isLoading} text={"Loading Instance List"}>
+            <div id="events-table" style={{overflow:"auto"}}>
+                {
+                            err !== "" ? 
+                            <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                            {err}
+                        </div>:
+                <>
+                {instances.length > 0 ?
+                <table style={{ width: "100%" }}>
+                    {/* <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Instance ID</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead> */}
+                    <tbody>
+                        {
+                            instances.map((obj)=>{
+                                return (
+                                    <Link key={obj.id} to={`/i/${obj.id}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
+                                        <tr className="event-list-item">
+                                            <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
+                                            <td style={{ textAlign: "left" }}>{obj.id}</td>
+                                            <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
+                                        </tr>
+                                    </Link>
+                                )
+                            })
+                        }
+                    </tbody>
+                </table> :
+                <NoResults/>}
+                </>}
+            </div>
+        </LoadingWrapper>
     )
 }
 

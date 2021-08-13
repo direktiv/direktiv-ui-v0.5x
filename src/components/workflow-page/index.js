@@ -7,7 +7,7 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoExitOutline, IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand } from 'react-icons/io5'
+import { IoExitOutline, IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand, IoCodeWorkingOutline, IoFlash } from 'react-icons/io5'
 import Modal from 'react-modal';
 
 import PieChart from '../charts/pie'
@@ -18,6 +18,7 @@ import Sankey from './sankey'
 import {NoResults} from '../../util-funcs'
 import Interactions from '../workflows-page/interactions'
 import ExportWorkflow from './export'
+import {LoadingPage} from '../loading'
 
 
 async function checkStartType(wf, setError) {
@@ -45,7 +46,7 @@ export default function WorkflowPage() {
     const [showLogEvent, setShowLogEvent] = useState(false)
     const [logEvent, setLogEvent] = useState("hello-world")
 
-    const [workflowValue, setWorkflowValue] = useState("")
+    const [workflowValue, setWorkflowValue] = useState(null)
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [executable, setExecutable] = useState(true)
@@ -57,13 +58,18 @@ export default function WorkflowPage() {
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
     const codemirrorRef = useRef();
+    const [tab, setTab] = useState("functions")
+    const [functions, setFunctions] = useState(null)
 
     const history = useHistory()
     const params = useParams()
     const [apiModalOpen, setAPIModalOpen] = useState(false)
     const [exportModalOpen, setExportModalOpen] = useState(false)
+    const [waitCount, setWaitCount] = useState(0)
 
+    const workflowRef = useRef()
 
+    workflowRef.current = params.workflow
     function toggleAPIModal() {
         setAPIModalOpen(!apiModalOpen)
     }
@@ -81,6 +87,38 @@ export default function WorkflowPage() {
             return { ...wfI }
         })
     }
+
+    const fetchKnativeFunctions = useCallback(()=>{
+        setFetching(true)
+        async function fetchKnativeFuncs() {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflowRef.current}/functions`, {
+                    method: "GET",
+                })
+                if(resp.ok) {
+                    let arr = await resp.json()
+                    if (arr.length > 0) {
+                        let exec = true
+                        for (var i=0; i < arr.length; i++) {
+                            if (arr[i].status === "False" || arr[i].status === "Unknown") {
+                                exec = false
+                            }
+                        }
+                        setExecutable(exec)
+                        setFunctions(arr)
+                    } else {
+                        setFunctions([])
+                    }
+                } else {
+                    await handleError('fetch knative functions', resp, "fetchKnativeFunctions")
+                }
+            } catch(e) {
+                setErr(`Unable to fetch knative functions: ${e.message}`)
+            }
+        }
+
+        return fetchKnativeFuncs().finally(()=>{setFetching(false)})
+    },[functions])
 
     const fetchWorkflow = useCallback(() => {
         setFetching(true)
@@ -113,7 +151,7 @@ export default function WorkflowPage() {
                 setErr(`Failed to fetch workflow: ${e.message}`)
             }
         }
-        fetchWf().finally(() => { setFetching(false) })
+        return fetchWf().finally(() => { setFetching(false);})
     }, [namespace, fetch, params.workflow, handleError])
 
     const updateWorkflow = useCallback(() => {
@@ -185,12 +223,29 @@ export default function WorkflowPage() {
         return postLogEvent().finally(() => { setFetching(false) })
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
 
-    useEffect(() => {
-        if (namespace !== "") {
-            fetchWorkflow()
-            
+    // polling knative functions
+    useEffect(()=>{
+            let interval = setInterval(()=>{
+                fetchKnativeFunctions()
+            }, 3000)
+        return () => {
+            clearInterval(interval)
         }
-    }, [fetchWorkflow, namespace])
+    },[fetchKnativeFunctions, namespace, functions])
+
+    // Initial fetchKnativeFunctions Fetch
+    useEffect(() => {
+        if (namespace !== "" && functions === null) {
+            fetchKnativeFunctions().finally(()=> {setWaitCount((wc)=>{return wc +1})})
+        }
+    }, [fetchKnativeFunctions, namespace, functions])
+
+    // Initial fetchWorkflow Fetch
+    useEffect(() => {
+        if (namespace !== "" && workflowValue === null) {
+            fetchWorkflow().finally(()=> {setWaitCount((wc)=>{return wc +1})})
+        }
+    }, [fetchWorkflow, namespace, workflowValue])
 
     useEffect(() => {
         localStorage.setItem('fullscrenEditor', fullscrenEditor);
@@ -296,6 +351,7 @@ export default function WorkflowPage() {
 
     return (
         <>
+            <LoadingPage waitCount={waitCount} waitGroup={2} text={`Loading Workflow ${params.workflow}`}/>
             {namespace !== "" ?
                 <div className="container" style={{ flex: "auto", padding: "10px" }}>
                     <Modal 
@@ -338,7 +394,7 @@ export default function WorkflowPage() {
                                         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                             <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                                    <Editor editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
+                                                    <Editor functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
                                                 </div>
                                             </div>
                                         </div>
@@ -403,8 +459,8 @@ export default function WorkflowPage() {
 
                                                 <div style={{ flex: "auto" }}>
                                                     {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
-                                                    {workflowValueOld !== "" ?
-                                                        <Diagram value={workflowValueOld} />
+                                                    {workflowValueOld !== null && functions !== null ?
+                                                        <Diagram functions={functions} value={workflowValueOld} />
                                                         :
                                                         ""
                                                     }
@@ -425,14 +481,27 @@ export default function WorkflowPage() {
                                 </div>
                             </div>
                             <div className="item-0 shadow-soft rounded tile">
-                                <TileTitle name="Instances">
-                                    <IoList />
+                                <TileTitle actionsDiv={[<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("events") }} >
+                        <IoFlash />  Instances
+        </div>,<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "functions"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("functions") }} >
+        <IoCodeWorkingOutline /> Functions
+        </div>]}>
+                                    <IoList /> Details
                                 </TileTitle>
-                                <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
-                                    <div id="events-tile" className="tile-contents">
-                                        <EventsList />
-                                    </div>
-                                </div>
+                                {tab === "events"?
+                                    <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                        <div id="events-tile" className="tile-contents">
+                                            <EventsList />
+                                        </div>
+                                    </div>:""
+                                }
+                                {tab === "functions" ?
+                                     <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                     <div id="events-tile" className="tile-contents">
+                                         <FuncComponent functions={functions}/>
+                                     </div>
+                                 </div>:""
+                                }
                             </div>
                             {attributeAdd ? attributeAdd : ""}
                         </div> : <></>}
@@ -441,6 +510,8 @@ export default function WorkflowPage() {
         </>
     )
 }
+
+
 
 function PieComponent() {
     const { fetch, namespace, handleError } = useContext(MainContext)
@@ -495,6 +566,40 @@ function PieComponent() {
 
     return (
         <PieChart lineWidth={40} data={metrics} />
+    )
+}
+
+function FuncComponent(props) {
+    const {functions} = props
+
+    return(
+      <div>
+              <ul style={{margin:"0px"}}>
+                {functions !== null ?
+                    <>
+                        {functions.length > 0 ?
+                            <>
+                                {functions.map((obj) => {
+    let statusMessage = ""
+    for(var x=0; x < obj.conditions.length; x++) {
+        statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
+    }
+                                    return(
+                                        <li title={statusMessage}  className="event-list-item">
+                                            <div>
+                                                <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                                                <span>
+                                                    {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
+                                                </span>
+                                            </div>
+                                        </li>
+                                    )
+                                })}
+                            </>
+                            : <NoResults />}
+                    </> : ""}
+              </ul>
+      </div>
     )
 }
 
@@ -608,10 +713,10 @@ function WorkflowActions(props) {
             {workflowButtons.map((obj)=>{
                 let url = obj.url
                 for (var i=0; i < obj.replace.length; i++) {
-                    if (obj.replace[i].key == "namespace") {
+                    if (obj.replace[i].key === "namespace") {
                         url = url.replaceAll(obj.replace[i].val, namespace)
                     }
-                    if (obj.replace[i].key == "workflow") {
+                    if (obj.replace[i].key === "workflow") {
                         url = url.replaceAll(obj.replace[i].val, workflowName)
                     }
                 }

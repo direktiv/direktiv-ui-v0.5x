@@ -296,6 +296,14 @@ export const  bcRoutes = [
   {
       path: "/jq/playground",
       breadcrumb: "JQ Playground"
+  },
+  {
+      path: "/:namespace/functions",
+      breadcrumb: "Knative Services"
+  },
+  {
+      path: "/functions/global",
+      breadcrumb: "Knative Services"
   }
 ]
 

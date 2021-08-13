@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
 
 export default function Navbar(props) {
 
@@ -102,6 +102,10 @@ export default function Navbar(props) {
     }
     
 
+    let matchFunctions = matchPath(location.pathname, {
+        path: "/:namespace/functions"
+    })
+    
     let matchInstanceL = matchPath(location.pathname,  {
         path: "/:namespace/i"
     })
@@ -118,6 +122,10 @@ export default function Navbar(props) {
 
     let matchJQ = matchPath(location.pathname, {
         path: "/jq/playground"
+    })
+
+    let matchGlobal = matchPath(location.pathname, {
+        path: "/functions/global"
     })
 
     let navItemMap = {}
@@ -368,6 +376,25 @@ export default function Navbar(props) {
                         </> : ''
                     }
                     <li>
+                        {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor:"default"}}>
+                                <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
+                                <span>Services</span>
+                            </div>
+                            :
+                            <Link style={{color: matchFunctions !== null ? "#4497f5": ""}} onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/${namespace}/functions`} className="nav-link">
+                                <div>
+                                <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
+                                <span>Services</span>
+                                </div>
+                            </Link>
+                        }
+                    </li>
+                    <li>
                     {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor: "default"}}>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
@@ -385,8 +412,23 @@ export default function Navbar(props) {
                             </div>
                         </Link>
 }
-                    </li>
+                    </li>         
+        
                 </ul>
+                <div className="nav-section divider"> 
+                    <ul>
+                        <li>
+                        <Link style={{color: matchGlobal !== null ? "#4497f5": "", display:"flex", alignItems:"center"}} onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/functions/global`} className="nav-link">
+                                <IoSettingsSharp style={{marginRight:"10px"}}/>
+                                <span>Global Services</span>
+                            </Link>
+                        </li>
+                    </ul>
+                </div>      
             </div>
             {footer ? footer : "" }
         </div>

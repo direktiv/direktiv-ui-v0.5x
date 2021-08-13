@@ -1,0 +1,96 @@
+.service-list-item {
+
+}
+.service-list-item > div:hover {
+    cursor: pointer;
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+}
+
+.service-list-item-panel{
+    border-radius: 10px;
+    border: 1px solid #b4b4b4;
+    /* box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light); */
+}
+
+.rc-slider-track {
+    background-color: #2396d8 !important;
+}
+
+.rc-slider-handle {
+    border: solid 2px #2396d8 !important;
+}
+
+
+.services-list-div {
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    line-height: 46px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.services-list-div:hover {
+
+}
+
+.services-list-div .buttons {
+    float: right;
+    margin-top: 4px;
+    margin-right: 4px;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.services-list-div .buttons > div {
+    margin-left: 10px;
+}
+
+.services-list-contents {
+    margin-left: 8px;
+    margin-right: 8px;
+    transition: height 0.5s;
+    height: 0px;
+    overflow: hidden;
+
+}
+
+.expanded div.services-list-contents {
+    display: flex;
+    padding-bottom: 8px;
+    /* height: 155px; */
+    height: fit-content
+}
+
+.expanded div.services-list-contents.singular {
+    /* height: 155px; */
+}
+
+.service-list-item-panel {
+    flex: auto;
+}
+
+/* SLIDER */
+.block-slider .rc-slider, .block-slider .rc-slider .rc-slider-rail, .block-slider .rc-slider .rc-slider-track {
+    height: 14px;
+}
+
+.block-slider .rc-slider .rc-slider-handle {
+    height: 23px;
+    border-width: 1px !important;
+    width: 4px;
+    border-color: black !important;
+}
+
+.block-slider .rc-slider .rc-slider-rail {
+    background-color: rgb(219, 58, 58);
+}
+
+.block-slider .rc-slider {
+    padding: 0px;
+}
+
+.block-slider .rc-slider .rc-slider-handle, .block-slider .rc-slider .rc-slider-track, .block-slider .rc-slider .rc-slider-rail{
+    border-radius: 0px;
+}

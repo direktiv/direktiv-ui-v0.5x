@@ -131,8 +131,6 @@ export default function ExportWorkflow(props) {
 
                     // trim self namespace from targets
                     const index = nsList.indexOf(namespace);
-                    console.log(index)
-                    console.log(namespace)
                     if (index > -1) {
                         nsList.splice(index, 1);
                     }
@@ -239,7 +237,6 @@ export default function ExportWorkflow(props) {
 
                 if (resp.ok) {
                     let nsVars = await resp.json()
-                    console.log("nsVars = ", nsVars)
                     if (nsVars.variables) {
                         for (const nsVar of nsVars.variables) {
                             targetReferences.variables[`${nsVar.name}-namespace`] = { key: nsVar.name, scope: "namespace" }
@@ -256,7 +253,6 @@ export default function ExportWorkflow(props) {
 
                 if (resp.ok) {
                     let nsSecrets = await resp.json()
-                    console.log("nsSecrets = ", nsSecrets)
                     if (nsSecrets.secrets) {
                         for (const nsSecret of nsSecrets.secrets) {
                             targetReferences.secrets[nsSecret.name] = { key: nsSecret.name }
@@ -305,7 +301,6 @@ export default function ExportWorkflow(props) {
                 })
 
             } catch (e) {
-                console.log("e = ", e)
                 setErr(`Failed to get target detail: ${e.message}`)
             }
         }
@@ -328,8 +323,6 @@ export default function ExportWorkflow(props) {
     }, [fetchWorkflow, currentWorkflow])
 
     const RenderAvailableNamespaces = () => {
-        console.log("availableNamespaces = ", availableNamespaces)
-
         if (availableNamespaces === undefined) {
             return (
                 <div>

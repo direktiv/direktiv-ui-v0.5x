@@ -15,6 +15,8 @@ import Modal from 'react-modal';
 import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal, IoHardwareChipSharp } from 'react-icons/io5'
 import ButtonWithDropDownCmp from './actions-btn'
+import {LoadingPage} from '../loading'
+
 
 
 async function checkStartType(wf, setError) {
@@ -44,6 +46,7 @@ export default function InstancePage() {
     const [workflowErr, setWorkflowErr] = useState("")
     const [detailsErr, setDetailsErr] = useState("")
     const [, setActionErr] = useState("")
+    const [isLoading, setIsLoading] = useState(true)
     
     // true starts with default false any other start type
     const [startType, setStartType] = useState(true)
@@ -84,7 +87,7 @@ export default function InstancePage() {
             }
         }
         if(namespace !== ""){
-        fetchWorkflow()
+            return fetchWorkflow()
         }
     },[init, fetch, params.namespace, params.workflow, namespace, handleError])
 
@@ -119,32 +122,45 @@ export default function InstancePage() {
         }
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
 
+    // Wait for instanceDetails to be populated
+    useEffect(()=>{
+        if (instanceDetails && Object.keys(instanceDetails).length > 0 && isLoading) {
+            setIsLoading(false)
+        }
+        
+    }, [instanceDetails, isLoading])
+
+    // Emergency timeout for loader if backend is misbehaving
+    useEffect(
+        () => {
+          let loadingTimer = setTimeout(() => {
+              setIsLoading(false); 
+              console.warn("Loader timeout, something is probably broken in backend")
+            }, 60 * 1000);
+          return () => {
+            clearTimeout(loadingTimer);
+          };
+    },[]);
+
     for (var i=0; i < extraLinks.length; i++) {
         let x = extraLinks[i]
-        console.log("x,", x)
-        console.log(params, "PARAMS")
         let path = x.path
         for (var j=0; j < x.replace.length; j++) {
             if(x.replace[j].key === "namespace") {
                 path = path.replaceAll(x.replace[j].val, params.namespace)
-                console.log("replace namespace", path)
             }
             if(x.replace[j].key === "workflow") {
                 path = path.replaceAll(x.replace[j].val, params.workflow)
-                console.log("replacewf", path)
             }
             if(x.replace[j].key === "instance") {
 
                 path = path.replaceAll(x.replace[j].val, params.instance)
-                console.log("replace, instance", path)
             }
         }
-        console.log(path)
         x.path = path
         extraLinks[i] = x
     }
 
-    console.log(extraLinks, "edited extra links")
 
     let listElements = [
         {
@@ -205,6 +221,7 @@ export default function InstancePage() {
     }
     return(
         <>
+        <LoadingPage isLoading={isLoading} text={`Loading Workflow ${params.workflow}`}/>
         {namespace !== "" ?
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <Modal 

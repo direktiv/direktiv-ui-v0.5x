@@ -7,7 +7,7 @@ import { useParams } from 'react-router'
 import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline, IoCloudDownloadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
 import { useDropzone } from 'react-dropzone'
-import bytes from 'bytes'
+import LoadingWrapper from "../loading"
 
 
 const EnvTableError = (props) => {
@@ -33,18 +33,21 @@ const EnvTableError = (props) => {
 const EnvTableHeader = () => {
     return (
         <div className={"var-table-row header"}>
-            <div className={"var-table-row-name"} >
+            <div style={{ flexGrow: "2", flexBasis: "0px", minWidth: "130pt" }}>
+                {/* Name column */}
                 Name
-                </div>
-            <div className={"var-table-row-value"} style={{ paddingTop: "0px", paddingBottom: "0px" }} >
+            </div>
+            <div style={{ flexGrow: "5", flexBasis: "0px" }}>
+                {/* Value column */}
                 Value
-                </div>
-            <div className={"var-table-row-size"} >
+            </div>
+            <div style={{ flexGrow: "1", flexBasis: "0px" }}>
+                {/* Size column */}
                 Size
-                </div>
-            <div className={"var-table-row-action"} style={{ justifyContent: "center", paddingTop: "0px", paddingBottom: "0px" }}>
-                Action
-                </div>
+            </div>
+            <div style={{ flexGrow: "1", flexBasis: "0px" }}>
+                {/* Action */}
+            </div>
         </div>
     )
 };
@@ -68,18 +71,26 @@ const EnvTableRow = (props) => {
                 </div>
             </div>
         </div>) : <></>}
-        <div className={`var-table-row ${show === true ? "show-value" : ""}`}>
-            <div className={"var-table-row-name"} >
+        <div className={`var-table-row ? "show-value" : ""}`}>
+            <div style={{ flexGrow: "2", flexBasis: "0px", minWidth: "130pt" }}>
+                {/* Name column */}
                 {env.name}
             </div>
-            <div className={`var-table-row-value`} >
-                <div style={{ display: "flex", height: "100%", justifyContent: "center" }}>
-                    {env.size < 1000000 ? (<>{show === true ?
-                        <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" onChange={(ev) => {
+            <div style={{ flexGrow: "4", flexBasis: "0px" }}>
+                {/* Value column */}
+
+                {env.size < 1000000 ? (<>{show === true ?
+                        <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" 
+                        style={{
+                            width: "100%",
+                            maxHeight: "38px",
+                            fontFamily: "Arial, Helvetica, sans-serif"
+                        }}
+                        onChange={(ev) => {
                             setLocalValue(ev.target.value)
                         }} />
                         :
-                        <div className={`var-table-input show-button rounded button ${isBinary ? "disabled": ""}`} onClick={() => {
+                        <div style={{ width: "100%" }} className={`var-table-input show-button rounded button ${isBinary ? "disabled": ""}`} onClick={() => {
                             getVar(env.name).then((newVal) => {
                                 if (!newVal) {
                                     return // TODO: Throw error
@@ -96,17 +107,50 @@ const EnvTableRow = (props) => {
                             })
                         }}><span>{`${isBinary ? "Cannot Show Binary Variable": "Show Value"}`}</span></div>
                     }</>) : (<div className={"var-table-input show-button rounded button disabled"}><span>Variable is too large to preview</span></div>)}
-                    
-                </div>
+
+                {/* <div className={`noselect ${ show ? "" : "rounded button" }`} style={{width: "100%", fontSize: "12pt", justifyContent: "center"}} onClick={() => {
+                    setShow(true)
+                }}>
+                    { show === false ?
+                    <span>Reveal Value</span>
+                     : 
+                    <div>
+                        <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false"
+                        style={{
+                            width: "100%",
+                            maxHeight: "38px",
+                            fontFamily: "Arial, Helvetica, sans-serif"
+                        }}
+                        onChange={(ev) => {
+                            setLocalValue(ev.target.value)
+                        }} />
+                    </div>}
+                </div> */}
             </div>
-            <div className={"var-table-row-size"} >
-                {bytes(env.size)}
+            <div style={{ flexGrow: "1", flexBasis: "0px" }}>
+                {/* Size column */}
+                {env.size} B
             </div>
-            <div className={"var-table-row-action"} >
+            <div style={{ flexGrow: "1", flexBasis: "0px", display: "flex" }}>
+                {/* Actions column */}
                 <EnvTableAction setError={setError} downloadVar={(vName) => {
                     setIsDownloading(true)
                     downloadVar(vName, setIsDownloading)
-                }} name={env.name} setVar={setVar} setLoading={setIsLoading} value={localValue} show={show} resetValue={() => { setRemoteValue(localValue); setIsBinary(false) }} hideEnv={() => { setShow(false); setLocalValue(remoteValue) }} index={index} edited={localValue !== remoteValue} />
+                }} 
+                name={env.name} 
+                setVar={setVar} 
+                setLoading={setIsLoading} 
+                value={localValue} 
+                show={show} 
+                resetValue={() => { 
+                    setRemoteValue(localValue); 
+                    setIsBinary(false) 
+                }} hideEnv={() => { 
+                        setShow(false); 
+                        setLocalValue(remoteValue) 
+                }} 
+                index={index}
+                edited={localValue !== remoteValue} />
             </div>
         </div>
         </>
@@ -180,16 +224,11 @@ const EnvTableAction = (props) => {
         )
     }
 
-    
-
-    
-
     buttons.push(
         <div title="Delete Variable" key={`${name}-btn-delete`}>
             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={IoTrash} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={() => { setVar(name, undefined, true) }} />
         </div>
     )
-
 
     return (
         <>
@@ -201,11 +240,10 @@ const EnvTableAction = (props) => {
 const EnvRowEmpty = (props) => {
     return (
         <div className={`var-table-row new-entry new-entry-button`} style={{minHeight:"183px"}}>
-            <div style={{ flexGrow: "1", flexBasis: "0" }} />
             <div style={{ flexGrow: "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
-                <span>No Variables</span>
+                <div style={{ fontSize: "12pt", fontWeight: "normal" }}>List is empty.</div>
             </div>
-            <div style={{ flexGrow: "1", flexBasis: "0" }} />
+            <div/>
         </div>
         )
 };
@@ -259,37 +297,41 @@ const EnvTableNewEntry = (props) => {
             {isLoading ? (<div className={"var-table-overlay"}>
             <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%"}}>
                 <div class="loader"></div> 
-                <div style={{color: "white", fontWeight: "bold", paddingTop:"4px"}}>
+                <div style={{color: "white", fontSize: "12pt", fontWeight: "normal", paddingTop:"4px"}}>
                     Setting Variable...
                 </div>
             </div>
             </div>) : <></>}
             {show ? (
-                <div className={`var-table-row new-entry`}>
-                    <div className={"var-table-row-name"} style={{ height: "inherit" }}>
-                        <div style={{ display: "flex", height: "100%", justifyContent: "center", padding: "0px 10px 0px 16px" }}>
-                            <textarea placeholder={"Name"} id={`new-entry-name`} className={"var-table-input"} value={name} spellCheck="false" onKeyDown={(e) => {
-                                if (e.code === "NumpadEnter" || e.code === "Enter") { e.preventDefault(); }
-                            }} onChange={(ev) => {
-                                setName(ev.target.value)
-                            }} />
+                <div className="var-table-row new-entry">
+                    <div style={{ flexGrow: "2", flexBasis: "0px" }}>
+                        <div className={"var-table-row-name"} style={{ height: "inherit" }}>
+                            <div style={{ display: "flex", height: "100%", justifyContent: "center", padding: "0px 10px 0px 16px" }}>
+                             <textarea placeholder={"Name"} id={`new-entry-name`} className={"var-table-input"} value={name} spellCheck="false" onKeyDown={(e) => {
+                                 if (e.code === "NumpadEnter" || e.code === "Enter") { e.preventDefault(); }
+                             }} onChange={(ev) => {
+                                 setName(ev.target.value)
+                             }} />
                         </div>
+                     </div>
                     </div>
-                    <div className={`var-table-row-value`} >
-                        <div style={{ display: "flex", height: "100%", justifyContent: "center" }}>
-                            <textarea placeholder={"Value"} id={`new-entry-value`} className={"var-table-input"} value={value} spellCheck="false" onChange={(ev) => {
+                    <div style={{ flexGrow: "4", flexBasis: "0px" }}>
+                        <div className={`var-table-row-value`} >
+                            <div style={{ display: "flex", height: "100%", justifyContent: "center" }}>
+                                <textarea placeholder={"Value"} id={`new-entry-value`} className={"var-table-input"} value={value} spellCheck="false" onChange={(ev) => {
                                 setValue(ev.target.value)
-                            }} />
+                                }} />
+                            </div>
                         </div>
                     </div>
-                    <div className={"var-table-row-size"} >
-                    </div>
+                    <div style={{ flexGrow: "1", flexBasis: "0px" }}></div>
+                    <div style={{ flexGrow: "1", flexBasis: "0px", display: "flex"}}>
                     <div className={"var-table-row-action"} >
                         <div key={`${name}-btn-upload`} {...getRootProps({ className: 'dropzone' })} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px", display: "flex", justifyContent: "center", alignItems: "center" }} title="Upload Variable" className={`circle button`}>
-                            <input {...getInputProps()} />
-                            <span>
-                                <IoCloudUploadOutline />
-                            </span>
+                                <input {...getInputProps()} />
+                                <span>
+                                    <IoCloudUploadOutline />
+                                </span>
                         </div>
                         <div onClick={() => {
                             setIsLoading(true)
@@ -305,10 +347,13 @@ const EnvTableNewEntry = (props) => {
                                 <Plus style={{ fontSize: "20pt", margin: "4px 0px 0px 1px" }} />
                             </span>
                         </div>
+                    </div>         
                     </div>
-                </div>) : (<div className={`var-table-row new-entry new-entry-button`}>
+                </div>
+            )
+                : (<div className={`var-table-row new-entry new-entry-button`}>
                     <div style={{ flexGrow: "1", flexBasis: "0" }} />
-                    <div className={`rounded button`} style={{ flexGrow: "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }} onClick={() => { setShow(true) }}>
+                    <div className={`rounded button`} style={{ maxWidth: "200px", flexGrow: "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt", fontWeight: "normal" }} onClick={() => { setShow(true) }}>
                         <span>Add New Variable</span>
                     </div>
                     <div style={{ flexGrow: "1", flexBasis: "0" }} />
@@ -341,6 +386,7 @@ export function EnvrionmentContainer(props) {
     const [, setFetching] = useState(false) // TODO fetching safety checks
     const [error, setError] = useState("")
     const [envList, setEnvList] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     const params = useParams()
 
@@ -379,7 +425,7 @@ export function EnvrionmentContainer(props) {
                 setError(`Failed to fetch variables: ${e.message}`)
             }
         }
-        fetchVars().finally(() => { setFetching(false) })
+        return fetchVars().finally(() => { setFetching(false) })
     }, [fetch, handleError, getPath, setFetching])
 
     const downloadVaraible = useCallback((varName, setIsDownloading) => {
@@ -424,7 +470,7 @@ export function EnvrionmentContainer(props) {
 
     useEffect(() => {
         if (namespace !== "") {
-            fetchVariables()
+            fetchVariables().finally(() => { setIsLoading(false)})
         }
     }, [fetchVariables, namespace])
 
@@ -503,34 +549,36 @@ export function EnvrionmentContainer(props) {
     }
 
     return (
-        <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
-            <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px" }}>
-                <TileTitle name="Variables">
-                    <IoLockOpen />
-                </TileTitle>
-                <div style={{ display: "flex", alignItems: "center", flexDirection: "column", marginRight: "-10px", marginLeft: "-10px" }}>
-                    <div className={"var-table"}>
-                        <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
-                        <div className={`var-table-accent-header`}><EnvTableHeader /></div>
-                        {envList.map((env, index) => {
-                            return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVaraible}/></div>)
-                        })}
-                        {
-                            envList.length === 0 ? (
-                                <>
-                                    <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
-                                    <div className={`var-table-accent-1 var-table-accent-end`}>
-                                        <EnvTableNewEntry setError={setError} setVar={setRemoteVariable}/>
-                                    </div>
-                                </>
-                            ):(
-                                <div className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
-                            )
-                        }
+        <LoadingWrapper isLoading={isLoading} text={`Loading ${mode === "namespace" ? "Namespace" : "Workflow"} Variables`}>
+            <div className="container" style={{ flex: "auto", flexDirection: "column", flexWrap: "wrap" }}>
+                <div className="item-0 shadow-soft rounded tile" style={{ height: "min-content", paddingBottom:"0px", flexGrow: "unset" }}>
+                    <TileTitle name="Variables">
+                        <IoLockOpen />
+                    </TileTitle>
+                    <div style={{ display: "flex", alignItems: "center", flexDirection: "column", marginRight: "-10px", marginLeft: "-10px" }}>
+                        <div className={"var-table"}>
+                            <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
+                            <div className={`var-table-accent-header`}><EnvTableHeader /></div>
+                            {envList.map((env, index) => {
+                                return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
+                                    <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVaraible}/></div>)
+                            })}
+                            {
+                                envList.length === 0 ? (
+                                    <>
+                                        <div className={`var-table-accent-0`}><EnvRowEmpty /></div>
+                                        <div className={`var-table-accent-1 var-table-accent-end`}>
+                                            <EnvTableNewEntry setError={setError} setVar={setRemoteVariable}/>
+                                        </div>
+                                    </>
+                                ):(
+                                    <div style={{ borderBottomRightRadius: "5px", borderBottomLeftRadius: "5px" }} className={`var-table-accent-${envList.length % 2} var-table-accent-end`}><EnvTableNewEntry setError={setError} setVar={setRemoteVariable} /></div>
+                                )
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </LoadingWrapper>
     )
 }

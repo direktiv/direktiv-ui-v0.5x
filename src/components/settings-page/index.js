@@ -7,7 +7,9 @@ import XCircle from 'react-bootstrap-icons/dist/icons/x-circle'
 import { useHistory } from 'react-router'
 import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons/io5'
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
-import {EnvrionmentContainer} from "../environment-page"
+import { EnvrionmentContainer } from "../environment-page"
+import LoadingWrapper from "../loading"
+
 
 
 function SettingsAction(props) {
@@ -45,25 +47,25 @@ function SettingsAction(props) {
             } else {
                 await handleError('delete namespace', resp, 'deleteNamespace')
             }
-        } catch(e) {
+        } catch (e) {
             setErr(`Failed to delete namespace: ${e.message}`)
         }
     }
 
 
     return (
-       <>
-       {
-                err !== "" ?    <div style={{ display:"flex", alignItems:"center", marginRight:"20px", fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
-                </div> :"" }
-                {checkPerm(permissions, "deleteNamespace") ? 
-       <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px" }}>
-            <ConfirmButton ConfirmationText={"Delete Namespace Confirmation"} Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
-                deleteNamespace()
-                ev.stopPropagation()
-            }} />
-        </div>: ""}
+        <>
+            {
+                err !== "" ? <div style={{ display: "flex", alignItems: "center", marginRight: "20px", fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {err}
+                </div> : ""}
+            {checkPerm(permissions, "deleteNamespace") ?
+                <div id="workflow-actions" className="" style={{ margin: "10px 10px 0px 0px" }}>
+                    <ConfirmButton ConfirmationText={"Delete Namespace Confirmation"} Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                        deleteNamespace()
+                        ev.stopPropagation()
+                    }} />
+                </div> : ""}
         </>
     )
 }
@@ -73,32 +75,31 @@ export default function SettingsPage() {
     return (
         <>
             {namespace !== "" ?
-            <>
-                  <div className="flex-row" style={{ maxHeight: "64px" }}>
+                <>
+                    <div className="flex-row" style={{ maxHeight: "64px" }}>
                         <div style={{ flex: "auto" }}>
                             <Breadcrumbs elements={["Workflows", "Example"]} />
                         </div>
                         <SettingsAction />
-                  </div>
-                  <div style={{height:"100%", width:"100%", display:"flex", flexDirection:"column"}}>
-                      <div className="container" style={{height:"50%", flexDirection:"row"}}>
-                        <div className="item-0 shadow-soft rounded tile" style={{minHeight:"300px"}}>
-                            <TileTitle name="Secrets">
-                                <IoLockOpen />
-                            </TileTitle>
-                            <Secrets />
+                    </div>
+                    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+                        <div className="container" style={{ flexDirection: "row" }}>
+                            <div className="item-0 shadow-soft rounded tile" style={{ minHeight: "300px" }}>
+                                <TileTitle name="Secrets">
+                                    <IoLockOpen />
+                                </TileTitle>
+                                <Secrets />
+                            </div>
+                            <div className="item-0 shadow-soft rounded tile">
+                                <TileTitle name="Container Registries">
+                                    <IoLogoDocker />
+                                </TileTitle>
+                                <Registries />
+                            </div>
                         </div>
-                        <div className="item-0 shadow-soft rounded tile">
-                            <TileTitle name="Container Registries">
-                                <IoLogoDocker />
-                            </TileTitle>
-                            <Registries />
-                        </div>
-                      </div>
-                      <EnvrionmentContainer mode={"namespace"}/>
-
-                  </div>
-                    </>
+                        <EnvrionmentContainer mode={"namespace"} />
+                    </div>
+                </>
                 : ""}
         </>
     )
@@ -112,6 +113,11 @@ function Secrets() {
     const [value, setValue] = useState("")
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
+
+    // Loading 
+    const [isLoading, setIsLoading] = useState(true)
+    const [opacity, setOpacity] = useState(null)
+    const [loadingText, setLoadingText] = useState("Loading Namespace Secrets")
 
     const fetchS = useCallback(() => {
         async function fetchData() {
@@ -127,21 +133,21 @@ function Secrets() {
                         setSecrets([])
                     }
                 } else {
-                        await handleError('fetch secrets', resp, 'listSecrets')
+                    await handleError('fetch secrets', resp, 'listSecrets')
                 }
             } catch (e) {
                 setErr(`Failed to fetch secrets: ${e.message}`)
             }
         }
-        fetchData()
+        return fetchData()
     }, [fetch, namespace, handleError])
 
     useEffect(() => {
-        fetchS()
+        fetchS().finally(() => { setIsLoading(false); setOpacity(30) })
     }, [fetchS])
 
     async function createSecret() {
-        if(key !== "" && value !== "") {
+        if (key !== "" && value !== "") {
             try {
                 let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
                     method: "POST",
@@ -151,9 +157,9 @@ function Secrets() {
                     setKey("")
                     setActionErr("")
                     setValue("")
-                    fetchS()
+                    return fetchS()
                 } else {
-                        await handleError('create secret', resp, 'createSecret')                        
+                    await handleError('create secret', resp, 'createSecret')
                 }
             } catch (e) {
                 setActionErr(`Failed to create secret: ${e.message}`)
@@ -161,7 +167,7 @@ function Secrets() {
         } else {
             setActionErr(`Failed to create Secret: key and value needs to be provided.`)
         }
-    
+
     }
 
     async function deleteSecret(val) {
@@ -173,7 +179,7 @@ function Secrets() {
             if (resp.ok) {
                 // refetch secrets
                 setActionErr("")
-                fetchS()
+                return fetchS()
             } else {
                 await handleError('delete secret', resp, 'deleteSecret')
             }
@@ -183,71 +189,79 @@ function Secrets() {
     }
 
     return (
-        <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
-         
-            {actionErr !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                             {actionErr}
-                             </div>
-            :""}
-            <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
-                <thead>
-                    <tr className="no-neumorph">
-                        <th style={{}}>
-                            Key
-                                    </th>
-                        <th style={{}}>
-                            Value
-                                    </th>
-                        <th style={{ width: "50px" }}>
+        <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight: "370px", overflow: "auto", minHeight: "300px" }}>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {
-                err !== "" ?    <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
+                {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {actionErr}
                 </div>
-                :
-                    secrets.map((obj) => {
-                        return (
-                            <tr key={obj.name}>
+                    : ""}
+                <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
+                    <thead>
+                        <tr className="no-neumorph">
+                            <th style={{}}>
+                                Key
+                            </th>
+                            <th style={{}}>
+                                Value
+                            </th>
+                            <th style={{ width: "50px" }}>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                {err}
+                            </div>
+                                :
+                                secrets.map((obj) => {
+                                    return (
+                                        <tr key={obj.name}>
+                                            <td style={{ paddingLeft: "10px" }}>
+                                                <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                                            </td>
+                                            <td style={{ paddingRight: "10px" }} colSpan="2">
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
+                                                    {checkPerm(permissions, "deleteSecret") ?
+                                                        <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
+                                                            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
+                                                                setLoadingText("Deleteing Secret")
+                                                                setIsLoading(true)
+                                                                deleteSecret(obj.name).finally(() => { setIsLoading(false)})
+                                                            }} />
+                                                        </div> : ""}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                        {checkPerm(permissions, "createSecret") ?
+                            <tr>
                                 <td style={{ paddingLeft: "10px" }}>
-                                    <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                                    <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e) => setKey(e.target.value)} />
                                 </td>
                                 <td style={{ paddingRight: "10px" }} colSpan="2">
                                     <div style={{ display: "flex", alignItems: "center" }}>
-                                        <input style={{ maxWidth: "150px" }} type="password" disabled value=".........." />
-                                        {checkPerm(permissions, "deleteSecret")?  
-                                        <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
-                                            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
-                                                deleteSecret(obj.name)
-                                            }} />
-                                        </div>:""}
+                                        <input type="text" style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
+                                        <div className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
+                                            setLoadingText("Creating Secret")
+                                            setIsLoading(true)
+                                            createSecret().finally(() => { setIsLoading(false)})
+                                        }}>
+                                            <span style={{ flex: "auto" }}>
+                                                <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
-                            </tr>
-                        )
-                    })}
-                    {checkPerm(permissions, "createSecret") ? 
-                    <tr>
-                        <td style={{ paddingLeft: "10px" }}>
-                            <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e) => setKey(e.target.value)} />
-                        </td>
-                        <td style={{ paddingRight: "10px" }} colSpan="2">
-                            <div style={{ display: "flex", alignItems: "center" }}>
-                                <input type="text" style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
-                                <div className="circle button success" style={{ marginLeft: "10px" }} onClick={() => createSecret()}>
-                                    <span style={{ flex: "auto" }}>
-                                        <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
-                                    </span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>:""}
-                </tbody>
-            </table>
-        </div>
+                            </tr> : ""}
+                    </tbody>
+                </table>
+            </div>
+        </LoadingWrapper>
     )
 }
 
@@ -260,6 +274,12 @@ function Registries() {
     const [registries, setRegistries] = useState([])
     const [err, setErr] = useState("")
     const [actionErr, setActionErr] = useState("")
+
+    // Loading 
+    const [isLoading, setIsLoading] = useState(true)
+    const [opacity, setOpacity] = useState(null)
+    const [loadingText, setLoadingText] = useState("Loading Registries")
+
 
     const fetchR = useCallback(() => {
         async function fetchData() {
@@ -275,21 +295,21 @@ function Registries() {
                         setRegistries([])
                     }
                 } else {
-                        await handleError('fetch registries', resp, 'listRegistries')
+                    await handleError('fetch registries', resp, 'listRegistries')
                 }
             } catch (e) {
                 setErr(`Failed to fetch registries: ${e.message}`)
             }
         }
-        fetchData()
+        return fetchData()
     }, [fetch, namespace, handleError])
 
     useEffect(() => {
-        fetchR()
+        fetchR().finally(() => { setIsLoading(false); setOpacity(30) })
     }, [fetchR])
 
     async function createRegistry() {
-        if(name !== "" && user !== "" && token !== "") {
+        if (name !== "" && user !== "" && token !== "") {
             try {
                 let resp = await fetch(`/namespaces/${namespace}/registries/`, {
                     method: "POST",
@@ -300,9 +320,9 @@ function Registries() {
                     setToken("")
                     setUser("")
                     setActionErr("")
-                    fetchR()
+                    return fetchR()
                 } else {
-                        await handleError('create registry', resp, 'createRegistry')
+                    await handleError('create registry', resp, 'createRegistry')
                 }
             } catch (e) {
                 setActionErr(`Failed to create registry: ${e.message}`)
@@ -322,9 +342,9 @@ function Registries() {
             if (resp.ok) {
                 // fetch registries
                 setActionErr("")
-                fetchR()
+                return fetchR()
             } else {
-                    await handleError('delete registry', resp, 'deleteRegistry')
+                await handleError('delete registry', resp, 'deleteRegistry')
             }
         } catch (e) {
             setActionErr(`Failed to delete registry: ${e.message}`)
@@ -332,82 +352,90 @@ function Registries() {
     }
 
     return (
-        <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
-       
-            {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {actionErr}
-                </div>: "" }
-            <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
-                <thead>
-                    <tr className="no-neumorph">
-                        <th style={{}}>
-                            URL
-                        </th>
-                        <th style={{}}>
-                            User
-                        </th>
-                        <th>
-                            Token
-                        </th>
-                        <th style={{ width: "50px" }}>
+        <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
+        
+                {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {actionErr}
+                    </div>: "" }
+                <table style={{ fontSize: "11pt", lineHeight: "48px" }}>
+                    <thead>
+                        <tr className="no-neumorph">
+                            <th style={{}}>
+                                URL
+                            </th>
+                            <th style={{}}>
+                                User
+                            </th>
+                            <th>
+                                Token
+                            </th>
+                            <th style={{ width: "50px" }}>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <>
-                    {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
-                </div>
-            :
-                    registries.map((obj) => {
-                        return (
-                            <tr key={obj.name}>
-                                <td style={{ paddingLeft: "10px" }}>
-                                    <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
-                                </td>
-                                <td>
-                                    <input style={{ maxWidth: "150px" }} type="text" disabled value={"*******"} />
-                                </td>
-                                <td style={{ paddingRight: "10px" }} colSpan="2">
-                                    <div style={{ display: "flex", alignItems: "center" }}>
-                                        <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
-                                        {checkPerm(permissions, "deleteRegistry")?  
-                                        
-                                        <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
-                                            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
-                                                deleteRegistry(obj.name)
-                                            }} />
-                                        </div>: ""}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <>
+                        {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                    {err}
+                    </div>
+                :
+                        registries.map((obj) => {
+                            return (
+                                <tr key={obj.name}>
+                                    <td style={{ paddingLeft: "10px" }}>
+                                        <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                                    </td>
+                                    <td>
+                                        <input style={{ maxWidth: "150px" }} type="text" disabled value={"*******"} />
+                                    </td>
+                                    <td style={{ paddingRight: "10px" }} colSpan="2">
+                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                            <input style={{ maxWidth: "150px" }} type="password" disabled value="*******" />
+                                            {checkPerm(permissions, "deleteRegistry")?  
+                                            
+                                            <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
+                                                <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
+                                                    setLoadingText("Deleting Registry")
+                                                    setIsLoading(true)
+                                                    deleteRegistry(obj.name).finally(() => { setIsLoading(false) })
+                                                }} />
+                                            </div>: ""}
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                            {checkPerm(permissions, "createRegistry") ? 
+
+                        <tr>
+                            <td style={{ paddingLeft: "10px" }}>
+                                <input style={{ maxWidth: "150px" }} type="text" onChange={(e) => setName(e.target.value)} value={name} placeholder="Enter URL" />
+                            </td>
+                            <td>
+                                <input style={{ maxWidth: "150px" }} type="text" value={user} onChange={(e) => setUser(e.target.value)} placeholder="Enter User" />
+                            </td>
+                            <td style={{ paddingRight: "10px" }} colSpan="2">
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e) => setToken(e.target.value)} />
+                                    <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
+                                        setLoadingText("Creating Registry")
+                                        setIsLoading(true)
+                                        createRegistry().finally(() => { setIsLoading(false) })
+                                        }}>
+                                        <span style={{ flex: "auto" }}>
+                                            <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                        </span>
                                     </div>
-                                </td>
-                            </tr>
-                        )
-                    })}
-                        {checkPerm(permissions, "createRegistry") ? 
-
-                    <tr>
-                        <td style={{ paddingLeft: "10px" }}>
-                            <input style={{ maxWidth: "150px" }} type="text" onChange={(e) => setName(e.target.value)} value={name} placeholder="Enter URL" />
-                        </td>
-                        <td>
-                            <input style={{ maxWidth: "150px" }} type="text" value={user} onChange={(e) => setUser(e.target.value)} placeholder="Enter User" />
-                        </td>
-                        <td style={{ paddingRight: "10px" }} colSpan="2">
-                            <div style={{ display: "flex", alignItems: "center" }}>
-                                <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e) => setToken(e.target.value)} />
-                                <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={() => createRegistry()}>
-                                    <span style={{ flex: "auto" }}>
-                                        <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
-                                    </span>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>: ""}
-                    </>
-                </tbody>
-            </table>
-        </div>
+                            </td>
+                        </tr>: ""}
+                        </>
+                    </tbody>
+                </table>
+            </div>
+        </LoadingWrapper >
     )
 }
 

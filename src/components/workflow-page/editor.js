@@ -1,5 +1,5 @@
-import { Controlled as CodeMirror } from "react-codemirror2";
-import React from "react";
+import { Controlled as CodeMirror} from "react-codemirror2";
+import React, {  useEffect, useState   } from 'react'
 
 
 // style editor
@@ -16,10 +16,170 @@ import 'codemirror/addon/fold/foldgutter.css';
 import "codemirror/mode/yaml/yaml.js";
 import "codemirror/addon/lint/yaml-lint";
 
-export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef } = props;
+function getFunctionLines(str){
+    var arr = str.split("\n");
+    var fLines = {};
+    var inF = false;
+    var fTabs = 0
+    var fChildTabs = 0;
+    var fInfoSink = {id: null, type: null, service: null}
 
-    function editorSave() {
+    for (var i = 0; i < arr.length; i++)
+    {
+        if (inF){
+            var numberOfTabs = arr[i].match(/^[\s-]*/)[0].length
+            
+            if (numberOfTabs <= fTabs) {
+                break // Left function 
+            }
+
+            if (fChildTabs === 0){
+                fChildTabs = numberOfTabs
+            } else if(numberOfTabs < fChildTabs){
+                break // Left function
+            }
+
+            // Check if this line contains id, service, type
+            var fID = arr[i].replace(/^[\s-]*id:/, "")
+            var fService = arr[i].replace(/^[\s-]*service:/, "")
+            var fType = arr[i].replace(/^[\s-]*type:/, "")
+            if (fID !== arr[i]) {
+                // If id was extracted from line, push it
+                let startPos = arr[i].match(/^[\s-]*id:\s*/)[0].length
+                let endPos = arr[i].match(/^[\s-]*id:\s*[\w-]*/)[0].length
+                fLines[fID.trim()] =  {line: i, start: startPos, end: endPos}
+                fInfoSink.id = fID.trim()
+            } else if (fService !== arr[i]) {
+                fInfoSink.service = fService.trim()
+            } else if (fType !== arr[i]) {
+                fInfoSink.type = fType.trim()
+            }
+
+            // Set Type
+            if (fInfoSink.id && fInfoSink.type) {
+                if (fInfoSink.type !== "knative-namespace" && fInfoSink.type !== "knative-global") {
+                    fLines[fInfoSink.id].type = fInfoSink.type
+                    fInfoSink = {id: null, type: null, service: null}
+                } else if (fInfoSink.service){
+                    fLines[fInfoSink.id].type = fInfoSink.type
+                    fLines[fInfoSink.id].service = fInfoSink.service
+                    fInfoSink = {id: null, type: null, service: null}
+                }
+
+            }
+        } else if (/^\s*functions:/.test(arr[i])){
+            inF  = true; // Entered Function
+            fTabs = arr[i].match(/^\s*/)[0].length
+        }
+    }
+
+    return fLines
+}
+
+function makeGutterError(msg) {
+    var tooltip = document.createElement("div");
+    var tooltipText = document.createElement("div");
+    tooltip.style.color = "#FF4040";
+    tooltip.innerHTML = "●";
+    tooltip.setAttribute('class', 'tooltip')
+
+    tooltipText.setAttribute('class', 'tooltiptext')
+    tooltipText.innerHTML = msg
+
+    tooltip.appendChild(tooltipText)
+    return tooltip;
+}
+
+// function makeLineError(msg) {
+//     var tooltip = document.createElement("div");
+//     var tooltipText = document.createElement("span");
+//     tooltip.style.color = "#FF4040";
+//     tooltip.innerHTML = "  Bad Function";
+//     tooltip.setAttribute('class', 'tooltip')
+
+//     tooltipText.setAttribute('class', 'tooltiptext')
+//     tooltipText.innerHTML = msg
+
+//     tooltip.appendChild(tooltipText)
+//     return tooltip;
+// }
+
+export default function ReactEditor(props) {
+    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
+    const [cmEditor, setCMEditor] = useState(null)
+    const [marks, setMarks] = useState([])
+
+
+    function setFunctionErrors(cm) {
+        let fLines = null;
+        let markedTexts = []
+        cm.clearGutter('Custom-Errors');
+        for (var i = 0; i < functions.length; i++)
+        {
+            var errorMsg = ""
+            for (const fCondition of functions[i].conditions) {
+                if (errorMsg !== "") {
+                    errorMsg += "<br>"
+                }
+
+                if (fCondition.status === "False"){
+                    errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>${fCondition.reason ? `├─Reason: ${fCondition.reason}<br>` : ""}`
+                    errorMsg += `└─Message: ${fCondition.message.length < 60 ? fCondition.message : "Too large to preview"}<br>`
+                }
+            }
+
+            let foundFunction = false
+            if (errorMsg !== "") {
+                // Get functions lines on first error
+                if (fLines === null){
+                    fLines = getFunctionLines(value);
+                }
+
+                // Extra check to make sure that value still has function
+                let invalidF = fLines[functions[i].info.name]
+                if (invalidF !== undefined && invalidF.type == "reusable") {
+                    cm.setGutterMarker(invalidF.line, 'Custom-Errors', makeGutterError(errorMsg));
+                    // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
+                    markedTexts.push(cm.markText({ch: invalidF.start, line: invalidF.line}, {ch: invalidF.end, line: invalidF.line}, {className: 'line-error'}))
+                    foundFunction = true
+                }
+
+                // Did not find function, look for global / namespace services
+                if (!foundFunction) {
+                    for (const [key, val] of Object.entries(fLines)) {
+                        if (val.type === "knative-namespace" && functions[i].info.namespace !== "" && (val.service === functions[i].serviceName || `ns-${functions[i].info.namespace}-${val.service}` === functions[i].serviceName)) {
+                            // found namespace service
+                            cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
+                            markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
+                            foundFunction = true
+                            break
+                        } else if (val.type === "knative-global" && functions[i].info.namespace === ""  && (val.service === functions[i].serviceName || `g-${val.service}` === functions[i].serviceName)) {
+                            // found global service
+                            cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
+                            markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
+                            foundFunction = true
+                            break
+                        }
+                    }
+                }
+           }
+        }
+
+        // Clear old marks
+        for (i = 0; i < marks.length; i++){
+            marks[i].clear()
+        }
+        
+        // Save new marks
+        setMarks(markedTexts)
+    }
+
+
+    function editorSave(cm) {
+        if (functions) {
+            setFunctionErrors(cm)
+        }
+
         if (saveCallback) {
             saveCallback()
             return
@@ -28,11 +188,19 @@ export default function ReactEditor(props) {
         console.warn("Editor: saveCallback not set")
     }
 
+    useEffect(() => {
+        if (functions && cmEditor && value && value.length > 0) {
+            setFunctionErrors(cmEditor)
+        }
+    }, [functions, cmEditor, value])
+
     return (
         <div className="editor-wrapper">
             {loading ? <div className="editor-loading"></div> : <></>}
             <div className={showFooter ? "editor-small" : "editor-full"}>
                 <CodeMirror
+                    editorDidMount={(cm)=>{
+                    }}
                     ref={editorRef}
                     value={value}
                     options={{
@@ -45,15 +213,15 @@ export default function ReactEditor(props) {
                         indentWithTabs: false,
                         smartIndent: true,
                         foldGutter: true,
-                        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "Custom-Errors"],
                         extraKeys: {
                             "Ctrl-S": editorSave,
                             Tab: (cm) => {
-                            if (cm.getMode().name === 'null') {
-                                cm.execCommand('insertTab');
-                            } else {
-                                cm.execCommand('indentMore');
-                            }
+                                if (cm.getMode().name === 'null') {
+                                    cm.execCommand('insertTab');
+                                } else {
+                                    cm.execCommand('indentMore');
+                                }
                             },
                             'Shift-Tab': (cm) => cm.execCommand('indentLess'),
                             "Ctrl-/": function (cm) {
@@ -113,6 +281,9 @@ export default function ReactEditor(props) {
                     }}
                     onBeforeChange={(editor, data, val) => {
                         setValue(val)
+                    }}
+                    editorDidMount={(cm, val)=>{
+                        setCMEditor(cm)
                     }}
                 />
             </div>

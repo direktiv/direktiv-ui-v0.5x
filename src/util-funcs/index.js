@@ -77,7 +77,7 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
           // if initial load
           if(load){
             // if pathname isnt jqplayground check if namespace is provided
-            if(window.location.pathname !== "/jq/playground") {
+            if(window.location.pathname !== "/jq/playground" && window.location.pathname.includes("/global/functions") ) {
               // 1st. check if namespace is in the pathname 
               if (window.location.pathname.split("/")[1] !== "") {
                 // handle if pathname is /i as its a different route
@@ -167,3 +167,30 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
     }
   }
   
+
+  
+// New regex patterns to match values against
+export const PrimaryRegex = new RegExp("^(([a-z][a-z0-9_\-]*[a-z0-9])|([a-z]))$")
+export const VarRegex = new RegExp("^(([a-zA-Z][a-zA-Z0-9_\-]*[a-zA-Z0-9])|([a-zA-Z]))$")
+
+export function validateAgainstPrimaryRegex(str, label) {
+
+  if (PrimaryRegex.test(str)) {
+    // str matches regex pattern, return without error
+    return 
+  }
+
+  return `${label} must container only lower-case alphanumeric characters, underscores, and dashes, must start with an alphabetic character, and must not end with '_' or '-'`
+
+}
+
+export function validateAgainstVariableRegex(str, label) {
+
+  if (VarRegex.test(str)) {
+    // str matches regex pattern, return without error
+    return 
+  }
+
+  return `${label} must container only alphanumeric characters, underscores, and dashes, must start with an alphabetic character, and must not end with '_' or '-'`
+
+}

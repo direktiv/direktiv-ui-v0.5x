@@ -125,6 +125,19 @@ input:focus {
     border: solid 1px rgba(0, 0, 0, 0.05);
 }
 
+.neumorph-hover:hover {
+    border-radius: 8px;
+    /* background-color: var(--primary-light); */
+    background: linear-gradient(145deg, #dadada, #f0f0f0);
+    box-shadow: var(--neumorph-offset-dark) var(--neumorph-offset-dark) var(--neumorph-blur) var(--neumorph-shadow-dark), var(--neumorph-offset-light) var(--neumorph-offset-light) var(--neumorph-blur) var(--neumorph-shadow-light);
+    /* width: fit-content;
+    height: fit-content; */
+    color: var(--font-dark);
+
+
+    /* border: solid 1px rgba(0, 0, 0, 0.05); */
+}
+
 /* ----- new neumorph ------ */
 
 .shadow-soft, .Toastify__toast {
