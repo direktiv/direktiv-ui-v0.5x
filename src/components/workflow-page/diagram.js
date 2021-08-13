@@ -234,12 +234,12 @@ function End(props) {
 function WorkflowDiagram(props) {
     const { elements, functions,params } = props
     const funcRef = useRef() 
-    funcRef.current = functions
     const { fitView } = useZoomPanHelper();
+    funcRef.current = functions
 
     useEffect(()=>{
         fitView()
-    },[fitView])
+    },[fitView, elements])
 
     const State = useCallback((props) => {
         const {data} = props
@@ -433,12 +433,7 @@ export default function Diagram(props) {
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
             <ReactFlowProvider>
-                {
-                     elements !== null ?                    
                     <WorkflowDiagram params={params} functions={functions} elements={elements} />
-                    :
-                    ""
-                }
             </ReactFlowProvider>
         </div>
 
