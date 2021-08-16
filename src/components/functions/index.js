@@ -22,15 +22,17 @@ export default function Functions() {
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
+            let x = "/functions/"
             let body = {
                 scope: "g"
             }
             if(params.namespace) {
                 body.scope = "ns"
+                x = `/namespaces/${params.namespace}/functions/`
                 body["namespace"] = params.namespace
             }
             try {
-                let resp = await fetch(`/functions/`, {
+                let resp = await fetch(x, {
                     method: "POST",
                     body: JSON.stringify(body)
                 })
@@ -179,10 +181,12 @@ function CreateKnativeFunc(props) {
                 size: parseInt(size),
                 cmd: cmd,
             }
+            let x = "/functions/new"
             if (namespace) {
+                x = `/namespaces/${namespace}/functions/new`
                 body["namespace"] = namespace
             }
-            let resp = await fetch(`/functions/new`, {
+            let resp = await fetch(x, {
                 method: "POST",
                 body: JSON.stringify(body)
             })

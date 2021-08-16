@@ -38,13 +38,13 @@ export default function Services() {
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
-            let x = "g"
+            let x = `/functions/g-${service}`
             if (namespace) {
-                x = `ns-${namespace}`
+                x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
             try {
                 let tr = []
-                let resp = await fetch(`/functions/${x}-${service}`, {
+                let resp = await fetch(x, {
                     method:"GET"
                 })
                 if (resp.ok) {
@@ -382,11 +382,11 @@ function CreateRevision(props) {
 
     const createRevision = async () => {
         try {
-            let x = "g"
+            let x = `/functions/g-${service}`
             if (namespace) {
-                x = `ns-${namespace}`
+                x =  `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
-            let resp = await fetch(`/functions/${x}-${service}`, {
+            let resp = await fetch(x, {
                 method: "POST",
                 body: JSON.stringify({
                     image: latestRevision.image,
@@ -523,9 +523,9 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            let x = "g"
+            let x = `/functions/g-${service}`
             if (namespace) {
-                x = `ns-${namespace}`
+                x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
 
             let body = [{
@@ -539,7 +539,7 @@ function EditRevision(props) {
                 })
             }
 
-            let resp = await fetch(`/functions/${x}-${service}`, {
+            let resp = await fetch(x, {
                 method: "PATCH",
                 body: JSON.stringify({values:body})
             })
