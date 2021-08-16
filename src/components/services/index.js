@@ -95,15 +95,17 @@ export default function Services() {
     
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
+            let x = `/functions/`
             let body = {
                 scope: "g"
             }
             if(namespace) {
+                x = `/namespaces/${namespace}/functions/`
                 body.scope = "ns"
                 body["namespace"] = namespace
             }
             try {
-                let resp = await fetch(`/functions/`, {
+                let resp = await fetch(x, {
                     method: "POST",
                     body: JSON.stringify(body)
                 })
