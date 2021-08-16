@@ -21,15 +21,22 @@ export default function Functions() {
   
 
     useEffect(()=>{
-        const sse = new EventSource('http://localhost:8080',{
-            withCredentials: true
-        })
+        const sse = new EventSource('http://localhost:8080')
 
         function getData(data) {
             console.log(data)
         }
 
+        sse.onmessage = e => getData(JSON.parse(e.data))
         
+        sse.onerror = () => {
+            console.log('error with sse')
+            sse.close();
+        }
+
+        return () => {
+            sse.close();
+        }
     },[])
 
     // const fetchServices = useCallback(()=>{
@@ -106,11 +113,11 @@ export default function Functions() {
                             <>
                                 {functions.length > 0 ?
                                     <div >
-                                        {functions.map((obj) => {
+                                        {/* {functions.map((obj) => {
                                             return (
                                                 <KnativeFunc conditions={obj.conditions} fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )
-                                        })}
+                                        })} */}
                                     </div>
                                     : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
                             </> : ""}
@@ -123,10 +130,10 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            {config !== null ?
+                            {/* {config !== null ?
                             <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
                                 : 
-                                ""}
+                                ""} */}
                             </div>
                     </div>
             </div>
