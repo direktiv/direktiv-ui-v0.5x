@@ -20,54 +20,67 @@ export default function Functions() {
     const [fetchServiceErr, setFetchServiceErr] = useState("")
   
 
-    const fetchServices = useCallback(()=>{
-        async function fetchFunctions() {
-            let x = "/functions/"
-            let body = {
-                scope: "g"
-            }
-            if(params.namespace) {
-                body.scope = "ns"
-                x = `/namespaces/${params.namespace}/functions/`
-                body["namespace"] = params.namespace
-            }
-            try {
-                let resp = await fetch(x, {
-                    method: "POST",
-                    body: JSON.stringify(body)
-                })
-                if(resp.ok) {
-                    let arr = await resp.json()
-                    setConfig(arr.config)
-                    if (arr.services.length > 0) {
-                        setFunctions(arr.services)
-                    } else {
-                        setFunctions([])
-                    }
-                } else {
-                    await handleError('fetch services', resp, 'listServices')
-                }
-            } catch(e) {
-                setFetchServiceErr(`Error fetching services: ${e.message}`)
-            }
-        }
-        return fetchFunctions()
-    },[fetch, handleError, params.namespace])
-
     useEffect(()=>{
-            let interval = setInterval(()=>{
-                fetchServices()
-            }, 3000)
-            return () => {
-                clearInterval(interval)
-            }
-    },[ functions])
+        const sse = new EventSource('http://localhost:8080',{
+            withCredentials: true
+        })
 
-    useEffect(()=>{
-        if (functions === null) {
-            fetchServices().finally(()=> {setIsLoading(false)}) 
+        function getData(data) {
+            console.log(data)
         }
-    },[fetchServices, functions])
+
+        
+    },[])
+
+    // const fetchServices = useCallback(()=>{
+    //     async function fetchFunctions() {
+    //         let x = "/functions/"
+    //         let body = {
+    //             scope: "g"
+    //         }
+    //         if(params.namespace) {
+    //             body.scope = "ns"
+    //             x = `/namespaces/${params.namespace}/functions/`
+    //             body["namespace"] = params.namespace
+    //         }
+    //         try {
+    //             let resp = await fetch(x, {
+    //                 method: "POST",
+    //                 body: JSON.stringify(body)
+    //             })
+    //             if(resp.ok) {
+    //                 let arr = await resp.json()
+    //                 setConfig(arr.config)
+    //                 if (arr.services.length > 0) {
+    //                     setFunctions(arr.services)
+    //                 } else {
+    //                     setFunctions([])
+    //                 }
+    //             } else {
+    //                 await handleError('fetch services', resp, 'listServices')
+    //             }
+    //         } catch(e) {
+    //             setFetchServiceErr(`Error fetching services: ${e.message}`)
+    //         }
+    //     }
+    //     return fetchFunctions()
+    // },[fetch, handleError, params.namespace])
+
+    // useEffect(()=>{
+    //         let interval = setInterval(()=>{
+    //             fetchServices()
+    //         }, 3000)
+    //         return () => {
+    //             clearInterval(interval)
+    //         }
+    // },[ functions])
+
+    // useEffect(()=>{
+    //     if (functions === null) {
+    //         fetchServices().finally(()=> {setIsLoading(false)}) 
+    //     }
+    // },[fetchServices, functions])
+
     return(
         <>
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
