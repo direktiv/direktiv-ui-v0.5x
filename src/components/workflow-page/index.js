@@ -111,7 +111,7 @@ export default function WorkflowPage() {
                         setFunctions([])
                     }
                 } else {
-                    await handleError('fetch workflow functions', resp, "getWorkflowFunctions")
+                    await handleError('get workflow functions', resp, "getWorkflowFunctions")
                 }
             } catch(e) {
                 setAErr(`Unable to get workflow functions: ${e.message}`)
