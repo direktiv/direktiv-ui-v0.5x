@@ -105,17 +105,18 @@ export default function Functions() {
                     </div>
                     </LoadingWrapper>
                 </div>
+                            {config !== null ?
+
                     <div className="shadow-soft rounded tile" style={{ maxWidth: "300px", height:"fit-content", flex: 1 }}>
                         <TileTitle name="Create knative service">
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            {config !== null ?
                             <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
-                                : 
-                                ""}
+                              
                             </div>
-                    </div>
+                    </div>  : 
+                                ""}
             </div>
         </div>
         </>
