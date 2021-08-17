@@ -460,7 +460,7 @@ export default function WorkflowPage() {
 
                                                 <div style={{ flex: "auto" }}>
                                                     {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
-                                                    {workflowValueOld !== null && functions !== null ?
+                                                    {workflowValueOld !== null ?
                                                         <Diagram functions={functions} value={workflowValueOld} />
                                                         :
                                                         ""
