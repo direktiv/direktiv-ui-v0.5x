@@ -82,7 +82,7 @@ export default function Services() {
                     setService(json)
                     setTraffic(tr)
                 } else {
-                    await handleError('fetch revisions', resp, 'fetchService')
+                    await handleError('fetch revisions', resp, 'getService')
                 }
             } catch(e) {
                 setErrFetchRev(`Error fetching service: ${e.message}`)
@@ -163,7 +163,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
+                    <ListRevisions checkPerm={checkPerm} permissions={permissions} traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
 
 }
                     </LoadingWrapper>
@@ -206,7 +206,7 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, getService, fetch, traffic} = props
+    const {revisions, getService, fetch, traffic, checkPerm, permissions} = props
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj, i)=>{
@@ -237,7 +237,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision checkPerm={checkPerm} permissions={permissions} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -245,7 +245,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete} = props
+    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, permissions, checkPerm, image, generation, created,  conditions, status, traffic, hideDelete} = props
 
     let panelID = name;
     function toggleItem(){
@@ -290,7 +290,7 @@ function Revision(props) {
                         <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
                 </div>
-               {!hideDelete ? <div style={{flex: "auto", textAlign: "right"}}>
+               {!hideDelete && checkPerm(permissions, "deleteService") ? <div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
