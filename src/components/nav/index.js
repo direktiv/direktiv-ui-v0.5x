@@ -415,7 +415,7 @@ export default function Navbar(props) {
                     </li>         
         
                 </ul>
-                <div className="nav-section divider"> 
+                {permissions.admin ?    <div className="nav-section divider"> 
                     <ul>
                         <li>
                         <Link style={{color: matchGlobal !== null ? "#4497f5": "", display:"flex", alignItems:"center"}} onClick={()=>{
@@ -428,7 +428,7 @@ export default function Navbar(props) {
                             </Link>
                         </li>
                     </ul>
-                </div>      
+                </div>    :""}  
             </div>
             {footer ? footer : "" }
         </div>
