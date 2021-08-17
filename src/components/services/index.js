@@ -290,7 +290,7 @@ function Revision(props) {
                         <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
                 </div>
-               {!hideDelete ?<> {checkPerm(permissions, "deleteService") ?<div style={{flex: "auto", textAlign: "right"}}>
+               {!hideDelete ?<> {checkPerm(permissions, "deleteRevision") ?<div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
