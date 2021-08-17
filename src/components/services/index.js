@@ -163,7 +163,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions checkPerm={checkPerm} permissions={permissions} traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
+                    <ListRevisions namespace={namespace} checkPerm={checkPerm} permissions={permissions} traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
 
 }
                     </LoadingWrapper>
@@ -206,7 +206,7 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, getService, fetch, traffic, checkPerm, permissions} = props
+    const {revisions, getService, fetch, traffic, checkPerm, permissions, namespace} = props
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj, i)=>{
@@ -237,7 +237,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision checkPerm={checkPerm} permissions={permissions} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision namespace={namespace} checkPerm={checkPerm} permissions={permissions} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -245,7 +245,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, permissions, checkPerm, image, generation, created,  conditions, status, traffic, hideDelete} = props
+    const {titleColor, namespace, name, fetch, size, cmd, minScale, fetchServices, permissions, checkPerm, image, generation, created,  conditions, status, traffic, hideDelete} = props
 
     let panelID = name;
     function toggleItem(){
@@ -255,7 +255,11 @@ function Revision(props) {
 
     const deleteRevision = async () => {
         try {
-            let resp = await fetch(`/functionrevisions/${name}`,{
+            let x = `/functionrevisions/${name}`
+            if(namespace) {
+                x = `/namespaces/${namespace}/functions/`
+            }
+            let resp = await fetch(x,{
                 method: "DELETE"
             })
             if (resp.ok) {
