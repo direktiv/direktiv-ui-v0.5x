@@ -499,7 +499,7 @@ export default function WorkflowPage() {
                                 {tab === "functions" ?
                                     <>
                                                   {
-                                             aErr === "" ? 
+                                             aErr !== "" ? 
                                     <>
 <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                                         {aErr}
