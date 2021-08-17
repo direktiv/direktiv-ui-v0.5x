@@ -275,7 +275,7 @@ function CreateKnativeFunc(props) {
 
 function KnativeFunc(props) {
 
-    const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage, permissions} = props
+    const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage, permissions, checkPerm} = props
 
     const deleteService = async () => {
         try {
