@@ -498,17 +498,20 @@ export default function WorkflowPage() {
                                 }
                                 {tab === "functions" ?
                                     <>
-                                    {checkPerm(permissions, "getWorkflowFunctions") ? 
-                                     <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
-                                     <div id="events-tile" className="tile-contents">
-                                         {
+                                                  {
                                              aErr === "" ? 
-                                         <FuncComponent functions={functions}/>
-:
+                                    <>
 <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                                         {aErr}
                                     </div>
-                                         }
+                                    </>
+                                    :""}
+                                    {checkPerm(permissions, "getWorkflowFunctions") ? 
+                                     <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                     <div id="events-tile" className="tile-contents">
+                           
+                                         <FuncComponent functions={functions}/>
+                                         
                                      </div> </div>:""}
                                     </>
                                 :""
