@@ -18,7 +18,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 export default function Services() {
-    const {fetch, handleError} = useContext(MainContext)
+    const {fetch, handleError, checkPerm, permissions} = useContext(MainContext)
     let { service, namespace } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
@@ -168,14 +168,12 @@ export default function Services() {
 }
                     </LoadingWrapper>
                 </div>
+                {latestRevision !== null && config !== null && traffic !== null ?
                 <div className="container" style={{ flexDirection: "column"}}>
-
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
                         <TileTitle name="Traffic Management">
                              <IoClipboardSharp />
                         </TileTitle>
-                        {
-                            traffic !== null ?
                             <EditRevision 
                                 setRev1Percentage={setRev1Percentage} 
                                 rev1Percentage={rev1Percentage} 
@@ -193,21 +191,14 @@ export default function Services() {
                                 namespace={namespace} 
                                 service={service}
                                 />
-                            :
-                            ""
-                        }
                     </div>
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px"}}>
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                        {latestRevision !== null && config !== null ?
                             <CreateRevision namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
-                            :
-                            ""
-                        }
                     </div>
-                </div>
+                </div>:""}
                 </div>
             </div>
         </div>
