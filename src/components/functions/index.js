@@ -12,7 +12,7 @@ import LoadingWrapper from "../loading"
 import { Link,  useParams } from 'react-router-dom'
 
 export default function Functions() {
-    const {fetch,  handleError} = useContext(MainContext)
+    const {fetch,  handleError, checkPerm, permissions} = useContext(MainContext)
     const params = useParams()
     const [isLoading, setIsLoading] = useState(true)
     const [functions, setFunctions] = useState(null)
@@ -95,7 +95,7 @@ export default function Functions() {
                                     <div >
                                         {functions.map((obj) => {
                                             return (
-                                                <KnativeFunc conditions={obj.conditions} fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                <KnativeFunc permissions={permissions} checkPerm={checkPerm} conditions={obj.conditions} fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )
                                         })}
                                     </div>
@@ -275,7 +275,7 @@ function CreateKnativeFunc(props) {
 
 function KnativeFunc(props) {
 
-    const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage} = props
+    const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage, permissions} = props
 
     const deleteService = async () => {
         try {
@@ -313,7 +313,7 @@ function KnativeFunc(props) {
                         <b>{name}</b> <i style={{fontSize:"12px"}}>{image}</i>
                     </div>
                 </div>
-                <div style={{flex: "auto", textAlign: "right"}}>
+                {checkPerm(permissions, "deleteService")?<div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
@@ -322,7 +322,7 @@ function KnativeFunc(props) {
                             }} /> 
                         </div>
                     </div>
-                </div>
+                </div>:""}
             </div>
             <div style={{fontSize:'14px', display:"flex"}}>
             <div className="services-list-contents singular" style={{height:"auto",  overflow:"visible", width:"100%", paddingBottom:"10px"}}>
