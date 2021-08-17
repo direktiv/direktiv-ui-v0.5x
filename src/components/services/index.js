@@ -290,7 +290,7 @@ function Revision(props) {
                         <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
                 </div>
-               {!hideDelete && checkPerm(permissions, "deleteService") ? <div style={{flex: "auto", textAlign: "right"}}>
+               {!hideDelete ?<> {checkPerm(permissions, "deleteService") ?<div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
@@ -299,7 +299,7 @@ function Revision(props) {
                             }} /> 
                         </div>
                     </div>
-                </div>:""}
+                </div>:""}</>:""}
             </div>
             <div className="services-list-contents singular">
             <div className="service-list-item-panel" style={{fontSize:'14px'}}>
@@ -540,7 +540,7 @@ function EditRevision(props) {
                 setErr('')
                 await getService()
             } else {
-                await handleError("set traffic", resp, "updateTraffic")
+                await handleError("set traffic", resp, "updateService")
             }
         } catch(e) {
             setErr(`Error setting traffic: ${e.message}`)
