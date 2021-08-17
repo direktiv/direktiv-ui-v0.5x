@@ -54,6 +54,7 @@ export default function WorkflowPage() {
     const [workflowInfo, setWorkflowInfo] = useState({ revision: 0, active: true, fetching: true })
 
     const [err, setErr] = useState("")
+    const [aErr, setAErr] = useState("")
     const [actionErr, setActionErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
@@ -110,10 +111,10 @@ export default function WorkflowPage() {
                         setFunctions([])
                     }
                 } else {
-                    await handleError('fetch knative functions', resp, "fetchKnativeFunctions")
+                    await handleError('fetch workflow functions', resp, "getWorkflowFunctions")
                 }
             } catch(e) {
-                setErr(`Unable to fetch knative functions: ${e.message}`)
+                setAErr(`Unable to get workflow functions: ${e.message}`)
             }
         }
 
@@ -496,11 +497,14 @@ export default function WorkflowPage() {
                                     </div>:""
                                 }
                                 {tab === "functions" ?
+                                    <>
+                                    {checkPerm(permissions, "getWorkflowFunctions") ? 
                                      <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
                                      <div id="events-tile" className="tile-contents">
                                          <FuncComponent functions={functions}/>
-                                     </div>
-                                 </div>:""
+                                     </div> </div>:""}
+                                    </>
+                                :""
                                 }
                             </div>
                             {attributeAdd ? attributeAdd : ""}
