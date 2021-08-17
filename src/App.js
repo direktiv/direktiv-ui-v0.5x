@@ -397,6 +397,7 @@ function Content() {
       checkPerm: CheckPerm,
       workflowButtons: [],
       extraLinks: [],
+      permissions: {},
       namespaceInteractions: NamespaceInteractions,
       workflowInteractions: WorkflowInteractions,
       instanceInteractions: InstanceInteractions,
