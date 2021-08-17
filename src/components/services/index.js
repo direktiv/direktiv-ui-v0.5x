@@ -257,7 +257,7 @@ function Revision(props) {
         try {
             let x = `/functionrevisions/${name}`
             if(namespace) {
-                x = `/namespaces/${namespace}/functions/`
+                x = `/namespaces/${namespace}/functionrevisions/${name}`
             }
             let resp = await fetch(x,{
                 method: "DELETE"
