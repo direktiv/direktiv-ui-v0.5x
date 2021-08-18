@@ -34,35 +34,52 @@ export default function Functions() {
             body["namespace"] = params.namespace
         }
         
-        var source = new SSE(`http://192.168.0.115/api${x}`, {
-            payload: JSON.stringify(body)
-        });
-
-        source.onstatus = function(e) {
-            console.log("status:", e)
+        var sse = new EventSource(`http://192.168.0.115/api${x}`)
+        sse.onerror = () => {
+            // error log here
+            // after logging, close the connection   
+            console.log('error on sse')
+            sse.close();
         }
-
-        source.addEventListener('open', function(e) {
-            // Connection was opened.
-            console.log("on open", e)
-        }, false);
-          
-        source.addEventListener('error', function(e) {
-            if (e.readyState == EventSource.CLOSED) {
-              // Connection was closed.
-              console.log("connection closed", e)
-            }
-            console.log("err:", e)
-        }, false);
-
-        source.addEventListener('message', function(e) {
-            console.log("new message: ", e)
-        });
         
-        source.stream();
+        function getRealtimeData(data) {
+            // process the data here
+            // pass it to state to be rendered
+            console.log(data)
+        }
+        
+        sse.onmessage = e => getRealtimeData(e);
+        
+        // var source = new SSE(`http://192.168.0.115/api${x}`, {
+        //     payload: JSON.stringify(body)
+        // });
+
+        // source.onstatus = function(e) {
+        //     console.log("status:", e)
+        // }
+
+        // source.addEventListener('open', function(e) {
+        //     // Connection was opened.
+        //     console.log("on open", e)
+        // }, false);
+          
+        // source.addEventListener('error', function(e) {
+        //     if (e.readyState == EventSource.CLOSED) {
+        //       // Connection was closed.
+        //       console.log("connection closed", e)
+        //     }
+        //     console.log("err:", e)
+        // }, false);
+
+        // source.addEventListener('message', function(e) {
+        //     console.log("new message: ", e)
+        // });
+        
+        // source.stream();
 
         return () => {
-            source.removeEventListener('message')
+            sse.close()
+            // source.removeEventListener('message')
         }
     },[])
 
