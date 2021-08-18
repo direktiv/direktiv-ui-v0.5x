@@ -18,7 +18,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 export default function Services() {
-    const {fetch, handleError} = useContext(MainContext)
+    const {fetch, handleError, sse} = useContext(MainContext)
     let { service, namespace } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
@@ -33,8 +33,10 @@ export default function Services() {
 
     const [rev1Percentage, setRev1Percentage] = useState(0)
 
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
 
+    const [initialized, setInitialized] = useState(false)
+    const [initTraffic, setInitTraffic] = useState(false)
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
@@ -59,14 +61,12 @@ export default function Services() {
                     }
 
                     if (!editable) {
-                        if (tr){
-                            if (tr.length > 0) {
-                                console.log("tr is greater than 0")
-                                setRev1Name(tr[0].name)
-                                setRev1Percentage(tr[0].value)
-                                if(tr[1]) {
-                                    setRev2Name(tr[1].name)
-                                }
+                        if (tr.length > 0) {
+                            console.log("tr is greater than 0")
+                            setRev1Name(tr[0].name)
+                            setRev1Percentage(tr[0].value)
+                            if(tr[1]) {
+                                setRev2Name(tr[1].name)
                             }
                         }
                     }
@@ -79,6 +79,7 @@ export default function Services() {
                             cmd: json.revisions[0].cmd ? json.revisions[0].cmd : ""
                         })
                     }
+                    setConfig(json.config)
                     setService(json)
                     setTraffic(tr)
                 } else {
@@ -91,51 +92,58 @@ export default function Services() {
         return getServices()
     },[fetch, handleError, namespace, editable, service])
 
-    // get config
-    
-    const fetchServices = useCallback(()=>{
-        async function fetchFunctions() {
-            let body = {
-                scope: "g"
-            }
-            if(namespace) {
-                body.scope = "ns"
-                body["namespace"] = namespace
-            }
-            try {
-                let resp = await fetch(`/functions/`, {
-                    method: "POST",
-                    body: JSON.stringify(body)
-                })
-                if(resp.ok) {
-                    let arr = await resp.json()
-                    setConfig(arr.config)
-                } else {
-                    await handleError('fetch services', resp, 'listServices')
-                }
-            } catch(e) {
-                setErrFetchRev(`Error fetching services: ${e.message}`)
-            }
-        }
-        return fetchFunctions()
-    },[fetch, handleError, namespace])
-
+    // setup sse for traffic updates
     useEffect(()=>{
-            let interval = setInterval(()=>{
-                getService(true)
-            }, 3000)
-            return () => {
-                clearInterval(interval)
+        if(!initTraffic) {
+            let x = `/watch/functions/g-${service}`
+            if(namespace){
+                x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
-    },[getService])
 
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                console.log('error on sse', e)
+            }
 
-    useEffect(()=>{
-        if (config === null) {
-            fetchServices().finally(()=> {setIsLoading(false)})     
+            async function getRealtimeData(e) {
+                console.log(e, "watch traffic update")
+            }
+
+            eventConnection.onmessage = e => getRealtimeData(e)
+            setInitTraffic(true)
         }
-    },[fetchServices, config])
+    },[initTraffic])
 
+    // setup sse for revisions
+    useEffect(()=>{
+        if (!initialized) {
+
+            let x = `/watch/functions/g-${service}/revisions/`
+            if (namespace) {
+                x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}/revisions/`
+            }
+            
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                console.log('error on sse', e)
+            }
+
+            async function getRealtimeData(e) {
+                console.log(e, "watch revisions update")
+            }
+
+            eventConnection.onmessage = e => getRealtimeData(e)
+            setInitialized(true)
+        }
+
+    },[initialized])
+
+
+    // initial load request
     useEffect(()=>{
         if (srvice === null) {
             getService().finally(()=> {setIsLoading(false)})     
@@ -161,19 +169,19 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
+                    <ListRevisions traffic={traffic} fetch={fetch}  revisions={srvice ? srvice.revisions : []}/>
 
 }
                     </LoadingWrapper>
                 </div>
                 <div className="container" style={{ flexDirection: "column"}}>
-
+                {
+                            traffic !== null ?
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
                         <TileTitle name="Traffic Management">
                              <IoClipboardSharp />
                         </TileTitle>
-                        {
-                            traffic !== null ?
+                      
                             <EditRevision 
                                 setRev1Percentage={setRev1Percentage} 
                                 rev1Percentage={rev1Percentage} 
@@ -187,24 +195,27 @@ export default function Services() {
                                 handleError={handleError} 
                                 traffic={traffic} 
                                 fetch={fetch} 
-                                getService={getService} 
+                                // getService={getService} 
                                 namespace={namespace} 
                                 service={service}
                                 />
-                            :
-                            ""
-                        }
+                      
                     </div>
+                          :
+                          ""
+                      }
+                        {latestRevision !== null && config !== null ?
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px"}}>
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                        {latestRevision !== null && config !== null ?
-                            <CreateRevision namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
-                            :
-                            ""
-                        }
+                      
+                            <CreateRevision namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} service={service}/>
+                     
                     </div>
+                           :
+                           ""
+                       }
                 </div>
                 </div>
             </div>
@@ -399,7 +410,7 @@ function CreateRevision(props) {
             if (resp.ok) {
                 setErr("")
                 setTraffic(100)
-                await getService()
+                // await getService()
             } else {
                 await handleError('update service', resp, 'updateService')
             }

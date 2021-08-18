@@ -18,71 +18,88 @@ export default function Functions() {
     const {fetch,  handleError, sse} = useContext(MainContext)
     const params = useParams()
     const [isLoading, setIsLoading] = useState(true)
-    const [functions, setFunctions] = useState(null)
+
     const [config, setConfig] = useState(null)
+
+    const [functions, setFunctions] = useState(null)
+    const functionsRef = useRef(functions ? functions: [])
+    
+    const [initialized, setInitialized] = useState(false)
     const [fetchServiceErr, setFetchServiceErr] = useState("")
   
 
     useEffect(()=>{
-        let x = "/functions/watch/"
-        let body = {
-            scope: "g"
+        if (!initialized && functions !== null) {
+            let x = "/functions/watch/"
+            let body = {
+                scope: "g"
+            }
+            if(params.namespace) {
+                body.scope = "ns"
+                x = `/namespaces/${params.namespace}/functions/watch/`
+                body["namespace"] = params.namespace
+            }
+            
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                console.log('error on sse', e)
+            }
+            
+            async function getRealtimeData(e) {
+                let funcs = functionsRef.current
+                console.log(funcs, "FUNCS CURRENTLY")
+                // process the data here
+                // pass it to state to be rendered
+                let json = JSON.parse(e.data)
+                switch (json.event) {
+                case "DELETED":
+                    console.log("DELETED event handler")
+                    for (var i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            funcs.splice(i, 1)
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                case "MODIFIED":
+                    console.log("MODIFIED event handler")
+                    for(var i=0; i < funcs.length; i++) {
+                        if (funcs[i].serviceName === json.function.serviceName) {
+                            funcs[i] = json.function
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                default:
+                    console.log("ADDED event handler")
+                    let found = false
+                    for(var i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            found = true 
+                            break
+                        }
+                    }
+                    if (!found){
+                        funcs.push(json.function)
+                        functionsRef.current = funcs
+                    }
+                }
+                console.log('funcs after check', functionsRef)
+                setFunctions(JSON.parse(JSON.stringify(functionsRef.current)))
+            }
+            
+            eventConnection.onmessage = e => getRealtimeData(e);
+            setInitialized(true)
+            return () => {
+                // eventConnection.close()
+            }
         }
-        if(params.namespace) {
-            body.scope = "ns"
-            x = `/namespaces/${params.namespace}/functions/watch/`
-            body["namespace"] = params.namespace
-        }
-        
-        let eventConnection = sse(`${x}`, {})
-        eventConnection.onerror = (e) => {
-            // error log here
-            // after logging, close the connection   
-            console.log('error on sse', e)
-            eventConnection.close();
-        }
-        
-        function getRealtimeData(data) {
-            // process the data here
-            // pass it to state to be rendered
-            console.log(data)
-        }
-        
-        eventConnection.onmessage = e => getRealtimeData(e);
-        
-        
-        // var source = new SSE(`http://192.168.0.115/api${x}`, {
-        //     payload: JSON.stringify(body)
-        // });
 
-        // source.onstatus = function(e) {
-        //     console.log("status:", e)
-        // }
-
-        // source.addEventListener('open', function(e) {
-        //     // Connection was opened.
-        //     console.log("on open", e)
-        // }, false);
-          
-        // source.addEventListener('error', function(e) {
-        //     if (e.readyState == EventSource.CLOSED) {
-        //       // Connection was closed.
-        //       console.log("connection closed", e)
-        //     }
-        //     console.log("err:", e)
-        // }, false);
-
-        // source.addEventListener('message', function(e) {
-        //     console.log("new message: ", e)
-        // });
-        
-        // source.stream();
-
-        return () => {
-            eventConnection.close()
-            // source.removeEventListener('message')
-        }
-    },[sse])
+    },[sse, functions, initialized, functionsRef.current])
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
@@ -104,8 +121,11 @@ export default function Functions() {
                     let arr = await resp.json()
                     setConfig(arr.config)
                     if (arr.services.length > 0) {
+                        functionsRef.current = arr.services
                         setFunctions(arr.services)
+
                     } else {
+                        functionsRef.current = []
                         setFunctions([])
                     }
                 } else {
@@ -128,10 +148,11 @@ export default function Functions() {
     // },[ functions])
 
     useEffect(()=>{
-        if (functions === null) {
+        if (config === null && functions === null) {
             fetchServices().finally(()=> {setIsLoading(false)}) 
         }
-    },[fetchServices, functions])
+    },[fetchServices])
+
 
     return(
         <>
@@ -148,39 +169,37 @@ export default function Functions() {
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
                     <div style={{maxHeight:"785px", overflow:"visible"}}>
-                        {fetchServiceErr !== "" ?
-                        <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                            {fetchServiceErr}
-                        </div>
-                        :
+                   
                         <>
                         {functions !== null ?
                             <>
                                 {functions.length > 0 ?
                                     <div >
                                         {functions.map((obj) => {
+                                            console.log(obj)
                                             return (
-                                                <KnativeFunc conditions={obj.conditions} fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                <KnativeFunc key={obj.serviceName} conditions={obj.conditions} fetch={fetch} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )
                                         })}
                                     </div>
                                     : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
                             </> : ""}
-                        </>}
+                        </>
                     </div>
                     </LoadingWrapper>
                 </div>
-                    <div className="shadow-soft rounded tile" style={{ maxWidth: "300px", height:"fit-content", flex: 1 }}>
+                    
+                    {!isLoading ?<div className="shadow-soft rounded tile" style={{ maxWidth: "300px", height:"fit-content", flex: 1 }}>
                         <TileTitle name="Create knative service">
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
                             {config !== null ?
-                            <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
+                            <CreateKnativeFunc config={config} handleError={handleError}  namespace={params.namespace} fetch={fetch}/>
                                 : 
                                 ""}
                             </div>
-                    </div>
+                    </div>: ""}
             </div>
         </div>
         </>
@@ -263,7 +282,7 @@ function CreateKnativeFunc(props) {
                 setScale(0)
                 setSize(0)
                 setCmd("")
-                await fetchServices()
+                // await fetchServices()
             } else {
                 await handleError('create service', resp, 'createService')
 
@@ -347,7 +366,7 @@ function KnativeFunc(props) {
                 method:"DELETE"
             })
             if (resp.ok) {
-                fetchServices()
+                // fetchServices()
             } else {
                 console.log(resp, "todo handle delete service resp")
             }
@@ -366,7 +385,7 @@ function KnativeFunc(props) {
 
     return(
         
-        <Link  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
+        <Link key={serviceName}  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
             <div className="neumorph-hover">
             <div className="services-list-div">
                 <div>
@@ -405,7 +424,7 @@ function KnativeFunc(props) {
                                     circleFill = "crashed"
                                 }
                                 return(
-                                    <li>
+                                    <li key={obj.name}>
                                         <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                                         <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
                                     </li>
