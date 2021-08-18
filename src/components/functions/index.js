@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState} from 'react'
+import {SSE} from 'sse.js'
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Slider, { SliderTooltip, Handle } from 'rc-slider';
@@ -11,6 +12,8 @@ import MainContext from '../../context'
 import LoadingWrapper from "../loading"
 import { Link,  useParams } from 'react-router-dom'
 
+
+
 export default function Functions() {
     const {fetch,  handleError} = useContext(MainContext)
     const params = useParams()
@@ -21,57 +24,81 @@ export default function Functions() {
   
 
     useEffect(()=>{
-        const sse = new EventSource('http://localhost:8080')
-
-        function getData(data) {
-            console.log(data)
+        let x = "/functions/watch/"
+        let body = {
+            scope: "g"
         }
-
-        sse.onmessage = e => getData(JSON.parse(e.data))
+        if(params.namespace) {
+            body.scope = "ns"
+            x = `/namespaces/${params.namespace}/functions/watch/`
+            body["namespace"] = params.namespace
+        }
         
-        sse.onerror = () => {
-            console.log('error with sse')
-            sse.close();
+        var source = new SSE(`http://192.168.0.115/api${x}`, {
+            payload: JSON.stringify(body)
+        });
+
+        source.onstatus = function(e) {
+            console.log("status:", e)
         }
+
+        source.addEventListener('open', function(e) {
+            // Connection was opened.
+            console.log("on open", e)
+        }, false);
+          
+        source.addEventListener('error', function(e) {
+            if (e.readyState == EventSource.CLOSED) {
+              // Connection was closed.
+              console.log("connection closed", e)
+            }
+            console.log("err:", e)
+        }, false);
+
+        source.addEventListener('message', function(e) {
+            console.log("new message: ", e)
+        });
+        
+        source.stream();
 
         return () => {
-            sse.close();
+            source.removeEventListener('message')
         }
     },[])
 
-    // const fetchServices = useCallback(()=>{
-    //     async function fetchFunctions() {
-    //         let x = "/functions/"
-    //         let body = {
-    //             scope: "g"
-    //         }
-    //         if(params.namespace) {
-    //             body.scope = "ns"
-    //             x = `/namespaces/${params.namespace}/functions/`
-    //             body["namespace"] = params.namespace
-    //         }
-    //         try {
-    //             let resp = await fetch(x, {
-    //                 method: "POST",
-    //                 body: JSON.stringify(body)
-    //             })
-    //             if(resp.ok) {
-    //                 let arr = await resp.json()
-    //                 setConfig(arr.config)
-    //                 if (arr.services.length > 0) {
-    //                     setFunctions(arr.services)
-    //                 } else {
-    //                     setFunctions([])
-    //                 }
-    //             } else {
-    //                 await handleError('fetch services', resp, 'listServices')
-    //             }
-    //         } catch(e) {
-    //             setFetchServiceErr(`Error fetching services: ${e.message}`)
-    //         }
-    //     }
-    //     return fetchFunctions()
-    // },[fetch, handleError, params.namespace])
+    const fetchServices = useCallback(()=>{
+        async function fetchFunctions() {
+            let x = "/functions/"
+            let body = {
+                scope: "g"
+            }
+            if(params.namespace) {
+                body.scope = "ns"
+                x = `/namespaces/${params.namespace}/functions/`
+                body["namespace"] = params.namespace
+            }
+            try {
+                let resp = await fetch(x, {
+                    method: "POST",
+                    body: JSON.stringify(body)
+                })
+                if(resp.ok) {
+                    let arr = await resp.json()
+                    setConfig(arr.config)
+                    if (arr.services.length > 0) {
+                        setFunctions(arr.services)
+                    } else {
+                        setFunctions([])
+                    }
+                } else {
+                    await handleError('fetch services', resp, 'listServices')
+                }
+            } catch(e) {
+                setFetchServiceErr(`Error fetching services: ${e.message}`)
+            }
+        }
+        return fetchFunctions()
+    },[fetch, handleError, params.namespace])
 
     // useEffect(()=>{
     //         let interval = setInterval(()=>{
@@ -82,11 +109,11 @@ export default function Functions() {
     //         }
     // },[ functions])
 
-    // useEffect(()=>{
-    //     if (functions === null) {
-    //         fetchServices().finally(()=> {setIsLoading(false)}) 
-    //     }
-    // },[fetchServices, functions])
+    useEffect(()=>{
+        if (functions === null) {
+            fetchServices().finally(()=> {setIsLoading(false)}) 
+        }
+    },[fetchServices, functions])
 
     return(
         <>
@@ -113,11 +140,11 @@ export default function Functions() {
                             <>
                                 {functions.length > 0 ?
                                     <div >
-                                        {/* {functions.map((obj) => {
+                                        {functions.map((obj) => {
                                             return (
                                                 <KnativeFunc conditions={obj.conditions} fetch={fetch} fetchServices={fetchServices} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )
-                                        })} */}
+                                        })}
                                     </div>
                                     : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
                             </> : ""}
@@ -130,10 +157,10 @@ export default function Functions() {
                             <IoAdd />
                         </TileTitle>
                         <div style={{maxHeight:"785px", overflow:"auto"}}>
-                            {/* {config !== null ?
+                            {config !== null ?
                             <CreateKnativeFunc config={config} handleError={handleError} fetchServices={fetchServices} namespace={params.namespace} fetch={fetch}/>
                                 : 
-                                ""} */}
+                                ""}
                             </div>
                     </div>
             </div>
