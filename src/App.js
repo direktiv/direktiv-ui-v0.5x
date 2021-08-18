@@ -1,6 +1,7 @@
 
 import { BrowserRouter as Router, Switch} from "react-router-dom";
 import Navbar from './components/nav'
+import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
 
 import NotificationSystem, { sendNotification } from './components/notifications/index.js'
 import { useState } from 'react';
@@ -316,6 +317,15 @@ function Content() {
   const [apiKey, setAPIKey] = useState(localStorage.getItem('apikey'))
 
 
+  const sseGen = useCallback((path, opts) => {
+    if (!opts.headers) {
+        opts.headers = { Authorization: `apikey ${apiKey}` }
+    } else {
+        opts.headers =  {...opts.headers, Authorization: `apikey ${apiKey}`}
+    }
+    return new EventSourcePolyfill(`${context.SERVER_BIND}${path}`, opts)
+  })
+
   const netch = useCallback((path, opts) => {
     if (!opts.headers) {
       opts.headers = { Authorization: `apikey ${apiKey}` }
@@ -387,6 +397,7 @@ function Content() {
     <MainContext.Provider value={{
       ...context,
       fetch: netch,
+      sse: sseGen,
       namespace: namespace,
       setNamespace: setNamespace,
       namespaces: namespaces,

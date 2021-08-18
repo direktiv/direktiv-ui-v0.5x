@@ -15,7 +15,7 @@ import { Link,  useParams } from 'react-router-dom'
 
 
 export default function Functions() {
-    const {fetch,  handleError} = useContext(MainContext)
+    const {fetch,  handleError, sse} = useContext(MainContext)
     const params = useParams()
     const [isLoading, setIsLoading] = useState(true)
     const [functions, setFunctions] = useState(null)
@@ -34,12 +34,12 @@ export default function Functions() {
             body["namespace"] = params.namespace
         }
         
-        var sse = new EventSource(`http://192.168.0.115/api${x}`)
-        sse.onerror = () => {
+        let eventConnection = sse(`${x}`, {})
+        eventConnection.onerror = (e) => {
             // error log here
             // after logging, close the connection   
-            console.log('error on sse')
-            sse.close();
+            console.log('error on sse', e)
+            eventConnection.close();
         }
         
         function getRealtimeData(data) {
@@ -48,7 +48,8 @@ export default function Functions() {
             console.log(data)
         }
         
-        sse.onmessage = e => getRealtimeData(e);
+        eventConnection.onmessage = e => getRealtimeData(e);
+        
         
         // var source = new SSE(`http://192.168.0.115/api${x}`, {
         //     payload: JSON.stringify(body)
@@ -78,10 +79,10 @@ export default function Functions() {
         // source.stream();
 
         return () => {
-            sse.close()
+            eventConnection.close()
             // source.removeEventListener('message')
         }
-    },[])
+    },[sse])
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
