@@ -101,7 +101,7 @@ export default function WorkflowPage() {
                     if (arr.length > 0) {
                         let exec = true
                         for (var i=0; i < arr.length; i++) {
-                            if (arr[i].status === "False" || arr[i].status === "Unknown") {
+                            if (arr[i].status === "False") {
                                 exec = false
                             }
                         }
