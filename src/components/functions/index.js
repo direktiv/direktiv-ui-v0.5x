@@ -24,19 +24,19 @@ export default function Functions() {
     const [functions, setFunctions] = useState(null)
     const functionsRef = useRef(functions ? functions: [])
     
-    const [initialized, setInitialized] = useState(false)
+    const [evSource, setEvSource] = useState(null)
     const [fetchServiceErr, setFetchServiceErr] = useState("")
   
 
     useEffect(()=>{
-        if (!initialized && functions !== null) {
-            let x = "/functions/watch/"
+        if (evSource === null && functions !== null) {
+            let x = "/watch/functions/?scope=g"
             let body = {
                 scope: "g"
             }
             if(params.namespace) {
                 body.scope = "ns"
-                x = `/namespaces/${params.namespace}/functions/watch/`
+                x = `/watch/namespaces/${params.namespace}/functions/`
                 body["namespace"] = params.namespace
             }
             
@@ -93,13 +93,18 @@ export default function Functions() {
             }
             
             eventConnection.onmessage = e => getRealtimeData(e);
-            setInitialized(true)
-            return () => {
-                // eventConnection.close()
+            setEvSource(eventConnection)
+        }
+    },[sse, functions, evSource, functionsRef.current])
+
+    useEffect(()=>{
+        return ()=>{
+            console.log('close connection')
+            if(evSource !== null) {
+                evSource.close()
             }
         }
-
-    },[sse, functions, initialized, functionsRef.current])
+    },[evSource])
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {

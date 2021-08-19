@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext, useCallback} from "react"
+import {useState, useEffect, useContext, useCallback, useRef} from "react"
 import Slider, { SliderTooltip, Handle } from 'rc-slider';
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
@@ -23,20 +23,24 @@ export default function Services() {
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
+
+
     const [config, setConfig] = useState(null)
 
     const [latestRevision, setLatestRevision] = useState(null)
-
+    const [revisions, setRevisions] = useState(null)
+    const revisionsRef = useRef(revisions ? revisions: [])
     const [editable, setEditable] = useState(false)
+    const editableRef = useRef(editable)
     const [rev1Name, setRev1Name] = useState("")
     const [rev2Name, setRev2Name] = useState("")
-
+    const rev2NameCache = useRef(rev2Name)
     const [rev1Percentage, setRev1Percentage] = useState(0)
 
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
-    const [initialized, setInitialized] = useState(false)
-    const [initTraffic, setInitTraffic] = useState(false)
+    const [revisionSource, setRevisionSource] = useState(null)
+    const [trafficSource, setTrafficSource] = useState(null)
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
@@ -45,43 +49,43 @@ export default function Services() {
                 x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
             try {
-                let tr = []
+                // let tr = []
                 let resp = await fetch(x, {
                     method:"GET"
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    for(var i=0; i < json.revisions.length; i++) {
-                        if (json.revisions[i].traffic > 0) {
-                            tr.push({
-                                name: json.revisions[i].name,
-                                value: json.revisions[i].traffic
-                            })
-                        }
-                    }
+                    // for(var i=0; i < json.revisions.length; i++) {
+                    //     if (json.revisions[i].traffic > 0) {
+                    //         tr.push({
+                    //             name: json.revisions[i].name,
+                    //             value: json.revisions[i].traffic
+                    //         })
+                    //     }
+                    // }
 
-                    if (!editable) {
-                        if (tr.length > 0) {
-                            console.log("tr is greater than 0")
-                            setRev1Name(tr[0].name)
-                            setRev1Percentage(tr[0].value)
-                            if(tr[1]) {
-                                setRev2Name(tr[1].name)
-                            }
-                        }
-                    }
+                    // if (!editable) {
+                    //     if (tr.length > 0) {
+                    //         console.log("tr is greater than 0")
+                    //         setRev1Name(tr[0].name)
+                    //         setRev1Percentage(tr[0].value)
+                    //         if(tr[1]) {
+                    //             setRev2Name(tr[1].name)
+                    //         }
+                    //     }
+                    // }
 
-                    if(!dontChangeRev) {
-                        setLatestRevision({
-                            image: json.revisions[0].image,
-                            scale: json.revisions[0].minScale ? json.revisions[0].minScale : 0,
-                            size: json.revisions[0].size ? json.revisions[0].size : 0,
-                            cmd: json.revisions[0].cmd ? json.revisions[0].cmd : ""
-                        })
-                    }
+                    // if(!dontChangeRev) {
+                    //     setLatestRevision({
+                    //         image: json.revisions[0].image,
+                    //         scale: json.revisions[0].minScale ? json.revisions[0].minScale : 0,
+                    //         size: json.revisions[0].size ? json.revisions[0].size : 0,
+                    //         cmd: json.revisions[0].cmd ? json.revisions[0].cmd : ""
+                    //     })
+                    // }
                     setConfig(json.config)
-                    setService(json)
-                    setTraffic(tr)
+                    // setService(json)
+                    // setTraffic(tr)
                 } else {
                     await handleError('fetch revisions', resp, 'fetchService')
                 }
@@ -94,7 +98,7 @@ export default function Services() {
 
     // setup sse for traffic updates
     useEffect(()=>{
-        if(!initTraffic) {
+        if(trafficSource === null) {
             let x = `/watch/functions/g-${service}`
             if(namespace){
                 x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}`
@@ -108,17 +112,40 @@ export default function Services() {
             }
 
             async function getRealtimeData(e) {
-                console.log(e, "watch traffic update")
+                let edi = editableRef.current
+                let json = JSON.parse(e.data)
+
+                
+                if (json.event === "MODIFIED" || json.event === "ADDED") {
+                    console.log("EDITABLE CHECK", edi)
+                    if (!edi) {
+                        if (json.traffic) {
+                            if(json.traffic.length > 0) {
+                                console.log(rev2NameCache.current, "current rev2")
+                                setRev1Name(json.traffic[0].revisionName)
+                                setRev1Percentage(json.traffic[0].traffic)
+                                if(json.traffic[1]) {
+                                    setRev2Name(json.traffic[1].revisionName)
+                                    rev2NameCache.current = json.traffic[1].revisionName
+                                } else if (rev2NameCache.current !== "") {
+                                    setRev2Name("")
+                                }
+                            }
+                       
+                        }
+                        setTraffic(json.traffic)
+                    }
+                } 
             }
 
             eventConnection.onmessage = e => getRealtimeData(e)
-            setInitTraffic(true)
+            setTrafficSource(eventConnection)
         }
-    },[initTraffic])
+    },[trafficSource, editable])
 
     // setup sse for revisions
     useEffect(()=>{
-        if (!initialized) {
+        if (revisionSource === null) {
 
             let x = `/watch/functions/g-${service}/revisions/`
             if (namespace) {
@@ -133,15 +160,68 @@ export default function Services() {
             }
 
             async function getRealtimeData(e) {
-                console.log(e, "watch revisions update")
+                let revs = revisionsRef.current
+
+                let json = JSON.parse(e.data)
+                switch(json.event) {
+                    case "DELETED":
+                        for (var i=0; i < revs.length; i++) {
+                            if(revs[i].name === json.revision.name) {
+                                revs.splice(i, 1)
+                                revisionsRef.current = revs
+                                break
+                            }
+                        }
+                        break
+                    case "MODIFIED":
+                        for(var i=0; i < revs.length; i++) {
+                            if (revs[i].name === json.revision.name) {
+                                revs[i] = json.revision
+                                revisionsRef.current = revs
+                                break
+                            }
+                        }
+                        break
+                    default:
+                        let found = false
+                        for(var i=0; i < revs.length; i++) {
+                            if(revs[i].name === json.revision.name) {
+                                found = true 
+                                break
+                            }
+                        }
+                        if (!found){
+                            revs.push(json.revision)
+                            revisionsRef.current = revs
+                        }
+                }
+
+                // filter based on revision dates
+                revisionsRef.current.sort(function(a,b){
+                    return a.created < b.created ? 1 : -1; 
+                })
+                setLatestRevision(JSON.parse(JSON.stringify(revisionsRef.current[0])))
+                setRevisions(JSON.parse(JSON.stringify(revisionsRef.current)))
             }
 
+
             eventConnection.onmessage = e => getRealtimeData(e)
-            setInitialized(true)
+            setRevisionSource(eventConnection)
         }
 
-    },[initialized])
+    },[revisionSource])
 
+    useEffect(()=>{
+        return ()=>{
+            if(revisionSource !== null) {
+                revisionSource.close()
+            }
+
+            if(trafficSource !== null) {
+                trafficSource.close()
+            }
+        }
+    },[trafficSource, revisionSource])
 
     // initial load request
     useEffect(()=>{
@@ -169,7 +249,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions traffic={traffic} fetch={fetch}  revisions={srvice ? srvice.revisions : []}/>
+                    <ListRevisions traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
 
 }
                     </LoadingWrapper>
@@ -188,10 +268,11 @@ export default function Services() {
                                 setRev2Name={setRev2Name} 
                                 setEditable={setEditable} 
                                 editable={editable}
+                                editableRef={editableRef}
                                 rev1Name={rev1Name} 
                                 rev2Name={rev2Name} 
                                 setRev1Name={setRev1Name} 
-                                revisions={srvice ? srvice.revisions : []} 
+                                revisions={revisions ? revisions : []} 
                                 handleError={handleError} 
                                 traffic={traffic} 
                                 fetch={fetch} 
@@ -243,15 +324,24 @@ function ListRevisions(props) {
                 }
                 if (traffic) {
                     if (traffic.length > 0) {
-                        if (traffic[0].name === obj.name){
+                        if (traffic[0].revisionName === obj.name){
                             titleColor = "#2396d8"
                         }
                         if (traffic[1]) {
-                            if (traffic[1].name === obj.name){
+                            if (traffic[1].revisionName === obj.name){
                                 titleColor = "rgb(219, 58, 58)"
                             }
                         }
                     }
+                    for (var i=0; i < traffic.length; i++) {
+                        if(traffic[i].revisionName === obj.name) {
+                            obj.traffic = traffic[i].traffic
+                        }
+                    }
+                }
+
+                if (obj.traffic !== 0 && obj.traffic !== undefined) {
+                    hideDelete = true
                 }
  
                 return(
@@ -372,7 +462,7 @@ function Revision(props) {
                         </ul>
                         </div>
                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                            {cmd !== undefined ? <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> : "" }
+                            {cmd !== "" ? <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> : "" }
                         </div>
                     </div>
                  </div>
@@ -524,12 +614,13 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {fetch, service, getService,handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
+    const {fetch, service, getService, editableRef, handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
 
     const [err, setErr] = useState("")
 
 
     const [isLoading, setIsLoading] = useState(false)
+
 
 
     const updateTraffic = async (rev1, rev2, val) => {
@@ -556,7 +647,7 @@ function EditRevision(props) {
             })
             if (resp.ok) {
                 setErr('')
-                await getService()
+                // await getService()
             } else {
                 await handleError("set traffic", resp, "updateTraffic")
             }
@@ -579,6 +670,13 @@ function EditRevision(props) {
             <Handle value={value} {...restProps} />
           </SliderTooltip>
         )
+    }
+
+    let x = editable 
+    if (x) {
+        if(rev2Name === "") {
+            x = false
+        }
     }
 
     return(
@@ -638,7 +736,7 @@ function EditRevision(props) {
                                     </div>
                                 </div>
                             </div>
-                            <Slider disabled={!editable} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
+                            <Slider disabled={!x} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
                             <div style={{position: "relative", width: "100%", padding: "0px"}}>
                                 <div style={{position: "relative", top: "4px"}}>
                                     <div style={{display: "flex", width: "100%"}}>
@@ -661,7 +759,7 @@ function EditRevision(props) {
             {!editable?
             <div title="Edit Traffic" style={{ textAlign: "right" }}>
                 <input onClick={() => {
-                    console.log('setting editable to ', !editable, setEditable)
+                    editableRef.current = !editable
                     setEditable(!editable)
                 }} type="submit" value="Edit Traffic" />
             </div>:""}
