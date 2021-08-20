@@ -40,7 +40,7 @@ async function checkStartType(wf, setError) {
 }
 
 export default function WorkflowPage() {
-    const { fetch, namespace, handleError, attributeAdd, checkPerm, permissions, workflowInteractions } = useContext(MainContext)
+    const { sse,fetch, namespace, handleError, attributeAdd, checkPerm, permissions, workflowInteractions } = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
@@ -60,7 +60,8 @@ export default function WorkflowPage() {
     const codemirrorRef = useRef();
     const [tab, setTab] = useState("functions")
     const [functions, setFunctions] = useState(null)
-
+    const functionsRef = useRef(functions ? functions: [])
+    const [funcSource, setFuncSource] = useState(null)
     const history = useHistory()
     const params = useParams()
     const [apiModalOpen, setAPIModalOpen] = useState(false)
@@ -68,6 +69,7 @@ export default function WorkflowPage() {
     const [waitCount, setWaitCount] = useState(0)
 
     const workflowRef = useRef()
+
 
     workflowRef.current = params.workflow
     function toggleAPIModal() {
@@ -87,6 +89,73 @@ export default function WorkflowPage() {
             return { ...wfI }
         })
     }
+
+    useEffect(()=>{
+        if(functions !== null && funcSource === null) {
+            let x = `/watch/namespaces/${namespace}/workflows/${workflowRef.current}/functions/`
+
+            let eventConnection = sse(`${x}`,{})
+            eventConnection.onerror = (e) => {
+                console.log("error on sse", e)
+            }
+
+            async function getData(e) {
+                let funcs = functionsRef.current
+                console.log(funcs, "FUNCS CURRENTLY")
+                // process the data here
+                // pass it to state to be rendered
+                let json = JSON.parse(e.data)
+                switch (json.event) {
+                case "DELETED":
+                    console.log("DELETED event handler")
+                    for (var i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            funcs.splice(i, 1)
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                case "MODIFIED":
+                    console.log("MODIFIED event handler")
+                    for(var i=0; i < funcs.length; i++) {
+                        if (funcs[i].serviceName === json.function.serviceName) {
+                            funcs[i] = json.function
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                default:
+                    console.log("ADDED event handler")
+                    let found = false
+                    for(var i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            found = true 
+                            break
+                        }
+                    }
+                    if (!found){
+                        funcs.push(json.function)
+                        functionsRef.current = funcs
+                    }
+                }
+                console.log('funcs after check', functionsRef)
+                setFunctions(JSON.parse(JSON.stringify(functionsRef.current)))
+            }
+
+            eventConnection.onmessage = e => getData(e)
+            setFuncSource(eventConnection)
+        }   
+    },[functions])
+
+    useEffect(()=>{
+        return () => {
+            if (funcSource !== null) {
+                funcSource.close()
+            }
+        }
+    },[funcSource])
 
     const fetchKnativeFunctions = useCallback(()=>{
         setFetching(true)
@@ -224,14 +293,14 @@ export default function WorkflowPage() {
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
 
     // polling knative functions
-    useEffect(()=>{
-            let interval = setInterval(()=>{
-                fetchKnativeFunctions()
-            }, 3000)
-        return () => {
-            clearInterval(interval)
-        }
-    },[fetchKnativeFunctions, namespace, functions])
+    // useEffect(()=>{
+    //         let interval = setInterval(()=>{
+    //             fetchKnativeFunctions()
+    //         }, 3000)
+    //     return () => {
+    //         clearInterval(interval)
+    //     }
+    // },[fetchKnativeFunctions, namespace, functions])
 
     // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
@@ -580,10 +649,15 @@ function FuncComponent(props) {
                         {functions.length > 0 ?
                             <>
                                 {functions.map((obj) => {
-    let statusMessage = ""
-    for(var x=0; x < obj.conditions.length; x++) {
-        statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
-    }
+
+let statusMessage = ""
+                                    console.log(obj, "IN FUNC COMPONENT")
+                                    if(obj.conditions){
+                                        for(var x=0; x < obj.conditions.length; x++) {
+                                            statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
+                                        }
+                                    }
+
                                     return(
                                         <li title={statusMessage}  className="event-list-item">
                                             <div>

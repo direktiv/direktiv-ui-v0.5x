@@ -117,16 +117,19 @@ export default function ReactEditor(props) {
         for (var i = 0; i < functions.length; i++)
         {
             var errorMsg = ""
-            for (const fCondition of functions[i].conditions) {
-                if (errorMsg !== "") {
-                    errorMsg += "<br>"
-                }
-
-                if (fCondition.status === "False"){
-                    errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>${fCondition.reason ? `├─Reason: ${fCondition.reason}<br>` : ""}`
-                    errorMsg += `└─Message: ${fCondition.message.length < 60 ? fCondition.message : "Too large to preview"}<br>`
+            if(functions[i].conditions){
+                for (const fCondition of functions[i].conditions) {
+                    if (errorMsg !== "") {
+                        errorMsg += "<br>"
+                    }
+    
+                    if (fCondition.status === "False"){
+                        errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>${fCondition.reason ? `├─Reason: ${fCondition.reason}<br>` : ""}`
+                        errorMsg += `└─Message: ${fCondition.message.length < 60 ? fCondition.message : "Too large to preview"}<br>`
+                    }
                 }
             }
+       
 
             let foundFunction = false
             if (errorMsg !== "") {

@@ -563,7 +563,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={config.maxscale}  defaultValue={latestRevision.scale} />
+                        <Slider value={latestRevision.minScale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={config.maxscale}  defaultValue={latestRevision.scale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>

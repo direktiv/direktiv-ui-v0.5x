@@ -61,7 +61,7 @@ export default function Revision() {
 
         if(podSource === null) {
             // setup
-            let x = `/watch/functions/${service}/revisions/${revision}/pods/`
+            let x = `/watch/functions/g-${service}/revisions/${revision}/pods/`
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}/pods/`
             }
@@ -74,6 +74,9 @@ export default function Revision() {
             async function getData(e) {
                 let pods = podsRef.current
 
+                if (e.data === "") {
+                    return
+                }
                 let json = JSON.parse(e.data)
                 switch (json.event) {
                     default:
@@ -131,7 +134,7 @@ export default function Revision() {
                     <Breadcrumbs />
                 </div>
             </div>
-            <div className="shadow-soft rounded tile" style={{ flex: 1, overflowX:"auto", maxHeight:"250px" }}>
+            <div className="shadow-soft rounded tile" style={{ flex: 1, overflow:"hidden", maxHeight:"300px" }}>
                 <TileTitle name={`Details for ${revision}`}>
                     <IoList />
                 </TileTitle>
@@ -139,6 +142,7 @@ export default function Revision() {
                     { revisionDetails !== null ? <DetailedRevision serviceName={revision} pods={pods}  revision={revisionDetails} /> : "" }
                 </LoadingWrapper>
             </div>
+            {pods.length > 0 ?
             <div className="shadow-soft rounded tile" style={{ flex: 1, overflow:"hidden" }}>
                 <TileTitle actionsDiv={podSubTabs} name={`Pods`}>
                     <IoList />
@@ -146,7 +150,7 @@ export default function Revision() {
                 <LoadingWrapper isLoading={isLoading} text={"Loading Pod Logs"}>
                     <PodLogs sse={sse} pod={tab} service={service} namespace={namespace} revision={revision} />
                 </LoadingWrapper>
-            </div>
+            </div>:""}
         </div>
     )
 }
@@ -199,6 +203,7 @@ function DetailedRevision(props) {
                         })}
                     </ul>
                 </div>
+                {pods.length > 0 ?
                 <div style={{flex: 1, textAlign:"left"}}>
                     <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Pods:</b></div></p>
                     <ul style={{margin:"5px", fontSize:"10pt"}}>
@@ -223,7 +228,7 @@ function DetailedRevision(props) {
                             )
                         })}
                     </ul>
-                </div>
+                </div>:""}
             </div>
         </div>
     )
@@ -257,6 +262,9 @@ function PodLogs(props) {
 
             async function getRealtimeData(e) {
                 let log = logsRef.current
+                if (e.data === "") {
+                    return
+                }
                 log += "\n"+e.data
                 document.getElementById("pod-logs").innerHTML += log
                 setLogs(log)
