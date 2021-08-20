@@ -4,7 +4,7 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import 'rc-slider/assets/index.css';
 import { ConfirmButton } from '../confirm-button'
-
+import {Link} from "react-router-dom"
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import {useParams} from "react-router-dom"
@@ -249,7 +249,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
+                    <ListRevisions namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
 
 }
                     </LoadingWrapper>
@@ -305,7 +305,8 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, getService, fetch, traffic} = props
+    const {revisions, getService, fetch, traffic, namespace, serviceName} = props
+    console.log(serviceName)
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj, i)=>{
@@ -345,7 +346,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -353,8 +354,8 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete} = props
-
+    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
+    console.log(serviceName)
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -386,9 +387,10 @@ function Revision(props) {
 
 
     return (
-        <div id={panelID} className="neumorph-hover" style={{marginBottom: "10px"}} onClick={() => {
+        <Link key={name} id={panelID} to={namespace !== undefined ? `/${namespace}/functions/${serviceName}/${name}`: `/functions/global/${serviceName}/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} onClick={() => {
             toggleItem();
         }}>
+            <div className="neumorph-hover">
             <div className="services-list-div ">
                 <div>
                     <div style={{display: "inline"}}>
@@ -409,9 +411,9 @@ function Revision(props) {
                     </div>
                 </div>:""}
             </div>
-            <div className="services-list-contents singular">
+            <div className="services-list-contents singular" style={{height:"auto",  overflow:"visible", width:"100%", paddingBottom:"10px"}}>
             <div className="service-list-item-panel" style={{fontSize:'14px'}}>
-                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
+                     {/* <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                          <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
                              <p><div style={{width:"100px", display:"inline-block"}}><b>Image:</b></div> {image}</p>
                              {size !== undefined ? 
@@ -434,13 +436,11 @@ function Revision(props) {
                              }
                             <p><div style={{width:"100px", display:"inline-block"}}><b>Created:</b></div> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> 
 
-                             {/* <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> */}
+                             {/* <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> 
                          </div>
-                     </div>
+                     </div> */}
                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-
-                        <p style={{marginTop:"0px"}}><b>Conditions:</b></p>
                         <ul>
                             {conditions ? <>
                             {conditions.map((obj)=>{
@@ -461,13 +461,11 @@ function Revision(props) {
                             :""}
                         </ul>
                         </div>
-                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                            {cmd !== "" ? <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> : "" }
-                        </div>
                     </div>
                  </div>
             </div>
         </div>
+        </Link>
     )
 }
 

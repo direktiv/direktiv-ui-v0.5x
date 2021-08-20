@@ -9,6 +9,7 @@ import  WorkflowPage from '../workflow-page'
 import EnvrionmentPage from "../environment-page"
 import Functions from "../functions"
 import Services from "../services"
+import Revision from "../revision"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -28,6 +29,7 @@ export default function Routes(props) {
         <>
             <Route exact path="/functions/global" component={Functions}/>
             <Route exact path="/functions/global/:service" component={Services}/>
+            <Route exact path="/functions/global/:service/:revision" component={Revision}/>
             <Route path="/jq/playground" component={JQPlaygroundPage} />
             <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
             <Route exact path="/">
@@ -45,6 +47,7 @@ export default function Routes(props) {
             <Route exact path="/:namespace" component={DashboardPage} />
             <Route exact path="/:namespace/functions" component={Functions}/>
             <Route exact path="/:namespace/functions/:service" component={Services}/>
+            <Route exact path="/:namespace/functions/:service/:revision" component={Revision}/>
             <Route exact path="/:namespace/w" component={WorkflowsPage} />
             <Route exact path="/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
             <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
