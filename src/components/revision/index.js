@@ -31,7 +31,7 @@ export default function Revision() {
     // set revision soruce
     useEffect(()=>{
         if(revisionSource === null) {
-            let x = `/watch/functions/${service}/revisions/${revision}`
+            let x = `/watch/functions/g-${service}/revisions/${revision}`
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}`
             }
