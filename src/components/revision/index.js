@@ -44,8 +44,8 @@ export default function Revision() {
 
             async function getData(e) {
                 let json = JSON.parse(e.data)
-
-                if (json.event === "ADDED") {
+                console.log(json, "JSON FOR REVISION WATCHING")
+                if (json.event === "ADDED" || json.event === "MODIFIED") {
                     setRevisionDetails(json.revision)
                 }
             }
@@ -78,7 +78,18 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
+                console.log(json, "JSON FOR POD WATCHING")
+
                 switch (json.event) {
+                    case "MODIFIED":
+                        for(var i=0; i < pods.length; i++) {
+                            if (pods[i].name === json.pod.name) {
+                                pods[i] = json.pod
+                                podsRef.current = pods
+                                break
+                            }
+                        }
+                        break
                     default:
                         let found = false
                         for(var i=0; i < pods.length; i++) {
