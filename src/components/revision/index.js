@@ -16,7 +16,7 @@ dayjs.extend(relativeTime);
 
 export default function Revision() {
     const {sse} = useContext(MainContext)
-    const {revision, namespace, service} = useParams()
+    const {revision, namespace, service, workflow} = useParams()
     const [isLoading, setIsLoading] = useState(false)
 
     const [podSource, setPodSource] = useState(null)
@@ -35,7 +35,9 @@ export default function Revision() {
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}`
             }
-
+            if(workflow) {
+                x = `/watch/functions/${service}/revisions/${revision}`
+            }
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -64,6 +66,9 @@ export default function Revision() {
             let x = `/watch/functions/g-${service}/revisions/${revision}/pods/`
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}/pods/`
+            }
+            if(workflow) {
+                x = `/watch/functions/${service}/revisions/${revision}/pods/`
             }
 
             let eventConnection = sse(`${x}`, {})
@@ -261,7 +266,6 @@ function PodLogs(props) {
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}/pods/${pod}/logs/`
             }
-
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here

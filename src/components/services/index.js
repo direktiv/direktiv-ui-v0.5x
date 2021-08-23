@@ -19,7 +19,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 export default function Services() {
     const {fetch, handleError, sse} = useContext(MainContext)
-    let { service, namespace } = useParams();
+    let { service, namespace, workflow } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
@@ -48,6 +48,11 @@ export default function Services() {
             if (namespace) {
                 x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
+            if(workflow) {
+                x = `/functions/${service}`
+            }
+            console.log(x, "get service")
+
             try {
                 // let tr = []
                 let resp = await fetch(x, {
@@ -103,7 +108,10 @@ export default function Services() {
             if(namespace){
                 x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
-
+            if(workflow) {
+                x = `/watch/functions/${service}`
+            }
+            console.log(x, "URL FOR TRAFFIC UPDATES")
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
@@ -151,7 +159,11 @@ export default function Services() {
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}/revisions/`
             }
-            
+            if(workflow) {
+                x = `/watch/functions/${service}/revisions/`
+            }
+            console.log(x, "URL FOR REVISIONS")
+
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
@@ -249,7 +261,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
+                    <ListRevisions workflow={workflow} namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
 
 }
                     </LoadingWrapper>
@@ -263,6 +275,7 @@ export default function Services() {
                         </TileTitle>
                       
                             <EditRevision 
+                                workflow={workflow}
                                 setRev1Percentage={setRev1Percentage} 
                                 rev1Percentage={rev1Percentage} 
                                 setRev2Name={setRev2Name} 
@@ -291,7 +304,7 @@ export default function Services() {
                              <IoAdd />
                         </TileTitle>
                       
-                            <CreateRevision namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} service={service}/>
+                            <CreateRevision workflow={workflow} namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} service={service}/>
                      
                     </div>
                            :
@@ -305,7 +318,7 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, getService, fetch, traffic, namespace, serviceName} = props
+    const {revisions, workflow, getService, fetch, traffic, namespace, serviceName} = props
     console.log(serviceName)
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
@@ -346,7 +359,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -354,7 +367,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
+    const {titleColor, name, fetch, workflow, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
     console.log(serviceName)
     let panelID = name;
     function toggleItem(){
@@ -385,9 +398,17 @@ function Revision(props) {
         circleFill = "crashed"
     }
 
+    let url = `/functions/global/${serviceName}/${name}`
+    if (namespace) {
+        url = `/${namespace}/functions/${serviceName}/${name}`
+    }
 
+    if (workflow) {
+        url = `/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
+    }
+    
     return (
-        <Link key={name} id={panelID} to={namespace !== undefined ? `/${namespace}/functions/${serviceName}/${name}`: `/functions/global/${serviceName}/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} onClick={() => {
+        <Link key={name} id={panelID} to={url} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} onClick={() => {
             toggleItem();
         }}>
             <div className="neumorph-hover">
@@ -413,32 +434,6 @@ function Revision(props) {
             </div>
             <div className="services-list-contents singular" style={{height:"auto",  overflow:"visible", width:"100%", paddingBottom:"10px"}}>
             <div className="service-list-item-panel" style={{fontSize:'14px'}}>
-                     {/* <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
-                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                             <p><div style={{width:"100px", display:"inline-block"}}><b>Image:</b></div> {image}</p>
-                             {size !== undefined ? 
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Size:</b></div> {size}</p> 
-                                :
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Size:</b></div> 0</p>
-                             }
-                             {traffic !== undefined  ?
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Traffic:</b></div> {traffic}%</p> 
-                                :
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Traffic:</b></div> 0%</p> 
-                             }
-                         </div>
-                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                            <p><div style={{width:"100px", display:"inline-block"}}><b>Generation:</b></div> {generation}</p>
-                             {minScale !== undefined ?
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Scale:</b></div> {minScale}</p> 
-                                : 
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Scale:</b></div> 0</p> 
-                             }
-                            <p><div style={{width:"100px", display:"inline-block"}}><b>Created:</b></div> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> 
-
-                             {/* <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> 
-                         </div>
-                     </div> */}
                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
                         <ul>
@@ -470,7 +465,7 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
+    const {service, getService, workflow, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
     // const [scale, setScale] = useState(0)
     // const [size, setSize] = useState(0)
@@ -484,6 +479,9 @@ function CreateRevision(props) {
             let x = `/functions/g-${service}`
             if (namespace) {
                 x =  `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+            }
+            if (workflow) {
+                x = `/functions/${service}`
             }
             let resp = await fetch(x, {
                 method: "POST",
@@ -612,7 +610,7 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {fetch, service, getService, editableRef, handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
+    const {fetch, service, workflow, getService, editableRef, handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
 
     const [err, setErr] = useState("")
 
@@ -627,7 +625,9 @@ function EditRevision(props) {
             if (namespace) {
                 x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
             }
-
+            if (workflow) {
+                x = `/functions/${service}`
+            }
             let body = [{
                 revision: rev1,
                 percent: val

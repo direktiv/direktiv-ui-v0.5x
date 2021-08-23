@@ -567,7 +567,7 @@ export default function WorkflowPage() {
                                 {tab === "functions" ?
                                      <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
                                      <div id="events-tile" className="tile-contents">
-                                         <FuncComponent functions={functions}/>
+                                         <FuncComponent namespace={namespace} workflow={params.workflow} functions={functions}/>
                                      </div>
                                  </div>:""
                                 }
@@ -639,7 +639,7 @@ function PieComponent() {
 }
 
 function FuncComponent(props) {
-    const {functions} = props
+    const {functions, namespace, workflow} = props
 
     return(
       <div>
@@ -660,12 +660,14 @@ let statusMessage = ""
 
                                     return(
                                         <li title={statusMessage}  className="event-list-item">
-                                            <div>
-                                                <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                                                <span>
-                                                    {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
-                                                </span>
-                                            </div>
+                                           <Link to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
+                                                <div>
+                                                    <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                                                    <span>
+                                                        {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
+                                                    </span>
+                                                </div>
+                                            </Link>
                                         </li>
                                     )
                                 })}

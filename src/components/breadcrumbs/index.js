@@ -14,6 +14,7 @@ export default function Breadcrumbs(props) {
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
+                console.log(obj, "OBJECT")
                 // if namespace exists dont show it
                 if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
                     return ""
