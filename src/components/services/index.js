@@ -433,7 +433,7 @@ function Revision(props) {
                 </div>:""}
             </div>
             <div className="services-list-contents singular" style={{height:"auto",  overflow:"visible", width:"100%", paddingBottom:"10px"}}>
-            <div className="service-list-item-panel" style={{fontSize:'14px'}}>
+            <div className="service-list-item-panel" style={{fontSize:'14px', width:"97%"}}>
                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
                         <ul>

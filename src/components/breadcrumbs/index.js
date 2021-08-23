@@ -16,7 +16,7 @@ export default function Breadcrumbs(props) {
             {breadcrumbs.map((obj)=>{
                 console.log(obj, "OBJECT")
                 // if namespace exists dont show it
-                if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
+                if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions" || obj.breadcrumb.props.children === "WorkflowFuncs") {
                     return ""
                 }
                 // if no instance id use custom breadcrumbs

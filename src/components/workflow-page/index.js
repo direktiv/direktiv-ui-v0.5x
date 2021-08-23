@@ -660,7 +660,7 @@ let statusMessage = ""
 
                                     return(
                                         <li title={statusMessage}  className="event-list-item">
-                                           <Link to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
+                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                     <span>
