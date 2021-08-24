@@ -123,9 +123,9 @@ export default function Services() {
                 let edi = editableRef.current
                 let json = JSON.parse(e.data)
 
-                
+                console.log(json, "TRAFFIC UPDATE")
                 if (json.event === "MODIFIED" || json.event === "ADDED") {
-                    console.log("EDITABLE CHECK", edi)
+                    console.log(edi, ":)")
                     if (!edi) {
                         if (json.traffic) {
                             if(json.traffic.length > 0) {
@@ -133,15 +133,19 @@ export default function Services() {
                                 setRev1Name(json.traffic[0].revisionName)
                                 setRev1Percentage(json.traffic[0].traffic)
                                 if(json.traffic[1]) {
-                                    setRev2Name(json.traffic[1].revisionName)
-                                    rev2NameCache.current = json.traffic[1].revisionName
+                                    if(json.traffic[1].traffic !== 0) {
+                                        setRev2Name(json.traffic[1].revisionName)
+                                        rev2NameCache.current = json.traffic[1].revisionName
+                                    } else {    
+                                        setRev2Name("")
+                                    }
                                 } else if (rev2NameCache.current !== "") {
                                     setRev2Name("")
                                 }
                             }
                        
                         }
-                        setTraffic(json.traffic)
+                        setTraffic(JSON.parse(JSON.stringify(json.traffic)))
                     }
                 } 
             }
@@ -342,7 +346,7 @@ function ListRevisions(props) {
                             titleColor = "#2396d8"
                         }
                         if (traffic[1]) {
-                            if (traffic[1].revisionName === obj.name){
+                            if (traffic[1].revisionName === obj.name && traffic[1].traffic !== 0){
                                 titleColor = "rgb(219, 58, 58)"
                             }
                         }
@@ -418,15 +422,13 @@ function Revision(props) {
                         <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                     </div>
                     <div style={{display: "inline"}}>
-                        <b style={{color: titleColor}}>{name}</b>             {traffic !== undefined ? <div style={{display: "inline", textAlign:"right", fontSize:"12px", width:"100%"}}>
-                        traffic({traffic}%)
-                    </div> : "" } <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
+                        <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
        
 
                 </div>
                {!hideDelete ? <div style={{flex: "auto", textAlign: "right"}}>
-                    <div className="buttons">
+                    <div className="buttons" style={{paddingRight:"25px"}}>
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                                 ev.preventDefault()
@@ -460,6 +462,13 @@ function Revision(props) {
                             :""}
                         </ul>
                         </div>
+                        {traffic !== undefined && traffic != 0 ?  <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+                        <ul style={{textAlign:"right", paddingRight:"20px"}}>
+                                    <li>
+                                        <span style={{fontWeight:500}}>Traffic: </span> <span style={{fontSize:'12px'}}>{traffic}%</span>
+                                    </li>
+                        </ul>
+                        </div>: ""}
                     </div>
                  </div>
             </div>
@@ -642,7 +651,9 @@ function EditRevision(props) {
                     percent: 100-val
                 })
             }
-
+            // make it not editable you've hit the button
+            // editableRef.current = !editable
+            // setEditable(!editable)
             let resp = await fetch(x, {
                 method: "PATCH",
                 body: JSON.stringify({values:body})
@@ -760,10 +771,10 @@ function EditRevision(props) {
             }
             {!editable?
             <div title="Edit Traffic" style={{ textAlign: "right" }}>
-                <input onClick={() => {
-                    editableRef.current = !editable
-                    setEditable(!editable)
-                }} type="submit" value="Edit Traffic" />
+                <input type="submit" value="Edit Traffic" onClick={()=>{
+                              editableRef.current = !editable
+                              setEditable(!editable)
+                }} />
             </div>:""}
             { (rev1Name && editable) ? 
             <div title="Set Traffic" style={{ textAlign: "right" }}>
@@ -771,6 +782,7 @@ function EditRevision(props) {
                     setIsLoading(true)
                     updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {
                         setIsLoading(false)
+                        editableRef.current = !editable
                         setEditable(false)
                     })
                 }} type="submit" value="Save" />
