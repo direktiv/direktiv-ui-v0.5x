@@ -105,7 +105,7 @@ function makeGutterError(msg) {
 // }
 
 export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
+    const { refValSet, value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
     const [cmEditor, setCMEditor] = useState(null)
     const [marks, setMarks] = useState([])
 
@@ -284,6 +284,7 @@ export default function ReactEditor(props) {
                     }}
                     onBeforeChange={(editor, data, val) => {
                         setValue(val)
+                        refValSet.current = val
                     }}
                     editorDidMount={(cm, val)=>{
                         setCMEditor(cm)

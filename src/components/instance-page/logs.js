@@ -12,7 +12,7 @@ export default function Logs(props) {
     const {instanceId, status} = props
 
     // const params = useParams()
-    const {fetch, handleError} = useContext(MainContext)
+    const {fetch, handleError, sse} = useContext(MainContext)
 
     // const [logs, setLogs] = useState([])
 
@@ -24,7 +24,7 @@ export default function Logs(props) {
     // const logsRef = useRef([])
 
     
-    const [logs, setLogs] = useState("")
+    // const [logs, setLogs] = useState("")
     const [err, setErr] = useState("")
     const [tail, setTail] = useState(true)
     const tailRef = useRef(true)
@@ -34,87 +34,71 @@ export default function Logs(props) {
     // const [scrolled, setScrolled] = useState(false)
     // const [init, setInit] = useState(false)
     // const [limit, setLimit] = useState(300)
+    const [logs, setLogs] = useState("")
+    const logsRef = useRef(logs)
 
+    const [logSource, setLogSource] = useState(null)
 
-    const fetchLogs = useCallback(()=> {
-        async function getLogs() {
-            try {
-                let resp = await fetch(`/instances/${instanceId}/logs?offset=${offsetRef.current}&limit=${limitRef.current}`, {
-                    method: "GET"
-                })
-                if(!resp.ok) {
-                        await handleError('fetch logs', resp, 'getInstanceLogs')
-                } else {
-                    let json = await resp.json()
-                    let newLogs = ""
-                    if (json.workflowInstanceLogs && json.workflowInstanceLogs.length > 0) {
-                        
-                        offsetRef.current = offsetRef.current + json.workflowInstanceLogs.length
-        
-                        for(var i=0; i < json.workflowInstanceLogs.length; i++) {
-                            let obj = json.workflowInstanceLogs[i]
-                            newLogs += `\u001b[38;5;248m[${dayjs.unix(`${obj.timestamp.seconds}.${obj.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
-                            newLogs += `${obj.message} `
-                            if(obj.context && obj.context.constructor === Object && Object.keys(obj.context).length > 0){
-                                newLogs += `\u001b[38;5;248m( `
-                                newLogs += Object.keys(obj.context).map((k) => {
-                                    return (
-                                        `${k}=${obj.context[k]} `
-                                    )
-                                })
-                                newLogs += ` )\u001b[0m`
-                            }
-                            newLogs += `\n`
-                        }
-                        let x = ansi_up.ansi_to_html(newLogs)
-                        document.getElementById("logs-test").innerHTML += x
+    useEffect(()=>{
+        if (logSource === null) {
+            let x = `/watch/instance/${instanceId}`
 
-                        // used for copying later
-                        setLogs((str) => {return str + newLogs})
-                    } 
+                     
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                console.log('error on sse', e)
+            }
+            
+            async function getData(e) {
+                let log = logsRef.current
+                if (e.data === "") {
+                    return
                 }
+                let json = JSON.parse(e.data) 
+                log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${json.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
+                log += `${json.message} `
+                if(json.context && json.context.constructor === Object && Object.keys(json.context).length > 0){
+                    log += `\u001b[38;5;248m( `
+                    log += Object.keys(json.context).map((k) => {
+                        return (
+                            `${k}=${json.context[k]} `
+                        )
+                    })
+                    log += ` )\u001b[0m`
+                }
+                log += `\n`
+
+                let x = ansi_up.ansi_to_html(log)
+                document.getElementById("logs-test").innerHTML += x
+
+                // used for copying later
+                setLogs((str) => {return str + log})
 
                 if (tailRef.current) {
                     if (document.getElementById('logs')) {
                         document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
                     }
                 }
-            } catch(e) {
-                setErr(`Failed to fetch logs: ${e.message}`)
             }
+            eventConnection.onmessage = e => getData(e);
+            setLogSource(eventConnection)
         }
-        getLogs()
-    },[instanceId,fetch, handleError])
+    },[logSource])
 
     useEffect(()=>{
-        statusRef.current = status
-        if(status !== undefined){
-                fetchLogs()
-                let timer = setInterval(async ()=>{
-                    fetchLogs()
-                    if(statusRef.current !== "pending") {
-                        // wait a little for noop state before clearing interval
-                        clearInterval(timer)
-                    }
-                }, 2000)
-                timerRef.current = timer
-        }
-        // fetchLogs()
-    },[status, fetchLogs])
-
-    // Handle rerunning to set back to default values
-    useEffect(()=>{
-        // component will unmount
-        return function cleanup() {
-            // wait a little for noop state before clearing interval
-            clearInterval(timerRef.current)
-            offsetRef.current = 0
-            setLogs("")
-            if(document.getElementById("logs-test")){
-                document.getElementById("logs-test").innerHTML = ""
+        return ()=>{
+            console.log('close connection')
+            if(logSource !== null) {
+                logSource.close()
+                setLogs("")
+                if(document.getElementById("logs-test")){
+                    document.getElementById("logs-test").innerHTML = ""
+                }
             }
         }
-    },[instanceId])
+    },[logSource])
 
     let checkScrollDirection = useCallback((event) => {
         if (checkScrollDirectionIsUp(event) && tail) {

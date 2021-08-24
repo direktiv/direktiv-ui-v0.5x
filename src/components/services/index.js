@@ -412,14 +412,18 @@ function Revision(props) {
             toggleItem();
         }}>
             <div className="neumorph-hover">
-            <div className="services-list-div ">
+            <div className="services-list-div " style={{width:"100%"}}>
                 <div>
                     <div style={{display: "inline"}}>
                         <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                     </div>
                     <div style={{display: "inline"}}>
-                        <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
+                        <b style={{color: titleColor}}>{name}</b>             {traffic !== undefined ? <div style={{display: "inline", textAlign:"right", fontSize:"12px", width:"100%"}}>
+                        traffic({traffic}%)
+                    </div> : "" } <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
+       
+
                 </div>
                {!hideDelete ? <div style={{flex: "auto", textAlign: "right"}}>
                     <div className="buttons">

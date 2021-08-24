@@ -245,72 +245,168 @@ function WorkflowDiagram(props) {
         const {data} = props
         let funcFailed = "var(--primary-light)"
         let titleMsg = `${data.label}-${data.type}`
-        if (funcRef.current && funcRef.current.length > 0 && data.state.type === "action") {
+        if (funcRef.current && funcRef.current.length > 0 && (data.state.type === "action" || data.state.type === "foreach" || data.state.type === "parallel")) {
             for(var i=0; i < funcRef.current.length; i++){
-
-                
-                if(funcRef.current[i].info.name === data.state.action.function) {
-                    if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
-                        let title = ""
-                        for(var x=0; x < funcRef.current[i].conditions.length; x++) {
-                            title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                console.log(data.state, "DATA STATE")
+                if(data.state.actions) {
+                    // parallel
+                    for(var l=0; l < data.state.actions.length; l++) {
+                        if(funcRef.current[i].info.name === data.state.actions[l].function) {
+                            if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                                let title = ""
+                                if( funcRef.current[i].conditions) {
+                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                        title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                                    }
+                                }
+        
+                                titleMsg = title
+                                funcFailed = "rgb(204,115,115)"
+                                break
+                            }
                         }
-                        titleMsg = title
-                        funcFailed = "rgb(204,115,115)"
-                        break
-                    }
-                }
-                for(var y=0; y < data.functions.length; y++) {
-                    if (data.functions[y].type === "knative-global" && data.state.action.function === data.functions[y].id) {
-                        // global func
-                    if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
-
-                        if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace === "") {
-                            let title = ""
-                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
-                                title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                        for(var y=0; y < data.functions.length; y++) {
+                            if (data.functions[y].type === "knative-global" && data.state.actions[l].function === data.functions[y].id) {
+                                // global func
+                            if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+        
+                                if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace === "") {
+                                    let title = ""
+                                    if(funcRef.current[i].conditions) {
+                                        for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                            title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                                        }
+                                    }
+                                 
+                                    titleMsg = title
+                                    funcFailed = "rgb(204,115,115)"
+                                break
+        
+                                } else if (funcRef.current[i].serviceName === `g-${data.functions[y].service}` && funcRef.current[i].info.namespace === "") {
+                                    let title = ""
+                                    if(funcRef.current[i].conditions) {
+                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                        title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                                    }
+                                }
+                                    titleMsg = title
+                                    funcFailed = "rgb(204,115,115)"
+                                break
+        
+                                }
                             }
-                            titleMsg = title
-                            funcFailed = "rgb(204,115,115)"
-                        break
-
-                        } else if (funcRef.current[i].serviceName === `g-${data.functions[y].service}` && funcRef.current[i].info.namespace === "") {
-                            let title = ""
-                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
-                                title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                            }else if (data.functions[y].type === "knative-namespace" && data.state.actions[l].function === data.functions[y].id) {
+                            if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                               
+                                // namespace func
+                                if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace !== "") {
+                                    let title = ""
+                                    if(funcRef.current[i].conditions) {
+        
+                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                        title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                                    }
+                                }
+                                    titleMsg = title
+                                    funcFailed = "rgb(204,115,115)"
+                                    break
+        
+                                }else if (funcRef.current[i].serviceName === `ns-${params.namespace}-${data.functions[y].service}` && funcRef.current[i].info.namespace !== "") {
+                                    let title = ""
+                                    if(funcRef.current[i].conditions) {
+        
+                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                        title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                                    }
+                                }
+                                    titleMsg = title
+                                    funcFailed = "rgb(204,115,115)"
+                                break
+        
+                                }
                             }
-                            titleMsg = title
-                            funcFailed = "rgb(204,115,115)"
-                        break
-
+                        }
                         }
                     }
-                    }else if (data.functions[y].type === "knative-namespace" && data.state.action.function === data.functions[y].id) {
-                    if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
-                       
-                        // namespace func
-                        if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace !== "") {
+                } else {
+                    if(funcRef.current[i].info.name === data.state.action.function) {
+                        if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
                             let title = ""
-                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
-                                title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                            if( funcRef.current[i].conditions) {
+                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                                }
                             }
+    
                             titleMsg = title
                             funcFailed = "rgb(204,115,115)"
                             break
-
-                        }else if (funcRef.current[i].serviceName === `ns-${params.namespace}-${data.functions[y].service}` && funcRef.current[i].info.namespace !== "") {
-                            let title = ""
-                            for(var x=0; x < funcRef.current[i].conditions.length; x++) {
-                                title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
-                            }
-                            titleMsg = title
-                            funcFailed = "rgb(204,115,115)"
-                        break
-
                         }
                     }
+                    for(var y=0; y < data.functions.length; y++) {
+                        if (data.functions[y].type === "knative-global" && data.state.action.function === data.functions[y].id) {
+                            // global func
+                        if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+    
+                            if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace === "") {
+                                let title = ""
+                                if(funcRef.current[i].conditions) {
+                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                        title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                                    }
+                                }
+                             
+                                titleMsg = title
+                                funcFailed = "rgb(204,115,115)"
+                            break
+    
+                            } else if (funcRef.current[i].serviceName === `g-${data.functions[y].service}` && funcRef.current[i].info.namespace === "") {
+                                let title = ""
+                                if(funcRef.current[i].conditions) {
+                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                                }
+                            }
+                                titleMsg = title
+                                funcFailed = "rgb(204,115,115)"
+                            break
+    
+                            }
+                        }
+                        }else if (data.functions[y].type === "knative-namespace" && data.state.action.function === data.functions[y].id) {
+                        if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
+                           
+                            // namespace func
+                            if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace !== "") {
+                                let title = ""
+                                if(funcRef.current[i].conditions) {
+    
+                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
+                                }
+                            }
+                                titleMsg = title
+                                funcFailed = "rgb(204,115,115)"
+                                break
+    
+                            }else if (funcRef.current[i].serviceName === `ns-${params.namespace}-${data.functions[y].service}` && funcRef.current[i].info.namespace !== "") {
+                                let title = ""
+                                if(funcRef.current[i].conditions) {
+    
+                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
+                                }
+                            }
+                                titleMsg = title
+                                funcFailed = "rgb(204,115,115)"
+                            break
+    
+                            }
+                        }
+                    }
+                    }
                 }
-                }
+
             }
         }
     

@@ -33,7 +33,6 @@ async function checkStartType(wf, setError) {
         }
         return true
     } catch (e) {
-        setError(`Unable to parse workflow: ${e.message}`)
         // return true if an error happens as the yaml is not runnable in the first place
         return true
     }
@@ -47,6 +46,7 @@ export default function WorkflowPage() {
     const [logEvent, setLogEvent] = useState("hello-world")
 
     const [workflowValue, setWorkflowValue] = useState(null)
+    const wfRefValue = useRef(workflowValue)
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [executable, setExecutable] = useState(true)
@@ -101,13 +101,11 @@ export default function WorkflowPage() {
 
             async function getData(e) {
                 let funcs = functionsRef.current
-                console.log(funcs, "FUNCS CURRENTLY")
                 // process the data here
                 // pass it to state to be rendered
                 let json = JSON.parse(e.data)
                 switch (json.event) {
                 case "DELETED":
-                    console.log("DELETED event handler")
                     for (var i=0; i < funcs.length; i++) {
                         if(funcs[i].serviceName === json.function.serviceName) {
                             funcs.splice(i, 1)
@@ -117,7 +115,6 @@ export default function WorkflowPage() {
                     }
                     break
                 case "MODIFIED":
-                    console.log("MODIFIED event handler")
                     for(var i=0; i < funcs.length; i++) {
                         if (funcs[i].serviceName === json.function.serviceName) {
                             funcs[i] = json.function
@@ -127,7 +124,6 @@ export default function WorkflowPage() {
                     }
                     break
                 default:
-                    console.log("ADDED event handler")
                     let found = false
                     for(var i=0; i < funcs.length; i++) {
                         if(funcs[i].serviceName === json.function.serviceName) {
@@ -140,7 +136,19 @@ export default function WorkflowPage() {
                         functionsRef.current = funcs
                     }
                 }
-                console.log('funcs after check', functionsRef)
+                let actFailed = true
+                for (var i=0; i < functionsRef.current.length; i++) {
+                    if (functionsRef.current[i].status === "False") {
+                        actFailed = false
+                    }
+                }
+                let x = await checkStartType(wfRefValue.current)
+                console.log(x, "after check")
+                if (!x) {
+                    console.log('scheduled start type')
+                    actFailed = false
+                }
+                setExecutable(JSON.parse(JSON.stringify(actFailed)))
                 setFunctions(JSON.parse(JSON.stringify(functionsRef.current)))
             }
 
@@ -148,7 +156,6 @@ export default function WorkflowPage() {
             setFuncSource(eventConnection)
         }   
     },[functions])
-
     useEffect(()=>{
         return () => {
             if (funcSource !== null) {
@@ -167,13 +174,6 @@ export default function WorkflowPage() {
                 if(resp.ok) {
                     let arr = await resp.json()
                     if (arr.length > 0) {
-                        let exec = true
-                        for (var i=0; i < arr.length; i++) {
-                            if (arr[i].status === "False" || arr[i].status === "Unknown") {
-                                exec = false
-                            }
-                        }
-                        setExecutable(exec)
                         setFunctions(arr)
                     } else {
                         setFunctions([])
@@ -202,11 +202,12 @@ export default function WorkflowPage() {
                     let wf = atob(json.workflow)
 
 
-                    let exec = await checkStartType(wf)
 
-                    setExecutable(exec)
+                    // setExecutable(exec)
                     setWorkflowValue(wf)
+                    wfRefValue.current = wf
                     setWorkflowValueOld(wf)
+
                     setWorkflowInfo((wfI) => {
                         wfI.active = json.active
                         return { ...wfI }
@@ -242,14 +243,15 @@ export default function WorkflowPage() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
+                    let x = await checkStartType(workflowValue)
+   
+                    setExecutable(x)
                     setWorkflowInfo((wfI) => {
                         wfI.active = json.active;
                         wfI.revision = json.revision;
                         return { ...wfI }
                     })
                     setWorkflowValueOld(workflowValue)
-                    let exec = await checkStartType(workflowValue)
-                    setExecutable(exec)
                     setActionErr("")
                     history.replace(`${json.id}`)
                 } else {
@@ -463,7 +465,7 @@ export default function WorkflowPage() {
                                         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                             <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                                    <Editor functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
+                                                    <Editor refValSet={wfRefValue} functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
                                                 </div>
                                             </div>
                                         </div>
