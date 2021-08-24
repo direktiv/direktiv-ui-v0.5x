@@ -121,6 +121,9 @@ export default function Services() {
 
             async function getRealtimeData(e) {
                 let edi = editableRef.current
+                if(e.data === "") {
+                    return
+                }
                 let json = JSON.parse(e.data)
 
                 console.log(json, "TRAFFIC UPDATE")
@@ -177,7 +180,9 @@ export default function Services() {
 
             async function getRealtimeData(e) {
                 let revs = revisionsRef.current
-
+                if(e.data === "") {
+                    return
+                }
                 let json = JSON.parse(e.data)
                 switch(json.event) {
                     case "DELETED":

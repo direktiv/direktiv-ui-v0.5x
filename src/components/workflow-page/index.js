@@ -101,6 +101,9 @@ export default function WorkflowPage() {
 
             async function getData(e) {
                 let funcs = functionsRef.current
+                if (e.data === "") {
+                    return
+                }
                 // process the data here
                 // pass it to state to be rendered
                 let json = JSON.parse(e.data)

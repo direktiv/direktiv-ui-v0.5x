@@ -45,7 +45,11 @@ export default function Revision() {
             }
 
             async function getData(e) {
+                if (e.data === "") {
+                    return
+                }
                 let json = JSON.parse(e.data)
+
                 console.log(json, "JSON FOR REVISION WATCHING")
                 if (json.event === "ADDED" || json.event === "MODIFIED") {
                     setRevisionDetails(json.revision)

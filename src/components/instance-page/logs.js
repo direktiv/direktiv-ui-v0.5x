@@ -57,6 +57,11 @@ export default function Logs(props) {
                     return
                 }
                 let json = JSON.parse(e.data) 
+                if(json.exit === 0) {
+                    console.log('closing listener')
+                        eventConnection.close()
+                    return
+                }
                 log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${json.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
                 log += `${json.message} `
                 if(json.context && json.context.constructor === Object && Object.keys(json.context).length > 0){

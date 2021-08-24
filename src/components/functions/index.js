@@ -49,9 +49,11 @@ export default function Functions() {
             
             async function getRealtimeData(e) {
                 let funcs = functionsRef.current
-                console.log(funcs, "FUNCS CURRENTLY")
                 // process the data here
                 // pass it to state to be rendered
+                if(e.data === "") {
+                    return
+                }
                 let json = JSON.parse(e.data)
                 switch (json.event) {
                 case "DELETED":
