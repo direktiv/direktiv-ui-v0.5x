@@ -86,8 +86,17 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
-
+                console.log(json, "POD DATA")
                 switch (json.event) {
+                    case "DELETED":
+                        for (var i=0; i < pods.length; i++) {
+                            if(pods[i].name === json.pod.name) {
+                                pods.splice(i, 1)
+                                podsRef.current = pods
+                                break
+                            }
+                        }
+                        break
                     case "MODIFIED":
                         for(var i=0; i < pods.length; i++) {
                             if (pods[i].name === json.pod.name) {
@@ -111,9 +120,12 @@ export default function Revision() {
                         }
                 }
                 // update tab to display first pod
-                if (tab === "") {
-                    setTab(pods[i].name)
+                if(pods[0]){
+                    if (tab === "" && pods[0].status === "Running") {
+                        setTab(pods[0].name)
+                    }
                 }
+                
                 setPods(JSON.parse(JSON.stringify(podsRef.current)))
             }
 
@@ -268,6 +280,14 @@ function PodLogs(props) {
                 // error log here
                 // after logging, close the connection   
                 console.log('error on sse', e)
+                try {
+                    let json = JSON.parse(e.data)
+                    if (json.Message.includes("could not get logs")) {
+                        console.log('could not get logs container is starting still')
+                    }
+                } catch(e) {
+                    console.log(e)
+                }
                 document.getElementById("pod-logs").innerHTML = ""
                 setLogs("")
             }

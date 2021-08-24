@@ -49,6 +49,8 @@ export default function Logs(props) {
                 // error log here
                 // after logging, close the connection   
                 console.log('error on sse', e)
+                document.getElementById("logs-test").innerHTML = ""
+                setLogs("")
             }
             
             async function getData(e) {
