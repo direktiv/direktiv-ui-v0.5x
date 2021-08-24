@@ -247,7 +247,6 @@ function WorkflowDiagram(props) {
         let titleMsg = `${data.label}-${data.type}`
         if (funcRef.current && funcRef.current.length > 0 && (data.state.type === "action" || data.state.type === "foreach" || data.state.type === "parallel")) {
             for(var i=0; i < funcRef.current.length; i++){
-                console.log(data.state, "DATA STATE")
                 if(data.state.actions) {
                     // parallel
                     for(var l=0; l < data.state.actions.length; l++) {

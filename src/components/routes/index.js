@@ -24,7 +24,6 @@ export default function Routes(props) {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
         history.push("/")
     } 
-    console.log(namespace, namespaces, "checking routes namespace")
     return(
         <>
             <Route exact path="/functions/global" component={Functions}/>

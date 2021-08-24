@@ -57,7 +57,6 @@ export default function Functions() {
                 let json = JSON.parse(e.data)
                 switch (json.event) {
                 case "DELETED":
-                    console.log("DELETED event handler")
                     for (var i=0; i < funcs.length; i++) {
                         if(funcs[i].serviceName === json.function.serviceName) {
                             funcs.splice(i, 1)
@@ -67,7 +66,6 @@ export default function Functions() {
                     }
                     break
                 case "MODIFIED":
-                    console.log("MODIFIED event handler")
                     for(var i=0; i < funcs.length; i++) {
                         if (funcs[i].serviceName === json.function.serviceName) {
                             funcs[i] = json.function
@@ -77,7 +75,6 @@ export default function Functions() {
                     }
                     break
                 default:
-                    console.log("ADDED event handler")
                     let found = false
                     for(var i=0; i < funcs.length; i++) {
                         if(funcs[i].serviceName === json.function.serviceName) {
@@ -90,7 +87,6 @@ export default function Functions() {
                         functionsRef.current = funcs
                     }
                 }
-                console.log('funcs after check', functionsRef)
                 setFunctions(JSON.parse(JSON.stringify(functionsRef.current)))
             }
             
@@ -101,7 +97,6 @@ export default function Functions() {
 
     useEffect(()=>{
         return ()=>{
-            console.log('close connection')
             if(evSource !== null) {
                 evSource.close()
             }
@@ -183,7 +178,6 @@ export default function Functions() {
                                 {functions.length > 0 ?
                                     <div >
                                         {functions.map((obj) => {
-                                            console.log(obj)
                                             return (
                                                 <KnativeFunc key={obj.serviceName} conditions={obj.conditions} fetch={fetch} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )

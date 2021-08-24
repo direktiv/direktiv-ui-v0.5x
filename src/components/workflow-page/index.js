@@ -146,9 +146,7 @@ export default function WorkflowPage() {
                     }
                 }
                 let x = await checkStartType(wfRefValue.current)
-                console.log(x, "after check")
                 if (!x) {
-                    console.log('scheduled start type')
                     actFailed = false
                 }
                 setExecutable(JSON.parse(JSON.stringify(actFailed)))
@@ -656,7 +654,6 @@ function FuncComponent(props) {
                                 {functions.map((obj) => {
 
 let statusMessage = ""
-                                    console.log(obj, "IN FUNC COMPONENT")
                                     if(obj.conditions){
                                         for(var x=0; x < obj.conditions.length; x++) {
                                             statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`

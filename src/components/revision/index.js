@@ -50,7 +50,6 @@ export default function Revision() {
                 }
                 let json = JSON.parse(e.data)
 
-                console.log(json, "JSON FOR REVISION WATCHING")
                 if (json.event === "ADDED" || json.event === "MODIFIED") {
                     setRevisionDetails(json.revision)
                 }
@@ -87,7 +86,6 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
-                console.log(json, "JSON FOR POD WATCHING")
 
                 switch (json.event) {
                     case "MODIFIED":
@@ -145,8 +143,6 @@ export default function Revision() {
         )
     }
 
-    console.log(revisionDetails, "REVISION")
-    console.log(pods, "PODS")
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
@@ -185,7 +181,6 @@ function DetailedRevision(props) {
     } else if (revision.size === 2) {
         size = "large"
     }
-    console.log(size)
     return(
         <div style={{fontSize:"11pt"}}>
             <div style={{display:"flex", width:"100%"}}>
@@ -228,7 +223,6 @@ function DetailedRevision(props) {
                     <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Pods:</b></div></p>
                     <ul style={{margin:"5px", fontSize:"10pt"}}>
                         {pods.map((obj)=>{
-                            console.log(obj, "pod log")
                             let circleFill = "crashed"
                             if (obj.status === "Succeeded" || obj.status === "Running") {
                                 circleFill = "success"
@@ -239,7 +233,6 @@ function DetailedRevision(props) {
                             if (obj.status === "Pending") {
                                 circleFill = "pending"
                             }
-                            console.log(obj.name, `${serviceName}-deployment-`)
                             return(
                                 <li style={{lineHeight:"24px"}}>
                                     <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />

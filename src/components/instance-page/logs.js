@@ -58,7 +58,6 @@ export default function Logs(props) {
                 }
                 let json = JSON.parse(e.data) 
                 if(json.exit === 0) {
-                    console.log('closing listener')
                         eventConnection.close()
                     return
                 }
@@ -94,7 +93,6 @@ export default function Logs(props) {
 
     useEffect(()=>{
         return ()=>{
-            console.log('close connection')
             if(logSource !== null) {
                 logSource.close()
                 setLogs("")

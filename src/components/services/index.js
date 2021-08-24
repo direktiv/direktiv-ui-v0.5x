@@ -51,7 +51,6 @@ export default function Services() {
             if(workflow) {
                 x = `/functions/${service}`
             }
-            console.log(x, "get service")
 
             try {
                 // let tr = []
@@ -111,7 +110,6 @@ export default function Services() {
             if(workflow) {
                 x = `/watch/functions/${service}`
             }
-            console.log(x, "URL FOR TRAFFIC UPDATES")
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
@@ -126,13 +124,10 @@ export default function Services() {
                 }
                 let json = JSON.parse(e.data)
 
-                console.log(json, "TRAFFIC UPDATE")
                 if (json.event === "MODIFIED" || json.event === "ADDED") {
-                    console.log(edi, ":)")
                     if (!edi) {
                         if (json.traffic) {
                             if(json.traffic.length > 0) {
-                                console.log(rev2NameCache.current, "current rev2")
                                 setRev1Name(json.traffic[0].revisionName)
                                 setRev1Percentage(json.traffic[0].traffic)
                                 if(json.traffic[1]) {
@@ -169,7 +164,6 @@ export default function Services() {
             if(workflow) {
                 x = `/watch/functions/${service}/revisions/`
             }
-            console.log(x, "URL FOR REVISIONS")
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -328,7 +322,6 @@ export default function Services() {
 
 function ListRevisions(props) {
     const {revisions, workflow, getService, fetch, traffic, namespace, serviceName} = props
-    console.log(serviceName)
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj, i)=>{
@@ -377,7 +370,6 @@ function ListRevisions(props) {
 
 function Revision(props) {
     const {titleColor, name, fetch, workflow, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
-    console.log(serviceName)
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -507,7 +499,7 @@ function CreateRevision(props) {
                     image: latestRevision.image,
                     cmd: latestRevision.cmd,
                     size: parseInt(latestRevision.size),
-                    minScale: parseInt(latestRevision.scale),
+                    minScale: parseInt(latestRevision.minScale),
                     trafficPercent: parseInt(traffic),
                 })
             })
@@ -561,7 +553,6 @@ function CreateRevision(props) {
           </SliderTooltip>
         )
     }
-    
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
         <div style={{ fontSize: "12pt"}}>
@@ -579,7 +570,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider  onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={3}  defaultValue={latestRevision.scale} />
+                        <Slider value={latestRevision.minScale}  onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, minScale: e}})} handle={handle} min={0} max={3}  defaultValue={latestRevision.minScale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
