@@ -145,9 +145,8 @@ export default function Services() {
                                     setRev2Name("")
                                 }
                             }
-                       
+                            setTraffic(JSON.parse(JSON.stringify(json.traffic)))
                         }
-                        setTraffic(JSON.parse(JSON.stringify(json.traffic)))
                     }
                 } 
             }
