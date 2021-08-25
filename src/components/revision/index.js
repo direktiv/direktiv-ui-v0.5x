@@ -31,7 +31,7 @@ export default function Revision() {
     // set revision soruce
     useEffect(()=>{
         if(revisionSource === null) {
-            let x = `/watch/functions/g-${service}/revisions/${revision}`
+            let x = `/watch/functions/global-${service}/revisions/${revision}`
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}`
             }
@@ -69,7 +69,7 @@ export default function Revision() {
 
         if(podSource === null) {
             // setup
-            let x = `/watch/functions/g-${service}/revisions/${revision}/pods/`
+            let x = `/watch/functions/global-${service}/revisions/${revision}/pods/`
             if (namespace) {
                 x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}/pods/`
             }

@@ -44,9 +44,9 @@ export default function Services() {
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
-            let x = `/functions/g-${service}`
+            let x = `/functions/global-${service}`
             if (namespace) {
-                x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
             if(workflow) {
                 x = `/functions/${service}`
@@ -107,9 +107,9 @@ export default function Services() {
     // setup sse for traffic updates
     useEffect(()=>{
         if(trafficSource === null) {
-            let x = `/watch/functions/g-${service}`
+            let x = `/watch/functions/global-${service}`
             if(namespace){
-                x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
             if(workflow) {
                 x = `/watch/functions/${service}`
@@ -160,9 +160,9 @@ export default function Services() {
     useEffect(()=>{
         if (revisionSource === null) {
 
-            let x = `/watch/functions/g-${service}/revisions/`
+            let x = `/watch/functions/global-${service}/revisions/`
             if (namespace) {
-                x = `/watch/namespaces/${namespace}/functions/ns-${namespace}-${service}/revisions/`
+                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}/revisions/`
             }
             if(workflow) {
                 x = `/watch/functions/${service}/revisions/`
@@ -498,9 +498,9 @@ function CreateRevision(props) {
 
     const createRevision = async () => {
         try {
-            let x = `/functions/g-${service}`
+            let x = `/functions/global-${service}`
             if (namespace) {
-                x =  `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x =  `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
             if (workflow) {
                 x = `/functions/${service}`
@@ -642,9 +642,9 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            let x = `/functions/g-${service}`
+            let x = `/functions/global-${service}`
             if (namespace) {
-                x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
             if (workflow) {
                 x = `/functions/${service}`

@@ -30,12 +30,12 @@ export default function Functions() {
 
     useEffect(()=>{
         if (evSource === null && functions !== null) {
-            let x = "/watch/functions/?scope=g"
+            let x = "/watch/functions/?scope=global"
             let body = {
-                scope: "g"
+                scope: "global"
             }
             if(params.namespace) {
-                body.scope = "ns"
+                body.scope = "namespace"
                 x = `/watch/namespaces/${params.namespace}/functions/`
                 body["namespace"] = params.namespace
             }
@@ -107,10 +107,10 @@ export default function Functions() {
         async function fetchFunctions() {
             let x = "/functions/"
             let body = {
-                scope: "g"
+                scope: "global"
             }
             if(params.namespace) {
-                body.scope = "ns"
+                body.scope = "namespace"
                 x = `/namespaces/${params.namespace}/functions/`
                 body["namespace"] = params.namespace
             }
