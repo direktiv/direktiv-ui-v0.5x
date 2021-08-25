@@ -222,6 +222,12 @@ export default function Services() {
                 revisionsRef.current.sort(function(a,b){
                     return a.created < b.created ? 1 : -1; 
                 })
+
+                if (!revisionsRef || !revisionsRef.current  || revisionsRef.current.length === 0) {
+                    console.log("revision missing")
+                    return
+                }
+
                 setLatestRevision(JSON.parse(JSON.stringify(revisionsRef.current[0])))
                 setRevisions(JSON.parse(JSON.stringify(revisionsRef.current)))
             }
