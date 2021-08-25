@@ -4,7 +4,7 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import 'rc-slider/assets/index.css';
 import { ConfirmButton } from '../confirm-button'
-import {Link} from "react-router-dom"
+import {Link, useHistory} from "react-router-dom"
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import {useParams} from "react-router-dom"
@@ -24,7 +24,7 @@ export default function Services() {
     const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
 
-
+    const history = useHistory()
     const [config, setConfig] = useState(null)
 
     const [latestRevision, setLatestRevision] = useState(null)
@@ -91,6 +91,10 @@ export default function Services() {
                     // setService(json)
                     // setTraffic(tr)
                 } else {
+                   let json = await resp.json()
+                   if (json.Message.includes("not found")){
+                       history.goBack()
+                   }
                     await handleError('fetch revisions', resp, 'fetchService')
                 }
             } catch(e) {
@@ -186,6 +190,9 @@ export default function Services() {
                                 revisionsRef.current = revs
                                 break
                             }
+                        }
+                        if (revs.length === 0) {
+                            history.goBack()
                         }
                         break
                     case "MODIFIED":
@@ -570,7 +577,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={latestRevision.minScale}  onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, minScale: e}})} handle={handle} min={0} max={3}  defaultValue={latestRevision.minScale} />
+                        <Slider value={latestRevision.minScale}  onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, minScale: e}})} handle={handle} min={0} max={config.maxscale}  defaultValue={latestRevision.minScale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>

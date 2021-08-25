@@ -1,7 +1,7 @@
 import Breadcrumbs from '../breadcrumbs'
 import {useContext, useEffect, useState, useRef} from "react"
 import TileTitle from '../tile-title'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import LoadingWrapper from "../loading"
 import { CopyToClipboard } from "../../util-funcs"
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
@@ -21,7 +21,7 @@ export default function Revision() {
 
     const [podSource, setPodSource] = useState(null)
     const [revisionSource, setRevisionSource] = useState(null)
-
+    const history = useHistory()
     const [revisionDetails, setRevisionDetails] = useState(null)
 
     const [pods, setPods] = useState([])
@@ -49,9 +49,12 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
-
+                console.log(json, "revision")
                 if (json.event === "ADDED" || json.event === "MODIFIED") {
                     setRevisionDetails(json.revision)
+                }
+                if(json.event === "DELETED"){
+                    history.goBack()
                 }
             }
 
