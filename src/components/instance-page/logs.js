@@ -63,7 +63,7 @@ export default function Logs(props) {
                         eventConnection.close()
                     return
                 }
-                log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${json.timestamp.nanos}`).format("h:mm:ss.SSS")}]\u001b[0m `
+                log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${Math.round(json.timestamp.nanos/1000000)}`).format("h:mm:ss.SSS")}]\u001b[0m `
                 log += `${json.message} `
                 if(json.context && json.context.constructor === Object && Object.keys(json.context).length > 0){
                     log += `\u001b[38;5;248m( `
