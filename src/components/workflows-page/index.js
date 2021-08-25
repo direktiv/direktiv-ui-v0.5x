@@ -192,7 +192,7 @@ export default function WorkflowsPage() {
                                         }}></input>
                                     </div>
                                 </div>
-                                <div id="events-table" style={{ display: "flex", flexDirection: "column", gap:"15px", maxHeight:"770px", overflow:"auto", paddingBottom:"20px" }}>
+                                <div id="events-table" style={{ display: "flex", flexDirection: "column", gap:"15px", maxHeight:"770px", overflow:"auto", padding:"5px 5px 20px 5px" }}>
                                     {err ? 
                                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                                         {err}
