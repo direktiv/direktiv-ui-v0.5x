@@ -415,7 +415,7 @@ export default function Navbar(props) {
                     </li>         
         
                 </ul>
-                {permissions.admin ?    <div className="nav-section divider"> 
+                {checkPerm(permissions, "admin") ?    <div className="nav-section divider"> 
                     <ul>
                         <li>
                         <Link style={{color: matchGlobal !== null ? "#4497f5": "", display:"flex", alignItems:"center"}} onClick={()=>{

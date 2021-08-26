@@ -1,12 +1,11 @@
 
 import { BrowserRouter as Router, Switch} from "react-router-dom";
 import Navbar from './components/nav'
+import { EventSourcePolyfill } from 'event-source-polyfill';
 
 import NotificationSystem, { sendNotification } from './components/notifications/index.js'
-import { useState } from 'react';
+import { useState, useContext, useCallback, useEffect } from 'react';
 import MainContext from './context'
-import { useContext } from 'react';
-import { useCallback, useEffect } from 'react';
 import Modal from 'react-modal'
 import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
@@ -304,6 +303,10 @@ export const  bcRoutes = [
   {
       path: "/functions/global",
       breadcrumb: "Knative Services"
+  },
+  {
+      path: "/:namespace/w/:workflow/functions",
+      breadcrumb: "WorkflowFuncs",
   }
 ]
 
@@ -315,6 +318,15 @@ function Content() {
   const [initialized, setInitialized] = useState(false)
   const [apiKey, setAPIKey] = useState(localStorage.getItem('apikey'))
 
+
+  const sseGen = useCallback((path, opts) => {
+    if (!opts.headers) {
+        opts.headers = { Authorization: `apikey ${apiKey}` }
+    } else {
+        opts.headers =  {...opts.headers, Authorization: `apikey ${apiKey}`}
+    }
+    return new EventSourcePolyfill(`${context.SERVER_BIND}${path}`, opts)
+  },[context.SERVER_BIND, apiKey])
 
   const netch = useCallback((path, opts) => {
     if (!opts.headers) {
@@ -387,6 +399,7 @@ function Content() {
     <MainContext.Provider value={{
       ...context,
       fetch: netch,
+      sse: sseGen,
       namespace: namespace,
       setNamespace: setNamespace,
       namespaces: namespaces,

@@ -33,20 +33,20 @@ async function checkStartType(wf, setError) {
         }
         return true
     } catch (e) {
-        setError(`Unable to parse workflow: ${e.message}`)
         // return true if an error happens as the yaml is not runnable in the first place
         return true
     }
 }
 
 export default function WorkflowPage() {
-    const { fetch, namespace, handleError, attributeAdd, checkPerm, permissions, workflowInteractions } = useContext(MainContext)
+    const { sse,fetch, namespace, handleError, attributeAdd, checkPerm, permissions, workflowInteractions } = useContext(MainContext)
     const [viewSankey, setViewSankey] = useState("")
 
     const [showLogEvent, setShowLogEvent] = useState(false)
     const [logEvent, setLogEvent] = useState("hello-world")
 
     const [workflowValue, setWorkflowValue] = useState(null)
+    const wfRefValue = useRef(workflowValue)
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const [executable, setExecutable] = useState(true)
@@ -54,14 +54,14 @@ export default function WorkflowPage() {
     const [workflowInfo, setWorkflowInfo] = useState({ revision: 0, active: true, fetching: true })
 
     const [err, setErr] = useState("")
-    const [aErr, setAErr] = useState("")
     const [actionErr, setActionErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
     const codemirrorRef = useRef();
     const [tab, setTab] = useState("functions")
     const [functions, setFunctions] = useState(null)
-
+    const functionsRef = useRef(functions ? functions: [])
+    const [funcSource, setFuncSource] = useState(null)
     const history = useHistory()
     const params = useParams()
     const [apiModalOpen, setAPIModalOpen] = useState(false)
@@ -69,6 +69,7 @@ export default function WorkflowPage() {
     const [waitCount, setWaitCount] = useState(0)
 
     const workflowRef = useRef()
+
 
     workflowRef.current = params.workflow
     function toggleAPIModal() {
@@ -89,6 +90,81 @@ export default function WorkflowPage() {
         })
     }
 
+    useEffect(()=>{
+        if(functions !== null && funcSource === null) {
+            let x = `/watch/namespaces/${namespace}/workflows/${workflowRef.current}/functions/`
+
+            let eventConnection = sse(`${x}`,{})
+            eventConnection.onerror = (e) => {
+                console.log("error on sse", e)
+            }
+
+            async function getData(e) {
+                let funcs = functionsRef.current
+                if (e.data === "") {
+                    return
+                }
+                // process the data here
+                // pass it to state to be rendered
+                let json = JSON.parse(e.data)
+                switch (json.event) {
+                case "DELETED":
+                    for (var i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            funcs.splice(i, 1)
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                case "MODIFIED":
+                    for(i=0; i < funcs.length; i++) {
+                        if (funcs[i].serviceName === json.function.serviceName) {
+                            funcs[i] = json.function
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                default:
+                    let found = false
+                    for(i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            found = true 
+                            break
+                        }
+                    }
+                    if (!found){
+                        funcs.push(json.function)
+                        functionsRef.current = funcs
+                    }
+                }
+                let actFailed = true
+                for ( i=0; i < functionsRef.current.length; i++) {
+                    if (functionsRef.current[i].status === "False") {
+                        actFailed = false
+                    }
+                }
+                x = await checkStartType(wfRefValue.current)
+                if (!x) {
+                    actFailed = false
+                }
+                setExecutable(JSON.parse(JSON.stringify(actFailed)))
+                setFunctions(JSON.parse(JSON.stringify(functionsRef.current)))
+            }
+
+            eventConnection.onmessage = e => getData(e)
+            setFuncSource(eventConnection)
+        }   
+    },[functions, funcSource, namespace, sse])
+    useEffect(()=>{
+        return () => {
+            if (funcSource !== null) {
+                funcSource.close()
+            }
+        }
+    },[funcSource])
+
     const fetchKnativeFunctions = useCallback(()=>{
         setFetching(true)
         async function fetchKnativeFuncs() {
@@ -99,13 +175,6 @@ export default function WorkflowPage() {
                 if(resp.ok) {
                     let arr = await resp.json()
                     if (arr.length > 0) {
-                        let exec = true
-                        for (var i=0; i < arr.length; i++) {
-                            if (arr[i].status === "False") {
-                                exec = false
-                            }
-                        }
-                        setExecutable(exec)
                         setFunctions(arr)
                     } else {
                         setFunctions([])
@@ -114,12 +183,12 @@ export default function WorkflowPage() {
                     await handleError('get workflow functions', resp, "getWorkflowFunctions")
                 }
             } catch(e) {
-                setAErr(`Unable to get workflow functions: ${e.message}`)
+                console.log(`Unable to get workflow functions: ${e.message}`)
             }
         }
 
         return fetchKnativeFuncs().finally(()=>{setFetching(false)})
-    },[functions])
+    },[fetch, handleError, namespace])
 
     const fetchWorkflow = useCallback(() => {
         setFetching(true)
@@ -134,11 +203,12 @@ export default function WorkflowPage() {
                     let wf = atob(json.workflow)
 
 
-                    let exec = await checkStartType(wf)
 
-                    setExecutable(exec)
+                    // setExecutable(exec)
                     setWorkflowValue(wf)
+                    wfRefValue.current = wf
                     setWorkflowValueOld(wf)
+
                     setWorkflowInfo((wfI) => {
                         wfI.active = json.active
                         return { ...wfI }
@@ -174,14 +244,15 @@ export default function WorkflowPage() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
+                    let x = await checkStartType(workflowValue)
+   
+                    setExecutable(x)
                     setWorkflowInfo((wfI) => {
                         wfI.active = json.active;
                         wfI.revision = json.revision;
                         return { ...wfI }
                     })
                     setWorkflowValueOld(workflowValue)
-                    let exec = await checkStartType(workflowValue)
-                    setExecutable(exec)
                     setActionErr("")
                     history.replace(`${json.id}`)
                 } else {
@@ -190,7 +261,6 @@ export default function WorkflowPage() {
             } catch (e) {
                 setActionErr(`Failed to update workflow: ${e.message}`)
             }
-            return
         }
         updateWf().finally(() => { setFetching(false) })
     }, [namespace, workflowValue, fetch, history, workflowInfo.fetching, params.workflow, handleError])
@@ -219,20 +289,19 @@ export default function WorkflowPage() {
             } catch (e) {
                 setActionErr(`Failed to set log event: ${e.message}`)
             }
-            return
         }
         return postLogEvent().finally(() => { setFetching(false) })
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
 
     // polling knative functions
-    useEffect(()=>{
-            let interval = setInterval(()=>{
-                fetchKnativeFunctions()
-            }, 3000)
-        return () => {
-            clearInterval(interval)
-        }
-    },[fetchKnativeFunctions, namespace, functions])
+    // useEffect(()=>{
+    //         let interval = setInterval(()=>{
+    //             fetchKnativeFunctions()
+    //         }, 3000)
+    //     return () => {
+    //         clearInterval(interval)
+    //     }
+    // },[fetchKnativeFunctions, namespace, functions])
 
     // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
@@ -348,8 +417,6 @@ export default function WorkflowPage() {
         }
     }, [codemirrorRef, fullscrenEditor])
 
-    const Actions = [logButton, saveButton]
-
     return (
         <>
             <LoadingPage waitCount={waitCount} waitGroup={2} text={`Loading Workflow ${params.workflow}`}/>
@@ -395,7 +462,7 @@ export default function WorkflowPage() {
                                         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                             <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                                    <Editor functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
+                                                    <Editor refValSet={wfRefValue} functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
                                                 </div>
                                             </div>
                                         </div>
@@ -490,31 +557,18 @@ export default function WorkflowPage() {
                                     <IoList /> Details
                                 </TileTitle>
                                 {tab === "events"?
-                                    <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                    <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"255px", overflowY: "auto" }}>
                                         <div id="events-tile" className="tile-contents">
                                             <EventsList />
                                         </div>
                                     </div>:""
                                 }
                                 {tab === "functions" ?
-                                    <>
-                                                  {
-                                             aErr !== "" ? 
-                                    <>
-<div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                                        {aErr}
-                                    </div>
-                                    </>
-                                    :""}
-                                    {checkPerm(permissions, "getWorkflowFunctions") ? 
-                                     <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                     <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"255px", overflowY: "auto" }}>
                                      <div id="events-tile" className="tile-contents">
-                           
-                                         <FuncComponent functions={functions}/>
-                                         
-                                     </div> </div>:""}
-                                    </>
-                                :""
+                                         <FuncComponent namespace={namespace} workflow={params.workflow} functions={functions}/>
+                                     </div>
+                                 </div>:""
                                 }
                             </div>
                             {attributeAdd ? attributeAdd : ""}
@@ -584,7 +638,7 @@ function PieComponent() {
 }
 
 function FuncComponent(props) {
-    const {functions} = props
+    const {functions, namespace, workflow} = props
 
     return(
       <div>
@@ -594,18 +648,24 @@ function FuncComponent(props) {
                         {functions.length > 0 ?
                             <>
                                 {functions.map((obj) => {
-    let statusMessage = ""
-    for(var x=0; x < obj.conditions.length; x++) {
-        statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
-    }
+
+let statusMessage = ""
+                                    if(obj.conditions){
+                                        for(var x=0; x < obj.conditions.length; x++) {
+                                            statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
+                                        }
+                                    }
+
                                     return(
-                                        <li title={statusMessage}  className="event-list-item">
-                                            <div>
-                                                <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                                                <span>
-                                                    {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
-                                                </span>
-                                            </div>
+                                        <li key={obj.info.name} title={statusMessage}  className="event-list-item">
+                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
+                                                <div>
+                                                    <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
+                                                    <span>
+                                                        {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
+                                                    </span>
+                                                </div>
+                                            </Link>
                                         </li>
                                     )
                                 })}

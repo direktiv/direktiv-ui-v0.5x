@@ -1,13 +1,12 @@
-import {useState, useEffect, useContext, useCallback} from "react"
+import {useState, useEffect, useContext, useCallback, useRef} from "react"
 import Slider, { SliderTooltip, Handle } from 'rc-slider';
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import 'rc-slider/assets/index.css';
 import { ConfirmButton } from '../confirm-button'
-
+import {Link, useHistory, useParams} from "react-router-dom"
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
-import {useParams} from "react-router-dom"
 import { IoAdd, IoClipboardSharp, IoList, IoTrash} from 'react-icons/io5'
 import MainContext from "../../context";
 import LoadingWrapper from "../loading"
@@ -18,131 +17,211 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 export default function Services() {
-    const {fetch, handleError, checkPerm, permissions} = useContext(MainContext)
-    let { service, namespace } = useParams();
+    const {fetch, handleError, sse} = useContext(MainContext)
+    let { service, namespace, workflow } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
-    const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
+
+    const history = useHistory()
     const [config, setConfig] = useState(null)
 
     const [latestRevision, setLatestRevision] = useState(null)
-
+    const [revisions, setRevisions] = useState(null)
+    const revisionsRef = useRef(revisions ? revisions: [])
     const [editable, setEditable] = useState(false)
+    const editableRef = useRef(editable)
     const [rev1Name, setRev1Name] = useState("")
     const [rev2Name, setRev2Name] = useState("")
-
+    const rev2NameCache = useRef(rev2Name)
     const [rev1Percentage, setRev1Percentage] = useState(0)
 
     const [isLoading, setIsLoading] = useState(true)
 
+    const [revisionSource, setRevisionSource] = useState(null)
+    const [trafficSource, setTrafficSource] = useState(null)
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
-            let x = `/functions/g-${service}`
+            let x = `/functions/global-${service}`
             if (namespace) {
-                x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
+            if(workflow) {
+                x = `/functions/${service}`
+            }
+
             try {
-                let tr = []
                 let resp = await fetch(x, {
                     method:"GET"
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    for(var i=0; i < json.revisions.length; i++) {
-                        if (json.revisions[i].traffic > 0) {
-                            tr.push({
-                                name: json.revisions[i].name,
-                                value: json.revisions[i].traffic
-                            })
-                        }
-                    }
-
-                    if (!editable) {
-                        if (tr){
-                            if (tr.length > 0) {
-                                console.log("tr is greater than 0")
-                                setRev1Name(tr[0].name)
-                                setRev1Percentage(tr[0].value)
-                                if(tr[1]) {
-                                    setRev2Name(tr[1].name)
-                                }
-                            }
-                        }
-                    }
-
-                    if(!dontChangeRev) {
-                        setLatestRevision({
-                            image: json.revisions[0].image,
-                            scale: json.revisions[0].minScale ? json.revisions[0].minScale : 0,
-                            size: json.revisions[0].size ? json.revisions[0].size : 0,
-                            cmd: json.revisions[0].cmd ? json.revisions[0].cmd : ""
-                        })
-                    }
-                    setService(json)
-                    setTraffic(tr)
+                    setConfig(json.config)
                 } else {
-                    await handleError('fetch revisions', resp, 'getService')
+                   let json = await resp.json()
+                   if (json.Message.includes("not found")){
+                       history.goBack()
+                   }
+                    await handleError('fetch revisions', resp, 'fetchService')
                 }
             } catch(e) {
                 setErrFetchRev(`Error fetching service: ${e.message}`)
             }
         }
         return getServices()
-    },[fetch, handleError, namespace, editable, service])
+    },[fetch, handleError, namespace, service, history, workflow])
 
-    // get config
-    
-    const fetchServices = useCallback(()=>{
-        async function fetchFunctions() {
-            let x = `/functions/`
-            let body = {
-                scope: "g"
+    // setup sse for traffic updates
+    useEffect(()=>{
+        if(trafficSource === null) {
+            let x = `/watch/functions/global-${service}`
+            if(namespace){
+                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
-            if(namespace) {
-                x = `/namespaces/${namespace}/functions/`
-                body.scope = "ns"
-                body["namespace"] = namespace
+            if(workflow) {
+                x = `/watch/functions/${service}`
             }
-            try {
-                let resp = await fetch(x, {
-                    method: "POST",
-                    body: JSON.stringify(body)
-                })
-                if(resp.ok) {
-                    let arr = await resp.json()
-                    setConfig(arr.config)
-                } else {
-                    await handleError('fetch services', resp, 'listServices')
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                console.log('error on sse', e)
+            }
+
+            async function getRealtimeData(e) {
+                let edi = editableRef.current
+                if(e.data === "") {
+                    return
                 }
-            } catch(e) {
-                setErrFetchRev(`Error fetching services: ${e.message}`)
+                let json = JSON.parse(e.data)
+
+                if (json.event === "MODIFIED" || json.event === "ADDED") {
+                    if (!edi) {
+                        if (json.traffic) {
+                            if(json.traffic.length > 0) {
+                                setRev1Name(json.traffic[0].revisionName)
+                                setRev1Percentage(json.traffic[0].traffic)
+                                if(json.traffic[1]) {
+                                    if(json.traffic[1].traffic !== 0) {
+                                        setRev2Name(json.traffic[1].revisionName)
+                                        rev2NameCache.current = json.traffic[1].revisionName
+                                    } else {    
+                                        setRev2Name("")
+                                    }
+                                } else if (rev2NameCache.current !== "") {
+                                    setRev2Name("")
+                                }
+                            }
+                            setTraffic(JSON.parse(JSON.stringify(json.traffic)))
+                        }
+                    }
+                } 
             }
+
+            eventConnection.onmessage = e => getRealtimeData(e)
+            setTrafficSource(eventConnection)
         }
-        return fetchFunctions()
-    },[fetch, handleError, namespace])
+    },[trafficSource, editable, namespace, service, sse, workflow])
+
+    // setup sse for revisions
+    useEffect(()=>{
+        if (revisionSource === null) {
+
+            let x = `/watch/functions/global-${service}/revisions/`
+            if (namespace) {
+                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}/revisions/`
+            }
+            if(workflow) {
+                x = `/watch/functions/${service}/revisions/`
+            }
+
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                console.log('error on sse', e)
+            }
+
+            async function getRealtimeData(e) {
+                let revs = revisionsRef.current
+                if(e.data === "") {
+                    return
+                }
+                let json = JSON.parse(e.data)
+                switch(json.event) {
+                    case "DELETED":
+                        for (var i=0; i < revs.length; i++) {
+                            if(revs[i].name === json.revision.name) {
+                                revs.splice(i, 1)
+                                revisionsRef.current = revs
+                                break
+                            }
+                        }
+                        if (revs.length === 0) {
+                            history.goBack()
+                        }
+                        break
+                    case "MODIFIED":
+                        for(i=0; i < revs.length; i++) {
+                            if (revs[i].name === json.revision.name) {
+                                revs[i] = json.revision
+                                revisionsRef.current = revs
+                                break
+                            }
+                        }
+                        break
+                    default:
+                        let found = false
+                        for(i=0; i < revs.length; i++) {
+                            if(revs[i].name === json.revision.name) {
+                                found = true 
+                                break
+                            }
+                        }
+                        if (!found){
+                            revs.push(json.revision)
+                            revisionsRef.current = revs
+                        }
+                }
+
+                // filter based on revision dates
+                revisionsRef.current.sort(function(a,b){
+                    return a.created < b.created ? 1 : -1; 
+                })
+        
+
+                if (revisionsRef.current[0]){
+                    setLatestRevision(JSON.parse(JSON.stringify(revisionsRef.current[0])))
+                    console.log('no revisions?')
+                }
+                setRevisions(JSON.parse(JSON.stringify(revisionsRef.current)))
+            }
+
+
+            eventConnection.onmessage = e => getRealtimeData(e)
+            setRevisionSource(eventConnection)
+        }
+
+    },[revisionSource, history, namespace, service, sse, workflow])
 
     useEffect(()=>{
-            let interval = setInterval(()=>{
-                getService(true)
-            }, 3000)
-            return () => {
-                clearInterval(interval)
+        return ()=>{
+            if(revisionSource !== null) {
+                revisionSource.close()
             }
-    },[getService])
 
+            if(trafficSource !== null) {
+                trafficSource.close()
+            }
+        }
+    },[trafficSource, revisionSource])
 
+    // initial load request
     useEffect(()=>{
         if (config === null) {
-            fetchServices().finally(()=> {setIsLoading(false)})     
-        }
-    },[fetchServices, config])
-
-    useEffect(()=>{
-        if (srvice === null) {
             getService().finally(()=> {setIsLoading(false)})     
         }
-    },[getService, srvice])
+    },[getService, config])
 
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -163,42 +242,59 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions namespace={namespace} checkPerm={checkPerm} permissions={permissions} traffic={traffic} fetch={fetch} getService={getService} revisions={srvice ? srvice.revisions : []}/>
+                    <ListRevisions workflow={workflow} namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
 
 }
                     </LoadingWrapper>
                 </div>
                 {latestRevision !== null && config !== null && traffic !== null ?
                 <div className="container" style={{ flexDirection: "column"}}>
+                {
+                            traffic !== null ?
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px" }}>
                         <TileTitle name="Traffic Management">
                              <IoClipboardSharp />
                         </TileTitle>
+                      
                             <EditRevision 
+                                workflow={workflow}
                                 setRev1Percentage={setRev1Percentage} 
                                 rev1Percentage={rev1Percentage} 
                                 setRev2Name={setRev2Name} 
                                 setEditable={setEditable} 
                                 editable={editable}
+                                editableRef={editableRef}
                                 rev1Name={rev1Name} 
                                 rev2Name={rev2Name} 
                                 setRev1Name={setRev1Name} 
-                                revisions={srvice ? srvice.revisions : []} 
+                                revisions={revisions ? revisions : []} 
                                 handleError={handleError} 
                                 traffic={traffic} 
                                 fetch={fetch} 
-                                getService={getService} 
+                                // getService={getService} 
                                 namespace={namespace} 
                                 service={service}
                                 />
+                      
                     </div>
+                          :
+                          ""
+                      }
+                      <>
+                        {latestRevision !== null && config !== null ?
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px"}}>
                         <TileTitle name="Create revision">
                              <IoAdd />
                         </TileTitle>
-                            <CreateRevision namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} getService={getService} service={service}/>
+                      
+                            <CreateRevision workflow={workflow} namespace={namespace} config={config} setLatestRevision={setLatestRevision} latestRevision={latestRevision} handleError={handleError} fetch={fetch} service={service}/>
+                     
                     </div>
-                </div>:""}
+                           :
+                           ""
+                       }
+                       </>
+                </div> : ""}
                 </div>
             </div>
         </div>
@@ -206,7 +302,7 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, getService, fetch, traffic, checkPerm, permissions, namespace} = props
+    const {revisions, workflow, getService, fetch, traffic, namespace, serviceName} = props
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj, i)=>{
@@ -225,19 +321,28 @@ function ListRevisions(props) {
                 }
                 if (traffic) {
                     if (traffic.length > 0) {
-                        if (traffic[0].name === obj.name){
+                        if (traffic[0].revisionName === obj.name){
                             titleColor = "#2396d8"
                         }
                         if (traffic[1]) {
-                            if (traffic[1].name === obj.name){
+                            if (traffic[1].revisionName === obj.name && traffic[1].traffic !== 0){
                                 titleColor = "rgb(219, 58, 58)"
                             }
                         }
                     }
+                    for (i=0; i < traffic.length; i++) {
+                        if(traffic[i].revisionName === obj.name) {
+                            obj.traffic = traffic[i].traffic
+                        }
+                    }
+                }
+
+                if (obj.traffic !== 0 && obj.traffic !== undefined) {
+                    hideDelete = true
                 }
  
                 return(
-                    <Revision namespace={namespace} checkPerm={checkPerm} permissions={permissions} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -245,8 +350,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, namespace, name, fetch, size, cmd, minScale, fetchServices, permissions, checkPerm, image, generation, created,  conditions, status, traffic, hideDelete} = props
-
+    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -280,12 +384,21 @@ function Revision(props) {
         circleFill = "crashed"
     }
 
+    let url = `/functions/global/${serviceName}/${name}`
+    if (namespace) {
+        url = `/${namespace}/functions/${serviceName}/${name}`
+    }
 
+    if (workflow) {
+        url = `/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
+    }
+    
     return (
-        <div id={panelID} className="neumorph-hover" style={{marginBottom: "10px"}} onClick={() => {
+        <Link key={name} id={panelID} to={url} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} onClick={() => {
             toggleItem();
         }}>
-            <div className="services-list-div ">
+            <div className="neumorph-hover">
+            <div className="services-list-div " style={{width:"100%"}}>
                 <div>
                     <div style={{display: "inline"}}>
                         <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
@@ -293,9 +406,11 @@ function Revision(props) {
                     <div style={{display: "inline"}}>
                         <b style={{color: titleColor}}>{name}</b> <i style={{fontSize:"12px"}}>{dayjs.unix(created).fromNow()}</i>
                     </div>
+       
+
                 </div>
-               {!hideDelete ?<> {checkPerm(permissions, "deleteRevision") ?<div style={{flex: "auto", textAlign: "right"}}>
-                    <div className="buttons">
+               {!hideDelete ? <div style={{flex: "auto", textAlign: "right"}}>
+                    <div className="buttons" style={{paddingRight:"25px"}}>
                         <div style={{position:"relative"}} title="Delete Service">
                             <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                                 ev.preventDefault()
@@ -303,53 +418,25 @@ function Revision(props) {
                             }} /> 
                         </div>
                     </div>
-                </div>:""}</>:""}
+                </div>:""}
             </div>
-            <div className="services-list-contents singular">
-            <div className="service-list-item-panel" style={{fontSize:'14px'}}>
-                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
-                         <div style={{flex: 1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                             <p><div style={{width:"100px", display:"inline-block"}}><b>Image:</b></div> {image}</p>
-                             {size !== undefined ? 
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Size:</b></div> {size}</p> 
-                                :
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Size:</b></div> 0</p>
-                             }
-                             {traffic !== undefined  ?
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Traffic:</b></div> {traffic}%</p> 
-                                :
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Traffic:</b></div> 0%</p> 
-                             }
-                         </div>
-                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                            <p><div style={{width:"100px", display:"inline-block"}}><b>Generation:</b></div> {generation}</p>
-                             {minScale !== undefined ?
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Scale:</b></div> {minScale}</p> 
-                                : 
-                                <p><div style={{width:"100px", display:"inline-block"}}><b>Scale:</b></div> 0</p> 
-                             }
-                            <p><div style={{width:"100px", display:"inline-block"}}><b>Created:</b></div> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> 
-
-                             {/* <p style={{marginBottom:"0px"}}><b>Created:</b> {dayjs.unix(created).format('h:mm a, DD-MM-YYYY')}</p> */}
-                         </div>
-                     </div>
+            <div className="services-list-contents singular" style={{height:"auto",  overflow:"visible", width:"100%", paddingBottom:"10px"}}>
+            <div className="service-list-item-panel" style={{fontSize:'14px', width:"97%"}}>
                     <div style={{display:"flex", flexDirection:"row", width:"100%"}}>
                         <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-
-                        <p style={{marginTop:"0px"}}><b>Conditions:</b></p>
                         <ul>
                             {conditions ? <>
                             {conditions.map((obj)=>{
-                                let circleFill = "success"
+                                let circleFill2 = "success"
                                 if (obj.status === "False") {
-                                    circleFill = "failed"
+                                    circleFill2 = "failed"
                                 }
                                 if (obj.status === "Unknown"){
-                                    circleFill = "crashed"
+                                    circleFill2 = "crashed"
                                 }
                                 return(
-                                    <li>
-                                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                                    <li key={obj.name}>
+                                        <CircleFill className={circleFill2} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                                         <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
                                     </li>
                                 )
@@ -357,31 +444,36 @@ function Revision(props) {
                             :""}
                         </ul>
                         </div>
-                        <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
-                            {cmd !== undefined ? <p style={{marginTop:"0px"}}><div style={{width:"100px", display:"inline-block"}}><b>Cmd:</b></div> {cmd}</p> : "" }
-                        </div>
+                        {traffic !== undefined && traffic !== 0 ?  <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+                        <ul style={{textAlign:"right", paddingRight:"20px"}}>
+                                    <li>
+                                        <span style={{fontWeight:500}}>Traffic: </span> <span style={{fontSize:'12px'}}>{traffic}%</span>
+                                    </li>
+                        </ul>
+                        </div>: ""}
                     </div>
                  </div>
             </div>
         </div>
+        </Link>
     )
 }
 
 function CreateRevision(props) {
-    const {service, getService, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
+    const {service,  workflow, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
-    // const [scale, setScale] = useState(0)
-    // const [size, setSize] = useState(0)
-    // const [cmd, setCmd] = useState("")
     const [traffic, setTraffic] = useState(100)
     const [isLoading, setIsLoading] = useState(false)
 
 
     const createRevision = async () => {
         try {
-            let x = `/functions/g-${service}`
+            let x = `/functions/global-${service}`
             if (namespace) {
-                x =  `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x =  `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
+            }
+            if (workflow) {
+                x = `/functions/${service}`
             }
             let resp = await fetch(x, {
                 method: "POST",
@@ -389,14 +481,14 @@ function CreateRevision(props) {
                     image: latestRevision.image,
                     cmd: latestRevision.cmd,
                     size: parseInt(latestRevision.size),
-                    minScale: parseInt(latestRevision.scale),
+                    minScale: parseInt(latestRevision.minScale),
                     trafficPercent: parseInt(traffic),
                 })
             })
             if (resp.ok) {
                 setErr("")
                 setTraffic(100)
-                await getService()
+                // await getService()
             } else {
                 await handleError('update service', resp, 'updateService')
             }
@@ -405,12 +497,8 @@ function CreateRevision(props) {
         }
     }
 
-    const handleTraffic = props => {
-        const {value, dragging, index, ...restProps} = props;
-
-        // if (!dragging) {
-        //     setLatestRevision((prevState)=>{return {...prevState, scale:value}})
-        // }
+    const handleTraffic = trprops => {
+        const {value, dragging, index, ...restProps} = trprops;
 
         return(
             <SliderTooltip
@@ -424,12 +512,8 @@ function CreateRevision(props) {
           </SliderTooltip>
         )
     }
-    const handle = props => {
-        const {value, dragging, index, ...restProps} = props;
-
-        // if (!dragging) {
-        //     setLatestRevision((prevState)=>{return {...prevState, scale:value}})
-        // }
+    const handle = haprops => {
+        const {value, dragging, index, ...restProps} = haprops;
 
         return(
             <SliderTooltip
@@ -443,7 +527,6 @@ function CreateRevision(props) {
           </SliderTooltip>
         )
     }
-    
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Revision"}>
         <div style={{ fontSize: "12pt"}}>
@@ -461,7 +544,7 @@ function CreateRevision(props) {
                         Scale:
                     </div>
                     <div style={{width:"190px"}}>
-                        <Slider value={latestRevision.scale} onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, scale: e}})} handle={handle} min={0} max={config.maxscale}  defaultValue={latestRevision.scale} />
+                        <Slider value={latestRevision.minScale}  onChange={(e)=>setLatestRevision((prevState)=>{return{...prevState, minScale: e}})} handle={handle} min={0} max={config.maxscale}  defaultValue={latestRevision.minScale} />
                     </div>
                 </div>
                 <div style={{display:"flex", alignItems:"center", gap:"10px", paddingBottom:"20px", minHeight:"36px"}}>
@@ -510,7 +593,7 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {fetch, service, getService,handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
+    const {fetch, service, workflow, editableRef, handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
 
     const [err, setErr] = useState("")
 
@@ -518,13 +601,16 @@ function EditRevision(props) {
     const [isLoading, setIsLoading] = useState(false)
 
 
+
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            let x = `/functions/g-${service}`
+            x = `/functions/global-${service}`
             if (namespace) {
-                x = `/namespaces/${namespace}/functions/ns-${namespace}-${service}`
+                x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
-
+            if (workflow) {
+                x = `/functions/${service}`
+            }
             let body = [{
                 revision: rev1,
                 percent: val
@@ -535,14 +621,16 @@ function EditRevision(props) {
                     percent: 100-val
                 })
             }
-
+            // make it not editable you've hit the button
+            // editableRef.current = !editable
+            // setEditable(!editable)
             let resp = await fetch(x, {
                 method: "PATCH",
                 body: JSON.stringify({values:body})
             })
             if (resp.ok) {
                 setErr('')
-                await getService()
+                // await getService()
             } else {
                 await handleError("set traffic", resp, "updateService")
             }
@@ -551,8 +639,8 @@ function EditRevision(props) {
         }
     }
 
-    const handle = props => {
-        const {value, dragging, index, ...restProps} = props;
+    const handle = haprops => {
+        const {value, dragging, index, ...restProps} = haprops;
 
         return(
             <SliderTooltip
@@ -565,6 +653,13 @@ function EditRevision(props) {
             <Handle value={value} {...restProps} />
           </SliderTooltip>
         )
+    }
+
+    let x = editable 
+    if (x) {
+        if(rev2Name === "") {
+            x = false
+        }
     }
 
     return(
@@ -581,7 +676,7 @@ function EditRevision(props) {
                             {
                                 revisions.map((obj)=>{
                                     return(
-                                        <option value={obj.name}>{obj.name}</option>
+                                        <option key={obj.name} value={obj.name}>{obj.name}</option>
                                     )
                                 })
                             }
@@ -605,7 +700,7 @@ function EditRevision(props) {
                             {
                                 revisions.map((obj)=>{
                                     return(
-                                        <option value={obj.name}>{obj.name}</option>
+                                        <option key={obj.name} value={obj.name}>{obj.name}</option>
                                     )
                                 })
                             }
@@ -624,7 +719,7 @@ function EditRevision(props) {
                                     </div>
                                 </div>
                             </div>
-                            <Slider disabled={!editable} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
+                            <Slider disabled={!x} handle={handle} min={0} max={100}  onChange={(e)=>{setRev1Percentage(e)}} value={rev1Percentage} defaultValue={rev1Percentage} />
                             <div style={{position: "relative", width: "100%", padding: "0px"}}>
                                 <div style={{position: "relative", top: "4px"}}>
                                     <div style={{display: "flex", width: "100%"}}>
@@ -646,10 +741,10 @@ function EditRevision(props) {
             }
             {!editable?
             <div title="Edit Traffic" style={{ textAlign: "right" }}>
-                <input onClick={() => {
-                    console.log('setting editable to ', !editable, setEditable)
-                    setEditable(!editable)
-                }} type="submit" value="Edit Traffic" />
+                <input type="submit" value="Edit Traffic" onClick={()=>{
+                              editableRef.current = !editable
+                              setEditable(!editable)
+                }} />
             </div>:""}
             { (rev1Name && editable) ? 
             <div title="Set Traffic" style={{ textAlign: "right" }}>
@@ -657,6 +752,7 @@ function EditRevision(props) {
                     setIsLoading(true)
                     updateTraffic(rev1Name, rev2Name, rev1Percentage).finally(()=> {
                         setIsLoading(false)
+                        editableRef.current = !editable
                         setEditable(false)
                     })
                 }} type="submit" value="Save" />

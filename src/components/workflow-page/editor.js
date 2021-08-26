@@ -1,5 +1,5 @@
 import { Controlled as CodeMirror} from "react-codemirror2";
-import React, {  useEffect, useState   } from 'react'
+import React, {  useCallback, useEffect, useState   } from 'react'
 
 
 // style editor
@@ -90,89 +90,81 @@ function makeGutterError(msg) {
     return tooltip;
 }
 
-// function makeLineError(msg) {
-//     var tooltip = document.createElement("div");
-//     var tooltipText = document.createElement("span");
-//     tooltip.style.color = "#FF4040";
-//     tooltip.innerHTML = "  Bad Function";
-//     tooltip.setAttribute('class', 'tooltip')
-
-//     tooltipText.setAttribute('class', 'tooltiptext')
-//     tooltipText.innerHTML = msg
-
-//     tooltip.appendChild(tooltipText)
-//     return tooltip;
-// }
-
 export default function ReactEditor(props) {
-    const { value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
+    const { refValSet, value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
     const [cmEditor, setCMEditor] = useState(null)
-    const [marks, setMarks] = useState([])
+    const [marks, setMarks] = useState(null)
+    const [init, setInit] = useState(false)
 
 
-    function setFunctionErrors(cm) {
-        let fLines = null;
-        let markedTexts = []
-        cm.clearGutter('Custom-Errors');
-        for (var i = 0; i < functions.length; i++)
-        {
-            var errorMsg = ""
-            for (const fCondition of functions[i].conditions) {
-                if (errorMsg !== "") {
-                    errorMsg += "<br>"
-                }
-
-                if (fCondition.status === "False"){
-                    errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>${fCondition.reason ? `├─Reason: ${fCondition.reason}<br>` : ""}`
-                    errorMsg += `└─Message: ${fCondition.message.length < 60 ? fCondition.message : "Too large to preview"}<br>`
-                }
-            }
-
-            let foundFunction = false
-            if (errorMsg !== "") {
-                // Get functions lines on first error
-                if (fLines === null){
-                    fLines = getFunctionLines(value);
-                }
-
-                // Extra check to make sure that value still has function
-                let invalidF = fLines[functions[i].info.name]
-                if (invalidF !== undefined && invalidF.type == "reusable") {
-                    cm.setGutterMarker(invalidF.line, 'Custom-Errors', makeGutterError(errorMsg));
-                    // cm.addLineWidget(invalidFunc.line, makeLineError(`${functions[i].statusMessage}`), {above: true});
-                    markedTexts.push(cm.markText({ch: invalidF.start, line: invalidF.line}, {ch: invalidF.end, line: invalidF.line}, {className: 'line-error'}))
-                    foundFunction = true
-                }
-
-                // Did not find function, look for global / namespace services
-                if (!foundFunction) {
-                    for (const [key, val] of Object.entries(fLines)) {
-                        if (val.type === "knative-namespace" && functions[i].info.namespace !== "" && (val.service === functions[i].serviceName || `ns-${functions[i].info.namespace}-${val.service}` === functions[i].serviceName)) {
-                            // found namespace service
-                            cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
-                            markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
-                            foundFunction = true
-                            break
-                        } else if (val.type === "knative-global" && functions[i].info.namespace === ""  && (val.service === functions[i].serviceName || `g-${val.service}` === functions[i].serviceName)) {
-                            // found global service
-                            cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
-                            markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
-                            foundFunction = true
-                            break
+    const setFunctionErrors = useCallback((cm)=>{
+        if(init) {
+            let fLines = null;
+            let markedTexts = []
+            cm.clearGutter('Custom-Errors');
+            for (var i = 0; i < functions.length; i++)
+            {
+                var errorMsg = ""
+                if(functions[i].conditions){
+                    for (const fCondition of functions[i].conditions) {
+                        if (errorMsg !== "") {
+                            errorMsg += "<br>"
+                        }
+        
+                        if (fCondition.status === "False"){
+                            errorMsg += `${fCondition.name}<br>├─Status: ${fCondition.status}<br>${fCondition.reason ? `├─Reason: ${fCondition.reason}<br>` : ""}`
+                            errorMsg += `└─Message: ${fCondition.message.length < 60 ? fCondition.message : "Too large to preview"}<br>`
                         }
                     }
                 }
-           }
+           
+    
+                let foundFunction = false
+                if (errorMsg !== "") {
+                    // Get functions lines on first error
+                    if (fLines === null){
+                        fLines = getFunctionLines(value);
+                    }
+    
+                    // Extra check to make sure that value still has function
+                    let invalidF = fLines[functions[i].info.name]
+                    if (invalidF !== undefined && invalidF.type === "reusable") {
+                        cm.setGutterMarker(invalidF.line, 'Custom-Errors', makeGutterError(errorMsg));
+                        markedTexts.push(cm.markText({ch: invalidF.start, line: invalidF.line}, {ch: invalidF.end, line: invalidF.line}, {className: 'line-error'}))
+                        foundFunction = true
+                    }
+    
+                    // Did not find function, look for global / namespace services
+                    if (!foundFunction) {
+                        for (const [val] of Object.values(fLines)) {
+                            if (val.type === "knative-namespace" && functions[i].info.namespace !== "" && (val.service === functions[i].serviceName || `ns-${functions[i].info.namespace}-${val.service}` === functions[i].serviceName)) {
+                                // found namespace service
+                                cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
+                                markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
+                                foundFunction = true
+                                break
+                            } else if (val.type === "knative-global" && functions[i].info.namespace === ""  && (val.service === functions[i].serviceName || `g-${val.service}` === functions[i].serviceName)) {
+                                // found global service
+                                cm.setGutterMarker(val.line, 'Custom-Errors', makeGutterError(errorMsg));
+                                markedTexts.push(cm.markText({ch: val.start, line: val.line}, {ch: val.end, line: val.line}, {className: 'line-error'}))
+                                foundFunction = true
+                                break
+                            }
+                        }
+                    }
+               }
+            }
+    
+            // Clear old marks
+            for (i = 0; i < marks.length; i++){
+                marks[i].clear()
+            }
+            
+            // Save new marks
+            setMarks(markedTexts)
+            setInit(true)
         }
-
-        // Clear old marks
-        for (i = 0; i < marks.length; i++){
-            marks[i].clear()
-        }
-        
-        // Save new marks
-        setMarks(markedTexts)
-    }
+    },[functions,marks,value,init])
 
 
     function editorSave(cm) {
@@ -192,15 +184,13 @@ export default function ReactEditor(props) {
         if (functions && cmEditor && value && value.length > 0) {
             setFunctionErrors(cmEditor)
         }
-    }, [functions, cmEditor, value])
+    }, [functions, cmEditor, value, setFunctionErrors])
 
     return (
         <div className="editor-wrapper">
             {loading ? <div className="editor-loading"></div> : <></>}
             <div className={showFooter ? "editor-small" : "editor-full"}>
                 <CodeMirror
-                    editorDidMount={(cm)=>{
-                    }}
                     ref={editorRef}
                     value={value}
                     options={{
@@ -226,7 +216,7 @@ export default function ReactEditor(props) {
                             'Shift-Tab': (cm) => cm.execCommand('indentLess'),
                             "Ctrl-/": function (cm) {
                                 // Check if commentKey prop has been passed
-                                if (!commentKey || commentKey === "") {
+                                if (!commentKey) {
                                     return
                                 }
 
@@ -281,6 +271,7 @@ export default function ReactEditor(props) {
                     }}
                     onBeforeChange={(editor, data, val) => {
                         setValue(val)
+                        refValSet.current = val
                     }}
                     editorDidMount={(cm, val)=>{
                         setCMEditor(cm)
