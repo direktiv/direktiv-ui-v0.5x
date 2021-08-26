@@ -557,14 +557,14 @@ export default function WorkflowPage() {
                                     <IoList /> Details
                                 </TileTitle>
                                 {tab === "events"?
-                                    <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                    <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"255px", overflowY: "auto" }}>
                                         <div id="events-tile" className="tile-contents">
                                             <EventsList />
                                         </div>
                                     </div>:""
                                 }
                                 {tab === "functions" ?
-                                     <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
+                                     <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"255px", overflowY: "auto" }}>
                                      <div id="events-tile" className="tile-contents">
                                          <FuncComponent namespace={namespace} workflow={params.workflow} functions={functions}/>
                                      </div>
