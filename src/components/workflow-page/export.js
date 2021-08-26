@@ -179,10 +179,8 @@ export default function ExportWorkflow(props) {
                     }
 
                     // count references to secrets
-                    if (json.references.secrets) {
-                        for (const _ of json.references.secrets) {
-                            nsSecretCount++
-                        }
+                    if (json.references.secrets && json.references.secrets.length) {
+                        nsSecretCount += json.references.secrets.length
                     }
 
                     setRefCount({ workflowVar: wfVarCount, namespaceVar: nsVarCount, namespaceSecrets: nsSecretCount })
