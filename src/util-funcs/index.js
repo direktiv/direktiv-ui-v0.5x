@@ -47,8 +47,6 @@ export function validateName(name, label) {
 }
 
 export function CopyToClipboard(s) {
-    // s = document.getElementById(s).innerHTML;               
-   
     if(!navigator.clipboard) {
       sendNotification("Copy-Error", "Browser does not support copy to clipboard", 0)
       return

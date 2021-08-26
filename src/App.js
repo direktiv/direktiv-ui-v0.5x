@@ -4,9 +4,8 @@ import Navbar from './components/nav'
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
 import NotificationSystem, { sendNotification } from './components/notifications/index.js'
-import { useState } from 'react';
+import { useState, useContext, useCallback, useEffect } from 'react';
 import MainContext from './context'
-import { useContext, useCallback, useEffect } from 'react';
 import Modal from 'react-modal'
 import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
