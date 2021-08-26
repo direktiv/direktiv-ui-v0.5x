@@ -261,7 +261,6 @@ export default function WorkflowPage() {
             } catch (e) {
                 setActionErr(`Failed to update workflow: ${e.message}`)
             }
-            return
         }
         updateWf().finally(() => { setFetching(false) })
     }, [namespace, workflowValue, fetch, history, workflowInfo.fetching, params.workflow, handleError])

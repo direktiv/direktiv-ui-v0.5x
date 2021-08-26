@@ -177,7 +177,7 @@ export default function WorkflowsPage() {
                         </div>
                     </div>
                     <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                        <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
+                        <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px", maxWidth:"970px" }}>
                             <TileTitle name="All workflows">
                                 <IoList />
                             </TileTitle >
@@ -209,7 +209,7 @@ export default function WorkflowsPage() {
                                         <>
                                             {searchResults.map(function (wfID) {
                                                 if (!(wfID in workflows)) {
-                                                    return (<></>);
+                                                    return (<div key=""></div>);
                                                 }
                                                 return (
                                                     <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit", padding:"3px" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>

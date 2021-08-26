@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useContext, useState } from "react"
+import { useCallback, useEffect, useContext, useState, useRef  } from "react"
 import MainContext from "../../context"
 import * as dayjs from "dayjs"
 import { IoCopy, IoEyeOffSharp, IoEyeSharp } from "react-icons/io5"
 import { CopyToClipboard } from "../../util-funcs"
-import { useRef } from "react"
 import AnsiUp from "ansi_up"
 
 var ansi_up = new AnsiUp();
@@ -19,9 +18,10 @@ export default function Logs(props) {
     const logsRef = useRef(logs)
 
     const [logSource, setLogSource] = useState(null)
+    const [iid, setIid] = useState(null)
 
     useEffect(()=>{
-        if (logSource === null) {
+        if (logSource === null || iid !== instanceId) {
             let x = `/watch/instance/${instanceId}`
 
                      
@@ -71,8 +71,9 @@ export default function Logs(props) {
             }
             eventConnection.onmessage = e => getData(e);
             setLogSource(eventConnection)
+            setIid(instanceId)
         }
-    },[logSource, instanceId, sse])
+    },[logSource, instanceId, sse, iid])
 
     useEffect(()=>{
         return ()=>{
@@ -114,7 +115,9 @@ export default function Logs(props) {
             <div style={{width: "100%", height: "100%"}}>
                 <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
                     <div id="logs" style={{ position: "absolute", right:"0", left:"0", borderRadius:"8px", overflow: tail ? "hidden":"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a",  top:"28px", bottom:"30px", paddingBottom:"10px" }}>
-                        <pre id="logs-test" />
+                        <pre id="logs-test" >
+                            {logs === "" ?  "Fetching logs...": ""}
+                        </pre>
                     </div>
                 </div>
             </div>
