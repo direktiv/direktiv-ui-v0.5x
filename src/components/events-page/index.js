@@ -45,7 +45,6 @@ export function EventsPageBody() {
     const {fetch, namespace, handleError} = useContext(MainContext)
     const [instances, setInstances] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-    // const [forbidden, setForbidden] = useState(false)
     const [err, setErr] = useState("")
 
     useEffect(()=>{
@@ -82,7 +81,7 @@ export function EventsPageBody() {
                         </div>:
                 <>
                 {instances.length > 0 ?
-                <table style={{ width: "100%" }}>
+                <table style={{ width: "100%", padding:"10px" }}>
                     {/* <thead>
                         <tr>
                             <th>Status</th>

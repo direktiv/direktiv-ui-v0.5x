@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useEffect, useRef, useState} from 'react'
-import {SSE} from 'sse.js'
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 import Slider, { SliderTooltip, Handle } from 'rc-slider';
@@ -25,7 +24,6 @@ export default function Functions() {
     const functionsRef = useRef(functions ? functions: [])
     
     const [evSource, setEvSource] = useState(null)
-    const [fetchServiceErr, setFetchServiceErr] = useState("")
   
 
     useEffect(()=>{
@@ -66,7 +64,7 @@ export default function Functions() {
                     }
                     break
                 case "MODIFIED":
-                    for(var i=0; i < funcs.length; i++) {
+                    for(i=0; i < funcs.length; i++) {
                         if (funcs[i].serviceName === json.function.serviceName) {
                             funcs[i] = json.function
                             functionsRef.current = funcs
@@ -76,7 +74,7 @@ export default function Functions() {
                     break
                 default:
                     let found = false
-                    for(var i=0; i < funcs.length; i++) {
+                    for(i=0; i < funcs.length; i++) {
                         if(funcs[i].serviceName === json.function.serviceName) {
                             found = true 
                             break
@@ -93,7 +91,7 @@ export default function Functions() {
             eventConnection.onmessage = e => getRealtimeData(e);
             setEvSource(eventConnection)
         }
-    },[sse, functions, evSource, functionsRef.current])
+    },[sse, functions, evSource, params.namespace])
 
     useEffect(()=>{
         return ()=>{
@@ -134,26 +132,17 @@ export default function Functions() {
                     await handleError('fetch services', resp, 'listServices')
                 }
             } catch(e) {
-                setFetchServiceErr(`Error fetching services: ${e.message}`)
+                console.log(`Error fetching services: ${e.message}`)
             }
         }
         return fetchFunctions()
     },[fetch, handleError, params.namespace])
 
-    // useEffect(()=>{
-    //         let interval = setInterval(()=>{
-    //             fetchServices()
-    //         }, 3000)
-    //         return () => {
-    //             clearInterval(interval)
-    //         }
-    // },[ functions])
-
     useEffect(()=>{
         if (config === null && functions === null) {
             fetchServices().finally(()=> {setIsLoading(false)}) 
         }
-    },[fetchServices])
+    },[fetchServices, config, functions])
 
 
     return(
@@ -208,7 +197,7 @@ export default function Functions() {
 }
 
 function CreateKnativeFunc(props) {
-    const {fetch, namespace, fetchServices, handleError, config} = props
+    const {fetch, namespace, handleError, config} = props
     const [err, setErr] = useState("")
     const [name, setName] = useState("")
     const [image, setImage] = useState("")
@@ -217,8 +206,8 @@ function CreateKnativeFunc(props) {
     const [cmd, setCmd] = useState("")
     const [isLoading, setIsLoading] = useState(false)
 
-    const handleScale = props => {
-        const {value, dragging, index, ...restProps} = props;
+    const handleScale = scprops => {
+        const {value, dragging, index, ...restProps} = scprops;
 
         if (!dragging) {
             setScale(value)
@@ -237,8 +226,8 @@ function CreateKnativeFunc(props) {
         )
     }
 
-    const handleSize = props => {
-        const {value, dragging, index, ...restProps} = props;
+    const handleSize = siprops => {
+        const {value, dragging, index, ...restProps} = siprops;
 
         if (!dragging) {
             setSize(value)
@@ -359,7 +348,7 @@ function CreateKnativeFunc(props) {
 
 function KnativeFunc(props) {
 
-    const {fetch, name, fetchServices,  conditions, serviceName, namespace, image, status, statusMessage} = props
+    const {fetch, name, conditions, serviceName, namespace, image, status} = props
 
     const deleteService = async () => {
         try {
@@ -417,16 +406,16 @@ function KnativeFunc(props) {
                         <ul style={{margin:"0px"}}>
                             {conditions ? <>
                             {conditions.map((obj)=>{
-                                let circleFill = "success"
+                                let circleFill2 = "success"
                                 if (obj.status === "False") {
-                                    circleFill = "failed"
+                                    circleFill2 = "failed"
                                 }
                                 if (obj.status === "Unknown"){
-                                    circleFill = "crashed"
+                                    circleFill2 = "crashed"
                                 }
                                 return(
                                     <li key={obj.name}>
-                                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                                        <CircleFill className={circleFill2} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                                         <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
                                     </li>
                                 )

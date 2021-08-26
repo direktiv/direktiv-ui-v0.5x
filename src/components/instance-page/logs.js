@@ -9,31 +9,12 @@ import AnsiUp from "ansi_up"
 var ansi_up = new AnsiUp();
 
 export default function Logs(props) {
-    const {instanceId, status} = props
+    const {instanceId} = props
 
-    // const params = useParams()
-    const {fetch, handleError, sse} = useContext(MainContext)
+    const { sse} = useContext(MainContext)
 
-    // const [logs, setLogs] = useState([])
-
-    const statusRef = useRef()
-    const timerRef = useRef()
-    const offsetRef = useRef(0)
-    const limitRef = useRef(300)
-    // const scrollRef = useRef(false)
-    // const logsRef = useRef([])
-
-    
-    // const [logs, setLogs] = useState("")
-    const [err, setErr] = useState("")
     const [tail, setTail] = useState(true)
     const tailRef = useRef(true)
-    // const [logsOffset, setLogsOffset] = useState(0)
-    // const [timer, setTimer] = useState(null)
-
-    // const [scrolled, setScrolled] = useState(false)
-    // const [init, setInit] = useState(false)
-    // const [limit, setLimit] = useState(300)
     const [logs, setLogs] = useState("")
     const logsRef = useRef(logs)
 
@@ -91,7 +72,7 @@ export default function Logs(props) {
             eventConnection.onmessage = e => getData(e);
             setLogSource(eventConnection)
         }
-    },[logSource])
+    },[logSource, instanceId, sse])
 
     useEffect(()=>{
         return ()=>{
@@ -140,9 +121,7 @@ export default function Logs(props) {
             <div id="test" className="editor-footer">
                     <div className="editor-footer-buffer" />
                     <div className="editor-footer-actions">
-                    {err !== "" ?<div style={{ fontSize: "12px", paddingTop: "8px", paddingBottom: "5px", marginRight:"20px", color: "red" }}>
-                        {err}
-                        </div>:""}
+          
                         <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
                             if(!tail){
                                 document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight

@@ -1,13 +1,12 @@
 
 import { BrowserRouter as Router, Switch} from "react-router-dom";
 import Navbar from './components/nav'
-import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+import { EventSourcePolyfill } from 'event-source-polyfill';
 
 import NotificationSystem, { sendNotification } from './components/notifications/index.js'
 import { useState } from 'react';
 import MainContext from './context'
-import { useContext } from 'react';
-import { useCallback, useEffect } from 'react';
+import { useContext, useCallback, useEffect } from 'react';
 import Modal from 'react-modal'
 import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
@@ -328,7 +327,7 @@ function Content() {
         opts.headers =  {...opts.headers, Authorization: `apikey ${apiKey}`}
     }
     return new EventSourcePolyfill(`${context.SERVER_BIND}${path}`, opts)
-  })
+  },[context.SERVER_BIND, apiKey])
 
   const netch = useCallback((path, opts) => {
     if (!opts.headers) {

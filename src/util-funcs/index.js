@@ -170,8 +170,8 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
 
   
 // New regex patterns to match values against
-export const PrimaryRegex = new RegExp("^(([a-z][a-z0-9_\-]*[a-z0-9])|([a-z]))$")
-export const VarRegex = new RegExp("^(([a-zA-Z][a-zA-Z0-9_\-]*[a-zA-Z0-9])|([a-zA-Z]))$")
+export const PrimaryRegex = new RegExp("^(([a-z][a-z0-9_-]*[a-z0-9])|([a-z]))$")
+export const VarRegex = new RegExp("^(([a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9])|([a-zA-Z]))$")
 
 export function validateAgainstPrimaryRegex(str, label) {
 

@@ -272,7 +272,7 @@ function WorkflowDiagram(props) {
                                 if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace === "") {
                                     let title = ""
                                     if(funcRef.current[i].conditions) {
-                                        for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                        for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                             title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
                                         }
                                     }
@@ -284,7 +284,7 @@ function WorkflowDiagram(props) {
                                 } else if (funcRef.current[i].serviceName === `g-${data.functions[y].service}` && funcRef.current[i].info.namespace === "") {
                                     let title = ""
                                     if(funcRef.current[i].conditions) {
-                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                         title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
                                     }
                                 }
@@ -302,7 +302,7 @@ function WorkflowDiagram(props) {
                                     let title = ""
                                     if(funcRef.current[i].conditions) {
         
-                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                         title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
                                     }
                                 }
@@ -314,7 +314,7 @@ function WorkflowDiagram(props) {
                                     let title = ""
                                     if(funcRef.current[i].conditions) {
         
-                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                         title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
                                     }
                                 }
@@ -332,7 +332,7 @@ function WorkflowDiagram(props) {
                         if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
                             let title = ""
                             if( funcRef.current[i].conditions) {
-                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                     title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
                                 }
                             }
@@ -342,7 +342,7 @@ function WorkflowDiagram(props) {
                             break
                         }
                     }
-                    for(var y=0; y < data.functions.length; y++) {
+                    for(y=0; y < data.functions.length; y++) {
                         if (data.functions[y].type === "knative-global" && data.state.action.function === data.functions[y].id) {
                             // global func
                         if (funcRef.current[i].status === "False" || funcRef.current[i].status === "Unknown") {
@@ -350,7 +350,7 @@ function WorkflowDiagram(props) {
                             if (funcRef.current[i].serviceName === data.functions[y].service && funcRef.current[i].info.namespace === "") {
                                 let title = ""
                                 if(funcRef.current[i].conditions) {
-                                    for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                    for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                         title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
                                     }
                                 }
@@ -362,7 +362,7 @@ function WorkflowDiagram(props) {
                             } else if (funcRef.current[i].serviceName === `g-${data.functions[y].service}` && funcRef.current[i].info.namespace === "") {
                                 let title = ""
                                 if(funcRef.current[i].conditions) {
-                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                     title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
                                 }
                             }
@@ -380,7 +380,7 @@ function WorkflowDiagram(props) {
                                 let title = ""
                                 if(funcRef.current[i].conditions) {
     
-                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                     title += `${funcRef.current[i].conditions[x].name}: ${funcRef.current[i].conditions[x].message}\n`
                                 }
                             }
@@ -392,7 +392,7 @@ function WorkflowDiagram(props) {
                                 let title = ""
                                 if(funcRef.current[i].conditions) {
     
-                                for(var x=0; x < funcRef.current[i].conditions.length; x++) {
+                                for(x=0; x < funcRef.current[i].conditions.length; x++) {
                                     title += `${funcRef.current[i].conditions[x].name}(${funcRef.current[i].conditions[x].reason}): ${funcRef.current[i].conditions[x].message}\n`
                                 }
                             }
@@ -447,7 +447,7 @@ function WorkflowDiagram(props) {
     
     
         )
-    },[functions])
+    },[params.namespace])
 
     return(
         <ReactFlow elements={elements} nodeTypes={{

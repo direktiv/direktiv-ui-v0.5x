@@ -118,7 +118,7 @@ export default function WorkflowPage() {
                     }
                     break
                 case "MODIFIED":
-                    for(var i=0; i < funcs.length; i++) {
+                    for(i=0; i < funcs.length; i++) {
                         if (funcs[i].serviceName === json.function.serviceName) {
                             funcs[i] = json.function
                             functionsRef.current = funcs
@@ -128,7 +128,7 @@ export default function WorkflowPage() {
                     break
                 default:
                     let found = false
-                    for(var i=0; i < funcs.length; i++) {
+                    for(i=0; i < funcs.length; i++) {
                         if(funcs[i].serviceName === json.function.serviceName) {
                             found = true 
                             break
@@ -140,12 +140,12 @@ export default function WorkflowPage() {
                     }
                 }
                 let actFailed = true
-                for (var i=0; i < functionsRef.current.length; i++) {
+                for ( i=0; i < functionsRef.current.length; i++) {
                     if (functionsRef.current[i].status === "False") {
                         actFailed = false
                     }
                 }
-                let x = await checkStartType(wfRefValue.current)
+                x = await checkStartType(wfRefValue.current)
                 if (!x) {
                     actFailed = false
                 }
@@ -156,7 +156,7 @@ export default function WorkflowPage() {
             eventConnection.onmessage = e => getData(e)
             setFuncSource(eventConnection)
         }   
-    },[functions])
+    },[functions, funcSource, namespace, sse])
     useEffect(()=>{
         return () => {
             if (funcSource !== null) {
@@ -188,7 +188,7 @@ export default function WorkflowPage() {
         }
 
         return fetchKnativeFuncs().finally(()=>{setFetching(false)})
-    },[functions])
+    },[fetch, handleError, namespace])
 
     const fetchWorkflow = useCallback(() => {
         setFetching(true)
@@ -290,7 +290,6 @@ export default function WorkflowPage() {
             } catch (e) {
                 setActionErr(`Failed to set log event: ${e.message}`)
             }
-            return
         }
         return postLogEvent().finally(() => { setFetching(false) })
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
@@ -418,8 +417,6 @@ export default function WorkflowPage() {
             codemirrorRef.current.editor.refresh()
         }
     }, [codemirrorRef, fullscrenEditor])
-
-    const Actions = [logButton, saveButton]
 
     return (
         <>
@@ -661,7 +658,7 @@ let statusMessage = ""
                                     }
 
                                     return(
-                                        <li title={statusMessage}  className="event-list-item">
+                                        <li key={obj.info.name} title={statusMessage}  className="event-list-item">
                                            <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>

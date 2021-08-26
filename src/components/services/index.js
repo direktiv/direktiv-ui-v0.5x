@@ -4,10 +4,9 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import 'rc-slider/assets/index.css';
 import { ConfirmButton } from '../confirm-button'
-import {Link, useHistory} from "react-router-dom"
+import {Link, useHistory, useParams} from "react-router-dom"
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
-import {useParams} from "react-router-dom"
 import { IoAdd, IoClipboardSharp, IoList, IoTrash} from 'react-icons/io5'
 import MainContext from "../../context";
 import LoadingWrapper from "../loading"
@@ -21,7 +20,6 @@ export default function Services() {
     const {fetch, handleError, sse} = useContext(MainContext)
     let { service, namespace, workflow } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
-    const [srvice, setService] = useState(null)
     const [traffic, setTraffic] = useState(null)
 
     const history = useHistory()
@@ -53,43 +51,12 @@ export default function Services() {
             }
 
             try {
-                // let tr = []
                 let resp = await fetch(x, {
                     method:"GET"
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    // for(var i=0; i < json.revisions.length; i++) {
-                    //     if (json.revisions[i].traffic > 0) {
-                    //         tr.push({
-                    //             name: json.revisions[i].name,
-                    //             value: json.revisions[i].traffic
-                    //         })
-                    //     }
-                    // }
-
-                    // if (!editable) {
-                    //     if (tr.length > 0) {
-                    //         console.log("tr is greater than 0")
-                    //         setRev1Name(tr[0].name)
-                    //         setRev1Percentage(tr[0].value)
-                    //         if(tr[1]) {
-                    //             setRev2Name(tr[1].name)
-                    //         }
-                    //     }
-                    // }
-
-                    // if(!dontChangeRev) {
-                    //     setLatestRevision({
-                    //         image: json.revisions[0].image,
-                    //         scale: json.revisions[0].minScale ? json.revisions[0].minScale : 0,
-                    //         size: json.revisions[0].size ? json.revisions[0].size : 0,
-                    //         cmd: json.revisions[0].cmd ? json.revisions[0].cmd : ""
-                    //     })
-                    // }
                     setConfig(json.config)
-                    // setService(json)
-                    // setTraffic(tr)
                 } else {
                    let json = await resp.json()
                    if (json.Message.includes("not found")){
@@ -102,7 +69,7 @@ export default function Services() {
             }
         }
         return getServices()
-    },[fetch, handleError, namespace, editable, service])
+    },[fetch, handleError, namespace, service, history, workflow])
 
     // setup sse for traffic updates
     useEffect(()=>{
@@ -154,7 +121,7 @@ export default function Services() {
             eventConnection.onmessage = e => getRealtimeData(e)
             setTrafficSource(eventConnection)
         }
-    },[trafficSource, editable])
+    },[trafficSource, editable, namespace, service, sse, workflow])
 
     // setup sse for revisions
     useEffect(()=>{
@@ -195,7 +162,7 @@ export default function Services() {
                         }
                         break
                     case "MODIFIED":
-                        for(var i=0; i < revs.length; i++) {
+                        for(i=0; i < revs.length; i++) {
                             if (revs[i].name === json.revision.name) {
                                 revs[i] = json.revision
                                 revisionsRef.current = revs
@@ -205,7 +172,7 @@ export default function Services() {
                         break
                     default:
                         let found = false
-                        for(var i=0; i < revs.length; i++) {
+                        for(i=0; i < revs.length; i++) {
                             if(revs[i].name === json.revision.name) {
                                 found = true 
                                 break
@@ -221,13 +188,12 @@ export default function Services() {
                 revisionsRef.current.sort(function(a,b){
                     return a.created < b.created ? 1 : -1; 
                 })
+        
 
-                if (!revisionsRef || !revisionsRef.current  || revisionsRef.current.length === 0) {
-                    console.log("revision missing")
-                    return
+                if (revisionsRef.current[0]){
+                    setLatestRevision(JSON.parse(JSON.stringify(revisionsRef.current[0])))
+                    console.log('no revisions?')
                 }
-
-                setLatestRevision(JSON.parse(JSON.stringify(revisionsRef.current[0])))
                 setRevisions(JSON.parse(JSON.stringify(revisionsRef.current)))
             }
 
@@ -236,7 +202,7 @@ export default function Services() {
             setRevisionSource(eventConnection)
         }
 
-    },[revisionSource])
+    },[revisionSource, history, namespace, service, sse, workflow])
 
     useEffect(()=>{
         return ()=>{
@@ -252,10 +218,10 @@ export default function Services() {
 
     // initial load request
     useEffect(()=>{
-        if (srvice === null) {
+        if (config === null) {
             getService().finally(()=> {setIsLoading(false)})     
         }
-    },[getService, srvice])
+    },[getService, config])
 
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -361,7 +327,7 @@ function ListRevisions(props) {
                             }
                         }
                     }
-                    for (var i=0; i < traffic.length; i++) {
+                    for (i=0; i < traffic.length; i++) {
                         if(traffic[i].revisionName === obj.name) {
                             obj.traffic = traffic[i].traffic
                         }
@@ -381,7 +347,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, workflow, size, cmd, minScale, fetchServices, image, generation, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
+    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -454,16 +420,16 @@ function Revision(props) {
                         <ul>
                             {conditions ? <>
                             {conditions.map((obj)=>{
-                                let circleFill = "success"
+                                let circleFill2 = "success"
                                 if (obj.status === "False") {
-                                    circleFill = "failed"
+                                    circleFill2 = "failed"
                                 }
                                 if (obj.status === "Unknown"){
-                                    circleFill = "crashed"
+                                    circleFill2 = "crashed"
                                 }
                                 return(
-                                    <li>
-                                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                                    <li key={obj.name}>
+                                        <CircleFill className={circleFill2} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                                         <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
                                     </li>
                                 )
@@ -471,7 +437,7 @@ function Revision(props) {
                             :""}
                         </ul>
                         </div>
-                        {traffic !== undefined && traffic != 0 ?  <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
+                        {traffic !== undefined && traffic !== 0 ?  <div style={{flex:1, textAlign:"left", padding:"10px", paddingTop:"0px", paddingBottom:"0px"}}>
                         <ul style={{textAlign:"right", paddingRight:"20px"}}>
                                     <li>
                                         <span style={{fontWeight:500}}>Traffic: </span> <span style={{fontSize:'12px'}}>{traffic}%</span>
@@ -487,11 +453,8 @@ function Revision(props) {
 }
 
 function CreateRevision(props) {
-    const {service, getService, workflow, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
+    const {service,  workflow, config, namespace, fetch, handleError, latestRevision, setLatestRevision} = props
     const [err, setErr] = useState("")
-    // const [scale, setScale] = useState(0)
-    // const [size, setSize] = useState(0)
-    // const [cmd, setCmd] = useState("")
     const [traffic, setTraffic] = useState(100)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -527,12 +490,8 @@ function CreateRevision(props) {
         }
     }
 
-    const handleTraffic = props => {
-        const {value, dragging, index, ...restProps} = props;
-
-        // if (!dragging) {
-        //     setLatestRevision((prevState)=>{return {...prevState, scale:value}})
-        // }
+    const handleTraffic = trprops => {
+        const {value, dragging, index, ...restProps} = trprops;
 
         return(
             <SliderTooltip
@@ -546,12 +505,8 @@ function CreateRevision(props) {
           </SliderTooltip>
         )
     }
-    const handle = props => {
-        const {value, dragging, index, ...restProps} = props;
-
-        // if (!dragging) {
-        //     setLatestRevision((prevState)=>{return {...prevState, scale:value}})
-        // }
+    const handle = haprops => {
+        const {value, dragging, index, ...restProps} = haprops;
 
         return(
             <SliderTooltip
@@ -631,7 +586,7 @@ function CreateRevision(props) {
 }
 
 function EditRevision(props) {
-    const {fetch, service, workflow, getService, editableRef, handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
+    const {fetch, service, workflow, editableRef, handleError, revisions, namespace, editable, setEditable, rev1Name, setRev1Name, rev2Name, setRev2Name, setRev1Percentage, rev1Percentage} = props
 
     const [err, setErr] = useState("")
 
@@ -642,7 +597,7 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            let x = `/functions/global-${service}`
+            x = `/functions/global-${service}`
             if (namespace) {
                 x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
@@ -677,8 +632,8 @@ function EditRevision(props) {
         }
     }
 
-    const handle = props => {
-        const {value, dragging, index, ...restProps} = props;
+    const handle = haprops => {
+        const {value, dragging, index, ...restProps} = haprops;
 
         return(
             <SliderTooltip
@@ -714,7 +669,7 @@ function EditRevision(props) {
                             {
                                 revisions.map((obj)=>{
                                     return(
-                                        <option value={obj.name}>{obj.name}</option>
+                                        <option key={obj.name} value={obj.name}>{obj.name}</option>
                                     )
                                 })
                             }
@@ -738,7 +693,7 @@ function EditRevision(props) {
                             {
                                 revisions.map((obj)=>{
                                     return(
-                                        <option value={obj.name}>{obj.name}</option>
+                                        <option key={obj.name} value={obj.name}>{obj.name}</option>
                                     )
                                 })
                             }

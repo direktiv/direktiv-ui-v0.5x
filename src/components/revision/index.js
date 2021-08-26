@@ -17,7 +17,6 @@ dayjs.extend(relativeTime);
 export default function Revision() {
     const {sse} = useContext(MainContext)
     const {revision, namespace, service, workflow} = useParams()
-    const [isLoading, setIsLoading] = useState(false)
 
     const [podSource, setPodSource] = useState(null)
     const [revisionSource, setRevisionSource] = useState(null)
@@ -61,7 +60,7 @@ export default function Revision() {
             eventConnection.onmessage = e => getData(e)
             setRevisionSource(eventConnection)
         }
-    },[revisionSource])
+    },[revisionSource, history, namespace, revision, service, sse, workflow])
 
     // set the pod source
     useEffect(()=>{
@@ -83,42 +82,41 @@ export default function Revision() {
             }
 
             async function getData(e) {
-                let pods = podsRef.current
+                let podz = podsRef.current
 
                 if (e.data === "") {
                     return
                 }
                 let json = JSON.parse(e.data)
-                console.log(json, "POD DATA")
                 switch (json.event) {
                     case "DELETED":
                         for (var i=0; i < pods.length; i++) {
-                            if(pods[i].name === json.pod.name) {
-                                pods.splice(i, 1)
+                            if(podz[i].name === json.pod.name) {
+                                podz.splice(i, 1)
                                 podsRef.current = pods
                                 break
                             }
                         }
                         break
                     case "MODIFIED":
-                        for(var i=0; i < pods.length; i++) {
-                            if (pods[i].name === json.pod.name) {
-                                pods[i] = json.pod
-                                podsRef.current = pods
+                        for(i=0; i < podz.length; i++) {
+                            if (podz[i].name === json.pod.name) {
+                                podz[i] = json.pod
+                                podsRef.current = podz
                                 break
                             }
                         }
                         break
                     default:
                         let found = false
-                        for(var i=0; i < pods.length; i++) {
-                            if(pods[i].name === json.pod.name) {
+                        for(i=0; i < podz.length; i++) {
+                            if(podz[i].name === json.pod.name) {
                                 found = true 
                                 break
                             }
                         }
                         if (!found){
-                            pods.push(json.pod)
+                            podz.push(json.pod)
                             podsRef.current = pods
                         }
                 }
@@ -135,7 +133,7 @@ export default function Revision() {
             eventConnection.onmessage = e => getData(e)
             setPodSource(eventConnection)
         }
-    },[podSource])
+    },[podSource, namespace, pods, revision, service, sse, tab, workflow])
 
     // unmount the sources
     useEffect(()=>{
@@ -169,7 +167,7 @@ export default function Revision() {
                 <TileTitle name={`Details for ${revision}`}>
                     <IoList />
                 </TileTitle>
-                <LoadingWrapper isLoading={isLoading} text={"Loading Revision Details"}>
+                <LoadingWrapper isLoading={false} text={"Loading Revision Details"}>
                     { revisionDetails !== null ? <DetailedRevision serviceName={revision} pods={pods}  revision={revisionDetails} /> : "" }
                 </LoadingWrapper>
             </div>
@@ -178,7 +176,7 @@ export default function Revision() {
                 <TileTitle actionsDiv={podSubTabs} name={`Pods`}>
                     <IoList />
                 </TileTitle>
-                <LoadingWrapper isLoading={isLoading} text={"Loading Pod Logs"}>
+                <LoadingWrapper isLoading={false} text={"Loading Pod Logs"}>
                     <PodLogs sse={sse} pod={tab} service={service} namespace={namespace} revision={revision} />
                 </LoadingWrapper>
             </div>:""}
@@ -200,21 +198,21 @@ function DetailedRevision(props) {
         <div style={{fontSize:"11pt"}}>
             <div style={{display:"flex", width:"100%"}}>
                 <div style={{flex: 1, textAlign:"left"}}>
-                    <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Created:</b></div>  {dayjs.unix(revision.created).format('h:mm a, DD-MM-YYYY')}</p>
-                    {size !== "" ? <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Size:</b></div> {size}</p> : ""}
-                    {revision.generation ? <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Generation:</b></div> {revision.generation}</p> : ""}
-                    {revision.cmd !== "" ?  <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Cmd:</b></div> {revision.cmd}</p> : ""}
+                    <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Created:</b></span>  {dayjs.unix(revision.created).format('h:mm a, DD-MM-YYYY')}</p>
+                    {size !== "" ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Size:</b></span> {size}</p> : ""}
+                    {revision.generation ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Generation:</b></span> {revision.generation}</p> : ""}
+                    {revision.cmd !== "" ?  <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Cmd:</b></span> {revision.cmd}</p> : ""}
                 </div>
                 <div style={{flex: 1, textAlign:"left"}}>
-                    {revision.image !== "" ? <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Image:</b></div> {revision.image}</p> : ""}
-                    {revision.minScale ? <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Scale:</b></div> {revision.minScale}</p> : ""}
-                    {revision.actualReplicas ? <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Actual Replicas:</b></div> {revision.actualReplicas}</p> : ""}
-                    {revision.desiredReplicas ? <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Desired Replicas:</b></div> {revision.desiredReplicas}</p> : ""}
+                    {revision.image !== "" ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Image:</b></span> {revision.image}</p> : ""}
+                    {revision.minScale ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Scale:</b></span> {revision.minScale}</p> : ""}
+                    {revision.actualReplicas ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Actual Replicas:</b></span> {revision.actualReplicas}</p> : ""}
+                    {revision.desiredReplicas ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Desired Replicas:</b></span> {revision.desiredReplicas}</p> : ""}
                 </div>
             </div>
             <div style={{display:"flex", width:"100%"}}>
                 <div style={{flex: 1, textAlign:"left"}}>
-                    <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Conditions:</b></div></p>
+                    <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Conditions:</b></span></p>
                     <ul style={{margin:"5px", fontSize:"10pt"}}>
                         {revision.conditions.map((obj)=>{
                             let circleFill = "success"
@@ -225,7 +223,7 @@ function DetailedRevision(props) {
                                 circleFill = "crashed"
                             }
                             return(
-                                <li style={{lineHeight:"24px"}}>
+                                <li key={obj.name} style={{lineHeight:"24px"}}>
                                     <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                                     <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
                                 </li>
@@ -235,7 +233,7 @@ function DetailedRevision(props) {
                 </div>
                 {pods.length > 0 ?
                 <div style={{flex: 1, textAlign:"left"}}>
-                    <p style={{margin:"5px"}}><div style={{width:"150px", display:"inline-block"}}><b>Pods:</b></div></p>
+                    <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Pods:</b></span></p>
                     <ul style={{margin:"5px", fontSize:"10pt"}}>
                         {pods.map((obj)=>{
                             let circleFill = "crashed"
@@ -249,7 +247,7 @@ function DetailedRevision(props) {
                                 circleFill = "pending"
                             }
                             return(
-                                <li style={{lineHeight:"24px"}}>
+                                <li key={obj.name} style={{lineHeight:"24px"}}>
                                     <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
                                     <span style={{fontWeight:500}}>{obj.name.replace(`${serviceName}-deployment-`, "")}</span>
                                 </li>
@@ -288,8 +286,8 @@ function PodLogs(props) {
                     if (json.Message.includes("could not get logs")) {
                         console.log('could not get logs container is starting still')
                     }
-                } catch(e) {
-                    console.log(e)
+                } catch(er) {
+                    console.log(er)
                 }
                 document.getElementById("pod-logs").innerHTML = ""
                 setLogs("")
@@ -313,7 +311,7 @@ function PodLogs(props) {
             eventConnection.onmessage = e => getRealtimeData(e)
             setLogSource(eventConnection)
         }
-    },[pod])
+    },[pod, namespace, revision, service, sse])
 
     // clean up log watch
     // unmount the sources
