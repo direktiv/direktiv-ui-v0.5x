@@ -73,3 +73,7 @@
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+.pie-sect {
+    filter: drop-shadow(2px 2px 5px  var(--neumorph-shadow-dark)) ;
+}

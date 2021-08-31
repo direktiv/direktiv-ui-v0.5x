@@ -47,6 +47,8 @@ export default function InstancePage() {
     const [detailsErr, setDetailsErr] = useState("")
     const [, setActionErr] = useState("")
     const [isLoading, setIsLoading] = useState(true)
+    const [metricsLoading, setMetricsLoading] = useState(true)
+    const [stateMetrics, setStateMetrics] = useState([])
     
     // true starts with default false any other start type
     const [startType, setStartType] = useState(true)
@@ -121,6 +123,26 @@ export default function InstancePage() {
             clearInterval(timer)
         }
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
+
+
+    useEffect(()=>{
+        async function getStateMetrics() {
+            try {
+                let resp = await fetch(`/namespaces/${params.namespace}/workflows/${params.workflow}/metrics/state-milliseconds`, {})
+                if(resp.ok) {
+                    let json = await resp.json()
+                    setStateMetrics(json.results)
+                } else {
+                    console.log(resp, "not ok resp get state metrics")
+                }
+            } catch(e) {
+                console.log(e, "handle error on state metrics")
+            }
+        }
+        if(metricsLoading) {
+            getStateMetrics().finally(()=>{setMetricsLoading(false)})
+        }
+    },[fetch, metricsLoading, params.namespace, params.workflow])
 
     // Wait for instanceDetails to be populated
     useEffect(()=>{
@@ -236,73 +258,6 @@ export default function InstancePage() {
                     <div style={{ flex: "auto" }}>
                         <Breadcrumbs instanceId={instanceId} />
                     </div>
-                    <>
-                        {instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete" ? 
-                            <>
-                                {startType && checkPerm(permissions, "executeWorkflow") ?
-                                ""
-                               // <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
-                                    //     onClick={async () => {
-                                    //     try{
-                                    //         let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/execute`, {
-                                    //             method: "POST",
-                                    //             body: atob(instanceDetails.input)
-                                    //         })
-                                    //         if(resp.ok) {
-                                    //             if(document.getElementById("logs-test")){
-                                    //                 document.getElementById("logs-test").innerHTML = ""
-                                    //             }
-                                    //             let json = await resp.json()    
-                                    //             history.push(`/i/${json.instanceId}`)
-                                    //         } else {
-                                    //             await handleError('rerun workflow', resp, 'executeWorkflow')
-                                    //         }
-                                    //     } catch(e) {
-                                    //         setActionErr(`Unable to execute workflow: ${e.message}`)
-                                    //     }
-                                    // }}>
-                                    //     <div style={{ alignItems: "center" }}>
-                                    //             Rerun Workflow
-                                    //     </div>
-                                    // </div>
-                                    :
-                                    ""
-                                }
-                            </> 
-                            : 
-                            <>
-                                {/* {checkPerm(permissions, "cancelInstance") ?
-                                    <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
-                                     onClick={async () => {
-                                        try {
-                                            let resp = await fetch(`/instances/${instanceId}`, {
-                                                method: "DELETE"
-                                            })
-                                            if(!resp.ok) {
-                                                await handleError('cancel instance', resp, 'cancelInstance')
-                                            }
-                                        }  catch(e) {
-                                            setActionErr(`Instance cancelled error: ${e.message}`)
-                                        }
-                                    }}>
-                                        <div style={{ alignItems: "center" }}>
-                                                Cancel Execution
-                                        </div>
-                                    </div> 
-                                    :
-                                    ""
-                                } */}
-                            </>
-                        }
-                    </>
-                    {/* <div id="" className="hover-gradient shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px"}}
-                    onClick={() => {
-                        history.push(`/${params.namespace}/w/${params.workflow}`)
-                    }}>
-                        <div style={{ alignItems: "center" }}>
-                                View Workflow
-                        </div>
-                    </div> */}
                     <div id="instance-status-tile" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <span id="instance-status-text" style={{ marginRight: "10px" }}>
@@ -314,9 +269,6 @@ export default function InstancePage() {
                         </div>
                     </div>
                     <ButtonWithDropDownCmp data={listElements}/>
-                    {/* <div onClick={() =>{toggleModal()}} title={"APIs"} className="shadow-soft rounded tile fit-content" style={{cursor:"pointer", zIndex: "5", maxHeight:"36px", display:"flex", alignItems:"center", height:"18px" }}>
-                            <IoEllipsisVertical className={"toggled-switch"} style={{ fontSize: "11pt",  marginLeft: "0px" }} />
-                    </div>  */}
                 </div>
             </div>
             {instanceDetails.errorMessage !== "" && instanceDetails.errorMessage !== undefined ?
@@ -362,7 +314,7 @@ export default function InstancePage() {
                         
                                 <>
                                 {instanceDetails.flow && wf ? 
-                                    <Diagram flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
+                                    <Diagram metrics={stateMetrics} flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
                                     :
                                     <div style={{ marginTop:"28px", fontSize:"12pt"}}>
                                         Unable to fetch workflow have you renamed the workflow recently?

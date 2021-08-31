@@ -7,10 +7,9 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoExitOutline, IoEaselOutline, IoList, IoPencil, IoPieChartSharp, IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand, IoCodeWorkingOutline, IoFlash } from 'react-icons/io5'
+import { IoExitOutline, IoEaselOutline, IoList, IoPencil,  IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand, IoCodeWorkingOutline, IoFlash } from 'react-icons/io5'
 import Modal from 'react-modal';
 
-import PieChart from '../charts/pie'
 import { useHistory, useParams } from 'react-router'
 import { Link } from "react-router-dom"
 import MainContext from '../../context'
@@ -19,6 +18,7 @@ import {NoResults} from '../../util-funcs'
 import Interactions from '../workflows-page/interactions'
 import ExportWorkflow from './export'
 import {LoadingPage} from '../loading'
+import { SuccessOrFailedWorkflows } from '../dashboard-page'
 
 
 async function checkStartType(wf, setError) {
@@ -70,7 +70,8 @@ export default function WorkflowPage() {
 
     const workflowRef = useRef()
 
-
+    const [metricsLoading, setMetricsLoading] = useState(true)
+    const [stateMetrics, setStateMetrics] = useState([])
     workflowRef.current = params.workflow
     function toggleAPIModal() {
         setAPIModalOpen(!apiModalOpen)
@@ -293,15 +294,24 @@ export default function WorkflowPage() {
         return postLogEvent().finally(() => { setFetching(false) })
     }, [namespace, workflowValueOld, fetch, workflowInfo.fetching, logEvent, params.workflow, handleError])
 
-    // polling knative functions
-    // useEffect(()=>{
-    //         let interval = setInterval(()=>{
-    //             fetchKnativeFunctions()
-    //         }, 3000)
-    //     return () => {
-    //         clearInterval(interval)
-    //     }
-    // },[fetchKnativeFunctions, namespace, functions])
+    useEffect(()=>{
+        async function getStateMetrics() {
+            try {
+                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics/state-milliseconds`, {})
+                if(resp.ok) {
+                    let json = await resp.json()
+                    setStateMetrics(json.results)
+                } else {
+                    console.log(resp, "not ok resp get state metrics")
+                }
+            } catch(e) {
+                console.log(e, "handle error on state metrics")
+            }
+        }
+        if(metricsLoading) {
+            getStateMetrics().finally(()=>{setMetricsLoading(false)})
+        }
+    },[fetch, metricsLoading, namespace, params.workflow])
 
     // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
@@ -527,8 +537,8 @@ export default function WorkflowPage() {
 
                                                 <div style={{ flex: "auto" }}>
                                                     {/* THIS CHECK IS HERE SO THE GRAPH LOADS PROPERLY */}
-                                                    {workflowValueOld !== null ?
-                                                        <Diagram functions={functions} value={workflowValueOld} />
+                                                    {workflowValueOld !== null && !metricsLoading ?
+                                                        <Diagram metrics={stateMetrics} functions={functions} value={workflowValueOld} />
                                                         :
                                                         ""
                                                     }
@@ -540,14 +550,7 @@ export default function WorkflowPage() {
                         </div>
                         {!fullscrenEditor ?
                         <div className="container graph-contents" style={{ width: "300px" }}>
-                            <div className="item-1 shadow-soft rounded tile" style={{ height: "280px" }}>
-                                <TileTitle name="Executed Workflows">
-                                    <IoPieChartSharp />
-                                </TileTitle>
-                                <div id="pie-dish" className="tile-contents">
-                                    <PieComponent />
-                                </div>
-                            </div>
+                            <SuccessOrFailedWorkflows namespace={namespace} fetch={fetch} workflow={params.workflow}/>
                             <div className="item-0 shadow-soft rounded tile">
                                 <TileTitle actionsDiv={[<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("events") }} >
                         <IoFlash />  Instances
@@ -576,64 +579,6 @@ export default function WorkflowPage() {
                     </div>
                 </div> : ""}
         </>
-    )
-}
-
-
-
-function PieComponent() {
-    const { fetch, namespace, handleError } = useContext(MainContext)
-    const params = useParams()
-    const [metrics, setMetrics] = useState(null)
-    const [err, setErr] = useState("")
-
-    useEffect(() => {
-        async function fetchMet() {
-            try {
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics`, {
-                    method: "GET"
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
-                    let met = [
-                        {
-                            title: "Completed",
-                            value: json.successfulExecutions
-                        },
-                        {
-                            title: "Failed",
-                            value: json.totalInstancesRun - json.successfulExecutions
-                        }
-                    ]
-                    setMetrics(met)
-                } else {
-                    await handleError('fetch metrics', resp, 'getWorkflowMetrics')
-                }
-            } catch (e) {
-                setErr(`Failed to fetch metrics for workflow: ${e.message}`)
-            }
-        }
-        if (metrics === null) {
-            fetchMet()
-        }
-    }, [fetch, namespace, params.workflow, metrics, handleError])
-
-    if (err !== "") {
-        return (
-            <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
-                {err}
-            </div>
-        )
-    }
-
-    if (metrics === null) {
-        return ""
-    }
-
-
-
-    return (
-        <PieChart lineWidth={40} data={metrics} />
     )
 }
 

@@ -232,7 +232,7 @@ function End(props) {
 
 
 function WorkflowDiagram(props) {
-    const { elements, functions,params } = props
+    const { elements, functions,params, metrics } = props
     const funcRef = useRef() 
     const { fitView } = useZoomPanHelper();
     funcRef.current = functions
@@ -245,6 +245,8 @@ function WorkflowDiagram(props) {
         const {data} = props
         let funcFailed = "var(--primary-light)"
         let titleMsg = `${data.label}-${data.type}`
+
+
         if (funcRef.current && funcRef.current.length > 0 && (data.state.type === "action" || data.state.type === "foreach" || data.state.type === "parallel")) {
             for(var i=0; i < funcRef.current.length; i++){
                 if(data.state.actions) {
@@ -408,6 +410,16 @@ function WorkflowDiagram(props) {
             }
         
         }
+
+        let timeEllapsed = ""
+        if(metrics.length > 0) {
+            for(let i=0; i < metrics.length; i++) {
+                if(data.label === metrics[i].metric.state){
+                    let msTime  = parseInt(metrics[i].value[1])
+                    timeEllapsed= `${msTime}ms`
+                }
+            }
+        }
    
         return(
             <div title={titleMsg} className="state" style={{width:"80px", height:"30px", backgroundColor: funcFailed}}>
@@ -420,8 +432,7 @@ function WorkflowDiagram(props) {
                             <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
                                 <IoChevronForwardSharp/>
                                 <div style={{flex:"auto"}}>
-                                {data.type}
-    
+                                    {data.type}
                                 </div>
                                 <div style={{display:"flex", alignItems:"center", cursor: "pointer"}} onClick={(e)=>{
                                     hljs.highlightBlock(document.getElementById(`${data.label}-yaml`))
@@ -431,6 +442,7 @@ function WorkflowDiagram(props) {
                                 </div>
                             </div>
                             <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.label}</h1>
+                            <p style={{fontWeight:"300", fontSize:"4pt"}}>{timeEllapsed}</p>
                             <Handle
                                 type="source"
                                 position="right"
@@ -447,7 +459,7 @@ function WorkflowDiagram(props) {
     
     
         )
-    },[params.namespace])
+    },[params.namespace, metrics])
 
     return(
         <ReactFlow elements={elements} nodeTypes={{
@@ -466,7 +478,7 @@ function WorkflowDiagram(props) {
 }
 
 export default function Diagram(props) {
-    const {value, functions, flow, status} = props
+    const {value, functions, flow, status, metrics} = props
     const params = useParams()
 
     const [elements, setElements] = useState([])
@@ -528,7 +540,7 @@ export default function Diagram(props) {
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
             <ReactFlowProvider>
-                    <WorkflowDiagram params={params} functions={functions} elements={elements} />
+                    <WorkflowDiagram metrics={metrics} params={params} functions={functions} elements={elements} />
             </ReactFlowProvider>
         </div>
 
