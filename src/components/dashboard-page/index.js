@@ -45,7 +45,7 @@ function TotalTimeWorkflows(props) {
 
     const [timeMetrics, setTimeMetrics] = useState([])
     const [totalTime, setTotalTime] = useState(0)
-
+    const [oname, setOName] = useState("")
     // fetch the first time
     useEffect(()=>{
         async function getDetails() {
@@ -62,6 +62,7 @@ function TotalTimeWorkflows(props) {
                     }
                     setTimeMetrics(arr)
                     setTotalTime(total)
+                    setOName(namespace)
                 } else {
                     console.log('handle time workflow metrics error resp', resp)
                 }
@@ -69,10 +70,10 @@ function TotalTimeWorkflows(props) {
                 console.log('handle total time workflows metrics error', e)
             }
         }    
-        if(isLoading){
+        if(isLoading || oname !== namespace){
             getDetails().finally(()=> {setIsLoading(false)})       
         }
-    },[fetch, isLoading, namespace])
+    },[fetch, isLoading, namespace, oname])
     let colors = ["#ef5350", "#ec407a", "#ab47bc", "#7e57c2", "#5c6bc0", "#42a5f5", "#29b6f6", "#26c6da", "#26a69a", "#66bb6a", "#9ccc65", "#d4e157", "#ffee58", "#ffca28", "#ffa726", "#ff7043", "#8d6e63", "#bdbdbd", "#78909c"]
 
     return(
@@ -111,6 +112,7 @@ export function SuccessOrFailedWorkflows(props) {
     const [isLoading, setIsLoading] = useState(true)
     const [percentage, setPercentage] = useState(0)
     const [sWorkflowMetrics, setSWorkflowMetrics] = useState([])
+    const [oname, setOName] = useState("")
 
     useEffect(()=>{
         async function fetchDetails() {
@@ -154,6 +156,7 @@ export function SuccessOrFailedWorkflows(props) {
                     } else {
                         setSWorkflowMetrics([])
                     }
+                    setOName(namespace)
                 } else {
                     console.log('handle success workflow metrics error resp', failedResp, successResp)
                 }
@@ -161,10 +164,10 @@ export function SuccessOrFailedWorkflows(props) {
                 console.log('handle success or failure workflows metrics error', e)
             }
         }
-        if(isLoading) {
+        if(isLoading || oname !== namespace) {
             fetchDetails().finally(()=> {setIsLoading(false)})    
         }
-    },[fetch, isLoading, namespace, workflow])
+    },[fetch, isLoading, namespace, workflow, oname])
 
     let colors = ["#2fa64d", "#db3447"]
 
@@ -204,7 +207,7 @@ function TotalWorkflows(props) {
     const [isLoading, setIsLoading] = useState(true)
     const [invokedWorkflows, setInvokedWorkflows] = useState([])
     const [tWorkflowMetrics, setTWorkflowMetrics] = useState([])
-
+    const [oname, setOName] = useState("")
 
     let colors = ["#ef5350", "#ec407a", "#ab47bc", "#7e57c2", "#5c6bc0", "#42a5f5", "#29b6f6", "#26c6da", "#26a69a", "#66bb6a", "#9ccc65", "#d4e157", "#ffee58", "#ffca28", "#ffa726", "#ff7043", "#8d6e63", "#bdbdbd", "#78909c"]
 
@@ -232,6 +235,7 @@ function TotalWorkflows(props) {
 
                         arrTotal[0].value = arrTotal[0].value + parseInt(json.results[i].value[1])
                     }
+                    setOName(namespace)
                     setTWorkflowMetrics(arr)
                     setInvokedWorkflows(arrTotal[0].value)
                 } else {
@@ -241,10 +245,10 @@ function TotalWorkflows(props) {
                 console.log('handle total workflows metrics error', e)
             }
         }
-        if(isLoading) {
+        if(isLoading || oname !== namespace) {
             fetchDetails().finally(()=> {setIsLoading(false)})    
         }
-    },[fetch, namespace, isLoading])
+    },[oname, fetch, namespace, isLoading])
 
     return(
         <div className="shadow-soft rounded tile" style={{ marginBottom:"10px", flex: 1}}>
