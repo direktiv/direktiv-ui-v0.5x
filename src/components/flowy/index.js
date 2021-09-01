@@ -82,6 +82,15 @@ function diagramToYAML(blocks) {
                     if(wf.states[x].id === blocks[i].source) {
                         wf.states[x]["transition"] = blocks[i].target
                     }
+                } else {
+                    console.log(blocks[i], "BLOCKS TEST")
+                    if(blocks[i].defaultTransition) {
+                        
+                    }
+
+                    if(blocks[i].condition) {
+                        
+                    }
                 }
             }
         }
@@ -94,9 +103,16 @@ function diagramToYAML(blocks) {
 }
 
 export default function Flowy() {
+    // blocks being handled
     const [blocks, setBlocks] = useState([])
+    
+    // object being dragged
     const [elementData, setElementData] = useState(null)
 
+    const [modalOverlay, setModalOverlay] = useState(null)
+
+
+    // state handlers
     const [startIndex, setStartIndex] = useState(0)
     const startIndexRef = useRef(0)
     const [switchIndex, setSwitchIndex] = useState(0)
@@ -125,8 +141,67 @@ export default function Flowy() {
 
     },[setBlocks, elementData])
 
-    const onEdgeUpdate = (oldEdge, newConnection) =>
-    setBlocks((els) => updateEdge(oldEdge, newConnection, els));
+    const switchPrompt = (id, params) => {
+        const attachNode = () => {
+            let bs  = blocks
+            if(document.getElementById("switch-condition").value !== "") {
+                // passing a condition
+                for(let i=0; i < bs.length; i++) {
+                    if(bs[i].data) {
+                        if(bs[i].data.id === id) {
+                            bs[i].data.conditions.push({
+                                condition: `jq('${document.getElementById("switch-condition").value}')`,
+                                transition: params.target,
+                            })
+                            params["condition"] = true
+                        }
+                    }
+                }
+            } else {
+                // passing a defaultTransition
+                for(let i=0; i < bs.length; i++) {
+                    if(bs[i].data) {
+                        if(bs[i].data.id === id) {
+                            if(bs[i].data.defaultTransition) {
+                                console.log(`default transition exists prompt error? transitioning to ${bs[i].data.defaultTransition} `)
+                                return
+                            } else {
+                                bs[i].data["defaultTransition"] = params.target
+                                params["defaultTransition"] = true
+                            }
+                        }
+                    }
+                }
+            }
+            setBlocks(addEdge(params, bs))
+            setModalOverlay(null)
+        } 
+
+        setModalOverlay(
+            <div style={{position: "absolute", display:"flex", alignItems:"center", justifyContent:"center", zIndex:100, borderRadius: ".55rem", background: "rgba(0,0,0,0.2)", width:"100%", height:"100%"}}>
+                <div className="rounded" style={{background:"linear-gradient(145deg, #dadada, #f0f0f0)", boxShadow:"1px 0px 13px 2px rgb(0 0 0 / 20%)", padding:"10px", textAlign:"left"}}>
+                    <h1 style={{fontSize:"12pt", margin:"5px"}}>Enter the condition you wish to transition on</h1>
+                    <input type="text" id="switch-condition" style={{width:"300px"}} />
+                    <p style={{fontSize:"10pt", fontStyle:"italic", margin: "5px", color:"rgb(134 134 134)"}}>
+                        leave blank to use as a default transition
+                    </p>
+                    <div style={{textAlign:"right"}}>
+                        <input type="submit" value="Attach" onClick={()=>attachNode()}/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    const onEdgeUpdate = (oldEdge, newConnection) => {
+        if(oldEdge.defaultTransition) {
+            newConnection["defaultTransition"] = true
+        }
+        if(oldEdge.condition) {
+            newConnection["condition"] = true
+        }
+        setBlocks((els) => updateEdge(oldEdge, newConnection, els));
+    }
 
     const onConnect = (params) => {
         for(let i=0; i < blocks.length; i++) {
@@ -136,6 +211,8 @@ export default function Flowy() {
                     if(blocks[i].data.type === "switch") {
                         // prompt somehow to ask for if its a default transition or a condition
                         console.log('prompt user for more input')
+                        switchPrompt(blocks[i].data.id, params)
+                        return
                     } else {
                         // loop through same array to check if edge already exists on this node and prompt for error saying u can only connect the one
                         for(let x=0; x < blocks.length; x++) {
@@ -163,7 +240,12 @@ export default function Flowy() {
                     output
                 </div>
             </div>
-            <div className="shadow-soft rounded tile" style={{ fontSize:"12pt", flexGrow:1}}>
+            <div className="shadow-soft rounded tile" style={{ fontSize:"12pt", flexGrow:1, padding:"0px", position: "relative"}}>
+                {
+                    modalOverlay ? 
+                    modalOverlay
+                    :""
+                }
                 <ReactFlowProvider>
                     <ReactFlow
                         nodeTypes={{
