@@ -1,106 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import ReactFlow, { ReactFlowProvider, Handle, addEdge, updateEdge } from "react-flow-renderer";
-import { IoChevronForwardSharp } from "react-icons/io5";
-import { Noop, StartNode, Switch } from "./states";
+import ReactFlow, { ReactFlowProvider, addEdge, updateEdge } from "react-flow-renderer";
+import { Noop, StartNode, Switch, CustomEdge } from "./states";
+import {State, diagramToYAML, Start, addState} from "./util"
 
-import YAML from 'yaml'
-
-function Start() {
-    return(
-        <div className="normal">
-            <Handle
-                type="source"
-                position="bottom"
-            />
-            <div className="start" />
-        </div>
-    )
-}
-
-function State(props) {
-    const {data, id} = props
-
-    return(
-        <div className="state" style={{width:"80px", height:"30px"}}>
-            <Handle
-                type="target"
-                position="top"
-                id="default"
-            />
-            <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                <IoChevronForwardSharp/>
-                <div style={{flex:"auto"}}>
-                    {data.type}
-                </div>
-            </div>
-            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{id}</h1>
-            <Handle
-                type="source"
-                position="bottom"
-                id="default"
-            /> 
-        </div>
-    )
-}
-
-function addState(e, elementData, setBlocks) {
-    const newNode = {
-        id: elementData.id,
-        type: elementData.type,
-        data: elementData,
-        position: {
-            x: e.pageX - 525,
-            y: e.pageY,
-        },
-    };
-    setBlocks((els)=>els.concat(newNode))
-}
-
-function diagramToYAML(blocks) {
-    let wf = {
-        id: "workflow-name",
-        states: []
-    }
-
-    let sortStart = ""
-    for(let i=0; i < blocks.length; i++) {
-        if(blocks[i].data) {
-            if(blocks[i].data.type !== "start") {
-                // not the start node
-                // must be a state and not an edge
-                wf.states.push(blocks[i].data)
-            }
-        } else {
-            if (blocks[i].source === "startNode") {
-                // target is the start of the workflow add to first element of array
-                sortStart = blocks[i].target
-            }
-            // this will be an edge connecting nodes
-            for(let x=0; x < wf.states.length; x++) {
-                // if its not a switch it doesn't have multiple transitions/conditions
-                if(wf.states[x].type !== "switch") {
-                    if(wf.states[x].id === blocks[i].source) {
-                        wf.states[x]["transition"] = blocks[i].target
-                    }
-                } else {
-                    console.log(blocks[i], "BLOCKS TEST")
-                    if(blocks[i].defaultTransition) {
-                        
-                    }
-
-                    if(blocks[i].condition) {
-                        
-                    }
-                }
-            }
-        }
-    }
-    console.log(wf.states, "before sort")
-    wf.states.sort((x,y)=>{return x.id === sortStart ? -1 : y.id === sortStart ? 1:0})
-    console.log(wf.states, "after sort")
-
-    console.log(YAML.stringify(wf))
-}
 
 export default function Flowy() {
     // blocks being handled
@@ -108,7 +10,7 @@ export default function Flowy() {
     
     // object being dragged
     const [elementData, setElementData] = useState(null)
-
+    const [elementSelected, setElementSelected] = useState(null)
     const [modalOverlay, setModalOverlay] = useState(null)
 
 
@@ -119,6 +21,22 @@ export default function Flowy() {
     const switchIndexRef = useRef(0)
     const [noopIndex, setNoopIndex] = useState(0)
     const noopIndexRef = useRef(0)
+
+    useEffect(()=>{
+        document.addEventListener("keydown", onKeyPress, false)
+        return ()=> {
+            document.removeEventListener("keydown", onKeyPress, false)
+        }
+    },[])
+
+    const onKeyPress = useCallback((e)=>{
+        console.log('key pressed', e)
+        if(e.ey == "Delete") {
+            console.log("delete key pressed")
+            console.log(elementSelected)
+        }
+    },[])
+
 
     const onAdd = useCallback((e)=>{
         switch(elementData.type){
@@ -154,6 +72,8 @@ export default function Flowy() {
                                 transition: params.target,
                             })
                             params["condition"] = true
+                            params["data"]["label"] = `${document.getElementById("switch-condition").value}`
+                            params["conditionString"] = `jq('${document.getElementById("switch-condition").value}')`
                         }
                     }
                 }
@@ -166,8 +86,10 @@ export default function Flowy() {
                                 console.log(`default transition exists prompt error? transitioning to ${bs[i].data.defaultTransition} `)
                                 return
                             } else {
+
                                 bs[i].data["defaultTransition"] = params.target
                                 params["defaultTransition"] = true
+                                params["data"]["label"]= "default"
                             }
                         }
                     }
@@ -199,11 +121,15 @@ export default function Flowy() {
         }
         if(oldEdge.condition) {
             newConnection["condition"] = true
+            newConnection["conditionString"] = oldEdge.conditionString
         }
         setBlocks((els) => updateEdge(oldEdge, newConnection, els));
     }
 
     const onConnect = (params) => {
+        params["data"] = {
+            edge: true
+        }
         for(let i=0; i < blocks.length; i++) {
             if(blocks[i].data) {
                 // state checking
@@ -227,9 +153,15 @@ export default function Flowy() {
         }
         setBlocks((els) => addEdge(params, els))
     };
-    
-    console.log(blocks)
-    
+
+    const onElementClick = (event, element) => {
+        setElementSelected(element)
+    };
+
+    const edgeTypes = {
+        default: CustomEdge,
+    };
+      
     return(
         <div onDragOver={(e)=>e.preventDefault()} onDrop={(e)=>onAdd(e)} className="container" style={{flexDirection:"row", height:"100%", overflow:"hidden"}}>
             <div className="shadow-soft rounded tile" style={{ maxWidth:"200px", fontSize:"12pt", flexGrow:1}}>
@@ -253,8 +185,13 @@ export default function Flowy() {
                             switch: State,
                             start: Start,
                         }}
+                        edgeTypes={edgeTypes}
                         onConnect={onConnect}
+                        onElementClick={onElementClick}
                         onEdgeUpdate={onEdgeUpdate}
+                        onNodeDoubleClick={(e)=>{
+                            console.log(e)
+                        }}
                         elements={blocks}
                     ></ReactFlow>
                 </ReactFlowProvider>
