@@ -26,6 +26,7 @@ export default function Revision() {
     const [pods, setPods] = useState([])
     const podsRef = useRef(pods)
     const [tab, setTab] = useState("")
+    const [err, setErr] = useState("")
 
     // set revision soruce
     useEffect(()=>{
@@ -40,7 +41,9 @@ export default function Revision() {
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
-                console.log("error on sse", e)
+                if(e.status === 403) {
+                    setErr("You are forbidden on watching revisions")
+                }
             }
 
             async function getData(e) {
@@ -77,7 +80,9 @@ export default function Revision() {
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
-                console.log("error on sse", e)
+                if(e.status === 403) {
+                    setErr("You are forbidden on watching pods.")
+                }
             }
 
             async function getData(e) {
@@ -167,7 +172,16 @@ export default function Revision() {
                     <IoList />
                 </TileTitle>
                 <LoadingWrapper isLoading={false} text={"Loading Revision Details"}>
+                    {err !== "" ?
+                    <>
+                        <div style={{ fontSize: "12px", paddingTop: "8px", paddingBottom: "5px", marginRight:"20px", color: "red" }}>
+                        {err}
+                        </div>
+                    </>
+                    :
+                    <>
                     { revisionDetails !== null ? <DetailedRevision serviceName={revision} pods={pods}  revision={revisionDetails} /> : "" }
+                    </>}
                 </LoadingWrapper>
             </div>
             {pods.length > 0 ?
@@ -278,6 +292,10 @@ function PodLogs(props) {
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
+                if (e.status === 403) {
+                    setErr("You are forbidden on watching pod logs")
+                    return
+                }
                 if(e.data){
                     try {
                         let json = JSON.parse(e.data)
@@ -333,7 +351,10 @@ function PodLogs(props) {
             <div style={{width: "100%", height: "100%"}}>
                 <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
                     <div id="logs" style={{ position: "absolute", right:"0", left:"0", borderRadius:"8px", overflow: tail ? "hidden":"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a",  top:"28px", bottom:"30px", paddingBottom:"10px" }}>
-                        <pre id="pod-logs" style={{marginTop:"-14px"}} />
+                        <pre id="pod-logs" style={{marginTop:"-14px"}} >
+                            {err !== "" ? err:""}
+
+                        </pre>
                     </div>
                 </div>
             </div>

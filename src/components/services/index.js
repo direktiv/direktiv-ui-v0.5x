@@ -41,6 +41,7 @@ export default function Services() {
     const [revisionSource, setRevisionSource] = useState(null)
     const [trafficSource, setTrafficSource] = useState(null)
 
+
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
             let x = `/functions/global-${service}`
@@ -86,7 +87,9 @@ export default function Services() {
             eventConnection.onerror = (e) => {
                 // error log here
                 // after logging, close the connection   
-                console.log('error on sse', e)
+                if(e.status === 403) {
+                    setErrFetchRev("You are forbidden on watching on traffic source")
+                }
             }
 
             async function getRealtimeData(e) {
@@ -140,7 +143,10 @@ export default function Services() {
             eventConnection.onerror = (e) => {
                 // error log here
                 // after logging, close the connection   
-                console.log('error on sse', e)
+                if(e.status === 403) {
+                    setErrFetchRev("You are forbidden on watching revisions")
+                    return
+                }
             }
 
             async function getRealtimeData(e) {
@@ -370,7 +376,7 @@ function Revision(props) {
             if (resp.ok) {
                 fetchServices()
             } else {
-                handleError("unable to delete revision", resp, "deleteRevision")
+                await handleError("unable to delete revision", resp, "deleteRevision")
             }
         } catch(e) {
             sendNotification("Error:", e.message, 0)

@@ -19,6 +19,7 @@ export default function Logs(props) {
 
     const [logSource, setLogSource] = useState(null)
     const [iid, setIid] = useState(null)
+    const [err, setErr] = useState("")
 
     useEffect(()=>{
         if (logSource === null || iid !== instanceId) {
@@ -29,7 +30,10 @@ export default function Logs(props) {
             eventConnection.onerror = (e) => {
                 // error log here
                 // after logging, close the connection   
-                console.log('error on sse', e)
+                if(e.status === 403) {
+                    setErr("You are unable to stream instance logs")
+                    return
+                }
                 document.getElementById("logs-test").innerHTML = ""
                 setLogs("")
             }
@@ -117,6 +121,7 @@ export default function Logs(props) {
                     <div id="logs" style={{ position: "absolute", right:"0", left:"0", borderRadius:"8px", overflow: tail ? "hidden":"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a",  top:"28px", bottom:"30px", paddingBottom:"10px" }}>
                         <pre id="logs-test" >
                             {logs === "" ?  "Fetching logs...": ""}
+                            {err !== "" ? err:""}
                         </pre>
                     </div>
                 </div>

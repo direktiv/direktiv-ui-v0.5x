@@ -58,6 +58,7 @@ export default function WorkflowPage() {
     const [actionErr, setActionErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
+    const [workflowFuncErr, setWorkflowFuncErr] = useState("")
     const codemirrorRef = useRef();
     const [tab, setTab] = useState("functions")
     const [functions, setFunctions] = useState(null)
@@ -98,7 +99,9 @@ export default function WorkflowPage() {
 
             let eventConnection = sse(`${x}`,{})
             eventConnection.onerror = (e) => {
-                console.log("error on sse", e)
+                if(e.status === 403) {
+                    setWorkflowFuncErr("You are forbidden on watching workflow functions")
+                }
             }
 
             async function getData(e) {
@@ -185,7 +188,7 @@ export default function WorkflowPage() {
                     await handleError('get workflow functions', resp, "getWorkflowFunctions")
                 }
             } catch(e) {
-                setErr(e.message)
+                setWorkflowFuncErr(e.message)
             }
         }
 
@@ -311,7 +314,7 @@ export default function WorkflowPage() {
         if(metricsLoading) {
             getStateMetrics().finally(()=>{setMetricsLoading(false)})
         }
-    },[fetch, metricsLoading, namespace, params.workflow])
+    },[handleError, fetch, metricsLoading, namespace, params.workflow])
 
     // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
@@ -568,9 +571,17 @@ export default function WorkflowPage() {
                                 }
                                 {tab === "functions" ?
                                      <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"255px", overflowY: "auto" }}>
-                                     <div id="events-tile" className="tile-contents">
+                                     {
+                                         workflowFuncErr !== "" ? 
+                                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                         {workflowFuncErr}
+                                     </div> 
+                                     :
+<div id="events-tile" className="tile-contents">
                                          <FuncComponent namespace={namespace} workflow={params.workflow} functions={functions}/>
                                      </div>
+                                        }
+                                     
                                  </div>:""
                                 }
                             </div>

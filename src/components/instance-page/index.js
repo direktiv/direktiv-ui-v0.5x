@@ -134,7 +134,7 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    handleError("unable to get state metrics", resp, "getWorkflowMetrics")
+                    await handleError("unable to get state metrics", resp, "getWorkflowMetrics")
                 }
             } catch(e) {
                 sendNotification("Error:", e.message, 0)
@@ -143,7 +143,7 @@ export default function InstancePage() {
         if(metricsLoading) {
             getStateMetrics().finally(()=>{setMetricsLoading(false)})
         }
-    },[fetch, metricsLoading, params.namespace, params.workflow])
+    },[handleError, fetch, metricsLoading, params.namespace, params.workflow])
 
     // Wait for instanceDetails to be populated
     useEffect(()=>{

@@ -44,7 +44,9 @@ export default function Functions() {
             eventConnection.onerror = (e) => {
                 // error log here
                 // after logging, close the connection   
-                console.log('error on sse', e)
+                if(e.status === 403) {
+                    setErr("You are forbidden on watching functions.")
+                }
             }
             
             async function getRealtimeData(e) {
@@ -363,7 +365,7 @@ function KnativeFunc(props) {
                 method:"DELETE"
             })
             if (!resp.ok) {
-                handleError("unable to delete service", resp, "deleteService")
+                await handleError("unable to delete service", resp, "deleteService")
             }
         } catch(e) {
             sendNotification("Error:", e.message, 0)
