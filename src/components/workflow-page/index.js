@@ -19,6 +19,7 @@ import Interactions from '../workflows-page/interactions'
 import ExportWorkflow from './export'
 import {LoadingPage} from '../loading'
 import { SuccessOrFailedWorkflows } from '../dashboard-page'
+import { sendNotification } from '../notifications'
 
 
 async function checkStartType(wf, setError) {
@@ -184,7 +185,7 @@ export default function WorkflowPage() {
                     await handleError('get workflow functions', resp, "getWorkflowFunctions")
                 }
             } catch(e) {
-                console.log(`Unable to get workflow functions: ${e.message}`)
+                setErr(e.message)
             }
         }
 
@@ -219,7 +220,6 @@ export default function WorkflowPage() {
                     await handleError('fetch workflow', resp, 'getWorkflow')
                 }
             } catch (e) {
-                // sendNotification("Failed to fetch workflow", e.message, 0)
                 setErr(`Failed to fetch workflow: ${e.message}`)
             }
         }
@@ -302,10 +302,10 @@ export default function WorkflowPage() {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    console.log(resp, "not ok resp get state metrics")
+                    handleError("unable to get state metrics", resp, "getWorkflowMetrics")
                 }
             } catch(e) {
-                console.log(e, "handle error on state metrics")
+                sendNotification("Error:", e.message, 0)
             }
         }
         if(metricsLoading) {
@@ -550,7 +550,7 @@ export default function WorkflowPage() {
                         </div>
                         {!fullscrenEditor ?
                         <div className="container graph-contents" style={{ width: "300px" }}>
-                            <SuccessOrFailedWorkflows namespace={namespace} fetch={fetch} workflow={params.workflow}/>
+                            <SuccessOrFailedWorkflows namespace={namespace} fetch={fetch} workflow={params.workflow} handleError={handleError}/>
                             <div className="item-0 shadow-soft rounded tile">
                                 <TileTitle actionsDiv={[<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("events") }} >
                         <IoFlash />  Instances

@@ -16,6 +16,7 @@ import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal, IoHardwareChipSharp } from 'react-icons/io5'
 import ButtonWithDropDownCmp from './actions-btn'
 import {LoadingPage} from '../loading'
+import { sendNotification } from '../notifications'
 
 
 
@@ -133,10 +134,10 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    console.log(resp, "not ok resp get state metrics")
+                    handleError("unable to get state metrics", resp, "getWorkflowMetrics")
                 }
             } catch(e) {
-                console.log(e, "handle error on state metrics")
+                sendNotification("Error:", e.message, 0)
             }
         }
         if(metricsLoading) {

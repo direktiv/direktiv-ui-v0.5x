@@ -14,6 +14,7 @@ import LoadingWrapper from "../loading"
 
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
+import { sendNotification } from "../notifications";
 
 dayjs.extend(relativeTime);
 export default function Services() {
@@ -192,8 +193,8 @@ export default function Services() {
 
                 if (revisionsRef.current[0]){
                     setLatestRevision(JSON.parse(JSON.stringify(revisionsRef.current[0])))
-                    console.log('no revisions?')
                 }
+
                 setRevisions(JSON.parse(JSON.stringify(revisionsRef.current)))
             }
 
@@ -242,7 +243,7 @@ export default function Services() {
      {errFetchRev}
  </div>                    
                     :
-                    <ListRevisions workflow={workflow} namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
+                    <ListRevisions handleError={handleError} workflow={workflow} namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch}  revisions={revisions !== null ? revisions: []}/>
 
 }
                     </LoadingWrapper>
@@ -302,7 +303,7 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const {revisions, workflow, getService, fetch, traffic, namespace, serviceName} = props
+    const {revisions, workflow, getService, fetch, traffic, namespace, serviceName, handleError} = props
     return(
             <div style={{overflowX:"visible", maxHeight:"785px"}}> 
             {revisions.map((obj, i)=>{
@@ -342,7 +343,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
                 )
             })}
             </div> 
@@ -350,7 +351,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName} = props
+    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError} = props
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -369,10 +370,10 @@ function Revision(props) {
             if (resp.ok) {
                 fetchServices()
             } else {
-                console.log(resp, "handle delete revision resp not ok")
+                handleError("unable to delete revision", resp, "deleteRevision")
             }
         } catch(e) {
-            console.log(e, "handle delete revision")
+            sendNotification("Error:", e.message, 0)
         }
     }
 

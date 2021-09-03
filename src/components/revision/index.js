@@ -48,7 +48,6 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
-                console.log(json, "revision")
                 if (json.event === "ADDED" || json.event === "MODIFIED") {
                     setRevisionDetails(json.revision)
                 }
@@ -268,6 +267,7 @@ function PodLogs(props) {
     const tailRef = useRef(tail)
     const [logs, setLogs] = useState("")
     const logsRef = useRef(logs)
+    const [err, setErr] = useState("")
 
     // set new log watcher on pod
     useEffect(()=>{
@@ -278,17 +278,18 @@ function PodLogs(props) {
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
-                // error log here
-                // after logging, close the connection   
-                console.log('error on sse', e)
-                try {
-                    let json = JSON.parse(e.data)
-                    if (json.Message.includes("could not get logs")) {
-                        console.log('could not get logs container is starting still')
+                if(e.data){
+                    try {
+                        let json = JSON.parse(e.data)
+                        if (json.Message.includes("could not get logs")) {
+                            setErr(`Container still starting: ${json.Message}`)
+                        }
+                    } catch(er) {
+                        // this error can probably be ignored.
+                        console.log(er)
                     }
-                } catch(er) {
-                    console.log(er)
                 }
+
                 document.getElementById("pod-logs").innerHTML = ""
                 setLogs("")
             }

@@ -5,6 +5,11 @@ export const ResourceRegex = new RegExp("^[a-z][a-z0-9._-]{1,34}[a-z0-9]$");
 
 export async function HandleError(summary, resp, perm) {
     const contentType = resp.headers.get('content-type');
+    if (resp.status === 405) {
+        // this shouldnt happen in the UI
+        throw new Error(`${summary}: method is not allowed`)
+
+    }
     if(resp.status !== 403) {
       if (!contentType || !contentType.includes('application/json')) {
         let text = await resp.text()
@@ -28,7 +33,7 @@ export function NoResults() {
   )
 }
 export function validateName(name, label) {
-    if (!name || name === "") {
+    if (!name) {
       return `${label} can not be empty`;
     }
   
