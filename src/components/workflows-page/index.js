@@ -177,7 +177,7 @@ export default function WorkflowsPage() {
                         </div>
                     </div>
                     <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                        <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px", maxWidth:"970px" }}>
+                        <div className="shadow-soft rounded tile" style={{ flex: "auto", flexGrow: "4", minWidth: "400px" }}>
                             <TileTitle name="All workflows">
                                 <IoList />
                             </TileTitle >

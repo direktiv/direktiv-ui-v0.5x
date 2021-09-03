@@ -19,6 +19,7 @@ import Interactions from '../workflows-page/interactions'
 import ExportWorkflow from './export'
 import {LoadingPage} from '../loading'
 import { SuccessOrFailedWorkflows } from '../dashboard-page'
+import { sendNotification } from '../notifications'
 
 
 async function checkStartType(wf, setError) {
@@ -57,6 +58,7 @@ export default function WorkflowPage() {
     const [actionErr, setActionErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
     const [toggleErr, setToggleErr] = useState("")
+    const [workflowFuncErr, setWorkflowFuncErr] = useState("")
     const codemirrorRef = useRef();
     const [tab, setTab] = useState("functions")
     const [functions, setFunctions] = useState(null)
@@ -97,7 +99,9 @@ export default function WorkflowPage() {
 
             let eventConnection = sse(`${x}`,{})
             eventConnection.onerror = (e) => {
-                console.log("error on sse", e)
+                if(e.status === 403) {
+                    setWorkflowFuncErr("You are forbidden on watching workflow functions")
+                }
             }
 
             async function getData(e) {
@@ -184,7 +188,7 @@ export default function WorkflowPage() {
                     await handleError('get workflow functions', resp, "getWorkflowFunctions")
                 }
             } catch(e) {
-                console.log(`Unable to get workflow functions: ${e.message}`)
+                setWorkflowFuncErr(e.message)
             }
         }
 
@@ -219,7 +223,6 @@ export default function WorkflowPage() {
                     await handleError('fetch workflow', resp, 'getWorkflow')
                 }
             } catch (e) {
-                // sendNotification("Failed to fetch workflow", e.message, 0)
                 setErr(`Failed to fetch workflow: ${e.message}`)
             }
         }
@@ -302,16 +305,16 @@ export default function WorkflowPage() {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    console.log(resp, "not ok resp get state metrics")
+                    await handleError("unable to get state metrics", resp, "getWorkflowMetrics")
                 }
             } catch(e) {
-                console.log(e, "handle error on state metrics")
+                sendNotification("Error:", e.message, 0)
             }
         }
         if(metricsLoading) {
             getStateMetrics().finally(()=>{setMetricsLoading(false)})
         }
-    },[fetch, metricsLoading, namespace, params.workflow])
+    },[handleError, fetch, metricsLoading, namespace, params.workflow])
 
     // Initial fetchKnativeFunctions Fetch
     useEffect(() => {
@@ -550,7 +553,7 @@ export default function WorkflowPage() {
                         </div>
                         {!fullscrenEditor ?
                         <div className="container graph-contents" style={{ width: "300px" }}>
-                            <SuccessOrFailedWorkflows namespace={namespace} fetch={fetch} workflow={params.workflow}/>
+                            <SuccessOrFailedWorkflows namespace={namespace} fetch={fetch} workflow={params.workflow} handleError={handleError}/>
                             <div className="item-0 shadow-soft rounded tile">
                                 <TileTitle actionsDiv={[<div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab("events") }} >
                         <IoFlash />  Instances
@@ -568,9 +571,17 @@ export default function WorkflowPage() {
                                 }
                                 {tab === "functions" ?
                                      <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"255px", overflowY: "auto" }}>
-                                     <div id="events-tile" className="tile-contents">
+                                     {
+                                         workflowFuncErr !== "" ? 
+                                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                                         {workflowFuncErr}
+                                     </div> 
+                                     :
+<div id="events-tile" className="tile-contents">
                                          <FuncComponent namespace={namespace} workflow={params.workflow} functions={functions}/>
                                      </div>
+                                        }
+                                     
                                  </div>:""
                                 }
                             </div>

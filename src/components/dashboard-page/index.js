@@ -11,7 +11,7 @@ import LoadingWrapper from '../loading'
 
 
 export default function DashboardPage() {
-    const {fetch, namespace} = useContext(MainContext)
+    const {fetch, namespace, handleError} = useContext(MainContext)
 
     return(
         <>
@@ -27,9 +27,9 @@ export default function DashboardPage() {
                         <Events />
                     </div>
                     <div className="container" style={{ flexDirection:"row", flexWrap:"wrap", flexGrow:1}}>
-                        <TotalWorkflows fetch={fetch} namespace={namespace} />
-                        <SuccessOrFailedWorkflows fetch={fetch} namespace={namespace} />
-                        <TotalTimeWorkflows fetch={fetch} namespace={namespace} />
+                        <TotalWorkflows fetch={fetch} namespace={namespace} handleError={handleError} />
+                        <SuccessOrFailedWorkflows fetch={fetch} namespace={namespace} handleError={handleError} />
+                        <TotalTimeWorkflows fetch={fetch} namespace={namespace} handleError={handleError} />
                     </div>
                 </div>
                 :
@@ -40,12 +40,13 @@ export default function DashboardPage() {
 }
 
 function TotalTimeWorkflows(props) {
-    const {fetch, namespace} = props
+    const {fetch, namespace, handleError} = props
     const [isLoading, setIsLoading] = useState(true)
 
     const [timeMetrics, setTimeMetrics] = useState([])
     const [totalTime, setTotalTime] = useState(0)
     const [oname, setOName] = useState("")
+    const [err, setErr] = useState("")
     // fetch the first time
     useEffect(()=>{
         async function getDetails() {
@@ -64,56 +65,63 @@ function TotalTimeWorkflows(props) {
                     setTotalTime(total)
                     setOName(namespace)
                 } else {
-                    console.log('handle time workflow metrics error resp', resp)
+                    await handleError('get workflow time metrics', resp, 'getNamespaceMetrics')
                 }
             } catch(e) {
-                console.log('handle total time workflows metrics error', e)
+                setErr(e.message)
             }
         }    
         if(isLoading || oname !== namespace){
             getDetails().finally(()=> {setIsLoading(false)})       
         }
-    },[fetch, isLoading, namespace, oname])
+    },[fetch, isLoading, namespace, oname, handleError])
     let colors = ["#ef5350", "#ec407a", "#ab47bc", "#7e57c2", "#5c6bc0", "#42a5f5", "#29b6f6", "#26c6da", "#26a69a", "#66bb6a", "#9ccc65", "#d4e157", "#ffee58", "#ffca28", "#ffa726", "#ff7043", "#8d6e63", "#bdbdbd", "#78909c"]
 
     return(
         <div className="shadow-soft rounded tile" style={{ flex: 1,   marginBottom:"10px" }}>
-            <TileTitle name="Time(s) each workflow has taken">
+            <TileTitle name="Average Execution Time">
                 <IoCodeSlashOutline />
             </TileTitle>
             <LoadingWrapper isLoading={isLoading} text={"Loading Total Time Workflow Metrics"}>
-                {timeMetrics.length > 0 ? 
-                <ResponsiveContainer height={300} width="100%">
-                    <PieChart>
-                        <Pie
-                            nameKey="name"
-                            innerRadius={70}
-                            paddingAngle={5}
-                            // label={renderLabel}
-                            data={timeMetrics}
-                        >
-                            <Label style={{fontSize:"20pt"}} value={`${totalTime}s`} position="center" />
-                            {timeMetrics.map((entry, index) => (
-                              <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                </ResponsiveContainer>:
-                <NoMetrics/>}
+                {err !== "" ?
+                <ErrorComp error={err}/>
+                :
+                <>
+                    {timeMetrics.length > 0 ? 
+                    <ResponsiveContainer height={300} width="100%">
+                        <PieChart>
+                            <Pie
+                                nameKey="name"
+                                innerRadius={70}
+                                paddingAngle={5}
+                                // label={renderLabel}
+                                data={timeMetrics}
+                            >
+                                <Label style={{fontSize:"20pt"}} value={`${totalTime}s`} position="center" />
+                                {timeMetrics.map((entry, index) => (
+                                <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                    </ResponsiveContainer>:
+                    <NoMetrics/>}
+                </>
+                }                
             </LoadingWrapper>
         </div>
     )
 }
 
 export function SuccessOrFailedWorkflows(props) {
-    const {fetch, namespace, workflow} = props
+    const {fetch, namespace, workflow, handleError} = props
 
     const [isLoading, setIsLoading] = useState(true)
     const [percentage, setPercentage] = useState(0)
     const [sWorkflowMetrics, setSWorkflowMetrics] = useState([])
     const [oname, setOName] = useState("")
-
+    const [err, setErr] = useState("")
+    
     useEffect(()=>{
         async function fetchDetails() {
             try{
@@ -158,25 +166,41 @@ export function SuccessOrFailedWorkflows(props) {
                     }
                     setOName(namespace)
                 } else {
-                    console.log('handle success workflow metrics error resp', failedResp, successResp)
+                    if(!failedResp.ok){
+                        if (workflow) {
+                            await handleError('get workflow successful and failed metrics', failedResp, 'getWorkflowMetrics')
+                        } else {
+                            await handleError('get workflow successful and failed metrics', failedResp, 'getNamespaceMetrics')
+                        }
+                    } else if (!successResp.ok) {
+                        if (workflow) {
+                            await handleError('get workflow successful and failed metrics', successResp, 'getWorkflowMetrics')
+                        } else {
+                            await handleError('get workflow successful and failed metrics', successResp, 'getNamespaceMetrics')
+                        }           
+                    }
                 }
             } catch(e) {
-                console.log('handle success or failure workflows metrics error', e)
+                setErr(e.message)
             }
         }
         if(isLoading || oname !== namespace) {
             fetchDetails().finally(()=> {setIsLoading(false)})    
         }
-    },[fetch, isLoading, namespace, workflow, oname])
+    },[fetch, isLoading, namespace, workflow, oname, handleError])
 
     let colors = ["#2fa64d", "#db3447"]
 
     return(
         <div className="shadow-soft rounded tile" style={{ flex: workflow?"none":1, marginBottom:"10px", minHeight:"300px" }}>
-            <TileTitle name={workflow? `Success rate on ${workflow}`:"Success rate on workflows invoked"}>
+            <TileTitle name={workflow? `Workflow Success Rate`:"Workflows Success Rate"}>
                 <IoCodeSlashOutline />
             </TileTitle>
             <LoadingWrapper isLoading={isLoading} text={"Loading Success Workflow Metrics"}>
+                {err !== "" ? 
+                <ErrorComp error={err}/>
+                :
+                <>
                 {sWorkflowMetrics.length > 0 ?
                 <ResponsiveContainer height={workflow ? 250: 300} width="100%">
                     <PieChart>
@@ -196,18 +220,21 @@ export function SuccessOrFailedWorkflows(props) {
                     </PieChart>
                 </ResponsiveContainer>
                 : <NoMetrics/>}
+                </>
+}
             </LoadingWrapper>
         </div>
     )
 }
 
 function TotalWorkflows(props) {
-    const {fetch, namespace} = props
+    const {fetch, namespace, handleError} = props
 
     const [isLoading, setIsLoading] = useState(true)
     const [invokedWorkflows, setInvokedWorkflows] = useState([])
     const [tWorkflowMetrics, setTWorkflowMetrics] = useState([])
     const [oname, setOName] = useState("")
+    const [err, setErr] = useState("")
 
     let colors = ["#ef5350", "#ec407a", "#ab47bc", "#7e57c2", "#5c6bc0", "#42a5f5", "#29b6f6", "#26c6da", "#26a69a", "#66bb6a", "#9ccc65", "#d4e157", "#ffee58", "#ffca28", "#ffa726", "#ff7043", "#8d6e63", "#bdbdbd", "#78909c"]
 
@@ -239,23 +266,27 @@ function TotalWorkflows(props) {
                     setTWorkflowMetrics(arr)
                     setInvokedWorkflows(arrTotal[0].value)
                 } else {
-                    console.log('handle total workflow metrics error resp', resp)
+                    await handleError('get total workflow metrics', resp, 'getNamespaceMetrics')
                 }
             } catch(e) {
-                console.log('handle total workflows metrics error', e)
+                setErr(e.message)
             }
         }
         if(isLoading || oname !== namespace) {
             fetchDetails().finally(()=> {setIsLoading(false)})    
         }
-    },[oname, fetch, namespace, isLoading])
+    },[oname, fetch, namespace, isLoading, handleError])
 
     return(
         <div className="shadow-soft rounded tile" style={{ marginBottom:"10px", flex: 1}}>
-            <TileTitle name="Number of workflows invoked">
+            <TileTitle name="Workflows Invoked">
                 <IoCodeSlashOutline />
             </TileTitle>
             <LoadingWrapper isLoading={isLoading} text={"Loading Total Workflow Metrics"}>
+                {err !== "" ?
+                    <ErrorComp error={err} /> 
+                :
+                <>
                 {tWorkflowMetrics.length > 0 ? 
                 <ResponsiveContainer height={300} width="100%">
                     <PieChart>
@@ -278,6 +309,8 @@ function TotalWorkflows(props) {
                  :
                  <NoMetrics />
                 }
+                </>
+            }
             </LoadingWrapper>
         </div>
     )
@@ -287,6 +320,15 @@ function NoMetrics() {
     return(
         <div style={{width:"100%", height:"100%", fontSize:"12pt", display:"flex", alignItems:"center", justifyContent:"center"}}>
             No metrics are stored.
+        </div>
+    )
+}
+
+function ErrorComp(props) {
+    const {error} = props
+    return(
+        <div style={{width:"100%", height:"100%", fontSize:"12pt", display:"flex", alignItems:"center", justifyContent:"center", color: "red"}}>
+            {error}
         </div>
     )
 }

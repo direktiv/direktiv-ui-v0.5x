@@ -10,6 +10,7 @@ import Breadcrumbs from '../breadcrumbs'
 import MainContext from '../../context'
 import LoadingWrapper from "../loading"
 import { Link,  useParams } from 'react-router-dom'
+import { sendNotification } from '../notifications';
 
 
 
@@ -24,6 +25,7 @@ export default function Functions() {
     const functionsRef = useRef(functions ? functions: [])
     
     const [evSource, setEvSource] = useState(null)
+    const [err, setErr] = useState("")
   
 
     useEffect(()=>{
@@ -35,14 +37,16 @@ export default function Functions() {
             if(params.namespace) {
                 body.scope = "namespace"
                 x = `/watch/namespaces/${params.namespace}/functions/`
-                body["namespace"] = params.namespace
+                body["namespace"] = params.namespace 
             }
             
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
                 // after logging, close the connection   
-                console.log('error on sse', e)
+                if(e.status === 403) {
+                    setErr("You are forbidden on watching functions.")
+                }
             }
             
             async function getRealtimeData(e) {
@@ -132,7 +136,7 @@ export default function Functions() {
                     await handleError('fetch services', resp, 'listServices')
                 }
             } catch(e) {
-                console.log(`Error fetching services: ${e.message}`)
+                setErr(e.message)
             }
         }
         return fetchFunctions()
@@ -159,6 +163,11 @@ export default function Functions() {
                         <IoList />
                     </TileTitle>
                     <LoadingWrapper isLoading={isLoading} text={"Loading Functions List"}>
+                        {err !== "" ? 
+                               <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
+                               {err}
+                               </div>
+                        :
                     <div style={{maxHeight:"785px", overflow:"visible"}}>
                    
                         <>
@@ -168,14 +177,14 @@ export default function Functions() {
                                     <div >
                                         {functions.map((obj) => {
                                             return (
-                                                <KnativeFunc checkPerm={checkPerm} permissions={permissions} key={obj.serviceName} conditions={obj.conditions} fetch={fetch} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
+                                                <KnativeFunc handleError={handleError} checkPerm={checkPerm} permissions={permissions} key={obj.serviceName} conditions={obj.conditions} fetch={fetch} minScale={obj.info.minScale} serviceName={obj.serviceName} namespace={params.namespace} size={obj.info.size} workflow={obj.info.workflow} image={obj.info.image} cmd={obj.info.cmd} name={obj.info.name} status={obj.status} statusMessage={obj.statusMessage}/>
                                             )
                                         })}
                                     </div>
                                     : <div style={{ fontSize: "12pt" }}>List is empty.</div>}
                             </> : ""}
                         </>
-                    </div>
+                    </div>}
                     </LoadingWrapper>
                 </div>
                     
@@ -348,20 +357,18 @@ function CreateKnativeFunc(props) {
 
 function KnativeFunc(props) {
 
-    const {fetch, name, conditions, serviceName, namespace, image, status, checkPerm, permissions} = props
+    const {fetch, name, conditions, serviceName, namespace, image, status, checkPerm, permissions, handleError} = props
 
     const deleteService = async () => {
         try {
             let resp = await fetch(`/functions/${serviceName}`, {
                 method:"DELETE"
             })
-            if (resp.ok) {
-                // fetchServices()
-            } else {
-                console.log(resp, "todo handle delete service resp")
+            if (!resp.ok) {
+                await handleError("unable to delete service", resp, "deleteService")
             }
         } catch(e) {
-            console.log(e, "handle delete service")
+            sendNotification("Error:", e.message, 0)
         }
     }
 

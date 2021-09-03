@@ -15,8 +15,19 @@ export default function Breadcrumbs(props) {
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
                 // if namespace exists dont show it
-                if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions" || obj.breadcrumb.props.children === "WorkflowFuncs") {
+                if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
                     return ""
+                }
+                if( obj.breadcrumb) {
+                    if(obj.breadcrumb.props){
+                        if(obj.breadcrumb.props.children) {
+                            if(
+                                obj.breadcrumb.props.children === "WorkflowFuncs"
+                            ) {
+                                return ""
+                            }
+                        }
+                    }
                 }
                 // if no instance id use custom breadcrumbs
                 if (!instanceId) {
