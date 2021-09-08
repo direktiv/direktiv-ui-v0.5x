@@ -106,7 +106,7 @@ const EnvTableRow = (props) => {
                                 }
                             })
                         }}><span>{`${isBinary ? "Cannot Show Binary Variable": "Show Value"}`}</span></div>
-                    }</>) : (<div className={"var-table-input show-button rounded button disabled"}><span>Variable is too large to preview</span></div>)}
+                    }</>) : (<div className={`var-table-input show-button rounded button disabled`} style={{width: "100%"}}><span>Variable is too large to preview</span></div>)}
 
                 {/* <div className={`noselect ${ show ? "" : "rounded button" }`} style={{width: "100%", fontSize: "12pt", justifyContent: "center"}} onClick={() => {
                     setShow(true)
