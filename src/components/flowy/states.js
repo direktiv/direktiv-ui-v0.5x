@@ -1,5 +1,6 @@
-import { IoChevronForwardSharp } from 'react-icons/io5';
-import {getBezierPath, getMarkerEnd} from "react-flow-renderer"
+import {getBezierPath, getMarkerEnd, getSmoothStepPath} from "react-flow-renderer"
+var randomWords = require('random-words');
+
 export function CustomEdge({
     id,
     sourceX,
@@ -21,89 +22,128 @@ export function CustomEdge({
         <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
         <text>
           <textPath href={`#${id}`} style={{ fontSize: '12px' }} startOffset="50%" textAnchor="middle">
-            {data.label}
+            {data ?  data.label: ""}
           </textPath>
         </text>
       </>
     );
 }
 
-export function StartNode(props) {
-    const {index, setElementData} = props
+export function GeneralState(props) {
+    const {setElementData, type} = props
+
+    let stateName = `${type}-${randomWords()}`
     
-    if (index === 0) {
-        return(
-            <div onDragStart={()=>{
-                setElementData({
-                type: "start",
-                id: "startNode",
-                })
-                }} draggable="true" style={{width:"fit-content"}}>
-                    <div className="normal">
-                        <div className="start" />
-                    </div>
-            </div>
-        )
-    } else {
-        return (
-            <div title="Start Node has already been added to flow." style={{width:"fit-content"}}>
-                <div className="normal" style={{background: "#b5b5b5"}}>
-                    <div className="start" />
-                </div>
-            </div>
-        )
+    const data = {
+        type: type,
+        id: stateName.toLowerCase(),
     }
-}
 
-// Noop state for flowy generation, takes index to create a counter for each one being added. If state not defined label is called noop
-export function Noop(props) {
-    const {index, setElementData} = props
-
-    let stateName = `noop`
-    if(index !== undefined) stateName = `noop-${index}`
-    
+    switch(type) {
+        case "parallel":
+            data["actions"] = []
+            break
+        case "validate":
+            data["schema"] = ""
+            break
+        case "setter":
+        case "getter":
+            data["variables"] = []
+            break
+        case "consumeEvent":
+            data["event"] = {
+                type: ""
+            }
+            break
+        case "foreach":
+            data["array"] = ""
+            data["action"] = ""
+            break
+        case "eventXor":
+        case "eventAnd":
+            data["events"] = []
+            break
+        case "error":
+            data["error"] = ""
+            data["message"] = ""
+            break
+        case "delay":
+            data["duration"] = ""
+            break
+        case "generateEvent":
+            data["event"] = {
+                type: "",
+                source: ""
+            }
+            break
+        case "action": 
+            data["action"] = ""
+            break
+        case "switch":
+            data["conditions"] = []
+            break
+        case "noop":
+            break
+        case "start":
+        default:
+            console.log("unsupported state type", type)
+    }
     
     return(
-        <div onDragStart={()=>{
-            setElementData({
-                type: "noop",
-                id: stateName,
-            })
-        }} draggable="true" state={stateName} type="noop" className="create-flowy state" style={{width:"80px", height:"30px"}}>
-            <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                <IoChevronForwardSharp/>
-                <div style={{flex:"auto"}}>
-                    noop
+        <tr className="spaceUnder" onDragStart={()=>{
+            setElementData(data)
+        }} draggable="true">
+               <td>
+                <div className="shadow-soft rounded state-item">
+                    {type}
                 </div>
-            </div>
-            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{stateName}</h1>
-        </div>
+            </td>
+        </tr>
     )
 }
 
-// Switch state for flowy graph generation, takes index to create a counter for each one being added. If state not defined label is called switch
-export function Switch(props) {
-    const {index, setElementData} = props
+export function ActionFunc(props) {
+    const {setElementData} = props
 
-    let stateName = `switch`
-    if(index !== undefined) stateName = `switch-${index}`
-    
-    
+    let stateName = `function-${randomWords()}`
+
+    const data = {
+        type: "function",
+        id: stateName,
+    }
+
     return(
-        <div onDragStart={()=>{
-            setElementData({
-                type: "switch",
-                conditions: [],
-                id: stateName,
-            })
-        }} draggable="true" state={stateName} type="noop" className="create-flowy state" style={{width:"80px", height:"30px"}}>
-            <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                <IoChevronForwardSharp/>
-                <div style={{flex:"auto"}}>
-                    switch
+        <tr className="spaceUnder" onDragStart={()=>{
+            setElementData(data)
+        }} draggable="true">
+               <td>
+                <div className="shadow-soft rounded state-item">
+                    function
                 </div>
-            </div>
-            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{stateName}</h1>
-        </div>
+            </td>
+        </tr>
     )
+}
+
+export function Schema(props) {
+    const { setElementData} = props
+
+    let  stateName = `schema-${randomWords()}`
+
+    const data = {
+        type: "schema",
+        id: stateName,
+    }
+
+    return(
+        <tr className="spaceUnder" onDragStart={()=>{
+            setElementData(data)
+        }} draggable="true">
+               <td>
+                <div className="shadow-soft rounded state-item">
+                    schema
+                </div>
+            </td>
+        </tr>
+    ) 
 }

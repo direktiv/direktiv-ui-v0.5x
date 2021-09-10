@@ -50,6 +50,10 @@ export default function Routes(props) {
             <Route exact path="/:namespace/functions/:service" component={Services}/>
             <Route exact path="/:namespace/functions/:service/:revision" component={Revision}/>
             <Route exact path="/:namespace/w" component={WorkflowsPage} />
+
+            <Route exact path="/:namespace/flowy" component={Flowy}/>
+            <Route exact path="/:namespace/w/:workflow/flowy" component={Flowy}/>
+
             <Route exact path="/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
             <Route exact path="/:namespace/w/:workflow/functions/:service" component={Services} />
             <Route exact path="/:namespace/w/:workflow/functions/:service/:revision" component={Revision}/>

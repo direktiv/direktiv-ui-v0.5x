@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { IoBuildSharp, IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
 
 export default function Navbar(props) {
 
@@ -143,6 +143,11 @@ export default function Navbar(props) {
 
     let matchDashboard = matchPath(location.pathname, {
         path: "/:namespace",
+        exact: true
+    })
+
+    let matchWorkflowBuilder = matchPath(location.pathname, {
+        path: "/:namespace/flowy",
         exact: true
     })
 
@@ -298,6 +303,25 @@ export default function Navbar(props) {
                             </div>
                         </Link>
 }
+                    </li>
+                    <li>
+                        {namespace === "" ? 
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                            <IoBuildSharp style={{ marginRight: "10px" }} />
+                            <span>Workflow Builder</span>
+                            </div>
+                            :
+                            <Link onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/${namespace}/flowy`} style={{color: matchWorkflowBuilder !== null ? "#4497f5": ""}} className="nav-link">
+                                <div>
+                                    <IoBuildSharp style={{ marginRight: "10px" }} />
+                                    <span>Workflow Builder</span>
+                                </div>
+                            </Link>
+                        }
                     </li>
                     <li>
                     {namespace === "" ?
