@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react"
-import ReactFlow, { ReactFlowProvider, isNode, addEdge, updateEdge } from "react-flow-renderer";
-import {  CustomEdge, ActionFunc, GeneralState, Schema } from "./states";
+import ReactFlow, { ReactFlowProvider, isNode, addEdge, updateEdge, MiniMap } from "react-flow-renderer";
+import {  ActionFunc, GeneralState, Schema } from "./states";
 import {State, diagramToYAML, Start, addState, ActionFunction, SchemaNode, generateElementsForBuilder} from "./util"
 import Breadcrumbs from '../breadcrumbs'
 import dagre from 'dagre'
@@ -356,7 +356,7 @@ export default function Flowy() {
 
         }
         fetchWorkflowAndDraw()
-    },[blocks, setBlocks, workflow, namespace, handleError, fetch])
+    },[blocks, setBlocks, init, workflow, namespace, handleError, fetch])
 
       
     return(
@@ -422,6 +422,7 @@ export default function Flowy() {
                         </div>
                     </div>
             </div>
+            {load ?  "": 
             <div style={{display:"flex", flexDirection:"column", flex: 1}}>
        
             <div onDragOver={(e)=>e.preventDefault()} onDrop={(e)=>onAdd(e)} className="shadow-soft rounded tile" style={{ fontSize:"12pt", flexGrow:1, padding:"0px", position: "relative"}}>
@@ -465,10 +466,17 @@ export default function Flowy() {
                         onElementClick={onElementClick}
                         onEdgeUpdate={onEdgeUpdate}
                         elements={blocks}
-                    ></ReactFlow>
+                    >
+    <MiniMap 
+                nodeColor={()=>{
+                    return '#4497f5'
+                }}
+            />
+
+                    </ReactFlow>
                 </ReactFlowProvider>
             </div>
-            </div>
+            </div>}
 
             <div className="shadow-soft rounded tile" style={{ maxWidth:"300px", fontSize:"12pt", flexGrow:1, overflow:"auto"}}>
                 <div>

@@ -558,7 +558,7 @@ export function SchemaSelected(props) {
                 <p>Schema: </p>
                 
                 <Editor
-                        placeholder="Please enter YAML to transform state"
+                        placeholder="Please enter YAML for a JSON Schema"
                         className={"language-yaml"}
                         value={schema}
                         onValueChange={code => setSchema(code)}
@@ -571,7 +571,7 @@ export function SchemaSelected(props) {
                             fontFamily: '"Fira code", "Fira Mono", monospace',
                             fontSize: 12,
                         }}
-                    />{/* <textarea value={schema} style={{width:"100%"}} onChange={(e)=>setSchema(e.target.value)} cols={4} rows={5} placeholder="Enter the JSON Schema to validate on" type="text" /> */}
+                    />
             </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
         {
@@ -595,28 +595,71 @@ export function FuncSelected(props) {
 
     const [image, setImage] = useState("")
     const [type, setType] = useState("")
+    const [service, setService] = useState("")
     const [currId, setCurrId] = useState("")
+    const [size, setSize] = useState("")
+    const [scale, setScale] = useState("")
+    const [workflow, setWorkflow] = useState("")
+    const [cmd, setCmd] = useState("")
     const [err, setErr] = useState("")
+    const [files, setFiles] = useState([])
 
     function changeState() {
         let bs = blocks
 
-        if(image !== ""){
             for(let i=0 ; i < bs.length; i++) {
                 if(bs[i].id === element.id) {
-                    bs[i].data["image"] = image
+                    switch(element.data.type){
+                        case "knative-global":
+                        case "knative-namespace":
+                            bs[i].data["service"] = service
+                            break
+                        case "reusable":
+                        case "isolated":
+                            bs[i].data["image"] = image
+                            bs[i].data["cmd"] = cmd
+                            bs[i].data["size"] = size
+                            bs[i].data["scale"] = parseInt(scale)
+                            break
+                        case "subflow":
+                            bs[i].data["workflow"] = workflow
+                            break
+                        default:
+                    }
+                    let acts = []
+                    for(let i=0; i < files.length; i++) {
+                        try {
+                            if(files[i].value !== "") {
+                                let yml = YAML.load(files[i].value)
+                                if(!yml.key) {
+                                    setErr(`File ${i} must have a key name`)
+                                    return
+                                } else {
+                                    acts.push(yml)
+                                }
+                            }
+        
+                        } catch(e) {
+                            setErr(`YAML is invalid for File ${i}.`)
+                            return
+                        }
+                    }
+
+                    if(acts.length > 0) {
+                        bs[i].data["files"] = acts
+                    }
                     bs[i].data["type"] = type
+
+
                     setErr("")
                     setBlocks(JSON.parse(JSON.stringify(blocks)))
                 }
             }
-        } else {
-            setErr("Image must be set")
-        }
     }
 
     useEffect(()=>{
         if(currId !== element.data.id) {
+            let acts = []
             if(element.data.image) {
                 setImage(element.data.image)
             } else {
@@ -627,35 +670,287 @@ export function FuncSelected(props) {
             } else {
                 setType("")
             }
+            if(element.data.service){
+                setService(element.data.service) 
+            } else {
+                setService("")
+            }
+            if(element.data.files) {
+                if(element.data.files.length > 0) {
+                    for(let x=0; x < element.data.files.length; x++) {
+                        acts.push({
+                            name: `file-${x}`,
+                            value: YAML2String.stringify(element.data.files[x])
+                        })
+                    }
+                } 
+            }else {
+                acts.push({
+                    name: `file-${files.length}`,
+                    value: ""
+                })
+            }
+            setFiles(acts)
+
+            if(element.data.cmd) {
+                setCmd(element.data.cmd)
+            } else {
+                setCmd("")
+            }
+            if(element.data.size) {
+                setSize(element.data.size) 
+            } else {
+                setSize("")
+            }
+            if(element.data.scale){
+                setScale(element.data.scale)
+            } else {
+                setScale("")
+            }
+            if(element.data.workflow){
+                setWorkflow(element.data.workflow)
+            } else {
+                setWorkflow("")
+            }
         }
         setCurrId(element.data.id)
-    },[element.data.id, element.data.image, currId])
+    },[element.data,  currId, files.length])
 
-    return(
-        <div style={{marginTop:"10px", fontSize:"10pt", display:"flex", flexWrap:"wrap", flexDirection:"column"}}>
-            <div style={{flex: 1, textAlign:"left"}}>
-                <p>Image: </p>
-                <input className="edit-input" type="text" value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter the image name" />
-            </div>
-            <div style={{flex: 1, textAlign:"left"}}>
-                <p>Type: </p>
-                <input className="edit-input" type="text" value={type} onChange={(e)=>setType(e.target.value)} placeholder="Enter the type of function" />
-            </div>
-            <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
+    const handleChange = (i,event) => {
+        files[i].value = event
+        setFiles([...files])
+    }
+
+    switch(type) {
+        case "knative-global":
+        case "knative-namespace":
+            return(
+                <div style={{marginTop:"10px", fontSize:"10pt", display:"flex", flexWrap:"wrap", flexDirection:"column"}}>
+                   <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Type: </p>
+                        <select className="edit-select" value={type} onChange={(e)=>setType(e.target.value)}>
+                            <option value="">Select a type</option>
+                            <option value="reusable">reusable</option>
+                            <option value="subflow">subflow</option>
+                            <option value="knative-global">knative-global</option>
+                            <option value="knative-namespace">knative-namespace</option>
+                            <option value="isolated">isolated</option>
+                        </select>
                     </div>
-                    :
-                    ""
-                }
-            <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
-
-                <input  type="submit" value="Change" onClick={()=>changeState()}/>
-            </div>
-        </div>
-    )
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Service: </p>
+                        <input className="edit-input" type="text" value={service} onChange={(e)=>setService(e.target.value)} placeholder="Enter the service name" />
+                    </div>
+                    {files.length > 0 ?
+                        <div style={{flex: 1, textAlign:"left"}}>
+                            {files.map((obj,i)=>{
+                                            return <div key={i} style={{flex: 1, textAlign:"left"}}>
+                                            <p>File {i}: </p>
+                                            
+                                            <Editor
+                                                    placeholder="Please enter YAML for a file object"
+                                                    className={"language-yaml"}
+                                                    value={obj.value}
+                                                    onValueChange={code => handleChange(i, code)}
+                                                    highlight={code => prism.highlight(code, prism.languages.yaml)}
+                                                    padding={3}
+                                                    style={{
+                                                        minHeight:"100px",
+                                                        borderRadius:"3px",
+                                                        maxWidth: "270px",
+                                                        fontFamily: '"Fira code", "Fira Mono", monospace',
+                                                        fontSize: 12,
+                                                    }}
+                                                />
+                                        </div>
+                                        })}
+                                </div>
+                            :
+                            ""}
+                    <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
+                        {files.length > 1 ?
+                        <input type="submit" value="Remove" onClick={()=>{
+                                    let acs = files
+                                    acs.pop()
+                                    setFiles(JSON.parse(JSON.stringify(acs)))
+                                }}  style={{marginRight:"3px"}} /> : ""}
+                                            <input type="submit" value="Add" onClick={()=>{
+                                    let acs = files
+                                    acs.push({
+                                        name: `file-${files.length}`,
+                                        value: ""
+                                    })
+                                    setFiles(JSON.parse(JSON.stringify(acs)))
+                                }} />
+                    </div>
+                    <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
+                        {
+                            err !== "" ? 
+                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
+                                {err}
+                            </div>
+                            :
+                            ""
+                        }
+                        <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
+                        <input  type="submit" value="Change" onClick={()=>changeState()}/>
+                    </div>
+                </div>
+            )
+        case "isolated":
+        case "reusable":
+            return(
+                <div style={{marginTop:"10px", fontSize:"10pt", display:"flex", flexWrap:"wrap", flexDirection:"column"}}>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Type: </p>
+                        <select className="edit-select" value={type} onChange={(e)=>setType(e.target.value)}>
+                            <option value="">Select a type</option>
+                            <option value="reusable">reusable</option>
+                            <option value="subflow">subflow</option>
+                            <option value="knative-global">knative-global</option>
+                            <option value="knative-namespace">knative-namespace</option>
+                            <option value="isolated">isolated</option>
+                        </select>
+                    </div>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Image: </p>
+                        <input className="edit-input" type="text" value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter the image name" />
+                    </div>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>CMD: </p>
+                        <input className="edit-input" type="text" value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the cmd for the service" />
+                    </div>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Size: </p>
+                        <select className="edit-select" value={size} onChange={(e)=>setSize(e.target.value)}>
+                            <option value=""> Select size</option>
+                            <option value="small">small</option>
+                            <option value="medium">medium</option>
+                            <option value="large">large</option>
+                        </select>
+                    </div>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Scale: </p>
+                        <input className="edit-input" type="text" value={scale} onChange={(e)=>setScale(e.target.value)} placeholder="Enter the scale for the image" />
+                    </div>
+                    {files.length > 0 ?
+                        <div style={{flex: 1, textAlign:"left"}}>
+                            {files.map((obj,i)=>{
+                                            return <div key={i} style={{flex: 1, textAlign:"left"}}>
+                                            <p>File {i}: </p>
+                                            
+                                            <Editor
+                                                    placeholder="Please enter YAML for a file object"
+                                                    className={"language-yaml"}
+                                                    value={obj.value}
+                                                    onValueChange={code => handleChange(i, code)}
+                                                    highlight={code => prism.highlight(code, prism.languages.yaml)}
+                                                    padding={3}
+                                                    style={{
+                                                        minHeight:"100px",
+                                                        borderRadius:"3px",
+                                                        maxWidth: "270px",
+                                                        fontFamily: '"Fira code", "Fira Mono", monospace',
+                                                        fontSize: 12,
+                                                    }}
+                                                />
+                                        </div>
+                                        })}
+                                </div>
+                            :
+                            ""}
+                      <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
+                        {files.length > 1 ?
+                        <input type="submit" value="Remove" onClick={()=>{
+                                    let acs = files
+                                    acs.pop()
+                                    setFiles(JSON.parse(JSON.stringify(acs)))
+                                }}  style={{marginRight:"3px"}} /> : ""}
+                                            <input type="submit" value="Add" onClick={()=>{
+                                    let acs = files
+                                    acs.push({
+                                        name: `file-${files.length}`,
+                                        value: ""
+                                    })
+                                    setFiles(JSON.parse(JSON.stringify(acs)))
+                                }} />
+                    </div>
+                    <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
+                        {
+                            err !== "" ? 
+                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
+                                {err}
+                            </div>
+                            :
+                            ""
+                        }
+                    <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
+        
+                        <input  type="submit" value="Change" onClick={()=>changeState()}/>
+                    </div>
+                </div>
+            )
+        case "subflow":
+            return(
+                <div style={{marginTop:"10px", fontSize:"10pt", display:"flex", flexWrap:"wrap", flexDirection:"column"}}>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Type: </p>
+                        <select className="edit-select" value={type} onChange={(e)=>setType(e.target.value)}>
+                            <option value="">Select a type</option>
+                            <option value="reusable">reusable</option>
+                            <option value="subflow">subflow</option>
+                            <option value="knative-global">knative-global</option>
+                            <option value="knative-namespace">knative-namespace</option>
+                            <option value="isolated">isolated</option>
+                        </select>
+                    </div>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Workflow: </p>
+                        <input className="edit-input" type="text" value={workflow} onChange={(e)=>setWorkflow(e.target.value)} placeholder="Enter the workflow name" />
+                    </div>
+                    <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
+                        {
+                            err !== "" ? 
+                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
+                                {err}
+                            </div>
+                            :
+                            ""
+                        }
+                        <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
+                        <input  type="submit" value="Change" onClick={()=>changeState()}/>
+                    </div>
+                </div>
+            )
+        default:
+            return(
+                <div style={{marginTop:"10px", fontSize:"10pt", display:"flex", flexWrap:"wrap", flexDirection:"column"}}>
+                    <div style={{flex: 1, textAlign:"left"}}>
+                        <p>Type: </p>
+                        <select className="edit-select" value={type} onChange={(e)=>setType(e.target.value)}>
+                            <option value="">Select a type</option>
+                            <option value="reusable">reusable</option>
+                            <option value="subflow">subflow</option>
+                            <option value="knative-global">knative-global</option>
+                            <option value="knative-namespace">knative-namespace</option>
+                            <option value="isolated">isolated</option>
+                        </select>
+                    </div>
+                    <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
+                        {
+                            err !== "" ? 
+                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
+                                {err}
+                            </div>
+                            :
+                            ""
+                        }
+                        <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
+                        <input  type="submit" value="Change" onClick={()=>changeState()}/>
+                    </div>
+                </div>
+            )
+    }
 }
 
 export function  ValidateSelected(props) {

@@ -14,3 +14,8 @@ tr.spaceUnder > td {
     max-width: 255px;
     min-width: 255px;
 }
+
+.edit-select{
+    max-width: 270px;
+    min-width: 270px;
+}

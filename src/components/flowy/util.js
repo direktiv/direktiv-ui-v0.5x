@@ -31,11 +31,24 @@ export const generateElementsForBuilder = (blocks, getLayoutedElements, value) =
                 }
 
                 switch(v.functions[i].type) {
+                    case "knative-global":
+                    case "knative-namespace":
+                        data["service"] = v.functions[i].service
+                        data["files"] = v.functions[i].files
+                        break
+                    case "isolated":
                     case "reusable":
                         data["image"] = v.functions[i].image
+                        data["files"] = v.functions[i].files
+                        data["cmd"] = v.functions[i].cmd
+                        data["size"] = v.functions[i].size
+                        data["scale"] = v.functions[i].scale
                         break
                     case "subflow":
                         data["workflow"] = v.functions[i].workflow
+                        break
+                    default:
+
                 }
                 console.log("new data for func", data)
                 newElements.push({
@@ -245,7 +258,7 @@ export function Start() {
 }
 
 export function ActionFunction(props) {
-    const {data, id} = props
+    const {data} = props
     return (
         <div className="state" style={{width:"80px", height:"30px"}}>
             <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
@@ -265,11 +278,11 @@ export function SchemaNode(props) {
         <div className="state" style={{width:"80px", height:"30px"}}>
             <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
                 <IoChevronForwardSharp/>
-                <div style={{flex:"auto", color: "#00e676"}}>
+                <div style={{flex:"auto", color: "rgb(6 158 84)"}}>
                     {data.type}
                 </div>
             </div>
-            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px", color:"#00e676"}}>{id}</h1>
+            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px", color:"rgb(6 158 84)"}}>{id}</h1>
         </div>
     )
 }
@@ -323,7 +336,6 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
 
     let sortStart = ""
 
-
     for(let i=0; i < blocks.length; i++) {
         if(blocks[i].source === "startNode") {
             // logic to get first element of the array from the start node
@@ -331,19 +343,35 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
         }
 
         switch(blocks[i].type) {
+            case "schema":
+                wf.schemas.push({
+                    id: blocks[i].data.id,
+                    schema: blocks[i].data.schema
+                })
+                break
             case "function":
-                // TODO add all the other details a function could possibly have
-        
                 let data = {
                     type: blocks[i].data.type,
                     id: blocks[i].data.id
                 }
                 switch(blocks[i].data.type) {
+                    case "knative-global":
+                    case "knative-namespace":
+                        data["files"] = blocks[i].data.files
+                        data["service"] = blocks[i].data.service
+                        break
+                    case "isolated":
                     case "reusable":
                         data["image"] = blocks[i].data.image
+                        data["files"] = blocks[i].data.files
+                        data["cmd"] = blocks[i].data.cmd
+                        data["size"] = blocks[i].data.size
+                        data["scale"] = blocks[i].data.scale
                         break
                     case "subflow":
                         data["workflow"] = blocks[i].data.workflow
+                        break
+                    default:
                 }
                 wf.functions.push(data)
                 break
@@ -364,9 +392,6 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
                     wf["version"] = blocks[i].version
                 }
                 break
-            case "schema":
-                // todo
-                break
             case "start":
                 break
             default:
@@ -374,121 +399,6 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
                     wf.states.push(blocks[i].data)
                 }
         }
-
- 
-        // if(blocks[i].type === "meta") {
-        //     // handle global meta data only one exists used to transfer data from a currently made workflow
-        //     if(blocks[i].description) {
-        //         wf["description"] = blocks[i].description
-        //     }
-        //     if(blocks[i].singular) {
-        //         wf["singular"] = blocks[i].singular
-        //     }
-        //     if(blocks[i].start) {
-        //         wf["start"] = blocks[i].start
-        //     }
-        //     if(blocks[i].timeouts) {
-        //         wf["timeouts"] = blocks[i].timeouts
-        //     }
-        //     if(blocks[i].version) {
-        //         wf["version"] = blocks[i].version
-        //     }
-        // } else if(blocks[i].data && blocks[i].data.edge !== true) {
-        //     if(blocks[i].data.type !== "start" && blocks[i].type !== "function" && blocks[i].data.type !== "schema") {
-        //         // not the start node
-        //         // must be a state and not an edge
-        //         wf.states.push(blocks[i].data)
-        //     } else if (blocks[i].data.type === "schema"){
-        //         wf.schemas.push({
-        //             id: blocks[i].data.id,
-        //             schema: blocks[i].data.schema
-        //         })
-        //     } else if (blocks[i].type === "function") {
-        //         let data = {
-        //             type: blocks[i].data.type,
-        //             id: blocks[i].data.id
-        //         }
-        //         switch(blocks[i].data.type) {
-        //             case "reusable":
-        //                 data["image"] = blocks[i].data.image
-        //                 break
-        //             case "subflow":
-        //                 data["workflow"] = blocks[i].data.workflow
-        //         }
-
-        //         wf.functions.push(data)
-        //     }
-        // } else {
-        //     if (blocks[i].source === "startNode") {
-        //         // target is the start of the workflow add to first element of array
-        //         sortStart = blocks[i].target
-        //     }
-        //     // this will be an edge connecting nodes
-        //     for(let x=0; x < wf.states.length; x++) {
-        //         // if its not a switch it doesn't have multiple transitions/conditions
-        //         if(wf.states[x].type !== "switch") {
-        //             if (wf.states[x].type === "eventXor") {
-        //                 // handle eventXORRRR
-        //                 if(wf.states[x].transition) {
-        //                     wf.states[x]["transition"] = blocks[i].target
-        //                 }
-
-        //                 if(blocks[i].condition) {
-        //                     for(let n=0; n < wf.states.length; n++) {
-        //                         if(wf.states[n].id === blocks[i].source) {
-        //                             for(let y=0; y < wf.states[n].events.length; y++) {
-        //                                 if(wf.states[n].events[y].event.type === blocks[i].conditionString) {
-        //                                     wf.states[n].events[y].transition = blocks[i].target
-        //                                 }
-        //                             }
-        //                         }
-        //                     }
-        //                 }   
-        //             }
-        //             else if(wf.states[x].type === "validate") {
-        //                 // HANDLE VALID STATE UPDATE
-        //                 if(wf.states[x].transition) {
-        //                     wf.states[x]["transition"] = blocks[i].target
-        //                 }
-
-        //                 if(blocks[i].condition) {
-        //                     for(let n=0; n < wf.states.length; n++) {
-        //                         if(wf.states[n].id === blocks[i].source) {
-        //                             for(let y=0; y < wf.states[n].catch.length; y++) {
-        //                                 if(wf.states[n].catch[y].error === blocks[i].conditionString) {
-        //                                     wf.states[n].catch[y].transition = blocks[i].target 
-        //                                 }
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //             } else {
-        //                 if(wf.states[x].id === blocks[i].source) {
-        //                     wf.states[x]["transition"] = blocks[i].target
-        //                 }
-        //             }
-        
-        //         } else {
-        //             // HANDLE SWITCH
-        //             console.log(blocks[i], "BLOCKS TEST")
-        //             if(blocks[i].defaultTransition) {
-        //                 wf.states[x]["defaultTransition"] = blocks[i].target
-        //             }
-        //             if(blocks[i].condition) {
-        //                 console.log(blocks[i], "CONDITION CHECK")
-        //                 for(let n=0; n < wf.states.length; n++) {
-        //                     if(wf.states[n].id === blocks[i].source) {
-        //                         for(let y=0; y < wf.states[n].conditions.length; y++) {
-        //                             if(wf.states[n].conditions[y].condition === blocks[i].conditionString) {
-        //                                 wf.states[n].conditions[y].transition = blocks[i].target
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
     }
 
     for(let y=0; y < blocks.length; y++) {
@@ -497,7 +407,20 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
                 if(blocks[y].source === wf.states[x].id) {
                     switch(wf.states[x].type){
                         case "eventXor":
-                            //todo
+                            if(wf.states[x].transition) {
+                                wf.states[x]["transition"] = blocks[y].target
+                            }
+                            if(blocks[y].condition) {
+                                for(let n=0; n < wf.states.length; n++) {
+                                    if(wf.states[n].id === blocks[y].source) {
+                                        for(let y=0; y < wf.states[n].events.length; y++) {
+                                            if(wf.states[n].events[y].event.type === blocks[y].conditionString) {
+                                                wf.states[n].events[y].transition = blocks[y].target
+                                            }
+                                        }
+                                    }
+                                }
+                            }   
                             break
                         case "switch":
                             if(blocks[y].defaultTransition) {
@@ -517,8 +440,17 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
                             break
                         default:
                             // check catch as it should be on all states.
-                            // add catch
-
+                            if(blocks[y].condition) {
+                                for(let n=0; n < wf.states.length; n++) {
+                                    if(wf.states[n].id === blocks[y].source) {
+                                        for(let y=0; y < wf.states[n].catch.length; y++) {
+                                            if(wf.states[n].catch[y].error === blocks[y].conditionString) {
+                                                wf.states[n].catch[y].transition = blocks[y].target 
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             wf.states[x]["transition"] = blocks[y].target
                     }
                 }
@@ -531,14 +463,26 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
     // check for null values and dont return
     if(wf.functions.length === 0) {
         delete wf.functions
+    } else {
+        for(var i=0; i < wf.functions.length; i++) {
+            for(const prop in wf.functions[i]) {
+                if(prop === "label") {
+                    delete wf.functions[i][prop]
+                }
+                if(!wf.functions[i][prop]){
+                    delete wf.functions[i][prop]
+                }
+            }
+        }
     }
+
     if(wf.schemas.length === 0) {
         delete wf.schemas
     }
     if(wf.states.length === 0) {
         delete wf.states
     } else {
-        for(var i=0; i < wf.states.length; i++) {
+        for( i=0; i < wf.states.length; i++) {
             for(const prop in wf.states[i]) {
                 if(prop === "label") {
                     delete wf.states[i][prop]

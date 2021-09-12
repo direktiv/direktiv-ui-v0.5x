@@ -1,4 +1,4 @@
-import {getBezierPath, getMarkerEnd, getSmoothStepPath} from "react-flow-renderer"
+import {getBezierPath, getMarkerEnd} from "react-flow-renderer"
 var randomWords = require('random-words');
 
 export function CustomEdge({
