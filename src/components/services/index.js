@@ -193,7 +193,7 @@ export default function Services() {
 
                 // filter based on revision dates
                 revisionsRef.current.sort(function(a,b){
-                    return a.created < b.created ? 1 : -1; 
+                    return a.generation < b.generation ? 1 : -1; 
                 })
         
 
