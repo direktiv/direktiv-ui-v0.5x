@@ -168,7 +168,6 @@ export default function Flowy() {
     }
 
     const onEdgeUpdate = (oldEdge, newConnection) => {
-        console.log(oldEdge, newConnection)
         newConnection["data"] = oldEdge["data"]
         if(newConnection.source === newConnection.target) {
             ShowErr(`Can't create an edge that points to itself`, setErr)
@@ -185,7 +184,6 @@ export default function Flowy() {
     }
 
     const onConnect = (params) => {
-        console.log(params)
         params["data"] = {
             edge: true
         }
@@ -207,7 +205,6 @@ export default function Flowy() {
                     } else {
                         // loop through same array to check if edge already exists on this node and prompt for error saying u can only connect the one
                         for(let x=0; x < blocks.length; x++) {
-                            console.log(blocks[i])
                             if(blocks[x].source === params.source) {
                                 ShowErr(`'${blocks[x].source}' already has one connection for transitioning please remove or change to new transition.`, setErr)
                                 return
@@ -221,7 +218,6 @@ export default function Flowy() {
     };
 
     const onElementClick = (event, element) => {
-        console.log("ELEMENT CLICKED", element)
         if(element.type !== "start"){
             setElementSelected(element)
         }
@@ -292,12 +288,10 @@ export default function Flowy() {
                         if (resp.ok) {
                             let json = await resp.json()
                             wf = atob(json.workflow)
-                            console.log(wf, "WORKFLOW")
                         }else {
                             await handleError('fetch workflow', resp, 'getWorkflow')
                         }
                     } catch(e) {
-                        console.log(e, "handle err fetch workflow")
                         return
                     }
         
@@ -462,7 +456,6 @@ export default function Flowy() {
                             function: ActionFunction,
                         }}
                         onConnect={onConnect}
-                        onSelect={(e)=>{console.log(e)}}
                         onElementClick={onElementClick}
                         onEdgeUpdate={onEdgeUpdate}
                         elements={blocks}
@@ -506,11 +499,8 @@ function ElementSelected(props) {
     
     function deleteElement() {
         let bs = blocks
-        console.log(bs, "before for loop")
-        console.log(element.id, "DELETING THIS")
         for(let i=0; i < bs.length; i++) {
             if(bs[i].id === element.id) {
-                console.log('element found', element)
                 if(element.source && element.target) {
                     // it is an edge remove the condition wherever it is in the state
                     for(let y=0; y < bs.length; y++) {
@@ -520,7 +510,6 @@ function ElementSelected(props) {
                                     // check conditions
                                     for(let z=0; z < bs[y].data.conditions.length; z++) {
                                         if(bs[y].data.conditions[z].transition === element.target) {
-                                            console.log("deleting condition")
                                             bs[y].data.conditions.splice(z, 1)
                                             z--
                                         }
@@ -531,10 +520,8 @@ function ElementSelected(props) {
                                     }
                                     break
                                 case "eventXor":
-                                    console.log(bs[y].data)
                                     for(let z=0; z < bs[y].data.events.length; z++) {
                                         if(bs[y].data.events[z].transition === element.target) {
-                                            console.log("deleting event")
                                             bs[y].data.events.splice(z, 1)
                                             z--
                                         }
@@ -556,17 +543,14 @@ function ElementSelected(props) {
                 i--
             }
             if(bs[i].source === element.id) {
-                console.log('edge found source', bs[i])
                 bs.splice(i, 1)
                 i--
             }
             if(bs[i].target === element.id) {
-                console.log("edge found target", bs[i])
                 bs.splice(i, 1)      
                 i--
             }
         }
-        console.log(bs, "NEW BS ARRAY")
         // set element selected back to nothing
         setElement(null)
         setBlocks([...bs])

@@ -50,7 +50,6 @@ export const generateElementsForBuilder = (blocks, getLayoutedElements, value) =
                     default:
 
                 }
-                console.log("new data for func", data)
                 newElements.push({
                     id: `${v.functions[i].id}${randomWords()}`,
                     position: position,
@@ -95,7 +94,6 @@ export const generateElementsForBuilder = (blocks, getLayoutedElements, value) =
                         data["events"] = v.states[i].events
                         break
                     case "foreach":
-                        console.log(v.states[i], "FOREACH")
                         data["array"] = v.states[i].array
                         data["action"] = v.states[i].action
                         break
@@ -137,7 +135,6 @@ export const generateElementsForBuilder = (blocks, getLayoutedElements, value) =
                             if(v.states[i].type === "eventXor") {
                                 condition = v.states[i].events[j].event.type
                             }
-                            console.log(condition)
                             newElements.push({
                                 id: `${v.states[i].id}-${v.states[i].events[j].transition}`,
                                 source: v.states[i].id,
@@ -494,6 +491,5 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
         }
     }
 
-    console.log(YAML.stringify(wf))
     func(YAML.stringify(wf))
 }

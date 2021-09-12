@@ -302,9 +302,8 @@ function PodLogs(props) {
                         if (json.Message.includes("could not get logs")) {
                             setErr(`Container still starting: ${json.Message}`)
                         }
-                    } catch(er) {
-                        // this error can probably be ignored.
-                        console.log(er)
+                    } catch(e){
+                        console.log(e, "")
                     }
                 }
 

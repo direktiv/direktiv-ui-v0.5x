@@ -149,8 +149,6 @@ export function GetterOrSetterSelected(props) {
             <input type="submit" value="Remove" onClick={()=>{
                         let acs = variables
                         acs.pop()
-                        console.log(acs)
-
                         setVariables(JSON.parse(JSON.stringify(acs)))
                     }}  style={{marginRight:"3px"}} />: "" }
                                 <input type="submit" value="Add" onClick={()=>{
@@ -193,7 +191,6 @@ export function EventAndXorSelected(props) {
     function changeState() {
         let acts = []
         for(let i=0; i < events.length; i++) {
-            console.log(events[i])
             try {
                 let json = YAML.load(events[i].value)
                 if(element.data.type === "eventXor") {
@@ -323,8 +320,6 @@ export function EventAndXorSelected(props) {
             <input type="submit" value="Remove" onClick={()=>{
                         let acs = events
                         acs.pop()
-                        console.log(acs)
-
                         setEvents(JSON.parse(JSON.stringify(acs)))
                     }}  style={{marginRight:"3px"}} /> : ""}
                                 <input type="submit" value="Add" onClick={()=>{
@@ -389,7 +384,6 @@ export function ParallelSelected(props) {
         } 
         let bs = blocks
         for(let x=0; x < bs.length; x++){
-            console.log(bs[x])
             if(bs[x].id === element.data.id) {
                 bs[x].data["actions"] = acts
                 bs[x].data["log"] = log
@@ -488,8 +482,6 @@ export function ParallelSelected(props) {
             <input type="submit" value="Remove" onClick={()=>{
                         let acs = actions
                         acs.pop()
-                        console.log(acs)
-
                         setActions(JSON.parse(JSON.stringify(acs)))
                     }}  style={{marginRight:"3px"}} /> : ""}
                                 <input type="submit" value="Add" onClick={()=>{
