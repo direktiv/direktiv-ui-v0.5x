@@ -417,7 +417,7 @@ function Content() {
     }}>
       {!load ?
 
-        <div id="content">
+        <div id="content" className="nav-panel">
           <Router>
             <div id="nav-panel">
               {namespaces !== null ?

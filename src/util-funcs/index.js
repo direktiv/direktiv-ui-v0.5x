@@ -69,14 +69,14 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
     try {
       let newNamespace = ""
       let namespaces = []
-      let resp = await fetch('/namespaces/', {
+      let resp = await fetch('/namespaces', {
         method: 'GET',
       })
   
       if(resp.ok) {
         let json = await resp.json()
         // if namespaces exist 
-        if(json.namespaces){
+        if(json.edges){
           // if initial load
           if(load){
             // if pathname isnt jqplayground check if namespace is provided
@@ -92,8 +92,8 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
   
                 // check if namespace exists here if not redirect back to /
                 let f = false
-                  for (let i = 0; i < json.namespaces.length; i++) {
-                    if (json.namespaces[i].name === newNamespace) {
+                  for (let i = 0; i < json.edges.length; i++) {
+                    if (json.edges[i].node.name === newNamespace) {
                       f = true
                     }
                   }
@@ -115,52 +115,47 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
                     if (localStorage.getItem("namespace") === "") {
   
                       // if the json namespaces array is greater than 0 set it to the first
-                      if (json.namespaces.length > 0) {
-                        newNamespace = json.namespaces[0].name
+                      if (json.edges.length > 0) {
+                        newNamespace = json.edges[0].node.name
                       }
                     } else {
   
                       let found = false
                       // check if the namespace previously stored in localstorage exists in the list
-                      for (let i = 0; i < json.namespaces.length; i++) {
-                        if(json.namespaces[i] !== null) {
-                          if (json.namespaces[i].name === localStorage.getItem("namespace")) {
+                      for (let i = 0; i < json.edges.length; i++) {
+                        if(json.edges[i] !== null) {
+                          if (json.edges[i].node.name === localStorage.getItem("namespace")) {
                             found = true
                             newNamespace = localStorage.getItem("namespace")
                             break
                           }
                         }
                       }
-  
                       if (!found) {
-  
                         // check if json array is greater than 0 to set to the first
-                        if (json.namespaces.length > 0) {
-                          newNamespace = json.namespaces[0].name
-                          localStorage.setItem("namespace", json.namespaces[0].name)
-                          sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
+                        if (json.edges.length > 0) {
+                          newNamespace = json.edges[0].node.name
+                          localStorage.setItem("namespace", json.edges[0].node.name)
+                          sendNotification("Namespace does not exist", `Changing to ${json.edges[0].node.name}`, 0)
                         }
                       }
                     }
                   } else {
                     // if the json namespace array is greater than 0 set it to the first as no other options is valid
-                    if (json.namespaces.length > 0) {
-                      newNamespace = json.namespaces[0].name
+                    if (json.edges.length > 0) {
+                      newNamespace = json.edges[0].node.name
                     }
                   }
                 }
               }
-  
               if (newNamespace === "" && val) {
                 newNamespace = val
               }
-              for (let i = 0; i < json.namespaces.length; i++) {
-                namespaces.push(json.namespaces[i].name)
+              for (let i = 0; i < json.edges.length; i++) {
+                namespaces.push(json.edges[i].node.name)
               }
         }
-  
         return {namespaces: namespaces, namespace: newNamespace}
-      
       } else {
         await handleError('fetch namespaces', resp)
       }

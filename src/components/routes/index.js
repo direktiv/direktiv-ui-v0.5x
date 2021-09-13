@@ -10,6 +10,7 @@ import EnvrionmentPage from "../environment-page"
 import Functions from "../functions"
 import Services from "../services"
 import Revision from "../revision"
+import Explorer from "../workflows-page/index2"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -47,7 +48,8 @@ export default function Routes(props) {
             <Route exact path="/:namespace/functions" component={Functions}/>
             <Route exact path="/:namespace/functions/:service" component={Services}/>
             <Route exact path="/:namespace/functions/:service/:revision" component={Revision}/>
-            <Route exact path="/:namespace/w" component={WorkflowsPage} />
+            <Route exact path="/:namespace/explorer" component={Explorer} />
+            <Route exact path="/:namespace/explorer/:path" component={Explorer} />
             <Route exact path="/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
             <Route exact path="/:namespace/w/:workflow/functions/:service" component={Services} />
             <Route exact path="/:namespace/w/:workflow/functions/:service/:revision" component={Revision}/>
