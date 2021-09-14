@@ -7,15 +7,16 @@ import Editor from 'react-simple-code-editor';
 // Stringify the object
 import YAML2String from 'yaml'
 
+import {ShowErr} from "./index"
+
 var prism = require('prismjs');
 require('prismjs/components/prism-yaml')
 
 
 export function GetterOrSetterSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [variables, setVariables] = useState([])
-    const [err, setErr] = useState("")
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
@@ -27,18 +28,16 @@ export function GetterOrSetterSelected(props) {
                 let json = YAML.load(variables[i].value)
                 if(element.data.type === "setter") {
                     if(!json.value) {
-                        setErr(`Variable ${i} must have a value provided to set.`)
-                        return
+                        throw(new Error(`Variable ${i} must have a value provided to set.`))
                     }
                 }
                 if(!json.key || !json.scope) {
-                    setErr(`Variable ${i} must have a key and scope provided.`)
-                    return
+                    throw(new Error(`Variable ${i} must have a key and scope provided`))
                 } else {
                     acts.push(json)
                 }
             } catch(e) {
-                setErr(`JSON is invalid for Action ${i}.`)
+                ShowErr(`Error changing '${element.id}': ${e.message}`, setErr)
                 return
             }
         }
@@ -46,7 +45,7 @@ export function GetterOrSetterSelected(props) {
         let bs = blocks
         let yaml = YAML.load(transform)
         if(typeof yaml !== "object" && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         for(let x=0; x < bs.length; x++) {
@@ -55,7 +54,6 @@ export function GetterOrSetterSelected(props) {
                 bs[x].data["log"] = log
                 bs[x].data["transform"] = yaml
                 setBlocks(bs)
-                setErr("")
             }
         }
     }
@@ -161,14 +159,6 @@ export function GetterOrSetterSelected(props) {
                     }} />
             </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -179,10 +169,9 @@ export function GetterOrSetterSelected(props) {
 }
 
 export function EventAndXorSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [events, setEvents] = useState([])
-    const [err, setErr] = useState("")
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
@@ -195,30 +184,27 @@ export function EventAndXorSelected(props) {
                 let json = YAML.load(events[i].value)
                 if(element.data.type === "eventXor") {
                     if(!json.event) {
-                        setErr(`Event ${i} requires the event object.`)
-                        return
+                        throw new Error(`Event ${i} requires the event object.`)
                     } else  if(!json.event.type) {
-                        setErr(`Event ${i} requires the event type inside the event object.`)
-                        return
+                        throw new Error(`Event ${i} requires the event type inside the event object.`)
                     } else {
                         acts.push(json)
                     }
                 } else {
                     if(!json.type) {
-                        setErr(`Event ${i} requires an event type`)
-                        return
+                        throw new Error(`Event ${i} requires an event type`)
                      } else {
                         acts.push(json)
                     }
                 }
             } catch(e) {
-                setErr(`YAML is invalid for Event ${i}.`)
+                ShowErr(`Error changing '${element.id}': ${e.message}`, setErr)
                 return
             }
         }
         let yaml = YAML.load(transform)
         if(typeof yaml !== "object" && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         let bs = blocks
@@ -228,7 +214,6 @@ export function EventAndXorSelected(props) {
                 bs[x].data["log"]= log
                 bs[x].data["transform"] = yaml
                 setBlocks(bs)
-                setErr("")
             }
         }
     }
@@ -332,16 +317,6 @@ export function EventAndXorSelected(props) {
                     }} />
             </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        
-        
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
                 <hr />
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -352,10 +327,9 @@ export function EventAndXorSelected(props) {
 }
 
 export function ParallelSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [actions, setActions] = useState([])
-    const [err, setErr] = useState("")
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
@@ -367,19 +341,18 @@ export function ParallelSelected(props) {
             try {
                 let yml = YAML.load(actions[i].value)
                 if(!yml.function) {
-                    setErr(`Action ${i} must have a function name`)
-                    return
+                    throw new Error(`Action ${i} must have a function name.`)
                 } else {
                     acts.push(yml)
                 }
             } catch(e) {
-                setErr(`YAML is invalid for Action ${i}.`)
+                ShowErr(`Error changing '${element.id}': ${e.message}`, setErr)
                 return
             }
         }
         let yaml = YAML.load(transform)
         if(typeof yaml !== "object"  && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         let bs = blocks
@@ -389,7 +362,6 @@ export function ParallelSelected(props) {
                 bs[x].data["log"] = log
                 bs[x].data["transform"] = yaml
                 setBlocks(bs)
-                setErr("")
             }
         }
     }
@@ -494,14 +466,6 @@ export function ParallelSelected(props) {
                     }} />
             </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
         </div>
@@ -510,10 +474,9 @@ export function ParallelSelected(props) {
 }
 
 export function SchemaSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [schema, setSchema] = useState("")
-    const [err, setErr] = useState("")
 
     function changeState() {
         let bs = blocks
@@ -524,15 +487,14 @@ export function SchemaSelected(props) {
                 for(let i=0 ; i < bs.length; i++) {
                     if(bs[i].id === element.id) {
                         bs[i].data["schema"] = json
-                        setErr("")
                         setBlocks(bs)
                     }
                 }
             } catch(e) {
-                setErr("Unable to parse schema as valid YAML")
+                ShowErr(`Error changing '${element.id}': Unable to parse schema as valid YAML`, setErr)
             }
         } else {
-            setErr("Image must be set")
+            ShowErr(`Error changing '${element.id}': Image must be set`, setErr)
         }
     }
 
@@ -566,14 +528,6 @@ export function SchemaSelected(props) {
                     />
             </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-            err !== "" ? 
-            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                {err}
-            </div>
-            :
-            ""
-        }
             <input  type="submit" value="Delete Schema" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
         <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -583,7 +537,7 @@ export function SchemaSelected(props) {
 }
 
 export function FuncSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [image, setImage] = useState("")
     const [type, setType] = useState("")
@@ -593,7 +547,6 @@ export function FuncSelected(props) {
     const [scale, setScale] = useState("")
     const [workflow, setWorkflow] = useState("")
     const [cmd, setCmd] = useState("")
-    const [err, setErr] = useState("")
     const [files, setFiles] = useState([])
 
     function changeState() {
@@ -624,15 +577,14 @@ export function FuncSelected(props) {
                             if(files[i].value !== "") {
                                 let yml = YAML.load(files[i].value)
                                 if(!yml.key) {
-                                    setErr(`File ${i} must have a key name`)
-                                    return
+                                    throw new Error(`File ${i} must have a key name`)
                                 } else {
                                     acts.push(yml)
                                 }
                             }
         
                         } catch(e) {
-                            setErr(`YAML is invalid for File ${i}.`)
+                            ShowErr(`Error changing '${element.id}': ${e.message}.`, setErr)
                             return
                         }
                     }
@@ -643,7 +595,6 @@ export function FuncSelected(props) {
                     bs[i].data["type"] = type
 
 
-                    setErr("")
                     setBlocks(JSON.parse(JSON.stringify(blocks)))
                 }
             }
@@ -776,14 +727,6 @@ export function FuncSelected(props) {
                                 }} />
                     </div>
                     <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                        {
-                            err !== "" ? 
-                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                                {err}
-                            </div>
-                            :
-                            ""
-                        }
                         <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
                         <input  type="submit" value="Change" onClick={()=>changeState()}/>
                     </div>
@@ -868,14 +811,6 @@ export function FuncSelected(props) {
                                 }} />
                     </div>
                     <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                        {
-                            err !== "" ? 
-                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                                {err}
-                            </div>
-                            :
-                            ""
-                        }
                     <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
         
                         <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -901,14 +836,6 @@ export function FuncSelected(props) {
                         <input className="edit-input" type="text" value={workflow} onChange={(e)=>setWorkflow(e.target.value)} placeholder="Enter the workflow name" />
                     </div>
                     <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                        {
-                            err !== "" ? 
-                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                                {err}
-                            </div>
-                            :
-                            ""
-                        }
                         <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
                         <input  type="submit" value="Change" onClick={()=>changeState()}/>
                     </div>
@@ -929,14 +856,6 @@ export function FuncSelected(props) {
                         </select>
                     </div>
                     <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                        {
-                            err !== "" ? 
-                            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                                {err}
-                            </div>
-                            :
-                            ""
-                        }
                         <input  type="submit" value="Delete Function" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
                         <input  type="submit" value="Change" onClick={()=>changeState()}/>
                     </div>
@@ -946,10 +865,9 @@ export function FuncSelected(props) {
 }
 
 export function  ValidateSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
     const [schema, setSchema] = useState("")
     const [isJson, setIsJson] = useState(false)
-    const [err, setErr] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
     const [currId, setCurrId] = useState("")
@@ -957,9 +875,9 @@ export function  ValidateSelected(props) {
 
     function changeState() {
         let bs = blocks
-   let yaml = YAML.load(transform)
+        let yaml = YAML.load(transform)  
         if(typeof yaml !== "object" && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing state '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         for(let i=0; i < bs.length; i++) {
@@ -1048,16 +966,7 @@ export function  ValidateSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
         <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
-
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
         </div>
     </div>
@@ -1066,9 +975,8 @@ export function  ValidateSelected(props) {
 }
 
 export function ConsumeEventSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
     const [type, setType] = useState("")
-    const [err, setErr] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
     const [currId, setCurrId] = useState("")
@@ -1077,7 +985,7 @@ export function ConsumeEventSelected(props) {
         let bs = blocks
        let yaml = YAML.load(transform)
         if(typeof yaml !== "object" && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         for(let i=0; i < bs.length; i++) {
@@ -1086,7 +994,6 @@ export function ConsumeEventSelected(props) {
                 bs[i].data["transform"] = yaml
                 bs[i].data["log"]=log
                 setBlocks(bs)
-                setErr("")
             }
         }
     }
@@ -1143,14 +1050,6 @@ export function ConsumeEventSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
         <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -1160,11 +1059,10 @@ export function ConsumeEventSelected(props) {
 }
 
 export function ForeachSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [array, setArray] = useState("")
     const [action, setAction] = useState("")
-    const [err, setErr] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
     const [currId, setCurrId] = useState("")
@@ -1177,8 +1075,7 @@ export function ForeachSelected(props) {
         try {
             actionjson = YAML.load(action)
             if(!actionjson.function) {
-                setErr("An action must have a function name")
-                return
+                throw new Error("An action must have a function name")
             }
             for(let i=0; i < bs.length; i++) {
                 if(bs[i].id === element.id) {
@@ -1186,17 +1083,16 @@ export function ForeachSelected(props) {
                         bs[i].data["action"] = actionjson
                     }
                     bs[i].data["array"] = `jq('${array}')`
-                    setErr("")
                     setBlocks(bs)
                 }
             }
         } catch(e) {
-            setErr("Unable to parse action as valid JSON")
+            ShowErr(`Error changing ${element.id}: ${e.message}`)
         }
         
         let yaml = YAML.load(transform)
         if(typeof yaml !== "object"  && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing ${element.id}: YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         for(let i=0; i < bs.length; i++) {
@@ -1284,14 +1180,6 @@ export function ForeachSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
                 <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
                 <input  type="submit" value="Change" onClick={()=>changeState()}/>
             </div>
@@ -1300,19 +1188,18 @@ export function ForeachSelected(props) {
 }
 
 export function ErrorSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
     const [error, setError] = useState("")
     const [message, setMessage] = useState("")
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
-    const [err, setErr] = useState("")
 
     function changeState() {
         let bs = blocks
     let yaml = YAML.load(transform)
         if(typeof yaml !== "object" && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         for(let i=0; i < bs.length; i++) {
@@ -1386,16 +1273,7 @@ export function ErrorSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
         <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
-
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
         </div>
     </div>
@@ -1403,26 +1281,28 @@ export function ErrorSelected(props) {
 }
 
 export function DelaySelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
     const [duration, setDuration] = useState("")
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
-    const [err, setErr] = useState("")
 
     function changeState() {
         let bs = blocks
         let yaml = YAML.load(transform)
         if(typeof yaml !== "object"  && typeof yaml !== "undefined") {
-            setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
+            ShowErr(`Error changing '${element.id}': YAML must be an 'object' type not a type of '${typeof yaml}'`, setErr)
             return
         } 
         for(let i=0; i < bs.length; i++) {
             if(bs[i].id === element.id) {
+                if(duration === "") {
+                    ShowErr(`Error changing '${element.id}': Requires a duration`, setErr)
+                    return
+                }
                 bs[i].data.duration = duration
                 bs[i].data["transform"] = yaml
                 bs[i].data["log"] = log
-                setErr("")
                 setBlocks(bs)
             }
         }
@@ -1480,14 +1360,6 @@ export function DelaySelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
         <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -1498,31 +1370,28 @@ export function DelaySelected(props) {
 }
 
 export function SwitchSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
-    const [err, setErr] = useState("")
 
     function changeState() {
         try {
             let yaml = YAML.load(transform)
             if(typeof yaml !== "object"  && typeof yaml !== "undefined") {
-                setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
-                return
+                throw new Error(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
             } 
             let bs = blocks
             for(let i=0; i < bs.length; i++) {
                 if(bs[i].id === element.id) {
                     bs[i].data["defaultTransform"] = yaml
                     bs[i].data["log"] = log
-                    setErr("")
                     setBlocks(bs)
                 }
             }
         } catch(e) {
-            setErr(`YAML is invalid ${e.message}`)
+            ShowErr(`Error changing state '${element.id}': ${e.message}`, setErr)
         }
     }
 
@@ -1568,15 +1437,7 @@ export function SwitchSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
                 <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
-            <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
+                <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
                 <input  type="submit" value="Change" onClick={()=>changeState()}/>
             </div>
@@ -1608,31 +1469,28 @@ export function EdgeSelected(props) {
 }
 
 export function NoopSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [currId, setCurrId] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
-    const [err, setErr] = useState("")
 
     function changeState() {
         try {
             let yaml = YAML.load(transform)
             if(typeof yaml !== "object"  && typeof yaml !== "undefined") {
-                setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
-                return
+                throw new Error(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
             } 
             let bs = blocks
             for(let i=0; i < bs.length; i++) {
                 if(bs[i].id === element.id) {
                     bs[i].data["transform"] = yaml
                     bs[i].data["log"] = log
-                    setErr("")
                     setBlocks(bs)
                 }
             }
         } catch(e) {
-            setErr(`YAML is invalid ${e.message}`)
+            ShowErr(`Error changing '${element.id}': ${e.message}`, setErr)
         }
     }
 
@@ -1677,14 +1535,6 @@ export function NoopSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
                 <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-                {
-                    err !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {err}
-                    </div>
-                    :
-                    ""
-                }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
                 <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -1695,21 +1545,19 @@ export function NoopSelected(props) {
 }
 
 export function GenerateEventSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [currId, setCurrId] = useState("")
     const [type, setType] = useState("")
     const [source, setSource] = useState("")
     const [transform, setTransform] = useState("")
     const [log, setLog] = useState("")
-    const [err, setErr] = useState("")
 
     function changeState() {
         try {
             let yaml = YAML.load(transform)
             if(typeof yaml !== "object"  && typeof yaml !== "undefined") {
-                setErr(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
-                return
+                throw new Error(`YAML must be an 'object' type not a type of '${typeof yaml}'`)
             } 
             let bs = blocks
             for(let i=0; i < bs.length; i++) {
@@ -1722,7 +1570,7 @@ export function GenerateEventSelected(props) {
                 }
             }
         } catch(e) {
-            setErr(`Transform YAML is invalid ${e.message}`)
+            ShowErr(`Error changing '${element.id}': ${e.message}`, setErr)
         }
      
     }
@@ -1789,14 +1637,6 @@ export function GenerateEventSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
         <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-            {
-                err !== "" ? 
-                <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                    {err}
-                </div>
-                :
-                ""
-            }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
             <input  type="submit" value="Change" onClick={()=>changeState()}/>
@@ -1807,13 +1647,12 @@ export function GenerateEventSelected(props) {
 }
 
 export function ActionSelected(props) {
-    const {element, blocks, setBlocks, deleteElement} = props
+    const {element, blocks, setBlocks, deleteElement, setErr} = props
 
     const [action, setAction] = useState("")
     const [log, setLog] = useState("")
     const [transform, setTransform] = useState("")
     const [currId, setCurrId] = useState("")
-    const [err, setErr] = useState("")
     // action text area check if function is provided if not error
 
     function changeState() {
@@ -1825,17 +1664,18 @@ export function ActionSelected(props) {
         try {
             actionjson = YAML.load(action)
             if(!actionjson.function) {
-                setErr("An action must have a function name")
-                return
+                throw new Error("An action must have a function name")
             }
         } catch(e) {
-            setErr("Unable to parse action as valid YAML")
+            ShowErr(`Error changing '${element.id}': ${e.message}`, setErr)
+            return
         }
 
         try {
             transformyaml = YAML.load(transform)
         } catch(e) {
-            setErr("Unable to parse transform as valid YAML")
+            ShowErr(`Error changing '${element.id}': Unable to parse transform as valid YAML`, setErr)
+            return
         }
 
         for(let i=0; i < bs.length; i++) {
@@ -1845,7 +1685,6 @@ export function ActionSelected(props) {
                 }
                 bs[i].data["transform"] = transformyaml
                 bs[i].data["log"] = log
-                setErr("")
                 setBlocks(bs)
             }
         }
@@ -1920,14 +1759,6 @@ export function ActionSelected(props) {
                     <input className="edit-input" type="text" value={log} onChange={(e)=>setLog(e.target.value)} />
                 </div>
             <div style={{flex: 1, textAlign:"right", marginTop:"10px"}}>
-        {
-            err !== "" ? 
-            <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                {err}
-            </div>
-            :
-            ""
-        }
             <input  type="submit" value="Delete State" style={{marginRight:"3px"}} onClick={()=>deleteElement()}/>
 
         <input  type="submit" value="Change" onClick={()=>changeState()}/>

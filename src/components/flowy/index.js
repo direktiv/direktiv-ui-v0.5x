@@ -15,7 +15,7 @@ import "./vsc.css"
 import './flowy.css'
 
 
-function ShowErr(message, setErr) {
+export function ShowErr(message, setErr) {
     setErr(message)
     setTimeout(()=>{
         setErr("")
@@ -44,8 +44,6 @@ export default function Flowy() {
     const [wfName, setWfName] = useState(workflow ? workflow: "")
     const [init, setInit] = useState(false)
     const [err, setErr] = useState("")
-    const [updateOrCreateErr, setUpdateOrCreateErr] = useState("")
-    const [load, setLoad] = useState("")
     
     // object being dragged
     const [elementData, setElementData] = useState(null)
@@ -223,12 +221,7 @@ export default function Flowy() {
         }
     };
 
-    // const edgeTypes = {
-    //     default: CustomEdge,
-    // };
-
     const createOrUpdateWorkflow = async (wf) => {
-        setLoad(true)
         if(workflow) {
             try {
                let resp = await fetch(`/namespaces/${namespace}/workflows/${workflow}`, {
@@ -240,14 +233,13 @@ export default function Flowy() {
                 body: wf
             })
             if (resp.ok) {
-                setLoad(false)
                 history.push(`/${namespace}/w/${workflow}`)
 
             } else {
                 await handleError('update workflow', resp, 'updateWorkflow')
             }
             } catch (e) {
-                setUpdateOrCreateErr(`Failed to update workflow: ${e.message}`)
+                ShowErr(`Failed to update workflow: ${e.message}`, setErr)
             }
         } else {
             // create a new workflow
@@ -262,14 +254,12 @@ export default function Flowy() {
                 })
                 if (resp.ok) {
                     let json = await resp.json()
-                    setLoad(false)
-
                     history.push(`/${namespace}/w/${json.id}`)
                 } else {
                         await handleError('create workflow', resp, 'createWorkflow')
                 }
             } catch (e) {
-                setUpdateOrCreateErr(`Workflow creation failed: ${e.message}`)
+                ShowErr(`Workflow creation failed: ${e.message}`, setErr)
             }
         }
     }
@@ -398,14 +388,6 @@ export default function Flowy() {
                         <div style={{fontSize:"12pt", fontWeight:"bold"}}>{workflow ? "Update Workflow":"Create Workflow"}</div>
                         <input value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" disabled={workflow ? true: false} placeholder="Enter workflow name" style={{marginTop:"10px"}} />
                         <div style={{textAlign:"right", marginTop:"10px", fontSize:"8pt"}}>
-                        {
-                    updateOrCreateErr !== "" ? 
-                    <div style={{textAlign:"center", color:"red", marginBottom:"10px"}}>
-                        {updateOrCreateErr}
-                    </div>
-                    :
-                    ""
-                }
                             <input type="submit" value={workflow ? "Update Workflow":"Create Workflow"} onClick={()=>{
                                 if(wfName) {
                                     diagramToYAML(wfName, blocks, setErr, createOrUpdateWorkflow)
@@ -416,7 +398,6 @@ export default function Flowy() {
                         </div>
                     </div>
             </div>
-            {load ?  "": 
             <div style={{display:"flex", flexDirection:"column", flex: 1}}>
        
             <div onDragOver={(e)=>e.preventDefault()} onDrop={(e)=>onAdd(e)} className="shadow-soft rounded tile" style={{ fontSize:"12pt", flexGrow:1, padding:"0px", position: "relative"}}>
@@ -469,7 +450,7 @@ export default function Flowy() {
                     </ReactFlow>
                 </ReactFlowProvider>
             </div>
-            </div>}
+            </div>
 
             <div className="shadow-soft rounded tile" style={{ maxWidth:"300px", fontSize:"12pt", flexGrow:1, overflow:"auto"}}>
                 <div>
@@ -478,7 +459,7 @@ export default function Flowy() {
                     {
                     elementSelected !== null ? 
                         <div style={{padding:"5px"}}>
-                            <ElementSelected setElement={setElementSelected} blocks={blocks} setBlocks={setBlocks} element={elementSelected}/>
+                            <ElementSelected setErr={setErr} setElement={setElementSelected} blocks={blocks} setBlocks={setBlocks} element={elementSelected}/>
                         </div>
                         :
                         <div style={{minHeight:"100px", display:"flex", alignItems:"center", justifyContent:"center", fontStyle:"italic"}}>
@@ -495,7 +476,7 @@ export default function Flowy() {
 }
 
 function ElementSelected(props) {
-    const {element, blocks, setBlocks, setElement} = props 
+    const {element, blocks, setBlocks, setElement, setErr} = props 
     
     function deleteElement() {
         let bs = blocks
@@ -559,34 +540,34 @@ function ElementSelected(props) {
     switch(element.type) {
         case "eventAnd":
         case "eventXor":
-            return <EventAndXorSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <EventAndXorSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "getter":
         case "setter":
-            return <GetterOrSetterSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <GetterOrSetterSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "parallel":
-            return <ParallelSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <ParallelSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "foreach":
-            return <ForeachSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <ForeachSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "consumeEvent":
-            return <ConsumeEventSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <ConsumeEventSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "validate":
-            return <ValidateSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <ValidateSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "error":
-            return <ErrorSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <ErrorSelected  setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "delay":
-            return <DelaySelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <DelaySelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "generateEvent":
-            return <GenerateEventSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <GenerateEventSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "schema":
-            return <SchemaSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <SchemaSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "function":
-            return <FuncSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <FuncSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "action":
-            return <ActionSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <ActionSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         case "switch":
-            return <SwitchSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element}/>
+            return <SwitchSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element}/>
         case "noop":
-            return <NoopSelected deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
+            return <NoopSelected setErr={setErr} deleteElement={deleteElement} blocks={blocks} setBlocks={setBlocks} element={element} />
         default:
             if(element.source && element.target) {
                 // this is an edge
