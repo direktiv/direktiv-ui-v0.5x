@@ -13,6 +13,7 @@ export default function InstanceInputOutput(props) {
     const {status, fetch, id, namespace, instance, handleError} = props
 
     const [data, setData] = useState("")
+    const [load, setLoad] = useState(true)
     const [err, setErr] = useState("")
 
     useEffect(()=>{
@@ -34,6 +35,7 @@ export default function InstanceInputOutput(props) {
                 } else {
                     setData(resp)
                 }
+                setLoad(false)
             } catch(e) {
                 setErr(e.message)
             }
@@ -82,7 +84,7 @@ export default function InstanceInputOutput(props) {
         )
     }
 
-    if (status !== "pending" && status !== undefined) {
+    if (status !== "pending" && status !== undefined && !load) {
         return(
             <div id={"toggle"+id} className="editor-wrapper" style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight:"300px",  top:"-28px", position: "relative", boxShadow:"none"}}>
                 <div style={{width: "100%", height: "100%"}}>
