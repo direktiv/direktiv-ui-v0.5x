@@ -4,13 +4,13 @@ import  EventsPage from '../events-page'
 import  InstancePage from '../instance-page'
 import  JQPlaygroundPage from '../jqplayground'
 import  SettingsPage from '../settings-page'
-import  WorkflowsPage from '../workflows-page'
 import  WorkflowPage from '../workflow-page'
 import EnvrionmentPage from "../environment-page"
 import Functions from "../functions"
 import Services from "../services"
 import Revision from "../revision"
 import Explorer from "../workflows-page/index2"
+import Instance from "../instance-page/index2"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -30,12 +30,12 @@ export default function Routes(props) {
             <Route exact path="/functions/global" component={Functions}/>
             <Route exact path="/functions/global/:service" component={Services}/>
             <Route exact path="/functions/global/:service/:revision" component={Revision}/>
-            <Route path="/jq/playground" component={JQPlaygroundPage} />
-            <Route path="/i/:namespace/:workflow/:instance" component={InstancePage} />
+            <Route exact path="/jq/playground" component={JQPlaygroundPage} />
+            <Route exact path="/n/:namespace/i/:id" component={Instance} />
             <Route exact path="/">
               {
                 namespace !== "" ?
-                  <Redirect to={`/${namespace}`} from="/" />
+                  <Redirect to={`/n/${namespace}`} from="/" />
                   :
                   <Route exact path="/">
                     <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12pt" }}>
@@ -44,18 +44,18 @@ export default function Routes(props) {
                   </Route>
               }
             </Route>
-            <Route exact path="/:namespace" component={DashboardPage} />
-            <Route exact path="/:namespace/functions" component={Functions}/>
-            <Route exact path="/:namespace/functions/:service" component={Services}/>
-            <Route exact path="/:namespace/functions/:service/:revision" component={Revision}/>
-            <Route exact path="/:namespace/explorer" component={Explorer} />
-            <Route exact path="/:namespace/explorer/:path" component={Explorer} />
-            <Route exact path="/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
-            <Route exact path="/:namespace/w/:workflow/functions/:service" component={Services} />
-            <Route exact path="/:namespace/w/:workflow/functions/:service/:revision" component={Revision}/>
-            <Route exact path="/:namespace/w/:workflow" component={WorkflowPage} />
-            <Route path="/:namespace/i" component={EventsPage} />
-            <Route path="/:namespace/s" component={SettingsPage} />
+            <Route exact path="/n/:namespace" component={DashboardPage} />
+            <Route exact path="/n/:namespace/functions" component={Functions}/>
+            <Route exact path="/n/:namespace/functions/:service" component={Services}/>
+            <Route exact path="/n/:namespace/functions/:service/:revision" component={Revision}/>
+            <Route exact path="/n/:namespace/explorer" component={Explorer} />
+            <Route exact path="/n/:namespace/explorer/*" component={Explorer} />
+            <Route exact path="/n/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
+            <Route exact path="/n/:namespace/w/:workflow/functions/:service" component={Services} />
+            <Route exact path="/n/:namespace/w/:workflow/functions/:service/:revision" component={Revision}/>
+            <Route exact path="/n/:namespace/w/:workflow" component={WorkflowPage} />
+            <Route exact path="/n/:namespace/i" component={EventsPage} />
+            <Route exact path="/n/:namespace/s" component={SettingsPage} />
         </>
     )
 }

@@ -9,6 +9,7 @@ import MainContext from './context'
 import Modal from 'react-modal'
 import {fetchNs, HandleError} from './util-funcs'
 import Routes from './components/routes'
+import {Namespaces} from './api'
 
 Modal.setAppElement("#root")
 
@@ -273,19 +274,19 @@ states:
 
 export const  bcRoutes = [
   {
-      path: '/:namespace',
+      path: '/n/:namespace',
       breadcrumb: "",
   },
   {
-      path: '/:namespace/w',
+      path: '/n/:namespace/w',
       breadcrumb: 'Workflows'
   },
   {
-      path: '/:namespace/i',
+      path: '/n/:namespace/i',
       breadcrumb: 'Instances'
   },
   {
-      path: '/:namespace/s',
+      path: '/n/:namespace/s',
       breadcrumb: 'Settings'
   },
   {
@@ -297,7 +298,7 @@ export const  bcRoutes = [
       breadcrumb: "JQ Playground"
   },
   {
-      path: "/:namespace/functions",
+      path: "/n/:namespace/functions",
       breadcrumb: "Knative Services"
   },
   {
@@ -305,7 +306,7 @@ export const  bcRoutes = [
       breadcrumb: "Knative Services"
   },
   {
-      path: "/:namespace/w/:workflow/functions",
+      path: "/n/:namespace/w/:workflow/functions",
       breadcrumb: "WorkflowFuncs",
   }
 ]
@@ -342,11 +343,10 @@ function Content() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(netch, loaded, setLoad, val, HandleError)
-            setLoad(false)
-            setNamespace(namespacesObj.namespace)
-            setNamespaces(namespacesObj.namespaces)
-          
+        let namespacesObj = await Namespaces(netch, HandleError, loaded, val)
+        setLoad(false)
+        setNamespace(namespacesObj.namespace)
+        setNamespaces(namespacesObj.namespaces)
       } catch (e) {
         sendNotification("Failed to fetch namespaces", e.message, 0)
         setLoad(false)
@@ -359,7 +359,7 @@ function Content() {
   const checkAuth = useCallback(()=>{
     async function fd() {
       try {
-        let resp = await netch(`/namespaces/`, {
+        let resp = await netch(`/namespaces`, {
           method: "GET"
         })
         if(resp.status === 401) {

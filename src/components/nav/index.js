@@ -10,18 +10,14 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { NamespaceCreate } from '../../api'
 
 export default function Navbar(props) {
 
     const textInput = useRef()
     const history = useHistory()
     const location = useLocation()
-
-    function toggleNamespaceSelector() {
-        let x = document.getElementById('namespaces-ul');
-        x.classList.toggle('active');
-    }
 
     const [acceptInput, setAcceptInput] = useState(false)
     const [err, setError] = useState("")
@@ -32,70 +28,16 @@ export default function Navbar(props) {
 
     async function createNamespace(val) {
         try {
-            let resp = await fetch(`/namespaces/${val}`, {
-                method: 'POST'
-            })
-            if (resp.ok) {
-                await resp.json()
-                
+            let ns = await NamespaceCreate(fetch, handleError, val)
 
-                let matchWf = matchPath(location.pathname, {
-                    path: `/${namespace}/w/:workflow`
-                })
+            localStorage.setItem("namespace", ns)
+            setNamespace(ns)
+            fetchNamespaces(false, ns)
+            setAcceptInput(!acceptInput)
+            toggleNamespaceSelector()
+            setError("")
 
-                let matchNWF = matchPath(location.pathname, {
-                    path: `/${namespace}/w`
-                })
-
-                if(matchWf !== null || matchNWF !== null) {
-                           // setNamespace(val)
-                    localStorage.setItem("namespace", val)
-                    setAcceptInput(!acceptInput)
-                    toggleNamespaceSelector()
-                    setNamespace(val)
-                    // sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
-                    fetchNamespaces(false, val)
-                    setError("")
-                    history.push(`/${val}/w`)
-                    return
-                }
-
-                let matchInstance = matchPath(location.pathname, {
-                    path: "/i/:namespace/:workflow/:instance"
-                })
-
-                let matchInstanceN = matchPath(location.pathname, {
-                    path: `/${namespace}/i`
-                })
-
-                if(matchInstance !== null || matchInstanceN !== null) {
-                    // setNamespace(val)
-                    localStorage.setItem("namespace", val)
-                    setAcceptInput(!acceptInput)
-                    toggleNamespaceSelector()
-                    setNamespace(val)
-                    // sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
-                    fetchNamespaces(false, val)
-                    setError("")
-
-                    history.push(`/${val}/i`)
-                    return
-                }
-
-                // setNamespace(val)
-                localStorage.setItem("namespace", val)
-                setAcceptInput(!acceptInput)
-                toggleNamespaceSelector()
-                setNamespace(val)
-                // sendNotification("Success!", `Namespace '${val}' has been created.`, 0)
-                fetchNamespaces(false, val)
-                setError("")
-
-                history.push(`/${val}`)
-
-            } else {
-                await handleError('create namespace', resp, 'addNamespace')
-            }
+            history.push(`/n/${val}`)
         } catch(e) {
             setError(`Failed to create namespace: ${e.message}`)
         }
@@ -103,22 +45,24 @@ export default function Navbar(props) {
     
 
     let matchFunctions = matchPath(location.pathname, {
-        path: "/:namespace/functions"
+        path: "/n/:namespace/functions"
     })
     
     let matchInstanceL = matchPath(location.pathname,  {
-        path: "/:namespace/i"
+        path: "/n/:namespace/i"
     })
 
     let matchInstanceFull = matchPath(location.pathname, {
-        path: "/i/:namespace/:workflow/:instance"
+        path: "/n/:namespace/i/:id"
     })
 
-    let matchWorkflow = matchPath(location.pathname, {
-        path: "/:namespace/w"
-    }, {
-        path: "/:namespace/w/:workflow"
-    })
+    let matchExplorer = matchPath(location.pathname, {
+        path: "/n/:namespace/explorer"
+    },{
+        path: "/n/:namespace/explorer/*"
+    },)
+
+    console.log(matchExplorer)
 
     let matchJQ = matchPath(location.pathname, {
         path: "/jq/playground"
@@ -138,14 +82,18 @@ export default function Navbar(props) {
     }
 
     let matchSettings = matchPath(location.pathname, {
-        path: "/:namespace/s"
+        path: "/n/:namespace/s"
     })
 
     let matchDashboard = matchPath(location.pathname, {
-        path: "/:namespace",
+        path: "/n/:namespace",
         exact: true
     })
 
+    function toggleNamespaceSelector() {
+        let x = document.getElementById('namespaces-ul');
+        x.classList.toggle('active');
+    }
 
     return(
         <div id="nav">
@@ -219,33 +167,33 @@ export default function Navbar(props) {
                                                     toggleNamespaceSelector()
                                                 
                                                     let matchWf = matchPath(location.pathname, {
-                                                        path: `/${namespace}/w/:workflow`
+                                                        path: `/n/${namespace}/w/:workflow`
                                                     })
 
                                                     let matchNWF = matchPath(location.pathname, {
-                                                        path: `/${namespace}/w`
+                                                        path: `/n/${namespace}/w`
                                                     })
 
                                                     if(matchWf !== null || matchNWF !== null) {
-                                                        history.push(`/${obj}/w`)
+                                                        history.push(`/n/${obj}/w`)
                                                         return
                                                     }
 
                                                     let matchInstance = matchPath(location.pathname, {
-                                                        path: "/i/:namespace/:workflow/:instance"
+                                                        path: "/n/:namespace/i/:id"
                                                     })
                                                     
                                                     let matchInstanceN = matchPath(location.pathname, {
-                                                        path: `/${namespace}/i`
+                                                        path: `/n/${namespace}/i`
                                                     })
 
                                                     if(matchInstance !== null || matchInstanceN !== null) {
-                                                        history.push(`/${obj}/i`)
+                                                        history.push(`/n/${obj}/i`)
                                                         return
                                                     }
 
 
-                                                    history.push(`/${obj}`)
+                                                    history.push(`/n/${obj}`)
                                                 }}>{obj}</li>
                                             )
                                         }
@@ -272,7 +220,7 @@ export default function Navbar(props) {
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
                             }
-                        }} to={`/${namespace}`} className="nav-link" style={{color: matchDashboard !== null ? "#4497f5": ""}}>
+                        }} to={`/n/${namespace}`} className="nav-link" style={{color: matchDashboard !== null ? "#4497f5": ""}}>
                             <div>
                                 <IoGrid style={{ marginRight: "10px" }} />
                                 <span>Dashboard</span>
@@ -280,24 +228,24 @@ export default function Navbar(props) {
                         </Link>
 }
                     </li>
-                    <li>  {namespace === "" ?
+                    <li>  
+                        {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor: "default"}}>
-                                                              <IoShapesSharp style={{ marginRight: "10px" }} />
-
-                                <span>Workflows</span>
+                                <IoSearch style={{ marginRight: "10px" }} />
+                                <span>Explorer</span>
                             </div>
                             :
-                        <Link onClick={()=>{
-                            if (document.getElementById("namespaces-ul").classList.contains("active")){
-                                toggleNamespaceSelector()
-                            }
-                        }} to={`/${namespace}/w`} style={{color: matchWorkflow !== null ? "#4497f5": ""}} className="nav-link">
-                            <div>
-                                <IoShapesSharp style={{ marginRight: "10px" }} />
-                                <span>Workflows</span>
-                            </div>
-                        </Link>
-}
+                            <Link onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/n/${namespace}/explorer`} style={{color: matchExplorer !== null ? "#4497f5": ""}} className="nav-link">
+                                <div>
+                                    <IoShapesSharp style={{ marginRight: "10px" }} />
+                                    <span>Explorer</span>
+                                </div>
+                            </Link>
+                        }
                     </li>
                     <li>
                     {namespace === "" ?
@@ -311,7 +259,7 @@ export default function Navbar(props) {
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
                             }
-                        }} to={`/${namespace}/i`} className="nav-link">
+                        }} to={`/n/${namespace}/i`} className="nav-link">
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
@@ -386,7 +334,7 @@ export default function Navbar(props) {
                                 if (document.getElementById("namespaces-ul").classList.contains("active")){
                                     toggleNamespaceSelector()
                                 }
-                            }} to={`/${namespace}/functions`} className="nav-link">
+                            }} to={`/n/${namespace}/functions`} className="nav-link">
                                 <div>
                                 <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
                                 <span>Services</span>
@@ -405,7 +353,7 @@ export default function Navbar(props) {
                             if (document.getElementById("namespaces-ul").classList.contains("active")){
                                 toggleNamespaceSelector()
                             }
-                        }} to={`/${namespace}/s`} className="nav-link">
+                        }} to={`/n/${namespace}/s`} className="nav-link">
                             <div>
                                 <IoSettingsSharp style={{ marginRight: "10px" }} />
                                 <span>Settings</span>

@@ -15,7 +15,7 @@ export default function Breadcrumbs(props) {
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
                 // if namespace exists dont show it
-                if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
+                if(obj.key === "N" ||obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
                     return ""
                 }
                 if( obj.breadcrumb) {
@@ -39,7 +39,7 @@ export default function Breadcrumbs(props) {
                     // return home key if dashboard
                     if(dashboard){
                         return(
-                            <span onClick={()=>history.push("/")} key={"/"}>Dashboard</span>
+                            <span onClick={()=>history.push(`/${params.namespace}`)} key={"/"}>Dashboard</span>
                         )
                     }
                 }
@@ -47,8 +47,8 @@ export default function Breadcrumbs(props) {
             })}
             {instanceId ?
                 <>
-                    <span key={"/i"} onClick={()=>history.push(`/${params.namespace}/i`)}>Instances</span>
-                    <span key={`/i${instanceId}`} onClick={()=>history.push(`/i/${instanceId}`)}>{instanceId}</span>        
+                    <span key={"/i"} onClick={()=>history.push(`/n/${params.namespace}/i`)}>Instances</span>
+                    <span key={`/i${instanceId}`} onClick={()=>history.push(`/n/${params.namespace}/i/${instanceId}`)}>{instanceId}</span>        
                 </>
             :
             ""

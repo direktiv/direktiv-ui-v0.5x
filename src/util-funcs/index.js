@@ -8,15 +8,20 @@ export async function HandleError(summary, resp, perm) {
     if (resp.status === 405) {
         // this shouldnt happen in the UI
         throw new Error(`${summary}: method is not allowed`)
-
     }
     if(resp.status !== 403) {
-      if (!contentType || !contentType.includes('application/json')) {
+
+if (!contentType || !contentType.includes('application/json')) {
         let text = await resp.text()
         throw new Error (`${summary}: ${text}`)
       } else {
-          let text = (await resp.json()).Message
-          throw new Error (`${summary}: ${text}`)
+          if(resp.headers.get('grpc-message')) {
+            throw new Error(`${summary}: ${resp.headers.get('grpc-message')}`)
+          } else {
+            let text = (await resp.json()).Message
+            throw new Error (`${summary}: ${text}`)
+          }
+
       }
      } else {
         throw new Error(`You are unable to '${summary}', contact system admin to grant '${perm}'.`)
