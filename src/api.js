@@ -117,3 +117,107 @@ export async function NamespaceLogs(fetch, namespace, handleError, endCursor) {
         throw new Error(`Error: ${e.message}`)
     }
 }
+
+export async function NamespaceSecrets(fetch, namespace, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/secrets`,{})
+        if(resp.ok) {
+            let json = await resp.json()
+            if (Array.isArray(json.secrets.edges)){
+                if(json.secrets.edges.length > 0) {
+                    return json.secrets.edges
+                }
+            } else {
+                return []
+            }
+        } else {
+            await handleError('fetch secrets', resp, 'listSecrets')
+        }
+    } catch(e) {
+        throw new Error(`Failed to fetch secrets: ${e.message}`)
+    }
+}
+
+export async function NamespaceRegistries(fetch, namespace, handleError) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${namespace}/registries`,{})
+        if(resp.ok) {
+            let json = await resp.json()
+            if (Array.isArray(json.registries.edges)) {
+                if(json.registries.edges.length > 0) {
+                   return json.registries.edges
+                }
+            } else {
+                return []
+            }
+        } else {
+            await handleError('fetch registries', resp, 'listRegistries')
+        }
+    } catch(e) {
+        throw new Error(`Failed to fetch registries: ${e.message}`)
+    }
+}
+
+export async function NamespaceCreateSecret(fetch, namespace, key, value, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/secrets`,{
+            method: "POST",
+            body: JSON.stringify({ namespace: namespace, key: key, data: value})
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('create secret', resp, 'createSecret')
+        }
+    } catch(e) {
+        throw new Error(`Failed to create secret: ${e.message}`)
+    }
+}
+
+export async function NamespaceCreateRegistry(fetch, namespace, key,val, handleError) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${namespace}/registries`, {
+            method: "POST",
+            body: JSON.stringify({key: key, namespace: namespace, data:val})
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('create registry', resp, 'createRegistry')
+        }
+    } catch(e) {
+        throw new Error(`Failed to create registry: ${e.message}`)
+    }
+}
+
+export async function NamespaceDeleteSecret(fetch, namespace, val, handleError){
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/secrets`, {
+            method: "DELETE",
+            body: JSON.stringify({ key: val, namespace: namespace })
+        })
+        if (resp.ok) {
+            return 
+        } else {
+            await handleError('delete secret', resp, 'deleteSecret')
+        }
+    } catch (e) {
+        throw new Error(`Failed to delete secret: ${e.message}`)
+    }
+}
+
+export async function NamespaceDeleteRegistry(fetch, namespace, key, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/registries`, {
+            method: "DELETE",
+            body: JSON.stringify({ key: key })
+        })
+        if (resp.ok) {
+            return 
+        } else {
+            await handleError('delete registry', resp, 'deleteRegistry')
+        }
+    } catch (e) {
+        throw new Error(`Failed to delete registry: ${e.message}`)
+    }
+}

@@ -9,6 +9,7 @@ import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 import { EnvrionmentContainer } from "../environment-page"
 import LoadingWrapper from "../loading"
+import { NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets } from '../../api'
 
 
 
@@ -122,21 +123,10 @@ function Secrets() {
     const fetchS = useCallback(() => {
         async function fetchData() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
-                    method: "GET"
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
-                    if (json.secrets) {
-                        setSecrets(json.secrets)
-                    } else {
-                        setSecrets([])
-                    }
-                } else {
-                    await handleError('fetch secrets', resp, 'listSecrets')
-                }
+                let secrets = await NamespaceSecrets(fetch, namespace, handleError)
+                setSecrets(secrets)
             } catch (e) {
-                setErr(`Failed to fetch secrets: ${e.message}`)
+                setErr(e.message)
             }
         }
         return fetchData()
@@ -149,20 +139,13 @@ function Secrets() {
     async function createSecret() {
         if (key !== "" && value !== "") {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
-                    method: "POST",
-                    body: JSON.stringify({ name: key, data: value })
-                })
-                if (resp.ok) {
-                    setKey("")
-                    setActionErr("")
-                    setValue("")
-                    return fetchS()
-                } else {
-                    await handleError('create secret', resp, 'createSecret')
-                }
-            } catch (e) {
-                setActionErr(`Failed to create secret: ${e.message}`)
+                await NamespaceCreateSecret(fetch, namespace, key, value, handleError)
+                setKey("")
+                setActionErr("")
+                setValue("")
+                return fetchS()
+            } catch(e) {
+                setActionErr(e.message)
             }
         } else {
             setActionErr(`Failed to create Secret: key and value needs to be provided.`)
@@ -172,19 +155,12 @@ function Secrets() {
 
     async function deleteSecret(val) {
         try {
-            let resp = await fetch(`/namespaces/${namespace}/secrets/`, {
-                method: "DELETE",
-                body: JSON.stringify({ name: val })
-            })
-            if (resp.ok) {
-                // refetch secrets
-                setActionErr("")
-                return fetchS()
-            } else {
-                await handleError('delete secret', resp, 'deleteSecret')
-            }
+            await NamespaceDeleteSecret(fetch, namespace, val, handleError)
+            // refetch secrets
+            setActionErr("")
+            return fetchS()
         } catch (e) {
-            setActionErr(`Failed to delete secret: ${e.message}`)
+            setActionErr(e.message)
         }
     }
 
@@ -218,9 +194,9 @@ function Secrets() {
                                 :
                                 secrets.map((obj) => {
                                     return (
-                                        <tr key={obj.name}>
+                                        <tr key={obj.node.name}>
                                             <td style={{ paddingLeft: "10px" }}>
-                                                <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.name} />
+                                                <input style={{ maxWidth: "150px" }} type="text" disabled value={obj.node.name} />
                                             </td>
                                             <td style={{ paddingRight: "10px" }} colSpan="2">
                                                 <div style={{ display: "flex", alignItems: "center" }}>
@@ -228,9 +204,9 @@ function Secrets() {
                                                     {checkPerm(permissions, "deleteSecret") ?
                                                         <div style={{ marginLeft: "10px", maxWidth: "38px" }}>
                                                             <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={XCircle} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={(ev) => {
-                                                                setLoadingText("Deleteing Secret")
+                                                                setLoadingText("Deleting Secret")
                                                                 setIsLoading(true)
-                                                                deleteSecret(obj.name).finally(() => { setIsLoading(false)})
+                                                                deleteSecret(obj.node.name).finally(() => { setIsLoading(false)})
                                                             }} />
                                                         </div> : ""}
                                                 </div>
@@ -284,21 +260,10 @@ function Registries() {
     const fetchR = useCallback(() => {
         async function fetchData() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/registries/`, {
-                    method: "GET",
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
-                    if (json.registries) {
-                        setRegistries(json.registries)
-                    } else {
-                        setRegistries([])
-                    }
-                } else {
-                    await handleError('fetch registries', resp, 'listRegistries')
-                }
+                let registries = await NamespaceRegistries(fetch, namespace, handleError)
+                setRegistries(registries)
             } catch (e) {
-                setErr(`Failed to fetch registries: ${e.message}`)
+                setErr(e.message)
             }
         }
         return fetchData()
@@ -311,21 +276,14 @@ function Registries() {
     async function createRegistry() {
         if (name !== "" && user !== "" && token !== "") {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/registries/`, {
-                    method: "POST",
-                    body: JSON.stringify({ "name": name, "data": `${user}:${token}` })
-                })
-                if (resp.ok) {
-                    setName("")
-                    setToken("")
-                    setUser("")
-                    setActionErr("")
-                    return fetchR()
-                } else {
-                    await handleError('create registry', resp, 'createRegistry')
-                }
+                await NamespaceCreateRegistry(fetch, namespace, name, `${user}:${token}`, handleError)
+                setName("")
+                setToken("")
+                setUser("")
+                setActionErr("")
+                return fetchR()
             } catch (e) {
-                setActionErr(`Failed to create registry: ${e.message}`)
+                setActionErr(e.message)
             }
         } else {
             setActionErr(`Failed to create a registry: Name, user and Token needs to be provided.`)
@@ -335,19 +293,12 @@ function Registries() {
 
     async function deleteRegistry(val) {
         try {
-            let resp = await fetch(`/namespaces/${namespace}/registries/`, {
-                method: "DELETE",
-                body: JSON.stringify({ name: val })
-            })
-            if (resp.ok) {
-                // fetch registries
-                setActionErr("")
-                return fetchR()
-            } else {
-                await handleError('delete registry', resp, 'deleteRegistry')
-            }
+            await NamespaceDeleteRegistry(fetch, namespace, val, handleError)
+            // fetch registries
+            setActionErr("")
+            return fetchR()
         } catch (e) {
-            setActionErr(`Failed to delete registry: ${e.message}`)
+            setActionErr(e.message)
         }
     }
 

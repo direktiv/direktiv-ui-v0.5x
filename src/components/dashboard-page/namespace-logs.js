@@ -49,7 +49,7 @@ dayjs.extend(utc)
 
 export default function NamespaceLogsComponent() {
 
-    const {namespace, fetch, handleError} = useContext(MainContext)
+    const {namespace, fetch, handleError, sse} = useContext(MainContext)
 
     const timerRef = useRef(0)
     const offsetRef = useRef("")
@@ -61,58 +61,98 @@ export default function NamespaceLogsComponent() {
     const [tail, setTail] = useState(true)
     const tailRef = useRef(true)
 
-    const fetchLogs = useCallback(()=>{
-        async function getLogs() {
-            try {
-                let newLogs = ""
-                let logs = await NamespaceLogs(fetch, namespace, handleError, offsetRef.current)
-                if(logs.pageInfo.endCursor !== "") {
-                    offsetRef.current = logs.pageInfo.endCursor
-                }
-                if(logs.edges && logs.edges.length > 0) {
-                    for(let i=0; i < logs.edges.length; i++) {
-                        let obj = logs.edges[i].node
-                        console.log(obj, "OBJ")
-                        newLogs += `\u001b[38;5;248m[${dayjs.utc(obj.t).local().format("HH:mm:ss.SSS")}]\u001b[0m `
-                        newLogs += `${obj.msg}`
-                        newLogs += `\n`
-                    }
-                    let x = ansi_up.ansi_to_html(newLogs)
-                    document.getElementById("logs-test").innerHTML += x
-                    setLogs((str) => {return str + newLogs})
-                }
-                if (tailRef.current) {
-                    if (document.getElementById('logs')) {
-                        document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
-                    }
-                }
-            } catch(e) {
-                setErr(e.message)
-            }
-        }
-        getLogs()
-    },[fetch, handleError, namespace])
+
+    const [namespaceLogSource, setNamespaceLogSource] = useState(null)
 
     useEffect(()=>{
-        if(timerRef.current === 0 && namespace !== "" && namespace !== undefined && namespace !== null) {
-            fetchLogs()
-            let timer = setInterval(async ()=>{
-                fetchLogs()
-            }, 2000)
-            timerRef.current = timer
-        }
-    },[namespace,fetchLogs])
-
-    useEffect(()=>{
-        return function cleanup() {
-            clearInterval(timerRef.current)
-            offsetRef.current = ""
-            setLogs("")
-            if(document.getElementById("logs-test")) {
-                document.getElementById("logs-test").innerHTML = ""
+        if(namespaceLogSource === null) {
+            let uri = `/stream/flow/namespaces/${namespace}/logs`
+            
+            let eventConnection = sse(`${uri}`,{})
+            eventConnection.onerror = (e) => {
+                if(e.status === 403) {
+                    setErr("You are unable to stream namespace logs")
+                    return
+                }
+                if(document.getElementById("logs-test")){
+                    document.getElementById("logs-test").innerHTML = ""
+                }
+                setLogs("")
             }
+
+            async function getData(e) {
+                console.log(e)
+            }
+        
+            eventConnection.onmessage = e => getData(e)
+            setNamespaceLogSource(eventConnection)
         }
     },[])
+
+    useEffect(()=>{
+        return () => {
+            if(namespaceLogSource !== null) {
+                namespaceLogSource.close()
+                setLogs("")
+                if(document.getElementById("logs-test")){
+                    document.getElementById("logs-test").innerHTML = ""
+                }
+            }
+        }
+    },[namespaceLogSource])
+
+    // const fetchLogs = useCallback(()=>{
+    //     async function getLogs() {
+    //         try {
+    //             let newLogs = ""
+    //             let logs = await NamespaceLogs(fetch, namespace, handleError, offsetRef.current)
+    //             if(logs.pageInfo.endCursor !== "") {
+    //                 offsetRef.current = logs.pageInfo.endCursor
+    //             }
+    //             if(logs.edges && logs.edges.length > 0) {
+    //                 for(let i=0; i < logs.edges.length; i++) {
+    //                     let obj = logs.edges[i].node
+    //                     console.log(obj, "OBJ")
+    //                     newLogs += `\u001b[38;5;248m[${dayjs.utc(obj.t).local().format("HH:mm:ss.SSS")}]\u001b[0m `
+    //                     newLogs += `${obj.msg}`
+    //                     newLogs += `\n`
+    //                 }
+    //                 let x = ansi_up.ansi_to_html(newLogs)
+    //                 document.getElementById("logs-test").innerHTML += x
+    //                 setLogs((str) => {return str + newLogs})
+    //             }
+    //             if (tailRef.current) {
+    //                 if (document.getElementById('logs')) {
+    //                     document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
+    //                 }
+    //             }
+    //         } catch(e) {
+    //             setErr(e.message)
+    //         }
+    //     }
+    //     getLogs()
+    // },[fetch, handleError, namespace])
+
+    // useEffect(()=>{
+    //     if(timerRef.current === 0 && namespace !== "" && namespace !== undefined && namespace !== null) {
+    //         fetchLogs()
+    //         let timer = setInterval(async ()=>{
+    //             fetchLogs()
+    //         }, 2000)
+    //         timerRef.current = timer
+    //     }
+    // },[namespace,fetchLogs])
+
+    // useEffect(()=>{
+    //     return function cleanup() {
+    //         clearInterval(timerRef.current)
+    //         offsetRef.current = ""
+    //         setLogs("")
+    //         if(document.getElementById("logs-test")) {
+    //             document.getElementById("logs-test").innerHTML = ""
+    //         }
+    //     }
+    // },[])
 
     // const fetchLogs = useCallback(()=>{
     //     async function getLogs() {
