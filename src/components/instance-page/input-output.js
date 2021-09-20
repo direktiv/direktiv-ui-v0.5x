@@ -41,32 +41,32 @@ export function TemplateHighlighter(props) {
     )
 }
 
-function ReactSyntaxHighlighter(props) {
-    const {code, id} = props
+// function ReactSyntaxHighlighter(props) {
+//     const {code, id} = props
 
-    const [data, setData] = useState(code)
-    const [load, setLoad] = useState(true)
+//     const [data, setData] = useState(code)
+//     const [load, setLoad] = useState(true)
 
-    useEffect(()=>{
-        const json = JSON.parse(atob(code))
-        setData(JSON.stringify(json, null, '\t'))
-        setLoad(false)
-    },[code])
+//     useEffect(()=>{
+//         const json = JSON.parse(atob(code))
+//         setData(JSON.stringify(json, null, '\t'))
+//         setLoad(false)
+//     },[code])
 
-    if(load) {
-        return ""
-    }
+//     if(load) {
+//         return ""
+//     }
 
-    return(
-<>
-        {!load ? 
-                <Code id={id} language={"json"} code={data} />
-                :
-                ""
-            }
-  </>
-    )
-}
+//     return(
+// <>
+//         {!load ? 
+//                 <Code id={id} language={"json"} code={data} />
+//                 :
+//                 ""
+//             }
+//   </>
+//     )
+// }
 
 export default function InputOutput(props) {
     const {data, status, id} = props
@@ -78,7 +78,7 @@ export default function InputOutput(props) {
             <div style={{width: "100%", height: "100%"}}>
                 <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
                     <div id="logs" style={{ width:"100%", borderRadius:"8px", overflow: "auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a", position: "absolute", top:"28px", bottom:"30px", paddingBottom:"10px" }}>
-                        <ReactSyntaxHighlighter id={id} code={data}/>
+                        <TemplateHighlighter id={id} code={data}/>
             
              </div>
              </div>
