@@ -420,27 +420,24 @@ function Content() {
       instanceInteractions: InstanceInteractions,
     }}>
       {!load ?
-
         <div id="content" className="nav-panel">
-          <Router>
+            <Router>
             <div id="nav-panel">
-              {namespaces !== null ?
-              <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace} />
+                {namespaces !== null ?
+                <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace} />
             :""}
-              </div>
+                </div>
             <div id="main-panel">
-              <Switch>
+                <Switch>
                 <Routes noNamespaces={"You are not a part of any namespaces! Create a namespace to continue using Direktiv."} namespaces={namespaces} namespace={namespace}/>
-              </Switch>
+                </Switch>
             </div>
-          </Router>
+            </Router>
         </div>
         :
         <></>}
-      <NotificationSystem />
-
+        <NotificationSystem />
     </MainContext.Provider>
-
   )
 }
 

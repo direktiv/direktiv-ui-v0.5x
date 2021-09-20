@@ -20,7 +20,7 @@ import LoadingWrapper from '../loading'
 import InstanceInputOutput from './instance-input-output'
 
 export default function Instance() {
-    const {fetch, namespace, handleError, extraLinks} = useContext(MainContext)
+    const {fetch, namespace, handleError, extraLinks, sse} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -34,6 +34,8 @@ export default function Instance() {
     const [stateMetrics, setStateMetrics] = useState([])
     const [startType, setStartType] = useState(true)
     const [timer, setTimer] = useState(null)
+
+    const [instanceSource, setInstanceSource] = useState(null)
 
     const params = useParams()
     const history = useHistory()
@@ -73,49 +75,88 @@ export default function Instance() {
         }
     },[fetch, handleError, instanceDetails.as, metricsLoading, namespace])
 
-    // get instance details
-    const getIDetails = useCallback((load)=>{
-        async function getInstanceDetails() {
-            try {
-                let details = await InstanceDetails(fetch, params.namespace, params.id, handleError)
-                console.log(details)
-                details["instance"]["flow"] = details.flow
-                setInstanceDetails(details.instance)
-                if(load){
-                    console.log('fetch workflow')
-                    fetchWorkflow(details.instance.as)
+    useEffect(()=>{
+        if(instanceSource === null) {
+            let x = `/stream/flow/namespaces/${namespace}/instances/${params.id}`
+
+            let eventConnection = sse(`${x}`, {})
+            eventConnection.onerror = (e) => {
+                // error log here
+                // after logging, close the connection   
+                if(e.status === 403) {
+                    setDetailsErr("You are unable to stream the instance")
+                    return
                 }
-            } catch(e) {
-                setDetailsErr(e.message)
             }
+
+            async function getData(e) {
+                console.log(e, "INSTANCE STREAM")
+                if(e.data === "") {
+                    return
+                }
+                let json = JSON.parse(e.data)
+               
+                json["instance"]["flow"] = json.flow
+                setInstanceDetails(json.instance)
+                fetchWorkflow(json.instance.as)
+                setDetailsLoad(false)
+            }
+
+            eventConnection.onmessage = e => getData(e)
+            setInstanceSource(eventConnection)
         }
-        getInstanceDetails()
-    },[fetch, handleError, params.id, params.namespace])
+    },[instanceSource, namespace])
 
     useEffect(()=>{
-        if(detailsLoad){
-            getIDetails(true)
-            setDetailsLoad(false)
+        return ()=>{
+            if(instanceSource !== null) {
+                instanceSource.close()
+            }
         }
-    },[fetch, fetchWorkflow, instanceDetails.status, getIDetails, detailsLoad, handleError, params.namespace, params.id])
+    },[instanceSource])
+    // get instance details
+    // const getIDetails = useCallback((load)=>{
+        // async function getInstanceDetails() {
+            // try {
+                // let details = await InstanceDetails(fetch, params.namespace, params.id, handleError)
+                // console.log(details)
+                // details["instance"]["flow"] = details.flow
+                // setInstanceDetails(details.instance)
+                // if(load){
+                    // console.log('fetch workflow')
+                    // fetchWorkflow(details.instance.as)
+                // }
+            // } catch(e) {
+                // setDetailsErr(e.message)
+            // }
+        // }
+        // getInstanceDetails()
+    // },[fetch, handleError, params.id, params.namespace])
+
+    // useEffect(()=>{
+    //     if(detailsLoad){
+    //         getIDetails(true)
+    //         setDetailsLoad(false)
+    //     }
+    // },[fetch, fetchWorkflow, instanceDetails.status, getIDetails, detailsLoad, handleError, params.namespace, params.id])
 
     // status poller
-    useEffect(()=>{
-        if(timer === null) {
-            let timerz = setInterval(()=>{
-                getIDetails()
-            }, 2000)        
-            if (instanceDetails.status !== "pending" && instanceDetails.status !== undefined) {
-                clearInterval(timer)
-            }
-            setTimer(timerz)
-            return function cleanup() {
-                if(timer !== null) {
-                    clearInterval(timer)
-                }
-            }
-        }
-    },[timer, getIDetails, instanceDetails.status])
+    // useEffect(()=>{
+        // if(timer === null) {
+            // let timerz = setInterval(()=>{
+                // getIDetails()
+            // }, 2000)        
+            // if (instanceDetails.status !== "pending" && instanceDetails.status !== undefined) {
+                // clearInterval(timer)
+            // }
+            // setTimer(timerz)
+            // return function cleanup() {
+                // if(timer !== null) {
+                    // clearInterval(timer)
+                // }
+            // }
+        // }
+    // },[timer, getIDetails, instanceDetails.status])
 
     // set load to false
     useEffect(()=>{
@@ -126,16 +167,16 @@ export default function Instance() {
 
 
     // Emergency timeout for loader if backend is misbehaving
-    useEffect(
-        () => {
-          let loadingTimer = setTimeout(() => {
-              setIsLoading(false); 
-              console.warn("Loader timeout, something is probably broken in backend")
-            }, 60 * 1000);
-          return () => {
-            clearTimeout(loadingTimer);
-          };
-    },[]);
+    // useEffect(
+        // () => {
+        //   let loadingTimer = setTimeout(() => {
+            //   setIsLoading(false); 
+            //   console.warn("Loader timeout, something is probably broken in backend")
+            // }, 60 * 1000);
+        //   return () => {
+            // clearTimeout(loadingTimer);
+        //   };
+    // },[]);
 
     for(var i=0; i < extraLinks.length; i++) {
         let x = extraLinks[i]

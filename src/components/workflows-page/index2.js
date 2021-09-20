@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoCheckmarkSharp, IoSearch, IoSave, IoPlaySharp, IoSubwayOutline, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoCheckmarkSharp, IoSearch, IoSave, IoPlaySharp, IoSubwayOutline, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoBookOutline, IoToggle, IoToggleOutline } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -18,6 +18,15 @@ import Modal from 'react-modal';
 
 import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
+import { action, noop, zwitch } from "./templates";
+
+
+function ShowError(msg, setErr) {
+    setErr(msg)
+    setTimeout(()=>{
+        setErr("")
+    },5000)
+}
 
 export default function Explorer() {
 
@@ -49,7 +58,7 @@ export default function Explorer() {
                         await handleError(`fetch details at path /${params[0]}`, resp, "TODO PERMISSION")
                     }
                 } catch(e) {
-                    setErr(`Error fetching path type: ${e.message}`)
+                    ShowError(`Error fetching path type: ${e.message}`, setErr)
                     setLoading(false)
                 }
             }
@@ -154,7 +163,7 @@ function WorkflowExplorer(props) {
                 //     return { ...wfI }
                 // })
             } catch(e) {
-                setErr(e.message)
+                ShowError(e.message, setErr)
             }
         }
         return fetchData().finally((()=>{setFetching(false)}))
@@ -223,8 +232,10 @@ function WorkflowExplorer(props) {
     let listElements = [
         {
             name: "Workflow Variables",
-            link: true,
-            path: `/n/${params.namespace}/w/${params[0]}/variables` 
+            func: async () => {
+                setTypeOfRequest("")
+                history.push(`/n/${params.namespace}/explorer/${params[0]}/variables` )
+            }
         },
         {
             name: "Export Workflow",
@@ -273,6 +284,15 @@ function WorkflowExplorer(props) {
                 </Modal>
                 <div className="container" style={{flexDirection: "column", flex: "auto"}}>
                     <div className="shadow-soft rounded tile" style={{ flex: "auto"}}>
+                        {err !== "" ?                    
+                            <div style={{position:"relative"}}>
+                                <div style={{position: "absolute", fontSize:"12pt", background:"#ff8a80", padding:"10px", borderRadius:"10px", zIndex:100, width:"50%", left:"300px"}}>
+                                    {err}
+                                </div>
+                            </div>
+                        :
+                            ""
+                        }
                         <TileTitle name="Details" actionsDiv={[
                             <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "editor" ? "#2396d8":""}} onClick={() => { setEditorTab("editor") }}>
                                 <IoPencil /> Editor
@@ -327,6 +347,7 @@ function ListExplorer(props) {
     const [loading, setLoading] = useState(true)
     const [init, setInit] = useState(false)
     const [objects, setObjects] = useState([])
+
     const [pageInfo, setPageInfo] = useState(null)
     const [err, setErr] = useState("")
 
@@ -359,7 +380,7 @@ function ListExplorer(props) {
                 }
 
             } catch(e) {
-                setErr(`Error fetching filelist: ${e.message}`)
+                ShowError(`Error fetching filelist: ${e.message}`, setErr)
             }
         }
         grabData()
@@ -382,6 +403,15 @@ function ListExplorer(props) {
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
                 <div className="shadow-soft rounded tile" style={{ flex: "auto"}}>
+                    {err !== "" ?                    
+                        <div style={{position:"relative"}}>
+                            <div style={{position: "absolute", fontSize:"12pt", background:"#ff8a80", padding:"10px", borderRadius:"10px", zIndex:100, width:"50%", left:"300px"}}>
+                                {err}
+                            </div>
+                        </div>
+                    :
+                        ""
+                    }
                     <TileTitle name="Explorer">
                         <IoSearch />
                     </TileTitle >
@@ -440,13 +470,7 @@ function CreateWorkflow(props) {
 
     const [wfName, setWfName] = useState("")
     const [template, setTemplate] = useState("default")
-    const templateData = `description: A simple 'no-op' state that returns 'Hello world!'
-states:
-- id: helloworld
-  type: noop
-  transform:
-    result: Hello world!
-`
+    const [templateData, setTemplateData] = useState(noop)
 
     const createWorkflow = async () => {
        try {
@@ -470,7 +494,7 @@ states:
                 await handleError('create workflow', resp, "TODO")
             }
         } catch(e) {
-            setErr(`Error creating workflow: ${e.message}`)
+            ShowError(`Error creating workflow: ${e.message}`, setErr)
         }
     }
 
@@ -482,8 +506,23 @@ states:
             </div>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
                 <p>Template Name:</p>
-                <select style={{width:"191px"}}>
+                <select onChange={(e)=>{
+                    setTemplate(e.target.value)
+                    switch(e.target.value){
+                        case "action":
+                            setTemplateData(action)
+                            break
+                        case "switch":
+                            setTemplateData(zwitch)
+                            break
+                        case "noop":
+                        default:
+                            setTemplateData(noop)
+                    }
+                }} style={{width:"191px"}}>
                     <option value="">noop</option>
+                    <option value="action">action</option>
+                    <option value="switch">switch</option>
                 </select>
             </div>
             <div className="divider-dark"/>
@@ -525,7 +564,7 @@ function CreateDirectory(props) {
                 await handleError('create directory', resp, "TODO")
             }
         } catch(e) {
-            setErr(`Error creating directory: ${e.message}`)
+            ShowError(`Error creating directory: ${e.message}`, setErr)
         }
     }
 
@@ -545,7 +584,20 @@ function CreateDirectory(props) {
 
 function FileObject(props) {
     const {type, id, name, fetchData, namespace, setErr, handleError, path, fetch, setTypeOfRequest} = props
+    const {checkPerm, permissions} = useContext(MainContext)
     const history = useHistory()
+
+    const [active, setActive] = useState(null)
+
+    useEffect(()=>{
+        async function checkActive() {
+            // TODO if workflow handle active
+            setActive(true)
+        }
+        if(active === null && type === "workflow"){
+            checkActive()
+        }
+    },[])
 
     function toggleObject() {
         //TODO add toggle workflow
@@ -568,7 +620,7 @@ function FileObject(props) {
                 await handleError('delete directory', resp, "TODO")
             }
         } catch(e) {
-            setErr(`Error creating directory: ${e.message}`)
+            ShowError(`Error creating directory: ${e.message}`, setErr)
         }
     }
 
@@ -582,7 +634,7 @@ function FileObject(props) {
                 {
                     type === "workflow" ?
                     // replace this?
-                    <IoSubwayOutline />
+                    <IoBookOutline />
                     :
                     <IoFolderOutline />
                 }
@@ -594,6 +646,29 @@ function FileObject(props) {
                 {
                     type === "workflow" ? 
                     <>
+                        {checkPerm(permissions, "toggleWorkflow") ?
+                        <>
+                            {active ?
+                                <div title="Toggle Workflow" className="button circle success" onClick={(ev) => {
+                                    ev.preventDefault();
+                                    toggleObject(id)
+                                }}>
+                                    <span>
+                                        <IoToggle />
+                                    </span>
+                                </div>
+                                :
+                                <div title="Toggle Workflow" className="button circle" onClick={(ev) => {
+                                    ev.preventDefault();
+                                    toggleObject(id)
+                                }}>
+                                    <span>
+                                        <IoToggleOutline className={"toggled-switch"} />
+                                    </span>
+                                </div>
+                            }
+                        </>: ""}
+                        {checkPerm(permissions, "getWorkflow") ?
                         <div title="Workflow Variables">
                             <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                                 setTypeOfRequest("")
@@ -605,18 +680,23 @@ function FileObject(props) {
                                     VAR
                                 </span>
                             </div>
-                        </div>
-                    </>
-                    :
-                    <>
-                    </>
-                }
-                <div title={type === "workflow" ? "Delete Workflow":"Delete Directory"}>
+                        </div>:""}
+                        {checkPerm(permissions, "deleteWorkflow") ? 
+                <div title={"Delete Workflow"}>
                     <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
                         ev.preventDefault();
                         deleteObject(id)
                     }} /> 
-                </div>
+                </div>:""}
+                    </>
+                    :
+                    <div title={"Delete Directory"}>
+                        <ConfirmButton Icon={IoTrash} IconColor={"var(--danger-color)"} OnConfirm={(ev) => {
+                            ev.preventDefault();
+                            deleteObject(id)
+                        }} /> 
+                    </div>
+                }
             </div>
         </li>
     )

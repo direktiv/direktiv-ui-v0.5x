@@ -43,32 +43,20 @@ export default function Logs(props) {
                     return
                 }
                 let json = JSON.parse(e.data) 
-                console.log(json, "INSTANCE LOGS")
 
-                // log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${Math.round(json.timestamp.nanos/1000000)}`).format("h:mm:ss.SSS")}]\u001b[0m `
-                // log += `${json.message} `
-                // if(json.context && json.context.constructor === Object && Object.keys(json.context).length > 0){
-                    // log += `\u001b[38;5;248m( `
-                    // log += Object.keys(json.context).map((k) => {
-                        // return (
-                            // `${k}=${json.context[k]} `
-                        // )
-                    // })
-                    // log += ` )\u001b[0m`
-                // }
-                // log += `\n`
-
-                // let x = ansi_up.ansi_to_html(log)
-                // document.getElementById("logs-test").innerHTML += x
-
-                // used for copying later
-                // setLogs((str) => {return str + log})
-
-                // if (tailRef.current) {
-                    // if (document.getElementById('logs')) {
-                        // document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
-                    // }
-                // }
+                for(let i=0; i < json.edges.length; i++) {
+                    log += `\u001b[38;5;248m[${dayjs.utc(json.edges[i].node.t).local().format("HH:mm:ss")}]\u001b[0m `
+                    log += `${json.edges[i].node.msg}`
+                    log += `\n`
+                }
+                let x = ansi_up.ansi_to_html(log)
+                document.getElementById("logs-test").innerHTML += x
+                setLogs((str) => {return str + log})
+                if (tailRef.current) {
+                    if (document.getElementById('logs')) {
+                        document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
+                    }
+                }
             }
             eventConnection.onmessage = e => getData(e);
             setLogSource(eventConnection)
