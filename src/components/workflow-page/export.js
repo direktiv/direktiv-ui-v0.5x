@@ -122,7 +122,6 @@ export default function ExportWorkflow(props) {
         async function fetchNS() {
             try {
                 let ns = await Namespaces(fetch, handleError, false, "")
-                console.log(ns, "NAMESPACES")
                     let nsList = []
 
                     // trim self namespace from targets

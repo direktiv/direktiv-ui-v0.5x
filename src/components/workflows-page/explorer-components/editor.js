@@ -5,7 +5,6 @@ import { IoCheckmarkSharp,  IoSave} from "react-icons/io5";
 
 export default function EditorDetails(props) {
     const {editorTab, wfRefValue, functions, codemirrorRef, actionErr, workflowValue, setWorkflowValue, updateWorkflow, workflowValueOld, metricsLoading, stateMetrics, showLogEvent, updateLogEvent, setShowLogEvent, logEvent, setLogEvent} = props
-    console.log(workflowValueOld, functions, stateMetrics, "FOR DIAGRAM", editorTab)
     return(
         <>
             {editorTab === "editor" ? 

@@ -7,7 +7,7 @@ import NotificationSystem, { sendNotification } from './components/notifications
 import { useState, useContext, useCallback, useEffect } from 'react';
 import MainContext from './context'
 import Modal from 'react-modal'
-import {fetchNs, HandleError} from './util-funcs'
+import { HandleError} from './util-funcs'
 import Routes from './components/routes'
 import {Namespaces} from './api'
 

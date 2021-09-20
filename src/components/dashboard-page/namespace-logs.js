@@ -69,7 +69,7 @@ export default function NamespaceLogsComponent() {
             eventConnection.onmessage = e => getData(e)
             setNamespaceLogSource(eventConnection)
         }
-    },[])
+    },[namespace, namespaceLogSource, sse])
 
     useEffect(()=>{
         return () => {

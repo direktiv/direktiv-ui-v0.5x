@@ -7,13 +7,11 @@ import {NoResults} from '../../../util-funcs'
 
 export function WorkflowInstanceList(props) {
     const {workflow} = props
-    console.log(props)
     const { fetch, namespace, handleError } = useContext(MainContext)
     const [instances, setInstances] = useState(null)
     const [err, setErr] = useState("")
 
     useEffect(() => {
-        console.log('hello')
         async function getInstances() {
             try {
                 let instances = await WorkflowInstances(fetch, namespace, workflow, handleError)

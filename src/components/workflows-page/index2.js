@@ -18,7 +18,7 @@ import Modal from 'react-modal';
 
 import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
-import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, noop, parallel, validate, zwitch } from "./templates";
+import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 
 
 function ShowError(msg, setErr) {
@@ -32,21 +32,18 @@ export default function Explorer() {
 
     const {fetch, handleError, namespace} = useContext(MainContext)
     const params = useParams()
-    console.log(params, "PARAMS")
     const [loading, setLoading] = useState(true)
     const [typeOfRequest, setTypeOfRequest] = useState("")
     const [err, setErr] = useState("")
 
     useEffect(()=>{
         async function getTypeOfNode() {
-            console.log(typeOfRequest)
             if(typeOfRequest === "") {
                 try {
                     let uri = `/flow/namespaces/${namespace}/node`
                     if(params[0]) {
                         uri += `/${params[0]}`
                     }
-                    console.log(`fetch:::: ${uri}/`)
                     let resp = await fetch(`${uri}/`, {
                         method: "GET"
                     })
@@ -151,7 +148,6 @@ function WorkflowExplorer(props) {
                 // TODO
                 // let logToEvents = await FetchLogToEvents(fetch, params.namespace, params[0])
 
-                console.log(wf)
                 // console.log(active)
 
                 wfRefValue.current = wf
@@ -509,6 +505,9 @@ function CreateWorkflow(props) {
                 <select onChange={(e)=>{
                     setTemplate(e.target.value)
                     switch(e.target.value){
+                        case "getAndSet":
+                            setTemplateData(getAndSet)
+                            break
                         case "parallel":
                             setTemplateData(parallel)
                             break
@@ -560,6 +559,7 @@ function CreateWorkflow(props) {
                     <option value="error">error</option>
                     <option value="parallel">parallel</option>
                     <option value="validate">validate</option>
+                    <option value="getAndSet">getAndSet</option>
                     <option value="generateSolveEvent">generateSolveEvent</option>
                     <option value="generateGreetingEvent">generateGreetingEvent</option>
                 </select>
@@ -648,7 +648,6 @@ function FileObject(props) {
             if(path) {
                 uriPath += `/${path}`
             }
-            console.log(uriPath, "URI PATH")
             let resp = await fetch(`${uriPath}/${name}`, {
                 method: "DELETE"
             })
@@ -668,7 +667,7 @@ function FileObject(props) {
             ev.preventDefault()
             setTypeOfRequest("")
             history.push(`/n/${namespace}/explorer/${id.replace("/", "")}`)
-        }} style={{display:"flex", gap:"10px", fontSize:"16pt", marginTop:"10px"}}>
+        }} style={{display:"flex", gap:"10px", fontSize:"16pt", marginTop:"10px", cursor:"pointer"}}>
             <div>
                 {
                     type === "workflow" ?
@@ -691,6 +690,7 @@ function FileObject(props) {
                                 <div title="Toggle Workflow" className="button circle success" onClick={(ev) => {
                                     ev.preventDefault();
                                     toggleObject(id)
+                                    ev.stopPropagation();
                                 }}>
                                     <span>
                                         <IoToggle />
@@ -700,6 +700,7 @@ function FileObject(props) {
                                 <div title="Toggle Workflow" className="button circle" onClick={(ev) => {
                                     ev.preventDefault();
                                     toggleObject(id)
+                                    ev.stopPropagation();
                                 }}>
                                     <span>
                                         <IoToggleOutline className={"toggled-switch"} />

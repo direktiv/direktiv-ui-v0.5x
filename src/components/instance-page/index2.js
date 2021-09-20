@@ -90,7 +90,6 @@ export default function Instance() {
             }
 
             async function getData(e) {
-                console.log(e, "INSTANCE STREAM")
                 if(e.data === "") {
                     return
                 }
@@ -114,69 +113,11 @@ export default function Instance() {
             }
         }
     },[instanceSource])
-    // get instance details
-    // const getIDetails = useCallback((load)=>{
-        // async function getInstanceDetails() {
-            // try {
-                // let details = await InstanceDetails(fetch, params.namespace, params.id, handleError)
-                // console.log(details)
-                // details["instance"]["flow"] = details.flow
-                // setInstanceDetails(details.instance)
-                // if(load){
-                    // console.log('fetch workflow')
-                    // fetchWorkflow(details.instance.as)
-                // }
-            // } catch(e) {
-                // setDetailsErr(e.message)
-            // }
-        // }
-        // getInstanceDetails()
-    // },[fetch, handleError, params.id, params.namespace])
-
-    // useEffect(()=>{
-    //     if(detailsLoad){
-    //         getIDetails(true)
-    //         setDetailsLoad(false)
-    //     }
-    // },[fetch, fetchWorkflow, instanceDetails.status, getIDetails, detailsLoad, handleError, params.namespace, params.id])
-
-    // status poller
-    // useEffect(()=>{
-        // if(timer === null) {
-            // let timerz = setInterval(()=>{
-                // getIDetails()
-            // }, 2000)        
-            // if (instanceDetails.status !== "pending" && instanceDetails.status !== undefined) {
-                // clearInterval(timer)
-            // }
-            // setTimer(timerz)
-            // return function cleanup() {
-                // if(timer !== null) {
-                    // clearInterval(timer)
-                // }
-            // }
-        // }
-    // },[timer, getIDetails, instanceDetails.status])
-
-    // set load to false
     useEffect(()=>{
         if(instanceDetails && Object.keys(instanceDetails).length > 0 && isLoading) {
             setIsLoading(false)
         }
     },[instanceDetails, isLoading])
-
-
-    // Emergency timeout for loader if backend is misbehaving
-    // useEffect(
-        // () => {
-        //   let loadingTimer = setTimeout(() => {
-            //   setIsLoading(false); 
-            //   console.warn("Loader timeout, something is probably broken in backend")
-            // }, 60 * 1000);
-        //   return () => {
-            // clearTimeout(loadingTimer);
-        //   };
-    // },[]);
 
     for(var i=0; i < extraLinks.length; i++) {
         let x = extraLinks[i]

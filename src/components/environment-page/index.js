@@ -11,7 +11,6 @@ import LoadingWrapper from "../loading"
 import { NamespaceDeleteVariable, NamespaceDownloadVariable, NamespaceGetVariable, NamespaceSetVariable, NamespaceVariables } from '../../api'
 import { WorkflowDeleteVariable, WorkflowDownloadVariable, WorkflowGetVariable, WorkflowSetVariable, WorkflowVariables } from '../workflows-page/api'
 
-const mime = require('mime-types')
 
 const EnvTableError = (props) => {
     const { error, hideError } = props
@@ -64,7 +63,6 @@ const EnvTableRow = (props) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
 
-    console.log(env, "ENV")
     return (
         <>
         {isLoading || isDownloading ? (<div className={"var-table-overlay"}>
@@ -436,7 +434,7 @@ export function EnvrionmentContainer(props) {
             }
         }
         return fetchVars().finally(() => { setFetching(false) })
-    }, [fetch, handleError, getPath, setFetching])
+    }, [fetch, handleError,  setFetching, mode, namespace ,params])
 
     const downloadVariable = useCallback((varName, setIsDownloading) => {
         setError("")
@@ -471,7 +469,7 @@ export function EnvrionmentContainer(props) {
             }
         }
         fetchVars().finally(() => { setFetching(false); setIsDownloading(false)})
-    }, [fetch, handleError, getPath, setFetching])
+    }, [fetch, handleError, setFetching, mode, namespace, params])
 
     useEffect(() => {
         if (namespace !== "") {
@@ -530,7 +528,6 @@ export function EnvrionmentContainer(props) {
                 data = await WorkflowGetVariable(fetch, namespace, params[0], envName, handleError)
             }
             setEnvList((oldE) => {
-                console.log(oldE)
                 for (let i = 0; i < oldE.length; i++) {
                     if (oldE[i].node.name === envName) {
                         oldE[i].node.value = data

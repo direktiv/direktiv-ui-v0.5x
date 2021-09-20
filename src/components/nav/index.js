@@ -36,8 +36,7 @@ export default function Navbar(props) {
             setAcceptInput(!acceptInput)
             toggleNamespaceSelector()
             setError("")
-
-            history.push(`/n/${val}`)
+            history.push(`/n/${ns}`)
         } catch(e) {
             setError(`Failed to create namespace: ${e.message}`)
         }
@@ -62,7 +61,6 @@ export default function Navbar(props) {
         path: "/n/:namespace/explorer/*"
     },)
 
-    console.log(matchExplorer)
 
     let matchJQ = matchPath(location.pathname, {
         path: "/jq/playground"
