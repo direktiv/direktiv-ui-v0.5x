@@ -86,6 +86,21 @@ export async function NamespaceCreate(fetch, handleError, val) {
     }
 }
 
+export async function NamespaceDelete(fetch, namespace, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}`,{
+            method:"DELETE"
+        })
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('delete namespace', resp, "deleteNamespace")
+        }
+    } catch(e) {
+        throw new Error(`Failed to delete namespace: ${e.message}`)
+    }
+}
+
 export async function NamespaceInstances(fetch, namespace, handleError) {
     try {
         let resp = await fetch(`/flow/namespaces/${namespace}/instances`,{})
@@ -147,9 +162,8 @@ export async function NamespaceRegistries(fetch, namespace, handleError) {
                 if(json.registries.edges.length > 0) {
                    return json.registries.edges
                 }
-            } else {
-                return []
-            }
+            } 
+            return []
         } else {
             await handleError('fetch registries', resp, 'listRegistries')
         }
@@ -219,5 +233,87 @@ export async function NamespaceDeleteRegistry(fetch, namespace, key, handleError
         }
     } catch (e) {
         throw new Error(`Failed to delete registry: ${e.message}`)
+    }
+}
+
+export async function NamespaceVariables(fetch, namespace, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/namespace-variables`,{
+            method: "GET"
+        })
+        if(resp.ok) {
+            let json = await resp.json()
+            if(Array.isArray(json.variables.edges)){
+                if(json.variables.edges.length > 0) {
+                    return json.variables.edges
+                }
+            }
+            return []
+        } else {
+            await handleError('fetch variables', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to fetch variables: ${e.message}`)
+    }
+}
+
+export async function NamespaceSetVariable(fetch, namespace, name, val, handleError) {
+    try {
+        let resp = await fetch(`/vars/namespaces/${namespace}/vars/${name}`, {
+            method: "PUT",
+            body: val
+        })
+        if (resp.ok) {
+            return true
+        } else {
+            await handleError('set variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to set variable: ${e.message}`)
+    }
+}
+
+export async function NamespaceDeleteVariable(fetch, namespace, name, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/namespace-variables/${name}`,{
+            method: "DELETE"
+        })
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('delete variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to delete variable: ${e.message}`)
+    }
+}
+
+export async function NamespaceGetVariable(fetch, namespace, name, handleError) {
+    try {
+        let resp = await fetch(`/vars/namespaces/${namespace}/vars/${name}`, {})
+        if(resp.ok) {
+            return await resp.text()
+        } else {
+            await handleError('get variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to get variable: ${e.message}`)
+    }
+}
+
+
+export async function NamespaceDownloadVariable(fetch, namespace, name, handleError) {
+    try {
+        let resp = await fetch(`/vars/namespaces/${namespace}/vars/${name}`, {})
+        if(resp.ok) {
+            return {
+               contentType: resp.headers.get("content-type"),
+               blob: await resp.blob()
+            }
+        } else {
+            await handleError('get variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to get variable: ${e.message}`)
     }
 }

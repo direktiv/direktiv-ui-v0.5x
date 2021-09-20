@@ -23,19 +23,21 @@ export default function Explorer() {
 
     const {fetch, handleError, namespace} = useContext(MainContext)
     const params = useParams()
-
+    console.log(params, "PARAMS")
     const [loading, setLoading] = useState(true)
     const [typeOfRequest, setTypeOfRequest] = useState("")
     const [err, setErr] = useState("")
 
     useEffect(()=>{
         async function getTypeOfNode() {
+            console.log(typeOfRequest)
             if(typeOfRequest === "") {
                 try {
                     let uri = `/flow/namespaces/${namespace}/node`
                     if(params[0]) {
                         uri += `/${params[0]}`
                     }
+                    console.log(`fetch:::: ${uri}/`)
                     let resp = await fetch(`${uri}/`, {
                         method: "GET"
                     })
@@ -59,12 +61,12 @@ export default function Explorer() {
         <div className="container" style={{ flex: "auto" }}>
             <LoadingWrapper isLoading={loading}>
                 {typeOfRequest === "workflow" ? 
-                    <WorkflowExplorer />
+                    <WorkflowExplorer setTypeOfRequest={setTypeOfRequest} />
                     :
                     ""
                 }  
                 {typeOfRequest === "directory" ?
-                    <ListExplorer fetch={fetch} params={params} namespace={namespace} handleError={handleError} />
+                    <ListExplorer setTypeOfRequest={setTypeOfRequest} fetch={fetch} params={params} namespace={namespace} handleError={handleError} />
                     :
                     ""
                 }
@@ -76,9 +78,11 @@ export default function Explorer() {
 function WorkflowExplorer(props) {
 
     // context
-    const {fetch, handleError, attributeAdd} = useContext(MainContext)
+    const {fetch, handleError, attributeAdd, namespace} = useContext(MainContext)
+    const { setTypeOfRequest} = props
     // params
     const params = useParams()
+    const history = useHistory()
 
     // Workflow States
     const [workflowValue, setWorkflowValue] = useState("")
@@ -198,7 +202,8 @@ function WorkflowExplorer(props) {
 
     async function executeWorkflow() {
         try {
-            await WorkflowExecute(fetch, params.namespace, params[0], handleError, jsonInput)
+            let id = await WorkflowExecute(fetch, params.namespace, params[0], handleError, jsonInput)
+            history.push(`/n/${namespace}/i/${id}`)
         } catch (e) {
             setExecuteErr(e.message)
         }
@@ -254,7 +259,7 @@ function WorkflowExplorer(props) {
         <>
             <div className="flex-row">
                 <div style={{ flex: "auto", display:"flex", width:"100%" }}>
-                    <Breadcrumbs />
+                    <Breadcrumbs resetData={[setTypeOfRequest]} />
                 </div>
                 <ButtonWithDropDownCmp data={listElements} />
             </div>
@@ -318,7 +323,7 @@ function WorkflowExplorer(props) {
 }
 
 function ListExplorer(props) {
-    const {fetch, params, namespace, handleError} = props
+    const {fetch, params, namespace, handleError, setTypeOfRequest} = props
     const [loading, setLoading] = useState(true)
     const [init, setInit] = useState(false)
     const [objects, setObjects] = useState([])
@@ -372,7 +377,7 @@ function ListExplorer(props) {
         <>
              <div className="flex-row">
                 <div style={{ flex: "auto", display:"flex", width:"100%" }}>
-                    <Breadcrumbs />
+                    <Breadcrumbs resetData={[setTypeOfRequest]} />
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
@@ -384,7 +389,7 @@ function ListExplorer(props) {
                         <ul>
                             {objects.map((obj)=>{
                                 return(
-                                    <FileObject fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
+                                    <FileObject setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
                                 )
                             })}
                         </ul>
@@ -539,7 +544,7 @@ function CreateDirectory(props) {
 }
 
 function FileObject(props) {
-    const {type, id, name, fetchData, namespace, setErr, handleError, path, fetch} = props
+    const {type, id, name, fetchData, namespace, setErr, handleError, path, fetch, setTypeOfRequest} = props
     const history = useHistory()
 
     function toggleObject() {
@@ -568,7 +573,9 @@ function FileObject(props) {
     }
 
     return(
-        <li onClick={()=>{
+        <li onClick={(ev)=>{
+            ev.preventDefault()
+            setTypeOfRequest("")
             history.push(`/n/${namespace}/explorer/${id.replace("/", "")}`)
         }} style={{display:"flex", gap:"10px", fontSize:"16pt", marginTop:"10px"}}>
             <div>
@@ -589,8 +596,10 @@ function FileObject(props) {
                     <>
                         <div title="Workflow Variables">
                             <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
+                                setTypeOfRequest("")
+                                history.push(`/n/${namespace}/explorer/${id.replace("/", "")}/variables`)
                                 ev.preventDefault();
-                                history.push(`/n/${namespace}/w/${name}/variables`)
+                                ev.stopPropagation();
                             }}>
                                 <span style={{fontWeight: "bold"}}>
                                     VAR

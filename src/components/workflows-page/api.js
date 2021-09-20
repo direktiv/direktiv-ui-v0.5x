@@ -44,8 +44,7 @@ export async function WorkflowExecute(fetch, namespace, workflow, handleError, j
         })
         if (resp.ok) {
             let json = await resp.json()
-            console.log(json)
-            // history.push(`/i/${json.instanceId}`)
+            return json.instance
         } else {
             await handleError('execute workflow', resp, 'executeWorkflow')
         }
@@ -169,5 +168,85 @@ export async function WorkflowStateMillisecondMetrics(fetch, namespace, workflow
         }
     } catch(e) {
         throw new Error(`${e.message}`)
+    }
+}
+
+export async function WorkflowVariables(fetch, namespace, workflow, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/workflow-variables/workflow/${workflow}`, {})
+        if(resp.ok) {
+            let json = await resp.json()
+            if(Array.isArray(json.variables.edges)){
+                if(json.variables.edges.length > 0) {
+                    return json.variables.edges
+                }
+            }
+            return []
+        } else {
+            await handleError('fetch variables', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to fetch variables: ${e.message}`)
+    }
+}
+
+export async function WorkflowSetVariable(fetch, namespace, workflow, name, val, handleError) {
+    try {
+        let resp = await fetch(`/vars/namespaces/${namespace}/workflows/${workflow}/vars/${name}`, {
+            method: "PUT",
+            body: val
+        })
+        if (resp.ok) {
+            return true
+        } else {
+            await handleError('set variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to set variable: ${e.message}`)
+    }
+}
+
+
+export async function WorkflowDeleteVariable(fetch, namespace, workflow, name, handleError) {
+    try {
+        let resp = await fetch(`/flow/namespaces/${namespace}/workflows/${workflow}/vars/${name}`,{
+            method: "DELETE"
+        })
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('delete variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to delete variable: ${e.message}`)
+    }
+}
+
+export async function WorkflowGetVariable(fetch, namespace, workflow, name, handleError) {
+    try {
+        let resp = await fetch(`/vars/namespaces/${namespace}/workflows/${workflow}/vars/${name}`, {})
+        if(resp.ok) {
+            return await resp.text()
+        } else {
+            await handleError('get variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to get variable: ${e.message}`)
+    }
+}
+
+export async function WorkflowDownloadVariable(fetch, namespace, workflow, name, handleError) {
+    try {
+        let resp = await fetch(`/vars/namespaces/${namespace}/workflows/${workflow}/vars/${name}`, {})
+        if(resp.ok) {
+            return {
+                contentType: resp.headers.get("content-type"),
+                blob: await resp.blob()
+             }
+        } else {
+            await handleError('get variable', resp, 'getVariables')
+        }
+    } catch(e) {
+        throw new Error(`Failed to get variable: ${e.message}`)
     }
 }

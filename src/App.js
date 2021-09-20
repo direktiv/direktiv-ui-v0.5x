@@ -273,6 +273,10 @@ states:
 ]
 
 export const  bcRoutes = [
+    {
+        path: '/n/:namespace/variables',
+        breadcrumb: "",
+    },
   {
       path: '/n/:namespace',
       breadcrumb: "",

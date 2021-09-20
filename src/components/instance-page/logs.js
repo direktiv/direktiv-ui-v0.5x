@@ -10,7 +10,7 @@ var ansi_up = new AnsiUp();
 export default function Logs(props) {
     const {instanceId} = props
 
-    const { sse, namespace} = useContext(MainContext)
+    const {sse, namespace} = useContext(MainContext)
 
     const [tail, setTail] = useState(true)
     const tailRef = useRef(true)
@@ -43,34 +43,32 @@ export default function Logs(props) {
                     return
                 }
                 let json = JSON.parse(e.data) 
-                if(json.exit === 0) {
-                        eventConnection.close()
-                    return
-                }
-                log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${Math.round(json.timestamp.nanos/1000000)}`).format("h:mm:ss.SSS")}]\u001b[0m `
-                log += `${json.message} `
-                if(json.context && json.context.constructor === Object && Object.keys(json.context).length > 0){
-                    log += `\u001b[38;5;248m( `
-                    log += Object.keys(json.context).map((k) => {
-                        return (
-                            `${k}=${json.context[k]} `
-                        )
-                    })
-                    log += ` )\u001b[0m`
-                }
-                log += `\n`
+                console.log(json, "INSTANCE LOGS")
 
-                let x = ansi_up.ansi_to_html(log)
-                document.getElementById("logs-test").innerHTML += x
+                // log += `\u001b[38;5;248m[${dayjs.unix(`${json.timestamp.seconds}.${Math.round(json.timestamp.nanos/1000000)}`).format("h:mm:ss.SSS")}]\u001b[0m `
+                // log += `${json.message} `
+                // if(json.context && json.context.constructor === Object && Object.keys(json.context).length > 0){
+                    // log += `\u001b[38;5;248m( `
+                    // log += Object.keys(json.context).map((k) => {
+                        // return (
+                            // `${k}=${json.context[k]} `
+                        // )
+                    // })
+                    // log += ` )\u001b[0m`
+                // }
+                // log += `\n`
+
+                // let x = ansi_up.ansi_to_html(log)
+                // document.getElementById("logs-test").innerHTML += x
 
                 // used for copying later
-                setLogs((str) => {return str + log})
+                // setLogs((str) => {return str + log})
 
-                if (tailRef.current) {
-                    if (document.getElementById('logs')) {
-                        document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
-                    }
-                }
+                // if (tailRef.current) {
+                    // if (document.getElementById('logs')) {
+                        // document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
+                    // }
+                // }
             }
             eventConnection.onmessage = e => getData(e);
             setLogSource(eventConnection)

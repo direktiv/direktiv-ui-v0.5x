@@ -5,7 +5,7 @@ import useBreadcrumbs from 'use-react-router-breadcrumbs'
 import MainContext from '../../context'
 
 export default function Breadcrumbs(props) {
-    const {dashboard, instanceId } = props
+    const {dashboard, instanceId, resetData } = props
     const {bcRoutes} = useContext(MainContext)
     const breadcrumbs = useBreadcrumbs(bcRoutes)
     const history = useHistory()
@@ -14,45 +14,29 @@ export default function Breadcrumbs(props) {
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
-                // if namespace exists dont show it
-                if(obj.key === "N" ||obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
-                    return ""
-                }
-                if( obj.breadcrumb) {
-                    if(obj.breadcrumb.props){
-                        if(obj.breadcrumb.props.children) {
-                            if(
-                                obj.breadcrumb.props.children === "WorkflowFuncs"
-                            ) {
-                                return ""
+
+                // If matching certain paths
+                if(obj.key === "/n" || obj.key === "/") {
+                    return
+                }     
+                console.log(obj)
+                return(
+                    <span onClick={()=>{
+                        // reset state back to empty string (used in explorer to update useEffect states)
+                        if(resetData){
+                            for(let i=0; i < resetData.length; i++) {
+                                let x = resetData[i]
+                                x("")
                             }
                         }
-                    }
-                }
-                // if no instance id use custom breadcrumbs
-                if (!instanceId) {
-                    if(obj.key !== "/") {
-                        return(
-                            <span onClick={()=>history.push(obj.key)} key={obj.key}>{obj.breadcrumb}</span>
-                        )
-                    }
-                    // return home key if dashboard
-                    if(dashboard){
-                        return(
-                            <span onClick={()=>history.push(`/${params.namespace}`)} key={"/"}>Dashboard</span>
-                        )
-                    }
-                }
-                return ""
+                        history.push(obj.key)
+                    }} key={obj.key}>
+                        {obj.breadcrumb}
+                    </span>
+                )
+                
+
             })}
-            {instanceId ?
-                <>
-                    <span key={"/i"} onClick={()=>history.push(`/n/${params.namespace}/i`)}>Instances</span>
-                    <span key={`/i${instanceId}`} onClick={()=>history.push(`/n/${params.namespace}/i/${instanceId}`)}>{instanceId}</span>        
-                </>
-            :
-            ""
-            }
         </div>
     )
 }

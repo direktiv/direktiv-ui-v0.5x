@@ -9,7 +9,7 @@ import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 import { EnvrionmentContainer } from "../environment-page"
 import LoadingWrapper from "../loading"
-import { NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets } from '../../api'
+import { NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDelete, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets } from '../../api'
 
 
 
@@ -20,36 +20,28 @@ function SettingsAction(props) {
 
     async function deleteNamespace() {
         try {
-            let resp = await fetch(`/namespaces/${namespace}`, {
-                method: "DELETE"
-            })
-            if (resp.ok) {
-                let goto = ""
-                for (let i = 0; i < namespaces.length; i++) {
-                    if (namespaces[i] !== namespace) {
-                        goto = namespaces[i]
-                        break
-                    }
+            await NamespaceDelete(fetch, namespace, handleError)
+            let goto = ""
+            for (let i = 0; i < namespaces.length; i++) {
+                if (namespaces[i] !== namespace) {
+                    goto = namespaces[i]
+                    break
                 }
-                if (goto === "") {
-                    // if not found push to / as no namespaces probably exist
-                    localStorage.setItem("namespace", "")
-                    await fetchNamespaces(false, "")
-                    setNamespace("")
-                    // window.location.pathname = "/"
-                    history.push("/")
-                } else {
-                    localStorage.setItem("namespace", goto)
-                    await fetchNamespaces(false, goto)
-                    history.push(`/${goto}`)
-                }
-
-
+            }
+            if (goto === "") {
+                // if not found push to / as no namespaces probably exist
+                localStorage.setItem("namespace", "")
+                await fetchNamespaces(false, "")
+                setNamespace("")
+                // window.location.pathname = "/"
+                history.push("/")
             } else {
-                await handleError('delete namespace', resp, 'deleteNamespace')
+                localStorage.setItem("namespace", goto)
+                await fetchNamespaces(false, goto)
+                history.push(`/${goto}`)
             }
         } catch (e) {
-            setErr(`Failed to delete namespace: ${e.message}`)
+            setErr(e.message)
         }
     }
 
