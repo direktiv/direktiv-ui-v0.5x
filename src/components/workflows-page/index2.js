@@ -501,11 +501,11 @@ function CreateWorkflow(props) {
     return(
         <div style={{fontSize:"12pt"}}>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
-                <p>Workflow Name:</p>
+                <p style={{whiteSpace: "nowrap"}}>Workflow Name:</p>
                 <input value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" placeholder="Name of Workflow..." />
             </div>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
-                <p>Template Name:</p>
+                <p style={{whiteSpace: "nowrap"}}>Template Name:</p>
                 <select onChange={(e)=>{
                     setTemplate(e.target.value)
                     switch(e.target.value){
@@ -565,11 +565,11 @@ function CreateWorkflow(props) {
                 </select>
             </div>
             <div className="divider-dark"/>
-            <div>
+            <div style={{width:"348px"}}>
                 <div style={{textAlign:"center", fontSize:"10pt"}}>
                     Template Preview
                 </div>
-                <div style={{marginTop:"10px", maxWidth:"320px"}}>
+                <div style={{marginTop:"10px"}}>
                     <TemplateHighlighter id={template} data={templateData} lang={"yaml"} />
                 </div>
             </div>
