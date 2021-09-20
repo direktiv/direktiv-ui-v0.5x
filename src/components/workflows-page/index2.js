@@ -67,7 +67,7 @@ export default function Explorer() {
     },[fetch, handleError, params, typeOfRequest])
 
     return(
-        <div className="container" style={{ flex: "auto" }}>
+        <div className="container" style={{ flex: "auto", minWidth: "678px" }}>
             <LoadingWrapper isLoading={loading}>
                 {typeOfRequest === "workflow" ? 
                     <WorkflowExplorer setTypeOfRequest={setTypeOfRequest} />
@@ -425,20 +425,20 @@ function ListExplorer(props) {
                         </ul>
                     </LoadingWrapper>
                 </div>
-                <div className="container" style={{ flexDirection: "column" }} >
-                    <div className="shadow-soft rounded tile">
-                        <TileTitle name="Create Directory">
-                            <IoAdd />
-                        </TileTitle >
-                        <CreateDirectory fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
-                    </div>
-                    <div className="shadow-soft rounded tile">
+                <div className="container" style={{ flexDirection: "column"}} >
+                    <div className="shadow-soft rounded tile" style={{flex: "5", display: "flex", flexDirection: "column"}}>
                         <TileTitle name="Create Workflow">
                             <IoAdd />
                         </TileTitle >
                         <CreateWorkflow fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
                     </div>
-                    <div className="shadow-soft rounded tile"  style={{flex: "auto"}}>
+                    <div className="shadow-soft rounded tile" style={{flex: "1"}}>
+                        <TileTitle name="Create Directory">
+                            <IoAdd />
+                        </TileTitle >
+                        <CreateDirectory fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
+                    </div>
+                    <div className="shadow-soft rounded tile"  style={{flex: "1"}}>
                         <TileTitle name="Send Namespace Event">
                             <IoAdd />
                         </TileTitle>
@@ -456,7 +456,7 @@ function SendNamespaceEvent(props){
     // TODO handle broadcasting namespace event
     return (
         <div>
-            <textarea rows={8} value={val} onChange={(e) => setVal(e.target.value)} style={{ width:"100%", resize: "none" }} />
+            <textarea rows={4} value={val} onChange={(e) => setVal(e.target.value)} style={{ width:"100%", resize: "none" }} />
             <div style={{ textAlign: "right" }}>
                 <input onClick={() => {}} type="submit" value="Send Event" />
             </div>
@@ -499,10 +499,10 @@ function CreateWorkflow(props) {
     }
 
     return(
-        <div style={{fontSize:"12pt"}}>
+        <div style={{fontSize:"12pt", flex: "1", display: "flex", flexDirection: "column"}}>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
                 <p style={{whiteSpace: "nowrap"}}>Workflow Name:</p>
-                <input value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" placeholder="Name of Workflow..." />
+                <input style={{width: "-webkit-fill-available"}} value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" placeholder="Name of Workflow..." />
             </div>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
                 <p style={{whiteSpace: "nowrap"}}>Template Name:</p>
@@ -565,15 +565,13 @@ function CreateWorkflow(props) {
                 </select>
             </div>
             <div className="divider-dark"/>
-            <div style={{width:"348px"}}>
-                <div style={{textAlign:"center", fontSize:"10pt"}}>
+            <div style={{textAlign:"center", fontSize:"10pt", marginBottom: "10px"}}>
                     Template Preview
-                </div>
-                <div style={{marginTop:"10px"}}>
-                    <TemplateHighlighter id={template} data={templateData} lang={"yaml"} />
-                </div>
             </div>
-            <div className="divider-dark" />
+            <div style={{width:"348px", flex: "1", marginBottom: "20px"}}>
+                <TemplateHighlighter id={template} data={templateData} lang={"yaml"} />
+            </div>
+            <div className="divider-dark"/>
             <div style={{ textAlign: "right" }}>
                 <input type="submit" value="Create Workflow" onClick={() => createWorkflow()} />
             </div>

@@ -24,7 +24,7 @@ export function Code({ id, code, language, padding }) {
 
     return (
       <div style={{height:"100%"}} className="Code">
-        <pre>
+        <pre style={{overflow: "visible"}}>
           <code  style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</code>
         </pre>
       </div>
@@ -35,7 +35,7 @@ export function TemplateHighlighter(props) {
     const {data, lang, id} = props
 
     return(
-        <div className="input-output" style={{overflow:"hidden", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0,  bottom: 0, padding:"10px"}}>
+        <div className="input-output" style={{maxHeight: "300px", overflowY: "auto", overflowX: "auto", height: "100%", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0,  bottom: 0, padding:"10px"}}>
             <Code  id={id} language={lang} code={data} />
         </div>
     )
