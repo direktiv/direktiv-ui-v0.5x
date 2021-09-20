@@ -568,7 +568,7 @@ function CreateWorkflow(props) {
             <div style={{textAlign:"center", fontSize:"10pt", marginBottom: "10px"}}>
                     Template Preview
             </div>
-            <div style={{width:"348px", flex: "1", marginBottom: "20px"}}>
+            <div style={{width:"348px", flex: "1", marginBottom: "5px"}}>
                 <TemplateHighlighter id={template} data={templateData} lang={"yaml"} />
             </div>
             <div className="divider-dark"/>
