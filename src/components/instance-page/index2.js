@@ -224,7 +224,7 @@ export default function Instance() {
                                 </span>
                             </div>
                         </div>
-                        <ButtonWithDropDownCmp data={listElements}/>
+                        <ButtonWithDropDownCmp height={"-80px"} data={listElements}/>
                     </div>
                </div>
                {instanceDetails.errMessage !== "" && instanceDetails.errMessage !== undefined ?
