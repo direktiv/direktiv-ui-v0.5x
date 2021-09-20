@@ -5,6 +5,7 @@ import MainContext from '../../context'
 import { IoArrowForwardOutline, IoDocumentTextOutline, IoCheckmarkCircleSharp, IoInformationCircle, IoKey, IoWarning } from 'react-icons/io5'
 import { XCircle } from 'react-bootstrap-icons'
 import ContentLoader from 'react-content-loader'
+import { Namespaces } from '../../api'
 
 const ExportError = (props) => {
     const { error, hideError } = props
@@ -120,29 +121,23 @@ export default function ExportWorkflow(props) {
     const fetchNamespaces = useCallback(() => {
         async function fetchNS() {
             try {
-                let resp = await fetch(`/namespaces/`, {
-                    method: "get",
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
+                let ns = await Namespaces(fetch, handleError, false, "")
+                console.log(ns, "NAMESPACES")
                     let nsList = []
 
                     // trim self namespace from targets
-                    const index = nsList.indexOf(namespace);
+                    const index = nsList.indexOf(ns.namespaces);
                     if (index > -1) {
                         nsList.splice(index, 1);
                     }
 
-                    for (const ns of json.namespaces) {
-                        if (ns.name !== namespace) {
-                            nsList.push(ns.name)
+                    for (const ns2 of ns.namespaces) {
+                        if (ns2 !== namespace) {
+                            nsList.push(ns2)
                         }
                     }
 
                     setAvailableNamespaces(nsList)
-                } else {
-                    await handleError('fetch namespaces', resp, 'getNamespaces')
-                }
             } catch (e) {
                 setErr(`Failed to get target namespace: ${e.message}`)
             }

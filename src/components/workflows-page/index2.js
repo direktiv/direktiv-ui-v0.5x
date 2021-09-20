@@ -272,7 +272,7 @@ function WorkflowExplorer(props) {
                 <div style={{ flex: "auto", display:"flex", width:"100%" }}>
                     <Breadcrumbs resetData={[setTypeOfRequest]} />
                 </div>
-                <ButtonWithDropDownCmp data={listElements} />
+                <ButtonWithDropDownCmp height={"-140px"} data={listElements} />
             </div>
             <div className="container" style={{flexDirection: "row", flexWrap: "wrap", flex: "auto"}}>
                 <Modal 
