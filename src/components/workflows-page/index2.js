@@ -549,7 +549,7 @@ function CreateWorkflow(props) {
                         default:
                             setTemplateData(noop)
                     }
-                }} style={{width:"191px"}}>
+                }}>
                     <option value="default">noop</option>
                     <option value="action">action</option>
                     <option value="switch">switch</option>
