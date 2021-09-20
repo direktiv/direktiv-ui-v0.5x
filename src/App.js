@@ -363,7 +363,7 @@ function Content() {
   const checkAuth = useCallback(()=>{
     async function fd() {
       try {
-        let resp = await netch(`/namespaces`, {
+        let resp = await netch(`/flow/namespaces`, {
           method: "GET"
         })
         if(resp.status === 401) {

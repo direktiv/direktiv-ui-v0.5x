@@ -389,7 +389,7 @@ function ListExplorer(props) {
                         <ul>
                             {objects.map((obj)=>{
                                 return(
-                                    <FileObject setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
+                                    <FileObject fetchData={fetchData} setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
                                 )
                             })}
                         </ul>
@@ -553,7 +553,7 @@ function FileObject(props) {
 
     async function deleteObject() {
         try {
-            let uriPath = `/namespaces/${namespace}/node`
+            let uriPath = `/flow/namespaces/${namespace}/node`
             if(path) {
                 uriPath += `/${path}`
             }
