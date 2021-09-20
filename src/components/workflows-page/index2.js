@@ -18,7 +18,7 @@ import Modal from 'react-modal';
 
 import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
-import { action, noop, zwitch } from "./templates";
+import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, noop, parallel, validate, zwitch } from "./templates";
 
 
 function ShowError(msg, setErr) {
@@ -509,6 +509,36 @@ function CreateWorkflow(props) {
                 <select onChange={(e)=>{
                     setTemplate(e.target.value)
                     switch(e.target.value){
+                        case "parallel":
+                            setTemplateData(parallel)
+                            break
+                        case "validate":
+                            setTemplateData(validate)
+                            break
+                        case "generateGreetingEvent":
+                            setTemplateData(generateEvent)
+                            break
+                        case "generateSolveEvent":
+                            setTemplateData(generateSolveEvent)
+                            break
+                        case "foreach":
+                            setTemplateData(foreach)
+                            break
+                        case "eventAnd":
+                            setTemplateData(eventAnd)
+                            break
+                        case "eventXor":
+                            setTemplateData(eventXor)
+                            break
+                        case "error":
+                            setTemplateData(error)
+                            break
+                        case "delay":
+                            setTemplateData(delay)
+                            break
+                        case "consumeEvent":
+                            setTemplateData(consumeEvent)
+                            break
                         case "action":
                             setTemplateData(action)
                             break
@@ -520,9 +550,18 @@ function CreateWorkflow(props) {
                             setTemplateData(noop)
                     }
                 }} style={{width:"191px"}}>
-                    <option value="">noop</option>
+                    <option value="default">noop</option>
                     <option value="action">action</option>
                     <option value="switch">switch</option>
+                    <option value="delay">delay</option>
+                    <option value="consumeEvent">consumeEvent</option>
+                    <option value="eventAnd">eventAnd</option>
+                    <option value="eventXor">eventXor</option>
+                    <option value="error">error</option>
+                    <option value="parallel">parallel</option>
+                    <option value="validate">validate</option>
+                    <option value="generateSolveEvent">generateSolveEvent</option>
+                    <option value="generateGreetingEvent">generateGreetingEvent</option>
                 </select>
             </div>
             <div className="divider-dark"/>
