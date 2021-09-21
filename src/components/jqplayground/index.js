@@ -144,7 +144,7 @@ export default function JQPlaygroundPage() {
             try {
                 rBody = JSON.stringify({
                     query: `${filter}`,
-                    data: input,
+                    data: btoa(input),
                 });
             } catch (e) {
                 setErr(`Invalid JQ Input: ${e.toString().replace("SyntaxError: JSON.parse: ", "")}`)
@@ -152,7 +152,7 @@ export default function JQPlaygroundPage() {
             }
 
             try {
-                let resp = await fetch(`/flow/jq-playground`, {
+                let resp = await fetch(`/jq`, {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json",
