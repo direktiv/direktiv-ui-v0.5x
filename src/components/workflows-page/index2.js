@@ -82,7 +82,7 @@ function WorkflowExplorer(props) {
 
     // Workflow States
     const [workflowValue, setWorkflowValue] = useState("")
-    const wfRefValue = useRef(workflowValue)
+    const wfRefValue = useRef("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [workflowInfo, setWorkflowInfo] = useState({ revision: 0, active: true, fetching: true })
     
@@ -104,6 +104,7 @@ function WorkflowExplorer(props) {
 
     // handle execute
     const [jsonInput, setJsonInput] = useState("{\n\n}")
+    const jsonRefInput = useRef(jsonInput)
     const [executable, setExecutable] = useState(true)
 
     // error handling
@@ -292,7 +293,7 @@ function WorkflowExplorer(props) {
                         ]}>
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
-                    <EditorDetails  workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics} editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} codemirrorRef={codemirrorRef} actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow} />
+                    <EditorDetails  workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics} editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef} actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow} />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flex: "auto", maxHeight:"200px"}}>
                         <TileTitle name="Execute Workflow">
@@ -301,7 +302,7 @@ function WorkflowExplorer(props) {
                         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", top: "-28px", position: "relative" }}>
                             <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                    <Editor err={executeErr} value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]} />
+                                    <Editor refValSet={jsonRefInput} err={executeErr} value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]} />
                                 </div>
                             </div>
                         </div>

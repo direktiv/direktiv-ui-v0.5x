@@ -137,7 +137,7 @@ function Secrets() {
                 setValue("")
                 return fetchS()
             } catch(e) {
-                setActionErr(e.message)
+                setActionErr(`Error: ${e.message}`)
             }
         } else {
             setActionErr(`Failed to create Secret: key and value needs to be provided.`)

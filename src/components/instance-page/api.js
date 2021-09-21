@@ -16,12 +16,13 @@ export async function InstanceDetails(fetch, namespace, instance, handleError) {
 
 export async function InstanceInput(fetch, namespace, instance, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/instances/${instance}/input`, {
+        let resp = await fetch(`/namespaces/${namespace}/instances/${instance}/input`, {
             method:"GET"
         })
         if(resp.ok) {
             let json = await resp.json()
-            return json.data
+            console.log(json, "CHECK")
+            return atob(json.data)
         } else {
             await handleError('get instance input', resp, 'getInstance')
         }
@@ -32,12 +33,12 @@ export async function InstanceInput(fetch, namespace, instance, handleError) {
 
 export async function InstanceOutput(fetch, namespace, instance, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/instances/${instance}/output`, {
+        let resp = await fetch(`/namespaces/${namespace}/instances/${instance}/output`, {
             method:"GET"
         })
         if(resp.ok) {
             let json = await resp.json()
-            return json.data
+            return atob(json.data)
         } else {
             await handleError('get instance output', resp, 'getInstance')
         }

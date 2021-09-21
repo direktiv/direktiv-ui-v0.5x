@@ -92,6 +92,7 @@ function makeGutterError(msg) {
 
 export default function ReactEditor(props) {
     const { refValSet, value, setValue, saveCallback, readOnly, showFooter, actions, loading, err, commentKey, editorRef, functions } = props;
+    console.log(refValSet)
     const [cmEditor, setCMEditor] = useState(null)
     const [marks, setMarks] = useState(null)
     const [init, setInit] = useState(false)

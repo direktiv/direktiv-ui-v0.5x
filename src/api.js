@@ -92,7 +92,7 @@ export async function NamespaceDelete(fetch, namespace, handleError) {
 
 export async function NamespaceInstances(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/instances`,{})
+        let resp = await fetch(`/namespaces/${namespace}/instances`,{})
         if(resp.ok) {
             let json = await resp.json()
             return json.instances.edges
@@ -100,7 +100,7 @@ export async function NamespaceInstances(fetch, namespace, handleError) {
             await handleError('list instances', resp, 'listInstances')
         }
     } catch(e) {
-        throw new Error(`Failed to list instances: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -118,33 +118,28 @@ export async function NamespaceLogs(fetch, namespace, handleError, endCursor) {
             await handleError('fetch namespace logs', resp, 'getNamespaceLogs')
         }
     } catch(e) {
-        throw new Error(`Error: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceSecrets(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/secrets`,{})
+        let resp = await fetch(`/namespaces/${namespace}/secrets`,{})
         if(resp.ok) {
             let json = await resp.json()
-            if (Array.isArray(json.secrets.edges)){
-                if(json.secrets.edges.length > 0) {
-                    return json.secrets.edges
-                }
-            } else {
-                return []
-            }
+            console.log(json)
+            return json.secrets.edges
         } else {
             await handleError('fetch secrets', resp, 'listSecrets')
         }
     } catch(e) {
-        throw new Error(`Failed to fetch secrets: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceRegistries(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/functions/namespaces/${namespace}/registries`,{})
+        let resp = await fetch(`/namespaces/${namespace}/registries`,{})
         if(resp.ok) {
             let json = await resp.json()
             if (Array.isArray(json.registries.edges)) {
@@ -157,15 +152,15 @@ export async function NamespaceRegistries(fetch, namespace, handleError) {
             await handleError('fetch registries', resp, 'listRegistries')
         }
     } catch(e) {
-        throw new Error(`Failed to fetch registries: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceCreateSecret(fetch, namespace, key, value, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/secrets`,{
-            method: "POST",
-            body: JSON.stringify({ namespace: namespace, key: key, data: value})
+        let resp = await fetch(`/namespaces/${namespace}/secrets/${key}`,{
+            method: "PUT",
+            body: JSON.stringify({ data: value})
         })
         if(resp.ok){
             return
@@ -173,7 +168,7 @@ export async function NamespaceCreateSecret(fetch, namespace, key, value, handle
             await handleError('create secret', resp, 'createSecret')
         }
     } catch(e) {
-        throw new Error(`Failed to create secret: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -189,15 +184,14 @@ export async function NamespaceCreateRegistry(fetch, namespace, key,val, handleE
             await handleError('create registry', resp, 'createRegistry')
         }
     } catch(e) {
-        throw new Error(`Failed to create registry: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceDeleteSecret(fetch, namespace, val, handleError){
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/secrets`, {
-            method: "DELETE",
-            body: JSON.stringify({ key: val, namespace: namespace })
+        let resp = await fetch(`/namespaces/${namespace}/secrets/${val}`, {
+            method: "DELETE"
         })
         if (resp.ok) {
             return 
@@ -205,7 +199,7 @@ export async function NamespaceDeleteSecret(fetch, namespace, val, handleError){
             await handleError('delete secret', resp, 'deleteSecret')
         }
     } catch (e) {
-        throw new Error(`Failed to delete secret: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -221,34 +215,29 @@ export async function NamespaceDeleteRegistry(fetch, namespace, key, handleError
             await handleError('delete registry', resp, 'deleteRegistry')
         }
     } catch (e) {
-        throw new Error(`Failed to delete registry: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceVariables(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/namespace-variables`,{
+        let resp = await fetch(`/namespaces/${namespace}/vars`,{
             method: "GET"
         })
         if(resp.ok) {
             let json = await resp.json()
-            if(Array.isArray(json.variables.edges)){
-                if(json.variables.edges.length > 0) {
-                    return json.variables.edges
-                }
-            }
-            return []
+            return json.variables.edges
         } else {
             await handleError('fetch variables', resp, 'getVariables')
         }
     } catch(e) {
-        throw new Error(`Failed to fetch variables: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceSetVariable(fetch, namespace, name, val, handleError) {
     try {
-        let resp = await fetch(`/vars/namespaces/${namespace}/vars/${name}`, {
+        let resp = await fetch(`/namespaces/${namespace}/vars/${name}`, {
             method: "PUT",
             body: val
         })
@@ -258,7 +247,7 @@ export async function NamespaceSetVariable(fetch, namespace, name, val, handleEr
             await handleError('set variable', resp, 'getVariables')
         }
     } catch(e) {
-        throw new Error(`Failed to set variable: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -273,7 +262,7 @@ export async function NamespaceDeleteVariable(fetch, namespace, name, handleErro
             await handleError('delete variable', resp, 'getVariables')
         }
     } catch(e) {
-        throw new Error(`Failed to delete variable: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -286,7 +275,7 @@ export async function NamespaceGetVariable(fetch, namespace, name, handleError) 
             await handleError('get variable', resp, 'getVariables')
         }
     } catch(e) {
-        throw new Error(`Failed to get variable: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -303,7 +292,7 @@ export async function NamespaceDownloadVariable(fetch, namespace, name, handleEr
             await handleError('get variable', resp, 'getVariables')
         }
     } catch(e) {
-        throw new Error(`Failed to get variable: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 

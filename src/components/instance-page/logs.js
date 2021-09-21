@@ -23,7 +23,7 @@ export default function Logs(props) {
 
     useEffect(()=>{
         if (logSource === null || iid !== instanceId) {
-            let x = `/stream/flow/namespaces/${namespace}/instances/${instanceId}/logs`
+            let x = `/namespaces/${namespace}/instances/${instanceId}/logs`
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {

@@ -38,7 +38,7 @@ export async function WorkflowSetActive(fetch, namespace, workflow, handleError,
 
 export async function WorkflowExecute(fetch, namespace, workflow, handleError, jsonInput) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/execute/workflow/${workflow}`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=execute`, {
             method: "POST",
             body: jsonInput
         })
@@ -49,7 +49,7 @@ export async function WorkflowExecute(fetch, namespace, workflow, handleError, j
             await handleError('execute workflow', resp, 'executeWorkflow')
         }
     } catch (e) {
-        throw new Error(`Failed to execute workflow: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -78,7 +78,7 @@ export async function WorkflowUpdate(fetch, namespace, workflow, handleError, wo
             await handleError('update workflow', resp, 'updateWorkflow')
         }
     } catch (e) {
-        throw new Error(`Failed to update workflow: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 

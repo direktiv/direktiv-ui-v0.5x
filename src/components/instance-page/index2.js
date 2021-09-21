@@ -15,6 +15,7 @@ import { Workflow, checkStartType, WorkflowStateMillisecondMetrics, WorkflowExec
 import { sendNotification } from '../notifications'
 import LoadingWrapper from '../loading'
 import InstanceInputOutput from './instance-input-output'
+import { InstanceInput } from './api'
 
 export default function Instance() {
     const {fetch, namespace, handleError, extraLinks, sse, checkPerm, permissions} = useContext(MainContext)
@@ -32,12 +33,26 @@ export default function Instance() {
     const [iid, setIid] = useState("")
     const [startType, setStartType] = useState(true)
     const [timer, setTimer] = useState(null)
+    const [input, setInput] = useState(null)
 
     const [instanceSource, setInstanceSource] = useState(null)
 
     const params = useParams()
     const history = useHistory()
 
+    useEffect(()=>{
+        async function fetchInput() {
+            try{
+                let inz = await InstanceInput(fetch, namespace, iid, handleError)
+                setInput(inz)
+            } catch(e) {
+                setActionErr(`${e.message}`)
+            }
+        }
+        if(input === null && iid !== "") {
+            fetchInput()
+        }
+    },[fetch, handleError, namespace, input, iid])
     // fetch the workflow for that instance
     const fetchWorkflow = useCallback((id)=>{
         async function fetchDetails() {
@@ -75,7 +90,7 @@ export default function Instance() {
 
     useEffect(()=>{
         if(instanceSource === null && params.id !== iid) {
-            let x = `/stream/flow/namespaces/${namespace}/instances/${params.id}`
+            let x = `/namespaces/${namespace}/instances/${params.id}`
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -86,19 +101,16 @@ export default function Instance() {
                     return
                 }
             }
-
             async function getData(e) {
                 if(e.data === "") {
                     return
                 }
                 let json = JSON.parse(e.data)
-               
                 json["instance"]["flow"] = json.flow
                 setInstanceDetails(json.instance)
                 fetchWorkflow(json.instance.as)
                 setDetailsLoad(false)
             }
-
             eventConnection.onmessage = e => getData(e)
             setInstanceSource(eventConnection)
             setIid(params.id)
@@ -129,7 +141,6 @@ export default function Instance() {
                 path = path.replaceAll(x.replace[j].val, params.workflow)
             }
             if(x.replace[j].key === "instance") {
-
                 path = path.replaceAll(x.replace[j].val, params.instance)
             }
         }
@@ -152,7 +163,7 @@ export default function Instance() {
                     name: "Rerun Workflow",
                     func: async ()=>{
                         try {
-                            let id = await WorkflowExecute(fetch, namespace, instanceDetails.as, handleError, "{}")
+                            let id = await WorkflowExecute(fetch, namespace, instanceDetails.as, handleError, input)
                             if(document.getElementById("logs-test")){
                                 document.getElementById("logs-test").innerHTML = ""
                             }
