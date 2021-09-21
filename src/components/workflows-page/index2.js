@@ -54,7 +54,7 @@ export default function Explorer() {
     },[fetch, handleError, params, typeOfRequest, namespace])
 
     return(
-        <div className="container" style={{ flex: "auto", minWidth: "678px" }}>
+        <div className="container" style={{ flex: "auto" }}>
             <LoadingWrapper isLoading={loading}>
                 {typeOfRequest === "workflow" ? 
                     <WorkflowExplorer setTypeOfRequest={setTypeOfRequest} />
@@ -369,7 +369,7 @@ function ListExplorer(props) {
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
-                <div className="shadow-soft rounded tile" style={{ flex: "auto"}}>
+                <div className="shadow-soft rounded tile" style={{ flex: "5"}}>
                     {err !== "" ?                    
                         <div style={{position:"relative"}}>
                             <div style={{position: "absolute", fontSize:"12pt", background:"#ff8a80", padding:"10px", borderRadius:"10px", zIndex:100, width:"50%", left:"300px"}}>
@@ -392,20 +392,20 @@ function ListExplorer(props) {
                         </ul>
                     </LoadingWrapper>
                 </div>
-                <div className="container" style={{ flexDirection: "column"}} >
-                    <div className="shadow-soft rounded tile" style={{flex: "5", display: "flex", flexDirection: "column"}}>
+                <div className="container" style={{ flexDirection: "column", flex: "1"}} >
+                    <div className="shadow-soft rounded tile" style={{flex: "5", display: "flex", flexDirection: "column", maxHeight: "576px"}}>
                         <TileTitle name="Create Workflow">
                             <IoAdd />
                         </TileTitle >
                         <CreateWorkflow fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
                     </div>
-                    <div className="shadow-soft rounded tile" style={{flex: "1"}}>
+                    <div className="shadow-soft rounded tile" style={{flex: "0 1"}}>
                         <TileTitle name="Create Directory">
                             <IoAdd />
                         </TileTitle >
                         <CreateDirectory fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
                     </div>
-                    <div className="shadow-soft rounded tile"  style={{flex: "1"}}>
+                    <div className="shadow-soft rounded tile"  style={{flex: "0 1"}}>
                         <TileTitle name="Send Namespace Event">
                             <IoAdd />
                         </TileTitle>
@@ -455,7 +455,7 @@ function CreateWorkflow(props) {
         <div style={{fontSize:"12pt", flex: "1", display: "flex", flexDirection: "column"}}>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
                 <p style={{whiteSpace: "nowrap"}}>Workflow Name:</p>
-                <input style={{width: "-webkit-fill-available"}} value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" placeholder="Name of Workflow..." />
+                <input style={{width: "100%"}} value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" placeholder="Name of Workflow..." />
             </div>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
                 <p style={{whiteSpace: "nowrap"}}>Template Name:</p>
@@ -522,11 +522,14 @@ function CreateWorkflow(props) {
                 </select>
             </div>
             <div className="divider-dark"/>
-            <div style={{textAlign:"center", fontSize:"10pt", marginBottom: "10px"}}>
+            <div style={{textAlign:"center", fontSize:"10pt", marginBottom: "10px"}}>   
                     Template Preview
             </div>
-            <div style={{width:"348px", flex: "1", marginBottom: "5px"}}>
+            <div  style={{flex: "1", marginBottom: "5px", justifyContent: "center", display: "flex"}}>
+                <div className="auto-width-780" style={{height: "100%", width:"348px", margin:"0px", flex: 1 }}>
+
                 <TemplateHighlighter id={template} data={templateData} lang={"yaml"} />
+                </div>
             </div>
             <div className="divider-dark"/>
             <div style={{ textAlign: "right" }}>
@@ -556,8 +559,8 @@ function CreateDirectory(props) {
     return(
         <div style={{fontSize:"12pt"}}>
             <div style={{display:"flex", alignItems:"center", gap:"10px"}}>
-                <p>Directory Name:</p>
-                <input value={dir} onChange={(e)=>setDir(e.target.value)} type="text" placeholder="Name of Directory..."/>
+                <p style={{whiteSpace: "nowrap"}}>Directory Name:</p>
+                <input style={{width:"100%"}} value={dir} onChange={(e)=>setDir(e.target.value)} type="text" placeholder="Name of Directory..."/>
             </div>
             <div className="divider-dark" />
             <div style={{ textAlign: "right" }}>
