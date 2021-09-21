@@ -13,6 +13,12 @@
   }
 }
 
+@media only screen and (max-width: 780px) {
+  .auto-width-780 {
+    width: auto !important;
+  }
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
