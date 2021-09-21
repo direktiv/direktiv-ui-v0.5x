@@ -10,6 +10,7 @@ import Services from "../services"
 import Revision from "../revision"
 import Explorer from "../workflows-page/index2"
 import Instance from "../instance-page/index2"
+import { useEffect, useState } from "react"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -22,8 +23,10 @@ export default function Routes(props) {
 
     if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/global/functions") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
+        console.log('ppooooosh')
         history.push("/")
     } 
+
     return(
         <>
             <Route exact path="/functions/global" component={Functions}/>
