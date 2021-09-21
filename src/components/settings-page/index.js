@@ -41,7 +41,7 @@ function SettingsAction(props) {
                 history.push(`/${goto}`)
             }
         } catch (e) {
-            setErr(e.message)
+            setErr(`Error: ${e.message}`)
         }
     }
 

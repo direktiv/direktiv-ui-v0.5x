@@ -2,7 +2,7 @@ export async function Namespaces(fetch, handleError, load, val) {
     try {
         let newNamespace = ""
         let namespaces = []
-        let resp = await fetch(`/flow/namespaces`, {})
+        let resp = await fetch(`/namespaces`, {})
 
         if(resp.ok) {
             let json = await resp.json() 
@@ -67,14 +67,17 @@ export async function Namespaces(fetch, handleError, load, val) {
             await handleError('fetching namespaces', resp, "listNamespaces")
         }
     } catch(e) {
-        throw new Error(`Failed to fetch namespaces: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceCreate(fetch, handleError, val) {
     try {
-        let resp = await fetch(`/flow/namespaces/${val}`, {
-            method: "POST"
+        let resp = await fetch(`/namespaces`, {
+            method: "POST",
+            body: JSON.stringify({
+                name: val
+            })
         })
         if(resp.ok) {
             return val
@@ -82,13 +85,13 @@ export async function NamespaceCreate(fetch, handleError, val) {
             await handleError('create namespace', resp, 'addNamespace')
         }
     } catch(e) {
-        throw new Error(`Failed to create namespace: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
 export async function NamespaceDelete(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}`,{
+        let resp = await fetch(`/namespaces/${namespace}`,{
             method:"DELETE"
         })
         if(resp.ok) {
@@ -97,7 +100,7 @@ export async function NamespaceDelete(fetch, namespace, handleError) {
             await handleError('delete namespace', resp, "deleteNamespace")
         }
     } catch(e) {
-        throw new Error(`Failed to delete namespace: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -315,5 +318,87 @@ export async function NamespaceDownloadVariable(fetch, namespace, name, handleEr
         }
     } catch(e) {
         throw new Error(`Failed to get variable: ${e.message}`)
+    }
+}
+
+export async function NamespaceTree(fetch, namespace, path, children, handleError) {
+    try {
+        let uri = `/namespaces/${namespace}/tree`
+        if(path[0]) {
+            uri += `/${path[0]}`
+        }
+        let resp = await fetch(`${uri}/`, {})
+        if(resp.ok) {
+            let json = await resp.json()
+            if(children) {
+                if(json.children && json.children.edges.length > 0) {
+                    return {
+                        list: json.children.edges,
+                        pageInfo: json.children.pageInfo
+                    }
+                } else {
+                    return {
+                        list: [],
+                        pageInfo: null
+                    }
+                }
+            } else {
+                return json.node.type
+            }
+        } else {
+            await handleError(`fetch details on ${path[0]}`, resp, "TODO PERM")
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
+export async function NamespaceCreateNode(fetch, namespace, path, dir, type, data, handleError) {
+    try {
+        let uriPath = `/namespaces/${namespace}/tree`
+        if(path) {
+            uriPath += `/${path}`
+        }
+        let body = {
+            type: type
+        }
+        if(type === "workflow") {
+            body = data
+            dir += "?op=create-workflow"
+        } else {
+            dir += "?op=create-directory"
+            body = JSON.stringify(body)
+        }
+        let resp = await fetch(`${uriPath}/${dir}`, {
+            method: "PUT",
+            body: body
+        })
+        if(resp.ok) {
+            return true
+        } else {
+            // TODO what permission we giving this?
+            await handleError('create node', resp, "TODO")
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
+export async function NamespaceDeleteNode(fetch, namespace, path, name, handleError) {
+    try {
+        let uriPath = `/namespaces/${namespace}/tree`
+        if(path) {
+            uriPath += `/${path}`
+        }
+        let resp = await fetch(`${uriPath}/${name}?op=delete-node`, {
+            method: "DELETE"
+        })
+        if(resp.ok){
+            return true
+        } else {
+            await handleError('delete node', resp, "TODO")
+        }
+    } catch(e) {
+        throw new Error(e.message)
     }
 }

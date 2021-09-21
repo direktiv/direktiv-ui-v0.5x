@@ -352,7 +352,7 @@ function Content() {
         setNamespace(namespacesObj.namespace)
         setNamespaces(namespacesObj.namespaces)
       } catch (e) {
-        sendNotification("Failed to fetch namespaces", e.message, 0)
+        sendNotification("Error:", e.message, 0)
         setLoad(false)
       }
     }
@@ -363,7 +363,7 @@ function Content() {
   const checkAuth = useCallback(()=>{
     async function fd() {
       try {
-        let resp = await netch(`/flow/namespaces`, {
+        let resp = await netch(`/namespaces`, {
           method: "GET"
         })
         if(resp.status === 401) {

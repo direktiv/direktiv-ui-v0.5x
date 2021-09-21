@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoCheckmarkSharp, IoSearch, IoSave, IoPlaySharp, IoSubwayOutline, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoBookOutline, IoToggle, IoToggleOutline } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoBookOutline, IoToggle, IoToggleOutline } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -19,6 +19,7 @@ import Modal from 'react-modal';
 import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
+import { NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
 
 
 function ShowError(msg, setErr) {
@@ -40,28 +41,17 @@ export default function Explorer() {
         async function getTypeOfNode() {
             if(typeOfRequest === "") {
                 try {
-                    let uri = `/flow/namespaces/${namespace}/node`
-                    if(params[0]) {
-                        uri += `/${params[0]}`
-                    }
-                    let resp = await fetch(`${uri}/`, {
-                        method: "GET"
-                    })
-                    if(resp.ok) {
-                        let json = await resp.json()
-                        setTypeOfRequest(json.node.type)
-                        setLoading(false)
-                    } else {
-                        await handleError(`fetch details at path /${params[0]}`, resp, "TODO PERMISSION")
-                    }
+                    let type = await NamespaceTree(fetch, namespace, params, false, handleError)
+                    setTypeOfRequest(type)
+                    setLoading(false)
                 } catch(e) {
-                    ShowError(`Error fetching path type: ${e.message}`, setErr)
+                    ShowError(`Error: ${e.message}`, setErr)
                     setLoading(false)
                 }
             }
         }
         getTypeOfNode()
-    },[fetch, handleError, params, typeOfRequest])
+    },[fetch, handleError, params, typeOfRequest, namespace])
 
     return(
         <div className="container" style={{ flex: "auto", minWidth: "678px" }}>
@@ -352,35 +342,16 @@ function ListExplorer(props) {
     const fetchData = useCallback(()=>{
         async function grabData() {
             try {
-                let uriPath = `/flow/namespaces/${namespace}/directory`
-                // add the full path to the request
-                if(params[0]) {
-                    // handle listing details about a directory
-                    uriPath += `/${params[0]}`
-                }
-                let resp = await fetch(`${uriPath}/`, {
-                    method: "GET"
-                })
-                if(resp.ok) {
-                    let json = await resp.json()
-                    if(json.children && json.children.edges.length > 0) {
-                        setObjects(json.children.edges)
-                        setPageInfo(json.children.pageInfo)
-                    } else {
-                        setObjects([])
-                    }
-                    setInit(true)
-                } else {
-                    // TODO what permission we giving this?
-                    await handleError('fetch objects', resp, "TODO")
-                }
-
+                let obj = await NamespaceTree(fetch, namespace, params, true, handleError) 
+                setObjects(obj.list)
+                setPageInfo(obj.pageInfo)
+                setInit(true)
             } catch(e) {
-                ShowError(`Error fetching filelist: ${e.message}`, setErr)
+                ShowError(`Error: ${e.message}`, setErr)
             }
         }
         grabData()
-    },[fetch, handleError, params])
+    },[fetch,namespace, handleError, params])
 
     useEffect(()=>{
         if(!init || params[0] !== paramsRef.current){
@@ -470,27 +441,13 @@ function CreateWorkflow(props) {
 
     const createWorkflow = async () => {
        try {
-            let uriPath = `namespaces/${namespace}/workflow`
-            if(path) {
-                uriPath += `/${path}`
-            }
-            let resp = await fetch(`/flow/${uriPath}/${wfName}`, {
-                method: "POST",
-                body: JSON.stringify(
-                    {
-                        source: templateData
-                    }
-                )
-            })
-            if(resp.ok) {
+            let success = await NamespaceCreateNode(fetch, namespace, path, wfName, "workflow", templateData, handleError)
+            if(success) {
                 fetchData()
                 setWfName("")
-            } else {
-                // TODO what permission we giving this?
-                await handleError('create workflow', resp, "TODO")
-            }
+            } 
         } catch(e) {
-            ShowError(`Error creating workflow: ${e.message}`, setErr)
+            ShowError(`Error: ${e.message}`, setErr)
         }
     }
 
@@ -586,22 +543,13 @@ function CreateDirectory(props) {
 
     const createDirectory = async () => {
         try {
-            let uriPath = `namespaces/${namespace}/directory`
-            if(path) {
-                uriPath += `/${path}`
-            }
-            let resp = await fetch(`/flow/${uriPath}/${dir}`, {
-                method: "POST"
-            })
-            if(resp.ok) {
+            let success = await NamespaceCreateNode(fetch, namespace, path, dir, "directory", undefined, handleError)
+            if(success) {
                 fetchData()
                 setDir("")
-            } else {
-                // TODO what permission we giving this?
-                await handleError('create directory', resp, "TODO")
-            }
+            } 
         } catch(e) {
-            ShowError(`Error creating directory: ${e.message}`, setErr)
+            ShowError(`Error: ${e.message}`, setErr)
         }
     }
 
@@ -634,7 +582,7 @@ function FileObject(props) {
         if(active === null && type === "workflow"){
             checkActive()
         }
-    },[])
+    },[active, type])
 
     function toggleObject() {
         //TODO add toggle workflow
@@ -642,21 +590,12 @@ function FileObject(props) {
 
     async function deleteObject() {
         try {
-            let uriPath = `/flow/namespaces/${namespace}/node`
-            if(path) {
-                uriPath += `/${path}`
-            }
-            let resp = await fetch(`${uriPath}/${name}`, {
-                method: "DELETE"
-            })
-            if(resp.ok) {
+            let success = await NamespaceDeleteNode(fetch, namespace, path, name, handleError)
+            if(success) {
                 fetchData()
-            } else {
-                // TODO what permission we giving this?
-                await handleError('delete directory', resp, "TODO")
-            }
+            } 
         } catch(e) {
-            ShowError(`Error creating directory: ${e.message}`, setErr)
+            ShowError(`Error: ${e.message}`, setErr)
         }
     }
 

@@ -404,18 +404,6 @@ export function EnvrionmentContainer(props) {
 
     const params = useParams()
 
-    const getPath = useCallback(() => {
-        function generatePath() {
-            if (mode === "namespace") {
-                return `/namespaces/${namespace}`
-            } else {
-                return `/namespaces/${namespace}/workflows/${params.workflow}`
-            }
-
-
-        }
-        return generatePath()
-    }, [namespace, params.workflow, mode])
 
     const fetchVariables = useCallback(() => {
         setError("")

@@ -5,23 +5,25 @@ export const ResourceRegex = new RegExp("^[a-z][a-z0-9._-]{1,34}[a-z0-9]$");
 
 export async function HandleError(summary, resp, perm) {
     const contentType = resp.headers.get('content-type');
+    
     if (resp.status === 405) {
         // this shouldnt happen in the UI
         throw new Error(`${summary}: method is not allowed`)
+    } else if(resp.status === 409) {
+        throw new Error(`${summary}: object already exists`)
     }
-    if(resp.status !== 403) {
 
-if (!contentType || !contentType.includes('application/json')) {
-        let text = await resp.text()
-        throw new Error (`${summary}: ${text}`)
-      } else {
+    if(resp.status !== 403) {
+        if (!contentType || !contentType.includes('application/json')) {
+            let text = await resp.text()
+            throw new Error (`${summary}: ${text}`)
+        } else {
           if(resp.headers.get('grpc-message')) {
             throw new Error(`${summary}: ${resp.headers.get('grpc-message')}`)
           } else {
             let text = (await resp.json()).Message
             throw new Error (`${summary}: ${text}`)
           }
-
       }
      } else {
         throw new Error(`You are unable to '${summary}', contact system admin to grant '${perm}'.`)

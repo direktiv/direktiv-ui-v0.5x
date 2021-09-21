@@ -55,8 +55,8 @@ export async function WorkflowExecute(fetch, namespace, workflow, handleError, j
 
 export async function WorkflowUpdate(fetch, namespace, workflow, handleError, workflowValue) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/workflows/${workflow}`, {
-            method: "put",
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=update-workflow`, {
+            method: "post",
             headers: {
                 "Content-type": "text/yaml",
                 "Content-Length": workflowValue.length,
@@ -65,12 +65,14 @@ export async function WorkflowUpdate(fetch, namespace, workflow, handleError, wo
         })
         if (resp.ok) {
             let json = await resp.json()
-            let active = await WorkflowActiveStatus(fetch, namespace, workflow, handleError)
-            let exec = await checkStartType(workflowValue)
+            // TODO
+            // let active = await WorkflowActiveStatus(fetch, namespace, workflow, handleError)
+            // TODO
+            // let exec = await checkStartType(workflowValue)
             return {
                 revision: json.revision.hash,
-                active: active,
-                exec: exec
+                active: true,
+                exec: true
             }
         } else {
             await handleError('update workflow', resp, 'updateWorkflow')
@@ -114,12 +116,12 @@ export async function WorkflowActiveStatus(fetch, namespace, workflow, handleErr
 
 export async function Workflow(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/workflow/${workflow}`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}`, {
             method: "get",
         })
         if (resp.ok) {
             let json = await resp.json()
-            return json.revision.source
+            return atob(json.revision.source)
             // let wf = atob(json.workflow)
 
 

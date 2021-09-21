@@ -62,7 +62,7 @@ export default function Logs(props) {
             setLogSource(eventConnection)
             setIid(instanceId)
         }
-    },[logSource, instanceId, sse, iid])
+    },[logSource, instanceId, sse, iid, namespace])
 
     useEffect(()=>{
         return ()=>{

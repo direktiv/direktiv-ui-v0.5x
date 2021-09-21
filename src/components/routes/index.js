@@ -1,7 +1,6 @@
 import {Route, Redirect, useLocation, useHistory} from "react-router-dom"
 import  DashboardPage from '../dashboard-page'
 import  EventsPage from '../events-page'
-import  InstancePage from '../instance-page'
 import  JQPlaygroundPage from '../jqplayground'
 import  SettingsPage from '../settings-page'
 import  WorkflowPage from '../workflow-page'

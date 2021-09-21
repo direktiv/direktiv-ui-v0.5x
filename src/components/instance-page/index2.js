@@ -1,26 +1,23 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react'
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
-import YAML from 'js-yaml'
 
-import {InstanceDetails} from "./api"
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import { useHistory, useParams } from 'react-router-dom'
 import Logs from './logs'
-import InputOutput from './input-output'
 import Diagram from '../workflow-page/diagram'
 
 import MainContext from '../../context'
 import { IoCode, IoEaselOutline, IoTerminal, IoHardwareChipSharp } from 'react-icons/io5'
 import ButtonWithDropDownCmp from './actions-btn'
-import { Workflow, checkStartType, WorkflowStateMillisecondMetrics } from '../workflows-page/api'
+import { Workflow, checkStartType, WorkflowStateMillisecondMetrics, WorkflowExecute } from '../workflows-page/api'
 import { sendNotification } from '../notifications'
 import LoadingWrapper from '../loading'
 import InstanceInputOutput from './instance-input-output'
 
 export default function Instance() {
-    const {fetch, namespace, handleError, extraLinks, sse} = useContext(MainContext)
+    const {fetch, namespace, handleError, extraLinks, sse, checkPerm, permissions} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -32,6 +29,7 @@ export default function Instance() {
     const [detailsLoad, setDetailsLoad] = useState(true)
     const [metricsLoading, setMetricsLoading] = useState(true)
     const [stateMetrics, setStateMetrics] = useState([])
+    const [iid, setIid] = useState("")
     const [startType, setStartType] = useState(true)
     const [timer, setTimer] = useState(null)
 
@@ -58,7 +56,7 @@ export default function Instance() {
         if(params.namespace !== "" && wf === "") {
             fetchDetails()
         }
-    },[fetch, handleError, init, instanceDetails, params.namespace])
+    },[fetch, handleError, init,  params.namespace, wf])
 
     // get metrics for diagram
     useEffect(()=>{
@@ -76,7 +74,7 @@ export default function Instance() {
     },[fetch, handleError, instanceDetails.as, metricsLoading, namespace])
 
     useEffect(()=>{
-        if(instanceSource === null) {
+        if(instanceSource === null && params.id !== iid) {
             let x = `/stream/flow/namespaces/${namespace}/instances/${params.id}`
 
             let eventConnection = sse(`${x}`, {})
@@ -103,8 +101,9 @@ export default function Instance() {
 
             eventConnection.onmessage = e => getData(e)
             setInstanceSource(eventConnection)
+            setIid(params.id)
         }
-    },[instanceSource, namespace])
+    },[instanceSource, iid, fetchWorkflow, namespace, params.id, sse])
 
     useEffect(()=>{
         return ()=>{
@@ -145,6 +144,28 @@ export default function Instance() {
             path: `/n/${params.namespace}/explorer/${instanceDetails.as}`
         }, ...extraLinks
     ]
+
+    if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete") {
+        if(startType && checkPerm(permissions, "executeWorkflow")) {
+            listElements.push(
+                {
+                    name: "Rerun Workflow",
+                    func: async ()=>{
+                        try {
+                            let id = await WorkflowExecute(fetch, namespace, instanceDetails.as, handleError, "{}")
+                            if(document.getElementById("logs-test")){
+                                document.getElementById("logs-test").innerHTML = ""
+                            }
+                            instanceSource.close()
+                            history.push(`/n/${namespace}/i/${id}`)
+                        } catch(e) {
+                            setActionErr(e.message)
+                        }
+                    }
+                }
+            )
+        }
+    }
 
     return(
         <LoadingWrapper isLoading={isLoading} text={`Loading Instance Details`}>

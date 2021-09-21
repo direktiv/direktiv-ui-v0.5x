@@ -38,7 +38,7 @@ export default function Navbar(props) {
             setError("")
             history.push(`/n/${ns}`)
         } catch(e) {
-            setError(`Failed to create namespace: ${e.message}`)
+            setError(`Error: ${e.message}`)
         }
     }
     

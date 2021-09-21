@@ -29,7 +29,7 @@ export default function NamespaceLogsComponent() {
 
     useEffect(()=>{
         if(namespaceLogSource === null) {
-            let uri = `/stream/flow/namespaces/${namespace}/logs`
+            let uri = `/namespaces/${namespace}/logs`
             
             let eventConnection = sse(`${uri}`,{})
             eventConnection.onerror = (e) => {
