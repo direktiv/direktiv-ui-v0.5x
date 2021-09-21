@@ -270,7 +270,7 @@ function WorkflowExplorer(props) {
                     <ExportWorkflow workflow={params[0]} namespace={params.namespace} toggleModal={toggleExportModal}/>
                 </Modal>
                 <div className="container" style={{flexDirection: "column", flex: "auto"}}>
-                    <div className="shadow-soft rounded tile" style={{ flex: "auto"}}>
+                    <div className="shadow-soft rounded tile" style={{ flex: "auto", display: "flex", flexDirection: "column"}}>
                         {err !== "" ?                    
                             <div style={{position:"relative"}}>
                                 <div style={{position: "absolute", fontSize:"12pt", background:"#ff8a80", padding:"10px", borderRadius:"10px", zIndex:100, width:"50%", left:"300px"}}>
@@ -295,20 +295,20 @@ function WorkflowExplorer(props) {
                         </TileTitle >
                     <EditorDetails  workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics} editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef} actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow} />
                     </div>
-                    <div className="shadow-soft rounded tile" style={{ flex: "auto", maxHeight:"200px"}}>
+                    <div className="shadow-soft rounded tile" style={{ flex: "auto", maxHeight:"200px", display: "flex", flexDirection: "column"}}>
                         <TileTitle name="Execute Workflow">
                             <IoPlaySharp />
                         </TileTitle >
-                        <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", top: "-28px", position: "relative" }}>
-                            <div style={{ width: "100%", height: "100%", position: "relative" }}>
-                                <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
+                        <div style={{ display: "flex", flexDirection: "column", flexWrap: "wrap", width: "100%", top: "-28px", position: "relative", flex: 1, minHeight: "200px" }}>
+                            <div style={{ flex: 1, width: "100%", position: "relative" }}>
+                                <div style={{ position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
                                     <Editor refValSet={jsonRefInput} err={executeErr} value={jsonInput} setValue={setJsonInput} showFooter={true} actions={[executeButton]} />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="container" style={{ flexDirection: "column", maxWidth:"380px", minWidth:"380px", flex: "auto" }} >
+                <div className="container auto-width-all-896" style={{ flexDirection: "column", maxWidth:"380px", minWidth:"380px", flex: "auto" }} >
                     <SuccessOrFailedWorkflows namespace={params.namespace} fetch={fetch} workflow={params.workflow} handleError={handleError}/>
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle actionsDiv={[
