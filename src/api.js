@@ -3,6 +3,7 @@ export async function Namespaces(fetch, handleError, load, val) {
         let newNamespace = ""
         let namespaces = []
         let resp = await fetch(`/namespaces`, {})
+        let storageNamespace = localStorage.getItem("namespace")
 
         if(resp.ok) {
             let json = await resp.json() 
@@ -13,36 +14,46 @@ export async function Namespaces(fetch, handleError, load, val) {
                 if(load) {
 
                     let exist = false
+                    let storageNSFound = false
                     let pathNamespace = window.location.pathname.split("/")[2]
-                    let newNamespace = ""
-
-                    // loop list of namespaces see if it exists? set if it exists other wise set to first
 
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
+                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true
                             newNamespace = json.edges[i].node.name
                         }
+
+                        if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
+                            storageNSFound = true
+                            newNamespace = storageNamespace
+                        }
                     }
 
                     // if ns does not exist, and there is atleast 1 ns in list then set it to first ns
-                    if(!exist && namespaces.length > 0) {
+                    if(!exist && namespaces.length > 0 && !storageNSFound) {
                         newNamespace = namespaces[0]
-                        // window.location.pathname = `/n/${newNamespace}`
-                        return {
-                            namespaces: namespaces,
-                            namespace: ""
-                        }
-                    } else if (pathNamespace === "") {
+                    } else if (pathNamespace === "" && !storageNSFound) {
                         // otherwise set it to root
                         window.location.pathname = "/"
                         return
                     }
 
-                    console.log('setting to ', newNamespace, namespaces)
-                    
+
+                    // Check routes that dont require namespace
+                    if (window.location.pathname === "/jq/playground" || window.location.pathname === "/global/functions") {
+                        return {
+                            namespaces: namespaces,
+                            namespace: newNamespace
+                        }
+                    } else if (!exist) {
+                        window.location.pathname = `/n/${newNamespace}`
+                        return
+                    }
+
+                    // Namespace exists 
                     return {
                         namespaces: namespaces,
                         namespace: newNamespace
