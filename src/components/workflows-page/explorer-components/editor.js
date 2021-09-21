@@ -8,9 +8,9 @@ export default function EditorDetails(props) {
     return(
         <>
             {editorTab === "editor" ? 
-                        <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
-                            <div style={{ width: "100%", height: "100%", position: "relative" }}>
-                                <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
+                        <div style={{ display: "flex", flexDirection: "column", flexWrap: "wrap", width: "100%", minHeight: "300px", top: "-28px", position: "relative", flex: 1 }}>
+                            <div style={{ width: "100%", flex: "1", height: "100%", position: "relative" }}>
+                                <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: "-25px" }}>
                                     <Editor refValSet={wfRefValue} functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={[<LogButton showLogEvent={showLogEvent} updateLogEvent={updateLogEvent} setShowLogEvent={setShowLogEvent} logEvent={logEvent} setLogEvent={setLogEvent} />, <SaveButton workflowValueOld={workflowValueOld} workflowValue={workflowValue} updateWorkflow={updateWorkflow} />]} commentKey={"#"}/>
                                 </div>
                             </div>
