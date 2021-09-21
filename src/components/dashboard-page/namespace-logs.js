@@ -20,6 +20,7 @@ export default function NamespaceLogsComponent() {
     const logsRef = useRef(logs)
 
     const [err, setErr] = useState("")
+    const [oldNamespace, setOldNamespace] = useState("")
     const [tail, setTail] = useState(true)
 
     const tailRef = useRef(true)
@@ -28,7 +29,7 @@ export default function NamespaceLogsComponent() {
     const [namespaceLogSource, setNamespaceLogSource] = useState(null)
 
     useEffect(()=>{
-        if(namespaceLogSource === null) {
+        if(namespaceLogSource === null || oldNamespace !== namespace) {
             let uri = `/namespaces/${namespace}/logs`
             
             let eventConnection = sse(`${uri}`,{})
@@ -45,12 +46,12 @@ export default function NamespaceLogsComponent() {
 
             async function getData(e) {
                 let log = logsRef.current
-
-                let json = JSON.parse(e.data)
                 if(e.data === "") {
                     return
                 }
 
+                let json = JSON.parse(e.data)
+            
                 for(let i=0; i < json.edges.length; i++) {
                     log += `\u001b[38;5;248m[${dayjs.utc(json.edges[i].node.t).local().format("HH:mm:ss")}]\u001b[0m `
                     log += `${json.edges[i].node.msg}`
@@ -68,6 +69,7 @@ export default function NamespaceLogsComponent() {
             }
             eventConnection.onmessage = e => getData(e)
             setNamespaceLogSource(eventConnection)
+            setOldNamespace(namespace)
         }
     },[namespace, namespaceLogSource, sse])
 

@@ -11,57 +11,43 @@ export async function Namespaces(fetch, handleError, load, val) {
             if(json.edges){
                 // if its the first load
                 if(load) {
-                    // check routes that dont have a namespace attached
-                    if(window.location.pathname !== "/jq/playground" && window.location.pathname.includes("/global/functions")) {
-                        if (window.location.pathname.split("/")[2] !== "") {
-                            newNamespace = window.location.pathname.split("/")[2]
-                        }
 
-                        let f = false
-                        for (let i=0; i < json.edges.length; i++) {
-                            if(json.edges[i].node.name === newNamespace) {
-                                f = true
-                            }
-                        }
+                    let exist = false
+                    let pathNamespace = window.location.pathname.split("/")[2]
+                    let newNamespace = ""
 
-                        if(!f) {
-                            window.location.pathname = "/"
-                            return
+                    // loop list of namespaces see if it exists? set if it exists other wise set to first
+
+                    // loop through ns and push ns to list. also check if path ns exists
+                    for(let i=0; i < json.edges.length; i++) {
+                        namespaces.push(json.edges[i].node.name)
+                        if(json.edges[i].node.name === pathNamespace){
+                            exist = true
+                            newNamespace = json.edges[i].node.name
                         }
                     }
 
-                    if(newNamespace === ""){
-                        if (localStorage.getItem("namespace") !== undefined && localStorage.getItem("namespace") === "") {
-                            if(json.edges.length > 0) {
-                                newNamespace = json.edges[0].node.name
-                            }
-                        } else {
-                            let found = false
-                            for (let i=0; i < json.edges.length; i++) {
-                                if(json.edges[i] !== null && json.edges[i].node.name === localStorage.getItem("namespace")) {
-                                    found = true
-                                    newNamespace = localStorage.getItem("namespace")
-                                    break
-                                }
-                            }
-                            if(!found && json.edges.length > 0) {
-                                newNamespace = json.edges[0].node.name
-                                localStorage.setItem("namespace", json.edges[0].node.name)
-                            } 
+                    // if ns does not exist, and there is atleast 1 ns in list then set it to first ns
+                    if(!exist && namespaces.length > 0) {
+                        newNamespace = namespaces[0]
+                        // window.location.pathname = `/n/${newNamespace}`
+                        return {
+                            namespaces: namespaces,
+                            namespace: ""
                         }
+                    } else if (pathNamespace === "") {
+                        // otherwise set it to root
+                        window.location.pathname = "/"
+                        return
+                    }
+
+                    console.log('setting to ', newNamespace, namespaces)
+                    
+                    return {
+                        namespaces: namespaces,
+                        namespace: newNamespace
                     }
                 }
-
-                if (newNamespace === "" && val) {
-                    newNamespace = val
-                }
-                for (let i=0; i < json.edges.length; i++) {
-                    namespaces.push(json.edges[i].node.name)
-                }
-            }
-            return {
-                namespaces: namespaces,
-                namespace: newNamespace
             }
         } else {
             await handleError('fetching namespaces', resp, "listNamespaces")
