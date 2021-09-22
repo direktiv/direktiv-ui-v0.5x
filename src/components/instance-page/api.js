@@ -1,3 +1,18 @@
+export async function InstanceCancel(fetch, namespace, instance, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/instances/${instance}/cancel`, {
+            method:"POST"
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('cancelling instance', resp, "cancelInstance")
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
 export async function InstanceDetails(fetch, namespace, instance, handleError) {
     try {
         let resp = await fetch(`/flow/namespaces/${namespace}/instances/${instance}`, {
@@ -21,7 +36,6 @@ export async function InstanceInput(fetch, namespace, instance, handleError) {
         })
         if(resp.ok) {
             let json = await resp.json()
-            console.log(json, "CHECK")
             return atob(json.data)
         } else {
             await handleError('get instance input', resp, 'getInstance')

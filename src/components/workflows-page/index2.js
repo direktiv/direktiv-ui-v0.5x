@@ -16,10 +16,10 @@ import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
 
 
-import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowUpdate } from "./api";
+import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
-import { NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
+import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
 
 
 function ShowError(msg, setErr) {
@@ -91,7 +91,7 @@ function WorkflowExplorer(props) {
     const [editorTab, setEditorTab] = useState("editor")
 
     // Logs
-    const [logEvent, setLogEvent] = useState("hello-world")
+    const [logEvent, setLogEvent] = useState("")
     const [showLogEvent, setShowLogEvent] = useState(false)
 
     // knative functions
@@ -133,22 +133,18 @@ function WorkflowExplorer(props) {
         setFetching(true)
         async function fetchData() {
             try {
-                let wf = await Workflow(fetch, params.namespace, params[0])
-                // TODO
-                // let active = await WorkflowActiveStatus(fetch, params.namespace, params[0])
-                // TODO
-                // let logToEvents = await FetchLogToEvents(fetch, params.namespace, params[0])
+                let {eventLogging, source} = await Workflow(fetch, params.namespace, params[0])
+                let active = await WorkflowActiveStatus(fetch, params.namespace, params[0])
 
-                // console.log(active)
+                wfRefValue.current = source
+                setWorkflowValue(source)
+                setWorkflowValueOld(source)
+                setLogEvent(eventLogging)
 
-                wfRefValue.current = wf
-                setWorkflowValue(wf)
-                setWorkflowValueOld(wf)
-
-                // setWorkflowInfo((wfI) => {
-                //     wfI.active = active
-                //     return { ...wfI }
-                // })
+                setWorkflowInfo((wfI) => {
+                    wfI.active = active
+                    return { ...wfI }
+                })
             } catch(e) {
                 ShowError(e.message, setErr)
             }
@@ -172,7 +168,12 @@ function WorkflowExplorer(props) {
     
 
     async function updateLogEvent() {
-        // TODO :)
+        try {
+            let val = await WorkflowSetLogToEvent(fetch, namespace, params[0], logEvent, handleError)
+            setLogEvent(val)
+        } catch(e) {
+            setActionErr(e.message)
+        }
     }
 
     async function updateWorkflow() {
@@ -242,7 +243,7 @@ function WorkflowExplorer(props) {
                     })
                     setToggleErr("")
                 } catch(e) {
-                    setToggleErr(`Failed to toggle workflow: ${e.message}`)
+                    setToggleErr(`Error: ${e.message}`)
                 }               
             },
         }
@@ -293,7 +294,12 @@ function WorkflowExplorer(props) {
                         ]}>
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
-                    <EditorDetails  workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics} editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef} actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow} />
+                    <EditorDetails  
+                        workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics}
+                        editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef}
+                        actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow}
+                        showLogEvent={showLogEvent} updateLogEvent={updateLogEvent} setShowLogEvent={setShowLogEvent} logEvent={logEvent} setLogEvent={setLogEvent}
+                    />
                     </div>
                     <div className="shadow-soft rounded tile" style={{ flex: "auto", maxHeight:"200px", display: "flex", flexDirection: "column"}}>
                         <TileTitle name="Execute Workflow">
@@ -387,7 +393,7 @@ function ListExplorer(props) {
                         <ul>
                             {objects.map((obj)=>{
                                 return(
-                                    <FileObject fetchData={fetchData} setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
+                                    <FileObject handleError={handleError} fetchData={fetchData} setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
                                 )
                             })}
                         </ul>
@@ -410,7 +416,7 @@ function ListExplorer(props) {
                         <TileTitle name="Send Namespace Event">
                             <IoAdd />
                         </TileTitle>
-                        <SendNamespaceEvent />
+                        <SendNamespaceEvent fetch={fetch} namespace={namespace} handleError={handleError} setErr={setErr}/>
                     </div>
                 </div>
             </div>
@@ -419,14 +425,23 @@ function ListExplorer(props) {
 }
 
 function SendNamespaceEvent(props){
+    const {fetch, namespace, handleError, setErr} = props
     const [val, setVal] = useState("")
 
-    // TODO handle broadcasting namespace event
+    async function sendNamespaceEvent() {
+        try {
+            await NamespaceBroadcastEvent(fetch, namespace, val, handleError)
+            setVal("")
+        } catch(e) {
+            ShowError(`Error: ${e.message}`, setErr)
+        }
+    }
+
     return (
         <div>
             <textarea rows={4} value={val} onChange={(e) => setVal(e.target.value)} style={{ width:"100%", resize: "none" }} />
             <div style={{ textAlign: "right" }}>
-                <input onClick={() => {}} type="submit" value="Send Event" />
+                <input onClick={() => sendNamespaceEvent()} type="submit" value="Send Event" />
             </div>
         </div>
     )
@@ -439,12 +454,18 @@ function CreateWorkflow(props) {
     const [wfName, setWfName] = useState("")
     const [template, setTemplate] = useState("default")
     const [templateData, setTemplateData] = useState(noop)
+    const history = useHistory()
 
     const createWorkflow = async () => {
        try {
             let success = await NamespaceCreateNode(fetch, namespace, path, wfName, "workflow", templateData, handleError)
             if(success) {
-                fetchData()
+                if(path) {
+                    history.push(`/n/${namespace}/explorer/${path}/${wfName}`)
+                } else {
+                    history.push(`/n/${namespace}/explorer/${wfName}`)
+                }
+                // fetchData()
                 setWfName("")
             } 
         } catch(e) {
@@ -542,14 +563,19 @@ function CreateWorkflow(props) {
 
 function CreateDirectory(props) {
 
-    const {fetch, handleError, path, setErr, fetchData, namespace} = props
+    const {fetch, handleError, path, setErr, namespace} = props
     const [dir, setDir] = useState("")
+    const history = useHistory()
 
     const createDirectory = async () => {
         try {
             let success = await NamespaceCreateNode(fetch, namespace, path, dir, "directory", undefined, handleError)
             if(success) {
-                fetchData()
+                if(path) {
+                    history.push(`/n/${namespace}/explorer/${path}/${dir}`)
+                } else {
+                    history.push(`/n/${namespace}/explorer/${dir}`)
+                }
                 setDir("")
             } 
         } catch(e) {
@@ -580,16 +606,25 @@ function FileObject(props) {
 
     useEffect(()=>{
         async function checkActive() {
-            // TODO if workflow handle active
-            setActive(true)
+            try {
+                let active = await WorkflowActiveStatus(fetch, namespace, id, handleError)
+                setActive(active)
+            } catch(e) {
+                ShowError(`Error: ${e.message}`)
+            }
         }
         if(active === null && type === "workflow"){
             checkActive()
         }
-    },[active, type])
+    },[active, type, fetch, handleError, id, namespace])
 
-    function toggleObject() {
-        //TODO add toggle workflow
+    async function toggleObject() {
+        try {
+            let active2 = await WorkflowSetActive(fetch, namespace, id, handleError, !active)
+            setActive(active2)
+        } catch(e) {
+            ShowError(`Error: ${e.message}`, setErr)
+        }
     }
 
     async function deleteObject() {

@@ -418,7 +418,7 @@ export function EnvrionmentContainer(props) {
                 }
                 setEnvList([...vars])
             } catch (e) {
-                setError(e.message)
+                setError(`Error: ${e.message}`)
             }
         }
         return fetchVars().finally(() => { setFetching(false) })
@@ -453,7 +453,7 @@ export function EnvrionmentContainer(props) {
                 link.click()
                 link.parentNode.removeChild(link)
             } catch (e) {
-                setError(`${e.message}`)
+                setError(`Error: ${e.message}`)
             }
         }
         fetchVars().finally(() => { setFetching(false); setIsDownloading(false)})
@@ -483,7 +483,7 @@ export function EnvrionmentContainer(props) {
         if (!force) {
             for (let i = 0; i < envList.length; i++) {
                 if (envList[i].name === envName) {
-                    setError("Failed To Create New Varaible: Variable Name Already Exists")
+                    setError("Failed To Create New Variable: Variable Name Already Exists")
                     setFetching(false)
                     return ok
                 }
@@ -499,7 +499,7 @@ export function EnvrionmentContainer(props) {
             }
             fetchVariables()
         } catch (e) {
-            setError(e.message)
+            setError(`Error: ${e.message}`)
         }
         setFetching(false)
         return ok

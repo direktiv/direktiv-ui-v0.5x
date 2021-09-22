@@ -15,7 +15,7 @@ import { Workflow, checkStartType, WorkflowStateMillisecondMetrics, WorkflowExec
 import { sendNotification } from '../notifications'
 import LoadingWrapper from '../loading'
 import InstanceInputOutput from './instance-input-output'
-import { InstanceInput } from './api'
+import { InstanceCancel, InstanceInput } from './api'
 
 export default function Instance() {
     const {fetch, namespace, handleError, extraLinks, sse, checkPerm, permissions} = useContext(MainContext)
@@ -59,9 +59,9 @@ export default function Instance() {
             setInit(true)
             if(!init) {
                 try {
-                    let wf = await Workflow(fetch, params.namespace, id, handleError)
-                    let start = await checkStartType(wf, setWorkflowErr)
-                    setWf(wf)
+                    let {source} = await Workflow(fetch, params.namespace, id, handleError)
+                    let start = await checkStartType(source, setWorkflowErr)
+                    setWf(source)
                     setStartType(start)
                 } catch(e) {
                     setWorkflowErr(`${e.message}`)
@@ -176,6 +176,19 @@ export default function Instance() {
                 }
             )
         }
+    } else if(checkPerm(permissions, "cancelInstance")) {
+        listElements.push(
+          {
+              name: "Cancel Instance",
+              func: async ()=>{
+                    try {
+                        await InstanceCancel(fetch, namespace, iid, handleError)
+                    }  catch(e) {
+                        setActionErr(`Error: ${e.message}`)
+                    }
+              }
+          }
+        )
     }
 
     return(

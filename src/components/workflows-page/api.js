@@ -17,22 +17,38 @@ export async function checkStartType(wf) {
     }
 }
 
-export async function WorkflowSetActive(fetch, namespace, workflow, handleError, active) {
+export async function WorkflowSetLogToEvent(fetch, namespace, workflow, val, handleError) {
     try {
-        let resp = await fetch(`/flow/active/${workflow}`, {
-            method: "PUT",
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-workflow-event-logging`,{
+            method: "POST",
             body: JSON.stringify({
-                active: active
+                logger: val
             })
         })
         if(resp.ok) {
-            let json = await resp.json()
-            return json.live
+            return val
+        } else {
+            await handleError('fetch workflow log to events', resp, 'getWorkflow')
+        }
+    } catch(e) {
+        throw new Error(`Failed to fetch log to events: ${e.message}`)
+    }
+}
+export async function WorkflowSetActive(fetch, namespace, workflow, handleError, active) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=toggle`, {
+            method: "POST",
+            body: JSON.stringify({
+                live: active
+            })
+        })
+        if(resp.ok) {
+            return active
         } else {
             await handleError('toggle workflow', resp, 'toggleWorkflow')
         }
     } catch(e) {
-        throw new Error(`Failed to toggle workflow: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -65,14 +81,12 @@ export async function WorkflowUpdate(fetch, namespace, workflow, handleError, wo
         })
         if (resp.ok) {
             let json = await resp.json()
-            // TODO
-            // let active = await WorkflowActiveStatus(fetch, namespace, workflow, handleError)
-            // TODO
-            // let exec = await checkStartType(workflowValue)
+            let active = await WorkflowActiveStatus(fetch, namespace, workflow, handleError)
+            let exec = await checkStartType(workflowValue)
             return {
                 revision: json.revision.hash,
-                active: true,
-                exec: true
+                active: active,
+                exec: exec
             }
         } else {
             await handleError('update workflow', resp, 'updateWorkflow')
@@ -84,7 +98,7 @@ export async function WorkflowUpdate(fetch, namespace, workflow, handleError, wo
 
 export async function WorkflowLogToEventStatus(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/workflows/${workflow}`,{
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-workflow-event-logging`,{
             method: "GET"
         })
         if(resp.ok) {
@@ -100,17 +114,18 @@ export async function WorkflowLogToEventStatus(fetch, namespace, workflow, handl
 
 export async function WorkflowActiveStatus(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/active/${workflow}`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=router`, {
             method: "get",
         })
         if (resp.ok) {
             let json = await resp.json()
+            console.log(json)
             return json.live
         } else {
             await handleError('fetch workflow active status', resp, 'getWorkflow')
         }
     } catch (e) {
-        throw new Error(`Failed to workflow active status: ${e.message}`)
+        throw new Error(`${e.message}`)
     }
 }
 
@@ -121,21 +136,10 @@ export async function Workflow(fetch, namespace, workflow, handleError) {
         })
         if (resp.ok) {
             let json = await resp.json()
-            return atob(json.revision.source)
-            // let wf = atob(json.workflow)
-
-
-
-            // // setExecutable(exec)
-            // setWorkflowValue(wf)
-            // wfRefValue.current = wf
-            // setWorkflowValueOld(wf)
-
-            // setWorkflowInfo((wfI) => {
-            //     wfI.active = json.active
-            //     return { ...wfI }
-            // })
-            // setLogEvent(json.logToEvents)
+            return {
+                eventLogging: json.eventLogging,
+                source: atob(json.revision.source)
+            }
         } else {
             await handleError('fetch workflow', resp, 'getWorkflow')
         }
@@ -146,7 +150,7 @@ export async function Workflow(fetch, namespace, workflow, handleError) {
 
 export async function WorkflowInstances(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/instances?pagination.filter.field=AS&pagination.filter.type=CONTAINS&pagination.filter.val=${workflow}`,{})
+        let resp = await fetch(`/namespaces/${namespace}/instances?pagination.filter.field=AS&pagination.filter.type=CONTAINS&pagination.filter.val=${workflow}`,{})
         if (resp.ok) {
             let json = await resp.json()
             console.log(json)
@@ -175,7 +179,7 @@ export async function WorkflowStateMillisecondMetrics(fetch, namespace, workflow
 
 export async function WorkflowVariables(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/workflow-variables/workflow/${workflow}`, {})
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=vars`, {})
         if(resp.ok) {
             let json = await resp.json()
             if(Array.isArray(json.variables.edges)){
@@ -194,7 +198,7 @@ export async function WorkflowVariables(fetch, namespace, workflow, handleError)
 
 export async function WorkflowSetVariable(fetch, namespace, workflow, name, val, handleError) {
     try {
-        let resp = await fetch(`/vars/namespaces/${namespace}/workflows/${workflow}/vars/${name}`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-var&var=${name}`, {
             method: "PUT",
             body: val
         })
@@ -211,7 +215,7 @@ export async function WorkflowSetVariable(fetch, namespace, workflow, name, val,
 
 export async function WorkflowDeleteVariable(fetch, namespace, workflow, name, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/workflows/${workflow}/vars/${name}`,{
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=delete-var&var=${name}`,{
             method: "DELETE"
         })
         if(resp.ok) {
@@ -226,7 +230,7 @@ export async function WorkflowDeleteVariable(fetch, namespace, workflow, name, h
 
 export async function WorkflowGetVariable(fetch, namespace, workflow, name, handleError) {
     try {
-        let resp = await fetch(`/vars/namespaces/${namespace}/workflows/${workflow}/vars/${name}`, {})
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=var&var=${name}`, {})
         if(resp.ok) {
             return await resp.text()
         } else {
@@ -239,7 +243,7 @@ export async function WorkflowGetVariable(fetch, namespace, workflow, name, hand
 
 export async function WorkflowDownloadVariable(fetch, namespace, workflow, name, handleError) {
     try {
-        let resp = await fetch(`/vars/namespaces/${namespace}/workflows/${workflow}/vars/${name}`, {})
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=var&var=${name}`, {})
         if(resp.ok) {
             return {
                 contentType: resp.headers.get("content-type"),

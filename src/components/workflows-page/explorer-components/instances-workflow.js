@@ -5,6 +5,10 @@ import { Link } from "react-router-dom"
 import MainContext from '../../../context'
 import {NoResults} from '../../../util-funcs'
 
+import * as dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 export function WorkflowInstanceList(props) {
     const {workflow} = props
     const { fetch, namespace, handleError } = useContext(MainContext)
@@ -44,8 +48,11 @@ export function WorkflowInstanceList(props) {
                                                     <li style={{ cursor: "pointer" }} className="event-list-item">
                                                         <div>
                                                             <span><CircleFill className={obj.node.status} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
-                                                            <span>
+                                                            <span style={{width:"150px"}}>
                                                                 {obj.node.as}
+                                                            </span>
+                                                            <span>
+                                                                {dayjs.utc(obj.node.createdAt).local().fromNow()}
                                                             </span>
                                                         </div>
                                                     </li>

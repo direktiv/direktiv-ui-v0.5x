@@ -264,7 +264,7 @@ export async function NamespaceSetVariable(fetch, namespace, name, val, handleEr
 
 export async function NamespaceDeleteVariable(fetch, namespace, name, handleError) {
     try {
-        let resp = await fetch(`/flow/namespaces/${namespace}/namespace-variables/${name}`,{
+        let resp = await fetch(`/namespaces/${namespace}/vars/${name}`,{
             method: "DELETE"
         })
         if(resp.ok) {
@@ -279,7 +279,7 @@ export async function NamespaceDeleteVariable(fetch, namespace, name, handleErro
 
 export async function NamespaceGetVariable(fetch, namespace, name, handleError) {
     try {
-        let resp = await fetch(`/vars/namespaces/${namespace}/vars/${name}`, {})
+        let resp = await fetch(`/namespaces/${namespace}/vars/${name}`, {})
         if(resp.ok) {
             return await resp.text()
         } else {
@@ -290,10 +290,9 @@ export async function NamespaceGetVariable(fetch, namespace, name, handleError) 
     }
 }
 
-
 export async function NamespaceDownloadVariable(fetch, namespace, name, handleError) {
     try {
-        let resp = await fetch(`/vars/namespaces/${namespace}/vars/${name}`, {})
+        let resp = await fetch(`/namespaces/${namespace}/vars/${name}`, {})
         if(resp.ok) {
             return {
                contentType: resp.headers.get("content-type"),
@@ -383,6 +382,22 @@ export async function NamespaceDeleteNode(fetch, namespace, path, name, handleEr
             return true
         } else {
             await handleError('delete node', resp, "TODO")
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
+export async function NamespaceBroadcastEvent(fetch, namespace, data, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/broadcast`,{
+            method: "POST",
+            body: data
+        })
+        if(resp.ok) {
+            return true
+        } else {
+            await handleError('send namespace event', resp, "namespaceEvent")
         }
     } catch(e) {
         throw new Error(e.message)

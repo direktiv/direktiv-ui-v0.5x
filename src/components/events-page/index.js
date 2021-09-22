@@ -86,7 +86,7 @@ export function EventsPageBody() {
                                         <tr className="event-list-item">
                                             <td style={{ textAlign: "center" }}><EventStatus status={obj.node.status} /></td>
                                             <td style={{ textAlign: "left" }}>{obj.node.as}</td>
-                                            <td>{dayjs.utc(obj.node.created_at).local().fromNow()}</td>
+                                            <td>{dayjs.utc(obj.node.createdAt).local().fromNow()}</td>
                                         </tr>
                                     </Link>
                                 )
