@@ -45,6 +45,49 @@ export async function GlobalFunction(fetch, handleError, svn) {
     }
 }
 
+// Can also be used to create function
+export async function GlobalUpdateFunction(fetch, handleError, svn, image, minScale, size, cmd, traffic) {
+    try {
+        let resp = await fetch(`/functions/${svn}`, {
+            method: "POST",
+            body: JSON.stringify({
+                image: image,
+                minScale: minScale,
+                size: size,
+                cmd: cmd,
+                trafficPercent: traffic
+            })
+        })
+
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('updating namespace service', resp, "updateNamespaceService")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalUpdateTrafficFunction(fetch, handleError, svn, traffic) {
+    try {
+        let resp = await fetch(`/functions/${svn}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+                values: traffic,
+            })
+        })
+
+        if(resp.ok) {
+            return await resp.json()
+        } else {
+            await handleError('set traffic', resp, "updateNamespaceServiceTraffic")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
 export async function GlobalCreateFunction(fetch, handleError, svn, image, minScale, size, cmd) {
     try {
         let resp = await fetch(`/functions`, {

@@ -15,7 +15,7 @@ export default function Breadcrumbs(props) {
             {breadcrumbs.map((obj)=>{
 
                 // If matching certain paths
-                if(obj.key === "/n" || obj.key === "/") {
+                if(obj.key === "/n" || obj.key === "/" || obj.key === "/functions") {
                     return ""
                 }     
 

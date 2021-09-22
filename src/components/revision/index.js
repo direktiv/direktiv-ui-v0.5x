@@ -71,7 +71,7 @@ export default function Revision() {
 
         if(podSource === null) {
             // setup
-            let x = `/functions/${service}/revisions/${revision}/pods`
+            let x = `/functions/${service}/revision/${revision}/pods`
             if (namespace) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revision/${revision}/pods`
             }
@@ -288,7 +288,7 @@ function PodLogs(props) {
     // set new log watcher on pod
     useEffect(()=>{
         if(pod !== "") {
-            let x = `/functions/${service}/revisions/${revision}/pods/${pod}/logs`
+            let x = `/functions/${service}/revision/${revision}/pods/${pod}/logs`
             if (namespace) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revision/${revision}/pods/${pod}/logs`
             }

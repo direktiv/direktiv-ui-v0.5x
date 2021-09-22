@@ -426,9 +426,7 @@ export async function NamespaceFunction(fetch, handleError, ns, svn) {
         let resp = await fetch(`/functions/namespaces/${ns}/function/${svn}`, {})
 
         if(resp.ok) {
-            let json = await resp.json() 
-
-            return json
+            return await resp.json()
         } else {
             await handleError('fetching namespace function', resp, "listNamespaceFunction")
         }
@@ -454,6 +452,49 @@ export async function NamespaceCreateFunction(fetch, handleError, ns, svn, image
             return
         } else {
             await handleError('creating namespace function', resp, "createNamespaceFunctions")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+// This is also used to create a revision
+export async function NamespaceUpdateFunction(fetch, handleError, ns, svn, image, minScale, size, cmd, traffic) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${ns}/function/${svn}`, {
+            method: "POST",
+            body: JSON.stringify({
+                image: image,
+                minScale: minScale,
+                size: size,
+                cmd: cmd,
+                trafficPercent: traffic
+            })
+        })
+
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('updating namespace service', resp, "updateNamespaceService")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function NamespaceUpdateTrafficFunction(fetch, handleError, namespace, svn, traffic) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${namespace}/function/${svn}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+                values: traffic,
+            })
+        })
+
+        if(resp.ok) {
+            return await resp.json()
+        } else {
+            await handleError('set traffic', resp, "updateNamespaceServiceTraffic")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
