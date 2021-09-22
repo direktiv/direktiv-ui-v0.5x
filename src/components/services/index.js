@@ -372,7 +372,6 @@ function Revision(props) {
                 await GlobalDeleteFunctionRevision(fetch, handleError, serviceName, revision)
             }
 
-            fetchServices()
         } catch (e) {
             sendNotification("Error:", e.message, 0)
         }
