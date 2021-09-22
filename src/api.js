@@ -43,7 +43,7 @@ export async function Namespaces(fetch, handleError, load, val) {
 
 
                     // Check routes that dont require namespace
-                    if (window.location.pathname === "/jq/playground" || window.location.pathname === "/global/functions") {
+                    if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
                         return {
                             namespaces: namespaces,
                             namespace: newNamespace
