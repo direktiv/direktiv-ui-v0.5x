@@ -129,6 +129,42 @@ export async function WorkflowActiveStatus(fetch, namespace, workflow, handleErr
     }
 }
 
+export async function WorkflowAddAttributes(fetch, namespace, workflow, attributes, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=create-node-attributes`, {
+            method: "PUT",
+            body: JSON.stringify({
+                attributes: attributes
+            })
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('add workflow attributes', resp, 'createNodeAttributes')
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
+export async function WorkflowDeleteAttributes(fetch, namespace, workflow, attributes, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=delete-node-attributes`, {
+            method: "DELETE",
+            body: JSON.stringify({
+                attributes: attributes
+            })
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('delete workflow attributes', resp, 'deleteNodeAttributes')
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
 export async function Workflow(fetch, namespace, workflow, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}`, {
@@ -136,9 +172,12 @@ export async function Workflow(fetch, namespace, workflow, handleError) {
         })
         if (resp.ok) {
             let json = await resp.json()
+            console.log(json)
             return {
                 eventLogging: json.eventLogging,
-                source: atob(json.revision.source)
+                attributes: json.node.attributes,
+                source: atob(json.revision.source),
+
             }
         } else {
             await handleError('fetch workflow', resp, 'getWorkflow')

@@ -12,6 +12,7 @@ import "./style/charts.css";
 import "./style/events.css";
 import "./style/responsive.css"
 import "./style/services.css"
+import "./style/attributes.css"
 
 import App from './App';
 

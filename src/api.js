@@ -153,12 +153,7 @@ export async function NamespaceRegistries(fetch, namespace, handleError) {
         let resp = await fetch(`/functions/namespaces/${namespace}/registries`,{})
         if(resp.ok) {
             let json = await resp.json()
-            if (Array.isArray(json.registries.edges)) {
-                if(json.registries.edges.length > 0) {
-                   return json.registries.edges
-                }
-            } 
-            return []
+            return json.registries
         } else {
             await handleError('fetch registries', resp, 'listRegistries')
         }

@@ -20,6 +20,7 @@ import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, Wor
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
+import Attribute from "./attributes";
 
 
 function ShowError(msg, setErr) {
@@ -117,6 +118,7 @@ function WorkflowExplorer(props) {
     // export modal
     const [exportModalOpen, setExportModalOpen] = useState(false)
 
+    const [attributes, setAttributes] = useState([])
 
     const codemirrorRef = useRef()
 
@@ -133,11 +135,12 @@ function WorkflowExplorer(props) {
         setFetching(true)
         async function fetchData() {
             try {
-                let {eventLogging, source} = await Workflow(fetch, params.namespace, params[0])
+                let {eventLogging, source, attributes} = await Workflow(fetch, params.namespace, params[0])
                 let active = await WorkflowActiveStatus(fetch, params.namespace, params[0])
 
                 wfRefValue.current = source
                 setWorkflowValue(source)
+                setAttributes(attributes)
                 setWorkflowValueOld(source)
                 setLogEvent(eventLogging)
 
@@ -328,7 +331,7 @@ function WorkflowExplorer(props) {
                         </TileTitle>
                         <Details tab={tab} />
                     </div>
-                    {attributeAdd ? attributeAdd : ""}
+                    <Attribute setErr={setErr} ShowError={ShowError} attributes={attributes} setAttributes={setAttributes} />
                 </div>
             </div>
         </>
