@@ -275,7 +275,7 @@ function Registries() {
                 setActionErr("")
                 return fetchR()
             } catch (e) {
-                setActionErr(e.message)
+                setActionErr(`Error: ${e.message}`)
             }
         } else {
             setActionErr(`Failed to create a registry: Name, user and Token needs to be provided.`)
@@ -290,7 +290,7 @@ function Registries() {
             setActionErr("")
             return fetchR()
         } catch (e) {
-            setActionErr(e.message)
+            setActionErr(`Error: ${e.message}`)
         }
     }
 
