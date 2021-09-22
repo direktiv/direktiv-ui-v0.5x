@@ -423,7 +423,7 @@ export async function NamespaceFunctions(fetch, handleError, ns) {
 
 export async function NamespaceFunction(fetch, handleError, ns, svn) {
     try {
-        let resp = await fetch(`/functions/namespaces/namespaces/${ns}/services/${svn}`, {})
+        let resp = await fetch(`/functions/namespaces/${ns}/function/${svn}`, {})
 
         if(resp.ok) {
             let json = await resp.json() 
@@ -463,7 +463,7 @@ export async function NamespaceCreateFunction(fetch, handleError, ns, svn, image
 export async function NamespaceDeleteFunction(fetch, handleError, ns, svn) {
     console.log("svn =", svn)
     try {
-        let resp = await fetch(`/functions/namespaces/${ns}/services/${svn}`, {
+        let resp = await fetch(`/functions/namespaces/${ns}/function/${svn}`, {
             method: "DELETE"
         })
 

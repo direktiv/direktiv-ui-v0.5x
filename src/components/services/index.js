@@ -44,7 +44,7 @@ export default function Services() {
 
     const getService = useCallback((dontChangeRev)=>{
         async function getServices() {
-            let x = `/functions/global-${service}`
+            let x = `/functions/${service}`
             if (namespace) {
                 x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
@@ -76,11 +76,12 @@ export default function Services() {
     // setup sse for traffic updates
     useEffect(()=>{
         if(trafficSource === null) {
-            let x = `/watch/functions/global-${service}`
+            let x = `/functions/${service}`
             if(namespace){
-                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
+                x = `/functions/namespaces/${namespace}/function/${service}`
             }
             if(workflow) {
+                //TODO: update route
                 x = `/watch/functions/${service}`
             }
             let eventConnection = sse(`${x}`, {})
@@ -131,11 +132,12 @@ export default function Services() {
     useEffect(()=>{
         if (revisionSource === null) {
 
-            let x = `/watch/functions/global-${service}/revisions/`
+            let x = `/functions/${service}/revisions`
             if (namespace) {
-                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}/revisions/`
+                x = `/functions/namespaces/${namespace}/function/${service}/revisions`
             }
             if(workflow) {
+                //TODO: update route
                 x = `/watch/functions/${service}/revisions/`
             }
 
@@ -349,7 +351,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic} revision={obj.rev}/>
                 )
             })}
             </div> 
@@ -357,7 +359,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError} = props
+    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError ,revision} = props
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -391,13 +393,13 @@ function Revision(props) {
         circleFill = "crashed"
     }
 
-    let url = `/functions/global/${serviceName}/${name}`
+    let url = `/functions/global/${serviceName}/${revision}`
     if (namespace) {
-        url = `/${namespace}/functions/${serviceName}/${name}`
+        url = `/n/${namespace}/functions/${serviceName}/${revision}`
     }
 
     if (workflow) {
-        url = `/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
+        url = `/n/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
     }
     
     return (
@@ -475,7 +477,7 @@ function CreateRevision(props) {
 
     const createRevision = async () => {
         try {
-            let x = `/functions/global-${service}`
+            let x = `/functions/${service}`
             if (namespace) {
                 x =  `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
@@ -611,7 +613,7 @@ function EditRevision(props) {
 
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            x = `/functions/global-${service}`
+            x = `/functions/${service}`
             if (namespace) {
                 x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
             }
