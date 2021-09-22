@@ -150,7 +150,7 @@ export async function NamespaceSecrets(fetch, namespace, handleError) {
 
 export async function NamespaceRegistries(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/namespaces/${namespace}/registries`,{})
+        let resp = await fetch(`/functions/namespaces/${namespace}/registries`,{})
         if(resp.ok) {
             let json = await resp.json()
             if (Array.isArray(json.registries.edges)) {
@@ -187,7 +187,7 @@ export async function NamespaceCreateRegistry(fetch, namespace, key,val, handleE
     try {
         let resp = await fetch(`/functions/namespaces/${namespace}/registries`, {
             method: "POST",
-            body: JSON.stringify({key: key, namespace: namespace, data:val})
+            body: JSON.stringify({data:val, reg: key})
         })
         if(resp.ok){
             return
@@ -216,9 +216,11 @@ export async function NamespaceDeleteSecret(fetch, namespace, val, handleError){
 
 export async function NamespaceDeleteRegistry(fetch, namespace, key, handleError) {
     try {
-        let resp = await fetch(`/namespaces/${namespace}/registries`, {
+        let resp = await fetch(`/functions/namespaces/${namespace}/registries`, {
             method: "DELETE",
-            body: JSON.stringify({ key: key })
+            body: JSON.stringify({
+                reg: key
+            })
         })
         if (resp.ok) {
             return 
@@ -401,5 +403,92 @@ export async function NamespaceBroadcastEvent(fetch, namespace, data, handleErro
         }
     } catch(e) {
         throw new Error(e.message)
+    }
+}
+// Functions
+export async function NamespaceFunctions(fetch, handleError, ns) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${ns}`, {})
+
+        if(resp.ok) {
+            let json = await resp.json() 
+
+            if (!json.functions) {
+                throw new Error("response missing functions");
+            }
+
+            if (!Array.isArray(json.functions)) {
+                throw new Error("functions response is incorrect type");
+            }
+
+            if (!json.config) {
+                throw new Error("response missing config");
+            }
+
+            return {
+                functions: json.functions,
+                config: json.config
+            }
+        } else {
+            await handleError('fetching namespace functions', resp, "listNamespaceFunctions")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function NamespaceFunction(fetch, handleError, ns, svn) {
+    try {
+        let resp = await fetch(`/functions/namespaces/namespaces/${ns}/services/${svn}`, {})
+
+        if(resp.ok) {
+            let json = await resp.json() 
+
+            return json
+        } else {
+            await handleError('fetching namespace function', resp, "listNamespaceFunction")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function NamespaceCreateFunction(fetch, handleError, ns, svn, image, minScale, size, cmd) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${ns}`, {
+            method: "POST",
+            body: JSON.stringify({
+                name: svn,
+                image: image,
+                minScale: minScale,
+                size: size,
+                cmd: cmd
+            })
+        })
+
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('creating namespace function', resp, "createNamespaceFunctions")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function NamespaceDeleteFunction(fetch, handleError, ns, svn) {
+    console.log("svn =", svn)
+    try {
+        let resp = await fetch(`/functions/namespaces/${ns}/services/${svn}`, {
+            method: "DELETE"
+        })
+
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('deleting namespace functions', resp, "deleteNamespaceFunction")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
     }
 }
