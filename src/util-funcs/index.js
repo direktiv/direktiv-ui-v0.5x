@@ -87,7 +87,7 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
           // if initial load
           if(load){
             // if pathname isnt jqplayground check if namespace is provided
-            if(window.location.pathname !== "/jq/playground" && window.location.pathname.includes("/global/functions") ) {
+            if(window.location.pathname !== "/jq/playground" && window.location.pathname.includes("/functions/global") ) {
               // 1st. check if namespace is in the pathname 
               if (window.location.pathname.split("/")[1] !== "") {
                 // handle if pathname is /i as its a different route
