@@ -31,11 +31,12 @@ export default function Revision() {
     // set revision soruce
     useEffect(()=>{
         if(revisionSource === null) {
-            let x = `/watch/functions/global-${service}/revisions/${revision}`
+            let x = `/functions/${service}/revisions/${revision}`
             if (namespace) {
-                x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}`
+                x = `/functions/namespaces/${namespace}/function/${service}/revisions/${revision}`
             }
             if(workflow) {
+                //TODO: Change to workflow watcher
                 x = `/watch/functions/${service}/revisions/${revision}`
             }
 
@@ -70,11 +71,12 @@ export default function Revision() {
 
         if(podSource === null) {
             // setup
-            let x = `/watch/functions/global-${service}/revisions/${revision}/pods/`
+            let x = `/functions/${service}/revision/${revision}/pods`
             if (namespace) {
-                x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}/pods/`
+                x = `/functions/namespaces/${namespace}/function/${service}/revision/${revision}/pods`
             }
             if(workflow) {
+                //TODO: Change to workflow watcher
                 x = `/watch/functions/${service}/revisions/${revision}/pods/`
             }
 
@@ -286,9 +288,9 @@ function PodLogs(props) {
     // set new log watcher on pod
     useEffect(()=>{
         if(pod !== "") {
-            let x = `/watch/functions/${service}/revisions/${revision}/pods/${pod}/logs/`
+            let x = `/functions/${service}/revision/${revision}/pods/${pod}/logs`
             if (namespace) {
-                x = `/watch/namespaces/${namespace}/functions/${service}/revisions/${revision}/pods/${pod}/logs/`
+                x = `/functions/namespaces/${namespace}/function/${service}/revision/${revision}/pods/${pod}/logs`
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {

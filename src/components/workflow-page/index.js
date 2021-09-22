@@ -95,6 +95,7 @@ export default function WorkflowPage() {
 
     useEffect(()=>{
         if(functions !== null && funcSource === null) {
+            // TODO: update route
             let x = `/watch/namespaces/${namespace}/workflows/${workflowRef.current}/functions/`
 
             let eventConnection = sse(`${x}`,{})
@@ -614,7 +615,7 @@ let statusMessage = ""
 
                                     return(
                                         <li key={obj.info.name} title={statusMessage}  className="event-list-item">
-                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
+                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/n/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                     <span>
@@ -719,7 +720,7 @@ function WorkflowActions(props) {
             <>
             <div title="Workflow Variables" >
                 <Link className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit", marginRight: "10px"}} 
-                to={`/${namespace}/w/${workflowName}/variables`}>
+                to={`/n/${namespace}/w/${workflowName}/variables`}>
                     <span style={{fontWeight: "bold"}}>
                         VAR
                     </span>

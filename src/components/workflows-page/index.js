@@ -212,7 +212,7 @@ export default function WorkflowsPage() {
                                                     return (<div key=""></div>);
                                                 }
                                                 return (
-                                                    <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit", padding:"3px" }} className="workflows-list-item" to={`/${namespace}/w/${wfID}`}>
+                                                    <Link key={`workflow-item-${wfID}`} style={{ color: "inherit", textDecoration: "inherit", padding:"3px" }} className="workflows-list-item" to={`/n/${namespace}/w/${wfID}`}>
                                                         <div className="workflows-list-name">
                                                             {wfID}
                                                         </div>
@@ -248,7 +248,7 @@ export default function WorkflowsPage() {
                                                             <div title="Workflow Variables" >
                                                                     <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                                                                         ev.preventDefault();
-                                                                        history.push(`/${namespace}/w/${wfID}/variables`)
+                                                                        history.push(`/n/${namespace}/w/${wfID}/variables`)
                                                                     }}>
                                                                         <span style={{fontWeight: "bold"}}>
                                                                             VAR

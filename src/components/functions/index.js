@@ -33,14 +33,10 @@ export default function Functions() {
 
     useEffect(()=>{
         if (evSource === null && functions !== null) {
-            let x = "/watch/functions/?scope=global"
-            let body = {
-                scope: "global"
-            }
+            let x = "/functions"
+
             if(params.namespace) {
-                body.scope = "namespace"
-                x = `/watch/namespaces/${params.namespace}/functions/`
-                body["namespace"] = params.namespace 
+                x = `/functions/namespaces/${params.namespace}`
             }
             
             let eventConnection = sse(`${x}`, {})
@@ -380,7 +376,7 @@ function KnativeFunc(props) {
 
     return(
         
-        <Link key={serviceName}  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
+        <Link key={serviceName}  to={namespace !== undefined ? `/n/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
             <div className="neumorph-hover">
             <div className="services-list-div">
                 <div>

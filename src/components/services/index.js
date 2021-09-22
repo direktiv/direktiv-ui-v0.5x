@@ -15,6 +15,9 @@ import LoadingWrapper from "../loading"
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 import { sendNotification } from "../notifications";
+import {NamespaceFunction, NamespaceUpdateFunction, NamespaceUpdateTrafficFunction} from '../../api';
+import {GlobalFunction, GlobalUpdateFunction, GlobalUpdateTrafficFunction} from "../functions/api"
+
 
 dayjs.extend(relativeTime);
 export default function Services() {
@@ -42,45 +45,38 @@ export default function Services() {
     const [trafficSource, setTrafficSource] = useState(null)
 
 
-    const getService = useCallback((dontChangeRev)=>{
+    const getService = useCallback((dontChangeRev) => {
         async function getServices() {
-            let x = `/functions/global-${service}`
-            if (namespace) {
-                x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
-            }
-            if(workflow) {
-                x = `/functions/${service}`
-            }
-
             try {
-                let resp = await fetch(x, {
-                    method:"GET"
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
-                    setConfig(json.config)
+                let resp = {}
+                if (namespace) {
+                    resp = await NamespaceFunction(fetch, handleError, namespace, service)
+                } else if (workflow) {
+                    //TODO: add route
+
                 } else {
-                   let json = await resp.json()
-                   if (json.Message.includes("not found")){
-                       history.goBack()
-                   }
-                    await handleError('fetch revisions', resp, 'fetchService')
+                    resp = await GlobalFunction(fetch, handleError, service)
                 }
-            } catch(e) {
+                setConfig(resp.config)
+            } catch (e) {
+                if (e.message.includes("not found")) {
+                    history.goBack()
+                }
                 setErrFetchRev(`Error fetching service: ${e.message}`)
             }
         }
         return getServices()
-    },[fetch, handleError, namespace, service, history, workflow])
+    }, [fetch, handleError, namespace, service, history, workflow])
 
     // setup sse for traffic updates
     useEffect(()=>{
         if(trafficSource === null) {
-            let x = `/watch/functions/global-${service}`
+            let x = `/functions/${service}`
             if(namespace){
-                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
+                x = `/functions/namespaces/${namespace}/function/${service}`
             }
             if(workflow) {
+                //TODO: update route
                 x = `/watch/functions/${service}`
             }
             let eventConnection = sse(`${x}`, {})
@@ -131,11 +127,12 @@ export default function Services() {
     useEffect(()=>{
         if (revisionSource === null) {
 
-            let x = `/watch/functions/global-${service}/revisions/`
+            let x = `/functions/${service}/revisions`
             if (namespace) {
-                x = `/watch/namespaces/${namespace}/functions/namespace-${namespace}-${service}/revisions/`
+                x = `/functions/namespaces/${namespace}/function/${service}/revisions`
             }
             if(workflow) {
+                //TODO: update route
                 x = `/watch/functions/${service}/revisions/`
             }
 
@@ -349,7 +346,7 @@ function ListRevisions(props) {
                 }
  
                 return(
-                    <Revision handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic}/>
+                    <Revision handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic} revision={obj.rev}/>
                 )
             })}
             </div> 
@@ -357,7 +354,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError} = props
+    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError ,revision} = props
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -391,13 +388,13 @@ function Revision(props) {
         circleFill = "crashed"
     }
 
-    let url = `/functions/global/${serviceName}/${name}`
+    let url = `/functions/global/${serviceName}/${revision}`
     if (namespace) {
-        url = `/${namespace}/functions/${serviceName}/${name}`
+        url = `/n/${namespace}/functions/${serviceName}/${revision}`
     }
 
     if (workflow) {
-        url = `/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
+        url = `/n/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
     }
     
     return (
@@ -475,31 +472,19 @@ function CreateRevision(props) {
 
     const createRevision = async () => {
         try {
-            let x = `/functions/global-${service}`
             if (namespace) {
-                x =  `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
-            }
-            if (workflow) {
-                x = `/functions/${service}`
-            }
-            let resp = await fetch(x, {
-                method: "POST",
-                body: JSON.stringify({
-                    image: latestRevision.image,
-                    cmd: latestRevision.cmd,
-                    size: parseInt(latestRevision.size),
-                    minScale: parseInt(latestRevision.minScale),
-                    trafficPercent: parseInt(traffic),
-                })
-            })
-            if (resp.ok) {
-                setErr("")
-                setTraffic(100)
-                // await getService()
+                await NamespaceUpdateFunction(fetch, handleError, namespace, service, latestRevision.image, parseInt(latestRevision.minScale), parseInt(latestRevision.size), latestRevision.cmd, parseInt(traffic))
+            } else if (workflow) {
+                //TODO: add route
+
             } else {
-                await handleError('update service', resp, 'updateService')
+                await GlobalUpdateFunction(fetch, handleError, service, latestRevision.image, parseInt(latestRevision.minScale), parseInt(latestRevision.size), latestRevision.cmd, parseInt(traffic))
             }
-        } catch(e) {
+
+            // clear error
+            setErr("")
+            setTraffic(100)
+        } catch (e) {
             setErr(`Error updating service: ${e.message}`)
         }
     }
@@ -607,13 +592,38 @@ function EditRevision(props) {
 
     const [isLoading, setIsLoading] = useState(false)
 
-
-
     const updateTraffic = async (rev1, rev2, val) => {
         try {
-            x = `/functions/global-${service}`
+            let traffic = [{
+                revision: rev1,
+                percent: val
+            }]
+            if (rev2 !== "") {
+                traffic.push({
+                    revision: rev2,
+                    percent: 100-val
+                })
+            }
+
             if (namespace) {
-                x = `/namespaces/${namespace}/functions/namespace-${namespace}-${service}`
+                await NamespaceUpdateTrafficFunction(fetch, handleError, namespace, service, traffic)
+            } else if (workflow) {
+                //TODO: add route
+
+            } else {
+                await GlobalUpdateTrafficFunction(fetch, handleError, service, traffic)
+            }
+
+            // clear error
+            setErr("")
+        } catch (e) {
+            setErr(`Error setting traffic: ${e.message}`)
+        }
+
+        try {
+            x = `/functions/${service}`
+            if (namespace) {
+                x = `/functions/namespaces/${namespace}/function/${service}`
             }
             if (workflow) {
                 x = `/functions/${service}`
