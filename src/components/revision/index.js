@@ -71,9 +71,9 @@ export default function Revision() {
 
         if(podSource === null) {
             // setup
-            let x = `/functions/${service}/revision/${revision}/pods`
+            let x = `/functions/${service}/revisions/${revision}/pods`
             if (namespace) {
-                x = `/functions/namespaces/${namespace}/function/${service}/revision/${revision}/pods`
+                x = `/functions/namespaces/${namespace}/function/${service}/revisions/${revision}/pods`
             }
             if(workflow) {
                 //TODO: Change to workflow watcher
@@ -288,9 +288,9 @@ function PodLogs(props) {
     // set new log watcher on pod
     useEffect(()=>{
         if(pod !== "") {
-            let x = `/functions/${service}/revision/${revision}/pods/${pod}/logs`
+            let x = `/functions/logs/pod/${pod}`
             if (namespace) {
-                x = `/functions/namespaces/${namespace}/function/${service}/revision/${revision}/pods/${pod}/logs`
+                x = `/functions/logs/pod/${pod}`
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -319,7 +319,9 @@ function PodLogs(props) {
                 if (e.data === "") {
                     return
                 }
-                log += "\n"+e.data
+
+                let json = JSON.parse(e.data)
+                log += "\n"+json.data
                 document.getElementById("pod-logs").innerHTML += log
                 setLogs(log)
                 if (tailRef.current) {

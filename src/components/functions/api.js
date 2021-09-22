@@ -127,3 +127,19 @@ export async function GlobalDeleteFunction(fetch, handleError, svn) {
         throw new Error(`${e.message}`)
     }
 }
+
+export async function GlobalDeleteFunctionRevision(fetch, handleError, svn, revision) {
+    try {
+        let resp = await fetch(`/functions/${svn}/revisions/${revision}`, {
+            method: "DELETE"
+        })
+
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('deleting global function revision', resp, "deleteNamespaceRevision")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}

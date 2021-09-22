@@ -15,8 +15,8 @@ import LoadingWrapper from "../loading"
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 import { sendNotification } from "../notifications";
-import {NamespaceFunction, NamespaceUpdateFunction, NamespaceUpdateTrafficFunction} from '../../api';
-import {GlobalFunction, GlobalUpdateFunction, GlobalUpdateTrafficFunction} from "../functions/api"
+import {NamespaceFunction, NamespaceUpdateFunction, NamespaceUpdateTrafficFunction, NamespaceDeleteFunctionRevision} from '../../api';
+import {GlobalFunction, GlobalUpdateFunction, GlobalUpdateTrafficFunction, GlobalDeleteFunctionRevision} from "../functions/api"
 
 
 dayjs.extend(relativeTime);
@@ -354,7 +354,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError ,revision} = props
+    const {titleColor, name, fetch, workflow, fetchServices, created,  conditions, status, traffic, hideDelete, namespace, serviceName, handleError, revision} = props
     let panelID = name;
     function toggleItem(){
         let x = document.getElementById(panelID);
@@ -363,19 +363,17 @@ function Revision(props) {
 
     const deleteRevision = async () => {
         try {
-            let x = `/functionrevisions/${name}`
-            if(namespace) {
-                x = `/namespaces/${namespace}/functionrevisions/${name}`
-            }
-            let resp = await fetch(x,{
-                method: "DELETE"
-            })
-            if (resp.ok) {
-                fetchServices()
+            if (namespace) {
+                await NamespaceDeleteFunctionRevision(fetch, handleError, namespace, serviceName, revision)
+            } else if (workflow) {
+                //TODO: add route
+
             } else {
-                await handleError("unable to delete revision", resp, "deleteRevision")
+                await GlobalDeleteFunctionRevision(fetch, handleError, serviceName, revision)
             }
-        } catch(e) {
+
+            fetchServices()
+        } catch (e) {
             sendNotification("Error:", e.message, 0)
         }
     }

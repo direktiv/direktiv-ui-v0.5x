@@ -533,3 +533,19 @@ export async function NamespaceDeleteFunction(fetch, handleError, ns, svn) {
         throw new Error(`${e.message}`)
     }
 }
+
+export async function NamespaceDeleteFunctionRevision(fetch, handleError, namespace, svn, revision) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${namespace}/function/${svn}/revisions/${revision}`, {
+            method: "DELETE"
+        })
+
+        if(resp.ok) {
+            return
+        } else {
+            await handleError('deleting namespace function revision', resp, "deleteNamespaceRevision")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
