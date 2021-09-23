@@ -37,10 +37,12 @@ export async function Namespaces(fetch, handleError, load, val) {
                         newNamespace = namespaces[0]
                     } else if (pathNamespace === "" && !storageNSFound) {
                         // otherwise set it to root
-                        window.location.pathname = "/"
-                        return
+                        // window.location.pathname = "/"
+                        return {
+                            namespaces: namespaces,
+                            namespace: newNamespace
+                        }
                     }
-
 
                     // Check routes that dont require namespace
                     if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
@@ -48,7 +50,7 @@ export async function Namespaces(fetch, handleError, load, val) {
                             namespaces: namespaces,
                             namespace: newNamespace
                         }
-                    } else if (!exist) {
+                    } else if (!exist && newNamespace !== "") {
                         window.location.pathname = `/n/${newNamespace}`
                         return
                     }
@@ -70,11 +72,8 @@ export async function Namespaces(fetch, handleError, load, val) {
 
 export async function NamespaceCreate(fetch, handleError, val) {
     try {
-        let resp = await fetch(`/namespaces`, {
-            method: "POST",
-            body: JSON.stringify({
-                name: val
-            })
+        let resp = await fetch(`/namespaces/${val}`, {
+            method: "PUT",
         })
         if(resp.ok) {
             return val
