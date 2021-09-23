@@ -59,7 +59,9 @@ export default function NamespaceLogsComponent() {
                 }
 
                 let x = ansi_up.ansi_to_html(log)
-                document.getElementById("logs-test").innerHTML += x
+                if(document.getElementById("logs-test")){
+                    document.getElementById("logs-test").innerHTML += x
+                }
                 setLogs((str) => {return str + log})
                 if (tailRef.current) {
                     if (document.getElementById('logs')) {

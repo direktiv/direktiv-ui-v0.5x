@@ -19,12 +19,14 @@ export default function Sankey(props) {
 
     const params = useParams()
 
+    console.log("params =", params)
+
 
     useEffect(()=>{
 
     async function fetchMet() {
         try {
-            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics`, {
+            let resp = await fetch(`/namespaces/${namespace}/tree/${params["0"]}?op=metrics-sankey`, {
                 method: "GET"
             })
             if (resp.ok) {

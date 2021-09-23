@@ -301,7 +301,7 @@ export default function WorkflowPage() {
     useEffect(()=>{
         async function getStateMetrics() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics/state-milliseconds`, {})
+                let resp = await fetch(`/namespaces/${namespace}/tree/${params.workflow}?op=metrics-state-milliseconds`, {})
                 if(resp.ok) {
                     let json = await resp.json()
                     setStateMetrics(json.results)

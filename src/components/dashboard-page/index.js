@@ -51,7 +51,7 @@ function TotalTimeWorkflows(props) {
     useEffect(()=>{
         async function getDetails() {
             try{
-                let resp = await fetch(`/namespaces/${namespace}/metrics/workflows-milliseconds`, {})
+                let resp = await fetch(`/namespaces/${namespace}/metrics/milliseconds`, {})
                 if(resp.ok){
                     let json = await resp.json()
                     let arr = []
@@ -125,11 +125,11 @@ export function SuccessOrFailedWorkflows(props) {
     useEffect(()=>{
         async function fetchDetails() {
             try{
-                let failedURL = `/namespaces/${namespace}/metrics/workflows-failed`
-                let successURL = `/namespaces/${namespace}/metrics/workflows-successful`
+                let failedURL = `/namespaces/${namespace}/metrics/failed`
+                let successURL = `/namespaces/${namespace}/metrics/successful`
                 if (workflow){
-                    failedURL = `/namespaces/${namespace}/workflows/${workflow}/metrics/failed`
-                    successURL = `/namespaces/${namespace}/workflows/${workflow}/metrics/successful`
+                    failedURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-failed`
+                    successURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-successful`
                 }
 
                 let failedResp = await fetch(failedURL,{})
@@ -241,7 +241,7 @@ function TotalWorkflows(props) {
     useEffect(()=>{
         async function fetchDetails() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/metrics/workflows-invoked`, {
+                let resp = await fetch(`/namespaces/${namespace}/metrics/invoked`, {
                     method: "GET"
                 })
                 if (resp.ok) {
