@@ -1,3 +1,6 @@
+//  val is a optional value of a namespace. If provided namespaces will be compared to val.
+//  This compareison has high proiority than path, and storage namespace comparison
+//  Comparison Priority: val -> path -> storage
 export async function Namespaces(fetch, handleError, load, val) {
     try {
         let newNamespace = ""
@@ -11,12 +14,12 @@ export async function Namespaces(fetch, handleError, load, val) {
             // if edges exists means theres namespaces to look at
             if(json.edges){
                 // if its the first load
+                let exist = false
+                let storageNSFound = false
+                let nsValueFound = false
+                let pathNamespace = window.location.pathname.split("/")[2]
+                
                 if(load) {
-
-                    let exist = false
-                    let storageNSFound = false
-                    let pathNamespace = window.location.pathname.split("/")[2]
-
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
                         console.log("i =", i)
@@ -26,9 +29,20 @@ export async function Namespaces(fetch, handleError, load, val) {
                             newNamespace = json.edges[i].node.name
                         }
 
+                        if(val && val !== "" && json.edges[i].node.name === val){
+                            nsValueFound = true
+                        }
+
                         if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
                             storageNSFound = true
-                            newNamespace = storageNamespace
+                        }
+                    }
+
+                    if (nsValueFound) {
+                        // window.location.pathname = `/n/${val}`
+                        return {
+                            namespaces: namespaces,
+                            namespace: val
                         }
                     }
 
@@ -44,6 +58,10 @@ export async function Namespaces(fetch, handleError, load, val) {
                         }
                     }
 
+                    if (newNamespace === "" && storageNSFound) {
+                        newNamespace = storageNamespace
+                    }
+
                     // Check routes that dont require namespace
                     if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
                         return {
@@ -56,6 +74,36 @@ export async function Namespaces(fetch, handleError, load, val) {
                     }
 
                     // Namespace exists 
+                    return {
+                        namespaces: namespaces,
+                        namespace: newNamespace
+                    }
+                } else {
+                    // loop through ns and push ns to list. also check if path ns exists
+                    for(let i=0; i < json.edges.length; i++) {
+                        console.log("i =", i)
+                        namespaces.push(json.edges[i].node.name)
+                        if(json.edges[i].node.name === pathNamespace){
+                            exist = true
+                        }
+
+                        if(val && val !== "" && json.edges[i].node.name === val){
+                            nsValueFound = true
+                        }
+
+                        if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
+                            storageNSFound = true
+                        }
+                    }
+
+                    if (nsValueFound) {
+                        newNamespace = val
+                    } else if (exist) {
+                        newNamespace = pathNamespace
+                    } else if (storageNSFound) {
+                        newNamespace = storageNamespace
+                    }
+
                     return {
                         namespaces: namespaces,
                         namespace: newNamespace
