@@ -34,7 +34,6 @@ export default function Navbar(props) {
             setNamespace(ns)
             fetchNamespaces(false, ns)
             setAcceptInput(!acceptInput)
-            toggleNamespaceSelector()
             setError("")
             history.push(`/n/${ns}`)
         } catch(e) {
