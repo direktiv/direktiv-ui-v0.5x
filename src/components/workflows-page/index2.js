@@ -318,7 +318,7 @@ function WorkflowExplorer(props) {
                     </div>
                 </div>
                 <div className="container auto-width-all-896" style={{ flexDirection: "column", maxWidth:"380px", minWidth:"380px", flex: "auto" }} >
-                    <SuccessOrFailedWorkflows namespace={params.namespace} fetch={fetch} workflow={params.workflow} handleError={handleError}/>
+                    <SuccessOrFailedWorkflows namespace={params.namespace} fetch={fetch} workflow={params["0"]} handleError={handleError}/>
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle actionsDiv={[
                             <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand"} onClick={() => { setTab("events") }} >
