@@ -58,9 +58,10 @@ function TotalTimeWorkflows(props) {
                     let total = 0
                     for(let i=0; i < json.results.length; i++) {
                         // create a key array for each line
-                        arr.push({name: json.results[i].metric.workflow, value: parseInt(json.results[i].value[1]/1000)})
-                        total += parseInt(json.results[i].value[1]/1000)
+                        arr.push({name: json.results[i].metric.workflow, value: parseInt(json.results[i].value[1])/1000})
+                        total += parseInt(json.results[i].value[1])/1000
                     }
+
                     setTimeMetrics(arr)
                     setTotalTime(total)
                     setOName(namespace)
@@ -97,7 +98,7 @@ function TotalTimeWorkflows(props) {
                                 // label={renderLabel}
                                 data={timeMetrics}
                             >
-                                <Label style={{fontSize:"20pt"}} value={`${totalTime}s`} position="center" />
+                                <Label style={{fontSize:"20pt"}} value={`${Math.round(totalTime)}s`} position="center" />
                                 {timeMetrics.map((entry, index) => (
                                 <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
                                 ))}
