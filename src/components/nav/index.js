@@ -121,7 +121,7 @@ export default function Navbar(props) {
                         <div style={{ width: "100%" }} >
                             <ul>
                                 <>
-                                {checkPerm(permissions, "addNamespace") ? 
+                                {checkPerm(permissions, "admin") ? 
                                 <li>
                                     <div style={{display:"flex", flexDirection:"column", flexFlow:"wrap"}}>
                                     
