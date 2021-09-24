@@ -73,8 +73,9 @@ export function EventsList(props) {
 }
 
 export function FuncComponent(props) {
-    const {functions, namespace, workflow} = props
-
+    const {functions, namespace, workflow, setTypeOfRequest} = props
+    
+    console.log(functions, namespace, workflow, "COMPONENTS IN FUNC COMP")
     return(
       <div>
               <ul style={{margin:"0px"}}>
@@ -84,16 +85,18 @@ export function FuncComponent(props) {
                             <>
                                 {functions.map((obj) => {
 
-let statusMessage = ""
+                                    let statusMessage = ""
                                     if(obj.conditions){
                                         for(var x=0; x < obj.conditions.length; x++) {
                                             statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
                                         }
                                     }
-
+                                    console.log(`/n/${namespace}/explorer/${workflow}/service/${obj.serviceName}`)
                                     return(
                                         <li key={obj.info.name} title={statusMessage}  className="event-list-item">
-                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
+                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} onClick={(()=>{
+                                               setTypeOfRequest("")
+                                           })} to={`/n/${namespace}/explorer/${workflow}/service/${obj.serviceName}`}>
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                     <span>

@@ -4,8 +4,10 @@ import { WorkflowInstanceList } from "./instances-workflow"
 
 export default function Details(props) {
 
-    const {tab, workflowFuncErr, functions} = props
+    const {tab, workflowFuncErr, functions, setTypeOfRequest} = props
     const params = useParams()
+
+    console.log('functions in details component', functions, tab)
     return(
         <div>
             {tab === "events"?
@@ -24,7 +26,7 @@ export default function Details(props) {
                         </div> 
                     :
                         <div id="events-tile" className="tile-contents">
-                            <FuncComponent namespace={params.namespace} workflow={params.workflow} functions={functions}/>
+                            <FuncComponent setTypeOfRequest={setTypeOfRequest} namespace={params.namespace} workflow={params[0]} functions={functions}/>
                         </div>
                     }
                 </div>:""

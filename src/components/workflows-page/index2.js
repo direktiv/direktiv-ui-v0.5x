@@ -16,7 +16,7 @@ import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
 
 
-import { Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
+import { checkStartType, Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
@@ -75,7 +75,7 @@ export default function Explorer() {
 function WorkflowExplorer(props) {
 
     // context
-    const {fetch, handleError, attributeAdd, namespace} = useContext(MainContext)
+    const {fetch, handleError,  sse, namespace} = useContext(MainContext)
     const { setTypeOfRequest} = props
     // params
     const params = useParams()
@@ -121,6 +121,89 @@ function WorkflowExplorer(props) {
     const [attributes, setAttributes] = useState([])
 
     const codemirrorRef = useRef()
+    const workflowRef = useRef(params[0])
+
+    // const [functions, setFunctions] = useState(null)
+    const functionsRef = useRef(functions ? functions: [])
+    const [funcSource, setFuncSource] = useState(null)
+    useEffect(()=>{
+        if(functions !== null && funcSource === null) {
+            // TODO: update route
+            let x = `/functions/namespaces/${namespace}/tree/${workflowRef.current}?op=services`
+
+            let eventConnection = sse(`${x}`,{})
+            eventConnection.onerror = (e) => {
+                if(e.status === 403) {
+                    setWorkflowFuncErr("You are forbidden on watching workflow functions")
+                }
+            }
+
+            async function getData(e) {
+                let funcs = functionsRef.current
+                if (e.data === "") {
+                    return
+                }
+                // process the data here
+                // pass it to state to be rendered
+                let json = JSON.parse(e.data)
+                console.log(json, "workflow function stream")
+                switch (json.event) {
+                case "DELETED":
+                    for (var i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            funcs.splice(i, 1)
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                case "MODIFIED":
+                    for(i=0; i < funcs.length; i++) {
+                        if (funcs[i].serviceName === json.function.serviceName) {
+                            funcs[i] = json.function
+                            functionsRef.current = funcs
+                            break
+                        }
+                    }
+                    break
+                default:
+                    let found = false
+                    for(i=0; i < funcs.length; i++) {
+                        if(funcs[i].serviceName === json.function.serviceName) {
+                            found = true 
+                            break
+                        }
+                    }
+                    if (!found){
+                        funcs.push(json.function)
+                        functionsRef.current = funcs
+                    }
+                }
+                let actFailed = true
+                for ( i=0; i < functionsRef.current.length; i++) {
+                    if (functionsRef.current[i].status === "False") {
+                        actFailed = false
+                    }
+                }
+                x = await checkStartType(wfRefValue.current)
+                if (!x) {
+                    actFailed = false
+                }
+                setExecutable(JSON.parse(JSON.stringify(actFailed)))
+                setFunctions(JSON.parse(JSON.stringify(functionsRef.current)))
+            }
+
+            eventConnection.onmessage = e => getData(e)
+            setFuncSource(eventConnection)
+        }   
+    },[functions, funcSource, namespace, sse])
+    useEffect(()=>{
+        return () => {
+            if (funcSource !== null) {
+                funcSource.close()
+            }
+        }
+    },[funcSource])
 
 
     // fetch workflow
@@ -329,7 +412,7 @@ function WorkflowExplorer(props) {
                             </div>]}>
                                 <IoList /> Details
                         </TileTitle>
-                        <Details tab={tab} />
+                        <Details      setTypeOfRequest={setTypeOfRequest} workflowFuncErr={workflowFuncErr} tab={tab} functions={functions} />
                     </div>
                     <Attribute setErr={setErr} ShowError={ShowError} attributes={attributes} setAttributes={setAttributes} />
                 </div>

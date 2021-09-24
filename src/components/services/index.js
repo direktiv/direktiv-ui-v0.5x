@@ -17,15 +17,17 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { sendNotification } from "../notifications";
 import {NamespaceFunction, NamespaceUpdateFunction, NamespaceUpdateTrafficFunction, NamespaceDeleteFunctionRevision} from '../../api';
 import {GlobalFunction, GlobalUpdateFunction, GlobalUpdateTrafficFunction, GlobalDeleteFunctionRevision} from "../functions/api"
+import { WorkflowFunction } from "../workflows-page/api";
 
 
 dayjs.extend(relativeTime);
 export default function Services() {
     const {fetch, handleError, sse} = useContext(MainContext)
+    const params = useParams()
+    console.log(params)
     let { service, namespace, workflow } = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [traffic, setTraffic] = useState(null)
-
     const history = useHistory()
     const [config, setConfig] = useState(null)
 
@@ -53,7 +55,7 @@ export default function Services() {
                     resp = await NamespaceFunction(fetch, handleError, namespace, service)
                 } else if (workflow) {
                     //TODO: add route
-
+                    resp = await WorkflowFunction(fetch, handleError, namespace, params[0], service)
                 } else {
                     resp = await GlobalFunction(fetch, handleError, service)
                 }

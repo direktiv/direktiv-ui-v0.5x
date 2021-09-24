@@ -17,6 +17,20 @@ export async function checkStartType(wf) {
     }
 }
 
+export async function WorkflowFunction(fetch, handleError, namespace, path, service) {
+    try {
+        let resp = await fetch(`/functions/namespaces/${namespace}/tree/${path}?op=function`, {})
+        if(resp.ok) {
+            return await resp.json()
+        } else {
+            await handleError('fetching workflow function', resp, "listWorkflowFunction")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+
 export async function WorkflowSetLogToEvent(fetch, namespace, workflow, val, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-workflow-event-logging`,{
