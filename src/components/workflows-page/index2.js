@@ -407,13 +407,13 @@ function ListExplorer(props) {
                         <TileTitle name="Create Workflow">
                             <IoAdd />
                         </TileTitle >
-                        <CreateWorkflow fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
+                        <CreateWorkflow fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr} setTypeOfRequest={setTypeOfRequest}/>
                     </div>
                     <div className="shadow-soft rounded tile" style={{flex: "0 1"}}>
                         <TileTitle name="Create Directory">
                             <IoAdd />
                         </TileTitle >
-                        <CreateDirectory fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr}/>
+                        <CreateDirectory fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr} setTypeOfRequest={setTypeOfRequest}/>
                     </div>
                     <div className="shadow-soft rounded tile"  style={{flex: "0 1"}}>
                         <TileTitle name="Send Namespace Event">
@@ -452,7 +452,7 @@ function SendNamespaceEvent(props){
 
 function CreateWorkflow(props) {
 
-    const {fetch, handleError, path, setErr, namespace, fetchData} = props
+    const {fetch, handleError, path, setErr, namespace, fetchData, setTypeOfRequest} = props
 
     const [wfName, setWfName] = useState("")
     const [template, setTemplate] = useState("default")
@@ -468,8 +468,10 @@ function CreateWorkflow(props) {
                 } else {
                     history.push(`/n/${namespace}/explorer/${wfName}`)
                 }
+
                 // fetchData()
                 setWfName("")
+                setTypeOfRequest("workflow")
             } 
         } catch(e) {
             ShowError(`Error: ${e.message}`, setErr)
@@ -566,7 +568,7 @@ function CreateWorkflow(props) {
 
 function CreateDirectory(props) {
 
-    const {fetch, handleError, path, setErr, namespace} = props
+    const {fetch, handleError, path, setErr, namespace, setTypeOfRequest} = props
     const [dir, setDir] = useState("")
     const history = useHistory()
 
@@ -580,6 +582,7 @@ function CreateDirectory(props) {
                     history.push(`/n/${namespace}/explorer/${dir}`)
                 }
                 setDir("")
+                setTypeOfRequest("directory")
             } 
         } catch(e) {
             ShowError(`Error: ${e.message}`, setErr)
