@@ -126,7 +126,7 @@ export async function NamespaceCreate(fetch, handleError, val) {
         if(resp.ok) {
             return val
         } else {
-            await handleError('create namespace', resp, 'addNamespace')
+            await handleError('create namespace', resp, 'admin')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -375,7 +375,7 @@ export async function NamespaceTree(fetch, namespace, path, children, handleErro
                 return json.node.type
             }
         } else {
-            await handleError(`fetch details on ${path[0]}`, resp, "TODO PERM")
+            await handleError(`fetch details on ${path[0]}`, resp, "getNode")
         }
     } catch(e) {
         throw new Error(e.message)
@@ -406,7 +406,7 @@ export async function NamespaceCreateNode(fetch, namespace, path, dir, type, dat
             return true
         } else {
             // TODO what permission we giving this?
-            await handleError('create node', resp, "TODO")
+            await handleError('create node', resp, "createNode")
         }
     } catch(e) {
         throw new Error(e.message)
@@ -425,7 +425,7 @@ export async function NamespaceDeleteNode(fetch, namespace, path, name, handleEr
         if(resp.ok){
             return true
         } else {
-            await handleError('delete node', resp, "TODO")
+            await handleError('delete node', resp, "deleteNode")
         }
     } catch(e) {
         throw new Error(e.message)
