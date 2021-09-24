@@ -10,6 +10,7 @@ export const action = `description: A simple 'action' state that sends a get req
 functions:
 - id: get
   image: vorteil/request:v6
+  type: reusable
 states:
 - id: getter 
   type: action
@@ -23,6 +24,7 @@ states:
 export const consumeEvent = `functions:
 - id: greeter
   image: vorteil/greeting:v2
+  type: reusable
 description: A simple 'consumeEvent' state that listens for the greetingcloudevent generated from the template 'generate-event'.
 states:
 - id: ce
@@ -81,6 +83,7 @@ export const foreach =`description: A simple 'foreach' state that solves express
 functions: 
 - id: solve
   image: vorteil/solve:v2
+  type: reusable
 states:
 - id: data
   type: noop
@@ -141,6 +144,7 @@ export const parallel=`description: A simple 'parallel' state workflow that runs
 functions: 
 - id: solve
   image: vorteil/solve:v2
+  type: reusable
 states:
 - id: run
   type: parallel
@@ -218,8 +222,10 @@ states:
 export const eventXor = `functions:
 - id: greeter
   image: vorteil/greeting:v2
+  type: reusable
 - id: solve2
   image: vorteil/solve:v2
+  type: reusable
 description: A simple 'eventXor' that waits for events to be received.
 states:
 - id: event-xor
@@ -251,8 +257,10 @@ states:
 export const eventAnd =`functions:
 - id: greeter
   image: vorteil/greeting:v2
+  type: reusable
 - id: solve
   image: vorteil/solve:v2
+  type: reusable
 description: A simple 'eventAnd' that waits for events to be received.
 states:
 - id: event-and
