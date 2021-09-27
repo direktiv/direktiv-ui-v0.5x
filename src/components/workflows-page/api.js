@@ -23,7 +23,7 @@ export async function WorkflowFunction(fetch, handleError, namespace, path, serv
         if(resp.ok) {
             return await resp.json()
         } else {
-            await handleError('fetching workflow function', resp, "listWorkflowFunction")
+            await handleError('fetching workflow function', resp, "getService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -152,7 +152,7 @@ export async function WorkflowAddAttributes(fetch, namespace, workflow, attribut
         if(resp.ok){
             return
         } else {
-            await handleError('add workflow attributes', resp, 'createNodeAttributes')
+            await handleError('add workflow attributes', resp, 'createAttribute')
         }
     } catch(e) {
         throw new Error(e.message)
@@ -170,7 +170,7 @@ export async function WorkflowDeleteAttributes(fetch, namespace, workflow, attri
         if(resp.ok){
             return
         } else {
-            await handleError('delete workflow attributes', resp, 'deleteNodeAttributes')
+            await handleError('delete workflow attributes', resp, 'deleteAttribute')
         }
     } catch(e) {
         throw new Error(e.message)
@@ -219,7 +219,7 @@ export async function WorkflowStateMillisecondMetrics(fetch, namespace, workflow
             let json = await resp.json()
             console.log(json, "TODO return proper metrics")   
         } else {
-            await handleError("unable to get state metrics", resp, "getWorkflowMetrics")
+            await handleError("unable to get state metrics", resp, "getMetrics")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -238,7 +238,7 @@ export async function WorkflowVariables(fetch, namespace, workflow, handleError)
             }
             return []
         } else {
-            await handleError('fetch variables', resp, 'getVariables')
+            await handleError('fetch variables', resp, 'listWorkflowVariables')
         }
     } catch(e) {
         throw new Error(`Failed to fetch variables: ${e.message}`)
@@ -254,7 +254,7 @@ export async function WorkflowSetVariable(fetch, namespace, workflow, name, val,
         if (resp.ok) {
             return true
         } else {
-            await handleError('set variable', resp, 'getVariables')
+            await handleError('set variable', resp, 'setWorkflowVariable')
         }
     } catch(e) {
         throw new Error(`Failed to set variable: ${e.message}`)
@@ -270,7 +270,7 @@ export async function WorkflowDeleteVariable(fetch, namespace, workflow, name, h
         if(resp.ok) {
             return
         } else {
-            await handleError('delete variable', resp, 'getVariables')
+            await handleError('delete variable', resp, 'setWorkflowVariable')
         }
     } catch(e) {
         throw new Error(`Failed to delete variable: ${e.message}`)
@@ -283,7 +283,7 @@ export async function WorkflowGetVariable(fetch, namespace, workflow, name, hand
         if(resp.ok) {
             return await resp.text()
         } else {
-            await handleError('get variable', resp, 'getVariables')
+            await handleError('get variable', resp, 'getWorkflowVariable')
         }
     } catch(e) {
         throw new Error(`Failed to get variable: ${e.message}`)
@@ -299,7 +299,7 @@ export async function WorkflowDownloadVariable(fetch, namespace, workflow, name,
                 blob: await resp.blob()
              }
         } else {
-            await handleError('get variable', resp, 'getVariables')
+            await handleError('get variable', resp, 'getWorkflowVariable')
         }
     } catch(e) {
         throw new Error(`Failed to get variable: ${e.message}`)

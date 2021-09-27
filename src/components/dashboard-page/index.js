@@ -66,7 +66,7 @@ function TotalTimeWorkflows(props) {
                     setTotalTime(total)
                     setOName(namespace)
                 } else {
-                    await handleError('get workflow time metrics', resp, 'getNamespaceMetrics')
+                    await handleError('get workflow time metrics', resp, 'getMetrics')
                 }
             } catch(e) {
                 setErr(e.message)
@@ -169,15 +169,15 @@ export function SuccessOrFailedWorkflows(props) {
                 } else {
                     if(!failedResp.ok){
                         if (workflow) {
-                            await handleError('get workflow successful and failed metrics', failedResp, 'getWorkflowMetrics')
+                            await handleError('get workflow successful and failed metrics', failedResp, 'getMetrics')
                         } else {
-                            await handleError('get workflow successful and failed metrics', failedResp, 'getNamespaceMetrics')
+                            await handleError('get workflow successful and failed metrics', failedResp, 'getMetrics')
                         }
                     } else if (!successResp.ok) {
                         if (workflow) {
-                            await handleError('get workflow successful and failed metrics', successResp, 'getWorkflowMetrics')
+                            await handleError('get workflow successful and failed metrics', successResp, 'getMetrics')
                         } else {
-                            await handleError('get workflow successful and failed metrics', successResp, 'getNamespaceMetrics')
+                            await handleError('get workflow successful and failed metrics', successResp, 'getMetrics')
                         }           
                     }
                 }
@@ -267,7 +267,7 @@ function TotalWorkflows(props) {
                     setTWorkflowMetrics(arr)
                     setInvokedWorkflows(arrTotal[0].value)
                 } else {
-                    await handleError('get total workflow metrics', resp, 'getNamespaceMetrics')
+                    await handleError('get total workflow metrics', resp, 'getMetrics')
                 }
             } catch(e) {
                 setErr(e.message)

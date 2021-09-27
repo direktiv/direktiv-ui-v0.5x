@@ -280,7 +280,7 @@ export async function NamespaceVariables(fetch, namespace, handleError) {
             let json = await resp.json()
             return json.variables.edges
         } else {
-            await handleError('fetch variables', resp, 'getVariables')
+            await handleError('fetch variables', resp, 'listNamespaceVariables')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -296,7 +296,7 @@ export async function NamespaceSetVariable(fetch, namespace, name, val, handleEr
         if (resp.ok) {
             return true
         } else {
-            await handleError('set variable', resp, 'getVariables')
+            await handleError('set variable', resp, 'setNamespaceVariable')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -311,7 +311,7 @@ export async function NamespaceDeleteVariable(fetch, namespace, name, handleErro
         if(resp.ok) {
             return
         } else {
-            await handleError('delete variable', resp, 'getVariables')
+            await handleError('delete variable', resp, 'setNamespaceVariable')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -324,7 +324,7 @@ export async function NamespaceGetVariable(fetch, namespace, name, handleError) 
         if(resp.ok) {
             return await resp.text()
         } else {
-            await handleError('get variable', resp, 'getVariables')
+            await handleError('get variable', resp, 'getNamespaceVariable')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -340,7 +340,7 @@ export async function NamespaceDownloadVariable(fetch, namespace, name, handleEr
                blob: await resp.blob()
             }
         } else {
-            await handleError('get variable', resp, 'getVariables')
+            await handleError('get variable', resp, 'getNamespaceVariable')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -438,7 +438,7 @@ export async function NamespaceBroadcastEvent(fetch, namespace, data, handleErro
         if(resp.ok) {
             return true
         } else {
-            await handleError('send namespace event', resp, "namespaceEvent")
+            await handleError('send namespace event', resp, "sendNamespaceEvent")
         }
     } catch(e) {
         throw new Error(e.message)
@@ -469,7 +469,7 @@ export async function NamespaceFunctions(fetch, handleError, ns) {
                 config: json.config
             }
         } else {
-            await handleError('fetching namespace functions', resp, "listNamespaceFunctions")
+            await handleError('fetching namespace functions', resp, "listServices")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -506,7 +506,7 @@ export async function NamespaceCreateFunction(fetch, handleError, ns, svn, image
         if(resp.ok) {
             return
         } else {
-            await handleError('creating namespace function', resp, "createNamespaceFunctions")
+            await handleError('creating namespace function', resp, "createService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -530,7 +530,7 @@ export async function NamespaceUpdateFunction(fetch, handleError, ns, svn, image
         if(resp.ok) {
             return
         } else {
-            await handleError('updating namespace service', resp, "updateNamespaceService")
+            await handleError('updating namespace service', resp, "updateService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -549,7 +549,7 @@ export async function NamespaceUpdateTrafficFunction(fetch, handleError, namespa
         if(resp.ok) {
             return await resp.json()
         } else {
-            await handleError('set traffic', resp, "updateNamespaceServiceTraffic")
+            await handleError('set traffic', resp, "updateService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -565,7 +565,7 @@ export async function NamespaceDeleteFunction(fetch, handleError, ns, svn) {
         if(resp.ok) {
             return
         } else {
-            await handleError('deleting namespace functions', resp, "deleteNamespaceFunction")
+            await handleError('deleting namespace functions', resp, "deleteService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -581,7 +581,7 @@ export async function NamespaceDeleteFunctionRevision(fetch, handleError, namesp
         if(resp.ok) {
             return
         } else {
-            await handleError('deleting namespace function revision', resp, "deleteNamespaceRevision")
+            await handleError('deleting namespace function revision', resp, "deleteRevision")
         }
     } catch(e) {
         throw new Error(`${e.message}`)

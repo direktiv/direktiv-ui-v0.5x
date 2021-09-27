@@ -382,9 +382,11 @@ const EnvTableNewEntry = (props) => {
 
 export default function EnvrionmentPage(props) {
     const q = useQuery()
-
+    let mode = "namespace"
     if(q.get("variables") === null) {
         return ""
+    } else {
+        mode ="workflow"
     }
     return (
         <>
@@ -394,7 +396,7 @@ export default function EnvrionmentPage(props) {
                         <Breadcrumbs elements={["Namespace Settings"]} />
                     </div>
                 </div>
-                <EnvrionmentContainer />
+                <EnvrionmentContainer mode={mode} />
             </div>
         </>
     )

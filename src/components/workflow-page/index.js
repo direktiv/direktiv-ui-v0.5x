@@ -186,7 +186,7 @@ export default function WorkflowPage() {
                         setFunctions([])
                     }
                 } else {
-                    await handleError('get workflow functions', resp, "getWorkflowFunctions")
+                    await handleError('get workflow functions', resp, "listServices")
                 }
             } catch(e) {
                 setWorkflowFuncErr(e.message)
@@ -306,7 +306,7 @@ export default function WorkflowPage() {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    await handleError("unable to get state metrics", resp, "getWorkflowMetrics")
+                    await handleError("unable to get state metrics", resp, "getMetrics")
                 }
             } catch(e) {
                 sendNotification("Error:", e.message, 0)
@@ -654,7 +654,7 @@ function EventsList(props) {
                         setInstances([])
                     }
                 } else {
-                    await handleError('fetch workflow instances', resp, 'listWorkflowInstances')
+                    await handleError('fetch workflow instances', resp, 'listInstances')
                 }
             } catch (e) {
                 setErr(`Unable to fetch workflow instances: ${e.message}`)

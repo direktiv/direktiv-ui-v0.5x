@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoCodeWorkingSharp, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import { IoCodeWorkingSharp, IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
 import { NamespaceCreate } from '../../api'
 
 export default function Navbar(props) {
@@ -238,7 +238,7 @@ export default function Navbar(props) {
                                 }
                             }} to={`/n/${namespace}/explorer`} style={{color: matchExplorer !== null ? "#4497f5": ""}} className="nav-link">
                                 <div>
-                                    <IoShapesSharp style={{ marginRight: "10px" }} />
+                                    <IoSearch style={{ marginRight: "10px" }} />
                                     <span>Explorer</span>
                                 </div>
                             </Link>
@@ -323,7 +323,7 @@ export default function Navbar(props) {
                     <li>
                         {namespace === "" ?
                             <div style={{color:"#b5b5b5", cursor:"default"}}>
-                                <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
+                                <IoCubeOutline style={{marginRight:"10px"}}/>
                                 <span>Services</span>
                             </div>
                             :
@@ -333,7 +333,7 @@ export default function Navbar(props) {
                                 }
                             }} to={`/n/${namespace}/functions`} className="nav-link">
                                 <div>
-                                <IoCodeWorkingSharp style={{marginRight:"10px"}}/>
+                                <IoCubeOutline style={{marginRight:"10px"}}/>
                                 <span>Services</span>
                                 </div>
                             </Link>
@@ -368,7 +368,7 @@ export default function Navbar(props) {
                                     toggleNamespaceSelector()
                                 }
                             }} to={`/functions/global`} className="nav-link">
-                                <IoSettingsSharp style={{marginRight:"10px"}}/>
+                                <IoCubeOutline style={{marginRight:"10px"}}/>
                                 <span>Global Services</span>
                             </Link>
                         </li>

@@ -32,7 +32,7 @@ export default function Sankey(props) {
                 let json = await resp.json()
                 return json.states
             } else {
-                await handleError('fetch workflow metrics', resp)
+                await handleError('fetch workflow metrics', resp, 'getMetrics')
             }
         } catch(e) {
             sendNotification(`Failed to fetch metrics for workflow:`, e.message, 0)
@@ -130,7 +130,7 @@ export default function Sankey(props) {
 
                         return(
                             <div style={{textAlign:"center", paddingTop:"10px", fontSize:"11pt",  height:dim.height-20, width: dim.width}}>
-                                No Metrics are found to draw the sankey have you tried executing the workflow?
+                                No Metrics are found to draw the sankey.
                             </div>
                         )
                     }}

@@ -22,7 +22,7 @@ export async function GlobalFunctions(fetch, handleError) {
                 config: json.config
             }
         } else {
-            await handleError('fetching global functions', resp, "listGlobalFunctions")
+            await handleError('fetching global functions', resp, "listServices")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -38,7 +38,7 @@ export async function GlobalFunction(fetch, handleError, svn) {
 
             return json
         } else {
-            await handleError('fetching global function', resp, "listGlobalFunction")
+            await handleError('fetching global function', resp, "getService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -62,7 +62,7 @@ export async function GlobalUpdateFunction(fetch, handleError, svn, image, minSc
         if(resp.ok) {
             return
         } else {
-            await handleError('updating namespace service', resp, "updateNamespaceService")
+            await handleError('updating namespace service', resp, "updateService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -81,7 +81,7 @@ export async function GlobalUpdateTrafficFunction(fetch, handleError, svn, traff
         if(resp.ok) {
             return await resp.json()
         } else {
-            await handleError('set traffic', resp, "updateNamespaceServiceTraffic")
+            await handleError('set traffic', resp, "updateService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -104,7 +104,7 @@ export async function GlobalCreateFunction(fetch, handleError, svn, image, minSc
         if(resp.ok) {
             return
         } else {
-            await handleError('creating global function', resp, "createGlobalFunctions")
+            await handleError('creating global function', resp, "createService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -120,7 +120,7 @@ export async function GlobalDeleteFunction(fetch, handleError, svn) {
         if(resp.ok) {
             return
         } else {
-            await handleError('deleting global functions', resp, "deleteGlobalFunction")
+            await handleError('deleting global functions', resp, "deleteService")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -136,7 +136,7 @@ export async function GlobalDeleteFunctionRevision(fetch, handleError, svn, revi
         if(resp.ok) {
             return
         } else {
-            await handleError('deleting global function revision', resp, "deleteNamespaceRevision")
+            await handleError('deleting global function revision', resp, "deleteRevision")
         }
     } catch(e) {
         throw new Error(`${e.message}`)

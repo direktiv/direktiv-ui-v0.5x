@@ -386,7 +386,7 @@ function APIInteractionTile() {
                     setVal("")
                     setErr("")
                 } else {
-                        await handleError('send event', resp, 'namespaceEvent')
+                        await handleError('send event', resp, 'sendNamespaceEvent')
                 }
             } catch (e) {
                 setErr(`Failed to send cloud event: ${e.message}`)

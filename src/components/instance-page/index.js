@@ -134,7 +134,7 @@ export default function InstancePage() {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    await handleError("unable to get state metrics", resp, "getWorkflowMetrics")
+                    await handleError("unable to get state metrics", resp, "getMetrics")
                 }
             } catch(e) {
                 sendNotification("Error:", e.message, 0)

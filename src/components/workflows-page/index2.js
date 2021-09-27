@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoBookOutline, IoToggle, IoToggleOutline } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoBookOutline, IoToggle, IoToggleOutline, IoDocumentSharp, IoFolderSharp, IoDocumentOutline } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -15,7 +15,7 @@ import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
 
-
+import { FiFile, FiFileMinus, FiFolder, FiFolderMinus, FiTrash } from "react-icons/fi";
 import { checkStartType, Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
@@ -316,19 +316,19 @@ function WorkflowExplorer(props) {
 
     let listElements = [
         {
-            name: "Workflow Variables",
+            name: "Variables",
             func: async () => {
                 setTypeOfRequest("")
                 history.push(`/n/${params.namespace}/explorer/${params[0]}?variables=true` )
             }
         },
-        {
-            name: "Export Workflow",
-            func: async () => {
-                // TODO
-                toggleExportModal()
-            },
-        },
+        // {
+        //     name: "Export Workflow",
+        //     func: async () => {
+        //         // TODO
+        //         toggleExportModal()
+        //     },
+        // },
         {
             name: workflowInfo.active ? "Disable" : "Enable",
             func: async () => {
@@ -357,7 +357,7 @@ function WorkflowExplorer(props) {
                 <div style={{ flex: "auto", display:"flex", width:"100%" }}>
                     <Breadcrumbs resetData={[setTypeOfRequest]} />
                 </div>
-                <ButtonWithDropDownCmp height={"-140px"} data={listElements} />
+                <ButtonWithDropDownCmp height={"-100px"} data={listElements} />
             </div>
             <div className="container" style={{flexDirection: "row", flexWrap: "wrap", flex: "auto"}}>
                 <Modal 
@@ -743,17 +743,17 @@ function FileObject(props) {
             ev.preventDefault()
             setTypeOfRequest("")
             history.push(`/n/${namespace}/explorer/${id.replace("/", "")}`)
-        }} style={{display:"flex", gap:"10px", fontSize:"16pt", marginTop:"10px", cursor:"pointer"}}>
+        }} className="neumorph-hover" style={{display:"flex", gap:"10px", fontSize:"16pt", marginTop:"10px", padding:"5px", cursor:"pointer"}}>
             <div>
                 {
                     type === "workflow" ?
                     // replace this?
-                    <IoBookOutline />
+                    <IoDocumentOutline />
                     :
                     <IoFolderOutline />
                 }
             </div>
-            <div style={{flex: 1}}>
+            <div style={{flex: 1, fontSize:"12pt"}}>
                 {name}
             </div>
             <div style={{display:"flex", gap:"10px"}}>
