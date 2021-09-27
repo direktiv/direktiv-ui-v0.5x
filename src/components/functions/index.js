@@ -108,7 +108,6 @@ export default function Functions() {
         async function fetchFunctions() {
             if(params.namespace) {
                 return NamespaceFunctions(fetch, handleError, params.namespace).then((resp) => {
-                    console.log("respConfig =", resp.config)
                     functionsRef.current = resp.functions
                     setFunctions(resp.functions)
                     setConfig(resp.config)
@@ -117,7 +116,6 @@ export default function Functions() {
                 })
             }
             return GlobalFunctions(fetch, handleError).then((resp) => {
-                console.log("respConfig =", resp.config)
                 functionsRef.current = resp.functions
                 setFunctions(resp.functions)
                 setConfig(resp.config)

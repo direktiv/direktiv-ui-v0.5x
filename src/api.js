@@ -22,7 +22,6 @@ export async function Namespaces(fetch, handleError, load, val) {
                 if(load) {
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
-                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true
@@ -81,7 +80,6 @@ export async function Namespaces(fetch, handleError, load, val) {
                 } else {
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
-                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true
@@ -185,7 +183,6 @@ export async function NamespaceSecrets(fetch, namespace, handleError) {
         let resp = await fetch(`/namespaces/${namespace}/secrets`,{})
         if(resp.ok) {
             let json = await resp.json()
-            console.log(json)
             return json.secrets.edges
         } else {
             await handleError('fetch secrets', resp, 'listSecrets')
@@ -560,7 +557,6 @@ export async function NamespaceUpdateTrafficFunction(fetch, handleError, namespa
 }
 
 export async function NamespaceDeleteFunction(fetch, handleError, ns, svn) {
-    console.log("svn =", svn)
     try {
         let resp = await fetch(`/functions/namespaces/${ns}/function/${svn}`, {
             method: "DELETE"

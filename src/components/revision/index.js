@@ -1,7 +1,7 @@
 import Breadcrumbs from '../breadcrumbs'
 import {useContext, useEffect, useState, useRef} from "react"
 import TileTitle from '../tile-title'
-import { useHistory, useParams } from 'react-router'
+import { useHistory, useParams, useLocation } from 'react-router'
 import LoadingWrapper from "../loading"
 import { CopyToClipboard } from "../../util-funcs"
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
@@ -13,10 +13,14 @@ import MainContext from '../../context'
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+  }
 export default function Revision() {
     const {sse} = useContext(MainContext)
-    const {revision, namespace, service, workflow} = useParams()
+    let {revision, namespace, service, workflow} = useParams()
+    const q = useQuery()
+    const params = useParams()
 
     const [podSource, setPodSource] = useState(null)
     const [revisionSource, setRevisionSource] = useState(null)
@@ -28,20 +32,34 @@ export default function Revision() {
     const [tab, setTab] = useState("")
     const [err, setErr] = useState("")
 
+    if(q.get("rev")) {
+        revision = q.get("rev")
+    }
+
     // set revision soruce
     useEffect(()=>{
         if(revisionSource === null) {
             let x = `/functions/${service}/revisions/${revision}`
-            if (namespace) {
+            if (namespace && params[0] === undefined) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revisions/${revision}`
-            }
-            if(workflow) {
+            } else if(params[0] !== undefined && q.get("rev") !== null) {
+                if(q.get("function") === null || q.get('rev') === null) {
+                    return
+                }
                 //TODO: Change to workflow watcher
-                x = `/watch/functions/${service}/revisions/${revision}`
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revision&svn=${q.get("function")}&rev=${q.get("rev")}`
+                // x = `/watch/functions/${service}/revisions/${revision}`
             }
-
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
+                if(e.type === "error") {
+                    let json = JSON.parse(e.data)
+                    if (json["Code"]) {
+                        setErr(`Error revision listen: ${json["Message"]}`)
+                        eventConnection.close()
+                        return
+                    }
+                }
                 if(e.status === 403) {
                     setErr("You are forbidden on watching revisions")
                 }
@@ -63,7 +81,7 @@ export default function Revision() {
             eventConnection.onmessage = e => getData(e)
             setRevisionSource(eventConnection)
         }
-    },[revisionSource, history, namespace, revision, service, sse, workflow])
+    },[q, params,revisionSource, history, namespace, revision, service, sse, workflow])
 
     // set the pod source
     useEffect(()=>{
@@ -72,16 +90,25 @@ export default function Revision() {
         if(podSource === null) {
             // setup
             let x = `/functions/${service}/revisions/${revision}/pods`
-            if (namespace) {
+            if (namespace && params[0] === undefined) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revisions/${revision}/pods`
-            }
-            if(workflow) {
-                //TODO: Change to workflow watcher
-                x = `/watch/functions/${service}/revisions/${revision}/pods/`
+            } else if(params[0] !== undefined) {
+                if(q.get("function") === null || q.get('rev') === null) {
+                    return
+                }
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=pods&svn=${q.get("function")}&rev=${q.get("rev")}`
             }
 
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
+                if(e.type === "error") {
+                    let json = JSON.parse(e.data)
+                    if (json["Code"]) {
+                        setErr(`Error pods listen: ${json["Message"]}`)
+                        eventConnection.close()
+                        return
+                    }
+                }
                 if(e.status === 403) {
                     setErr("You are forbidden on watching pods.")
                 }
@@ -94,6 +121,7 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
+        
                 switch (json.event) {
                     case "DELETED":
                         for (var i=0; i < pods.length; i++) {
@@ -139,7 +167,7 @@ export default function Revision() {
             eventConnection.onmessage = e => getData(e)
             setPodSource(eventConnection)
         }
-    },[podSource, namespace, pods, revision, service, sse, tab, workflow])
+    },[q, params, podSource, namespace, pods, revision, service, sse, tab, workflow])
 
     // unmount the sources
     useEffect(()=>{
@@ -162,11 +190,14 @@ export default function Revision() {
         )
     }
 
+    if(service === undefined && q.get("rev") === null) {
+        return ""
+    }
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
-                    <Breadcrumbs />
+                    <Breadcrumbs appendQueryParams={true} />
                 </div>
             </div>
             <div className="shadow-soft rounded tile" style={{ flex: 1, overflow:"hidden", maxHeight:"300px" }}>

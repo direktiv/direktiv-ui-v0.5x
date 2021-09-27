@@ -117,7 +117,6 @@ export async function WorkflowLogToEventStatus(fetch, namespace, workflow, handl
         })
         if(resp.ok) {
             let json = await resp.json()
-            console.log(json)
         } else {
             await handleError('fetch workflow log to events', resp, 'getWorkflow')
         }
@@ -133,7 +132,6 @@ export async function WorkflowActiveStatus(fetch, namespace, workflow, handleErr
         })
         if (resp.ok) {
             let json = await resp.json()
-            console.log(json)
             return json.live
         } else {
             await handleError('fetch workflow active status', resp, 'getWorkflow')
@@ -186,7 +184,6 @@ export async function Workflow(fetch, namespace, workflow, handleError) {
         })
         if (resp.ok) {
             let json = await resp.json()
-            console.log(json)
             return {
                 eventLogging: json.eventLogging,
                 attributes: json.node.attributes,
@@ -206,7 +203,6 @@ export async function WorkflowInstances(fetch, namespace, workflow, handleError)
         let resp = await fetch(`/namespaces/${namespace}/instances?pagination.filter.field=AS&pagination.filter.type=CONTAINS&pagination.filter.val=${workflow}`,{})
         if (resp.ok) {
             let json = await resp.json()
-            console.log(json)
             return json.instances.edges
         } else {
             await handleError('list instances', resp, 'listInstances')

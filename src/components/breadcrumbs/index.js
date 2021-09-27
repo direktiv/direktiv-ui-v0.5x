@@ -1,19 +1,32 @@
 import React, { useContext } from 'react'
 
-import { useHistory } from 'react-router'
+import { useHistory, useLocation, useParams } from 'react-router'
 import useBreadcrumbs from 'use-react-router-breadcrumbs'
 import MainContext from '../../context'
 
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+  }
+
+  
 export default function Breadcrumbs(props) {
-    const {resetData } = props
-    const {bcRoutes} = useContext(MainContext)
+
+    const {resetData, appendQueryParams} = props
+    const {namespace, bcRoutes} = useContext(MainContext)
+    const params = useParams()
     const breadcrumbs = useBreadcrumbs(bcRoutes)
     const history = useHistory()
+    const q = useQuery()
 
+
+    let queryParams = `?`
+    q.forEach((v, k)=>{
+        queryParams += `${k}=${v}&`
+    })
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
-
+              
                 // If matching certain paths
                 if(obj.key === "/n" || obj.key === "/" || obj.key === "/functions") {
                     return ""
@@ -28,7 +41,14 @@ export default function Breadcrumbs(props) {
                                 x("")
                             }
                         }
-                        history.push(obj.key)
+
+                        // Handle workflow services with query parameters
+                        // if(appendQueryParams && obj.match.path !== `/n/${namespace}` && obj.match.path !== `/n/${namespace}/explorer` && obj.match.path !== `/n/${namespace}/explorer/${params[0]}`) {
+                            // history.push(`${obj.key}${queryParams}`)
+                        // } else {
+                            history.push(obj.key)
+                        // }
+                        
                     }} key={obj.key}>
                         {obj.breadcrumb}
                     </span>
@@ -36,6 +56,23 @@ export default function Breadcrumbs(props) {
                 
 
             })}
+            {q.get("variables") ?
+            <span onClick={()=>{
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?variables=true`)
+            }}>Variables</span>
+            :""}
+            {q.get('function') ?
+            <span onClick={()=>{
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}`)
+            }}>{q.get("function")}</span>
+            :""}
+            {q.get('rev') ?
+            <span onClick={()=>{
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}&rev=${q.get("rev")}`)
+            }}>
+                {q.get("rev")}
+            </span>
+            :""}
         </div>
     )
 }

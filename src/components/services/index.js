@@ -4,7 +4,7 @@ import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import 'rc-slider/assets/index.css';
 import { ConfirmButton } from '../confirm-button'
-import {Link, useHistory, useParams} from "react-router-dom"
+import {Link, useHistory, useParams, useLocation} from "react-router-dom"
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import { IoAdd, IoClipboardSharp, IoList, IoTrash} from 'react-icons/io5'
@@ -19,13 +19,18 @@ import {NamespaceFunction, NamespaceUpdateFunction, NamespaceUpdateTrafficFuncti
 import {GlobalFunction, GlobalUpdateFunction, GlobalUpdateTrafficFunction, GlobalDeleteFunctionRevision} from "../functions/api"
 import { WorkflowFunction } from "../workflows-page/api";
 
-
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+  }
+  
 dayjs.extend(relativeTime);
+
 export default function Services() {
     const {fetch, handleError, sse} = useContext(MainContext)
+    // const params = useParams()
+    const q = useQuery()
     const params = useParams()
-    console.log(params)
-    let { service, namespace, workflow } = useParams();
+    let { service, namespace} = useParams();
     const [errFetchRev, setErrFetchRev] = useState("")
     const [traffic, setTraffic] = useState(null)
     const history = useHistory()
@@ -46,16 +51,21 @@ export default function Services() {
     const [revisionSource, setRevisionSource] = useState(null)
     const [trafficSource, setTrafficSource] = useState(null)
 
+    let workflow = params[0]
+
+    if(service === undefined) {
+        service = q.get("function")
+    }
 
     const getService = useCallback((dontChangeRev) => {
         async function getServices() {
             try {
                 let resp = {}
-                if (namespace) {
+                if (namespace && params[0] === undefined) {
                     resp = await NamespaceFunction(fetch, handleError, namespace, service)
-                } else if (workflow) {
-                    //TODO: add route
-                    resp = await WorkflowFunction(fetch, handleError, namespace, params[0], service)
+                } else if (params[0]) {
+                    // Not implemented via the API
+                    // resp = await WorkflowFunction(fetch, handleError, namespace, q.get("path"), service)
                 } else {
                     resp = await GlobalFunction(fetch, handleError, service)
                 }
@@ -68,18 +78,19 @@ export default function Services() {
             }
         }
         return getServices()
-    }, [fetch, handleError, namespace, service, history, workflow])
+    }, [fetch, handleError, namespace, service, history, params])
 
     // setup sse for traffic updates
     useEffect(()=>{
         if(trafficSource === null) {
             let x = `/functions/${service}`
-            if(namespace){
+            if(namespace && params[0] === undefined){
                 x = `/functions/namespaces/${namespace}/function/${service}`
-            }
-            if(workflow) {
-                //TODO: update route
-                x = `/watch/functions/${service}`
+            } else if(params[0]) {
+                if(q.get("function") === null) {
+                    return
+                }
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function&svn=${q.get("function")}`
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -123,21 +134,23 @@ export default function Services() {
             eventConnection.onmessage = e => getRealtimeData(e)
             setTrafficSource(eventConnection)
         }
-    },[trafficSource, editable, namespace, service, sse, workflow])
+    },[q, trafficSource, editable, namespace, service, sse, workflow, params])
 
     // setup sse for revisions
     useEffect(()=>{
         if (revisionSource === null) {
 
             let x = `/functions/${service}/revisions`
-            if (namespace) {
+            if (namespace && params[0] === undefined) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revisions`
-            }
-            if(workflow) {
+            } else if(params[0]) {
+                if(q.get("function") === null) {
+                    return
+                }
                 //TODO: update route
-                x = `/watch/functions/${service}/revisions/`
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revisions&svn=${q.get("function")}`
+                // x = `/watch/functions/${service}/revisions/`
             }
-
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
@@ -208,7 +221,7 @@ export default function Services() {
             setRevisionSource(eventConnection)
         }
 
-    },[revisionSource, history, namespace, service, sse, workflow])
+    },[q,revisionSource, history, namespace, service, sse, workflow, params])
 
     useEffect(()=>{
         return ()=>{
@@ -229,11 +242,19 @@ export default function Services() {
         }
     },[getService, config])
 
+    // Query get function if it doesnt exist
+    if(q.get("function") === null && params[0] !== undefined) {
+        return ""
+    }
+    if(q.get("function") !== null && q.get("rev") !== null) {
+        return ""
+    }
+
     return(
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
-                    <Breadcrumbs elements={["Events / Logs"]} />
+                    <Breadcrumbs appendQueryParams={true} elements={["Events / Logs"]} />
                 </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flex: "auto", gap:"40px" }}>
@@ -253,7 +274,7 @@ export default function Services() {
 }
                     </LoadingWrapper>
                 </div>
-                {latestRevision !== null && config !== null && traffic !== null ?
+                {latestRevision !== null && config !== null && traffic !== null && params[0] === undefined ?
                 <div className="container" style={{ flexDirection: "column"}}>
                 {
                             traffic !== null ?
@@ -261,7 +282,6 @@ export default function Services() {
                         <TileTitle name="Traffic Management">
                              <IoClipboardSharp />
                         </TileTitle>
-                      
                             <EditRevision 
                                 workflow={workflow}
                                 setRev1Percentage={setRev1Percentage} 
@@ -287,7 +307,7 @@ export default function Services() {
                           ""
                       }
                       <>
-                        {latestRevision !== null && config !== null ?
+                        {latestRevision !== null && config !== null && params[0] === undefined ?
                     <div className="shadow-soft rounded tile" style={{  maxWidth: "400px"}}>
                         <TileTitle name="Create revision">
                              <IoAdd />
@@ -388,12 +408,10 @@ function Revision(props) {
     }
 
     let url = `/functions/global/${serviceName}/${revision}`
-    if (namespace) {
+    if (namespace && workflow === undefined) {
         url = `/n/${namespace}/functions/${serviceName}/${revision}`
-    }
-
-    if (workflow) {
-        url = `/n/${namespace}/w/${workflow}/functions/${serviceName}/${name}`
+    }else if (workflow) {
+        url = `/n/${namespace}/explorer/${workflow}?rev=${name}&function=${serviceName}`
     }
     
     return (

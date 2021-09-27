@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import { Link } from "react-router-dom"
 import MainContext from '../../../context'
 import {NoResults} from '../../../util-funcs'
@@ -74,8 +74,7 @@ export function EventsList(props) {
 
 export function FuncComponent(props) {
     const {functions, namespace, workflow, setTypeOfRequest} = props
-    
-    console.log(functions, namespace, workflow, "COMPONENTS IN FUNC COMP")
+    const history = useHistory()
     return(
       <div>
               <ul style={{margin:"0px"}}>
@@ -91,19 +90,22 @@ export function FuncComponent(props) {
                                             statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
                                         }
                                     }
-                                    console.log(`/n/${namespace}/explorer/${workflow}/service/${obj.serviceName}`)
                                     return(
-                                        <li key={obj.info.name} title={statusMessage}  className="event-list-item">
-                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} onClick={(()=>{
-                                               setTypeOfRequest("")
-                                           })} to={`/n/${namespace}/explorer/${workflow}/service/${obj.serviceName}`}>
+                                        <li onClick={(ev)=>{
+                                            // setTypeOfRequest("")
+                                            ev.preventDefault()
+                                            // `/n/${namespace}/functions/${obj.serviceName}?path=${workflow}`
+                                            // `/n/${namespace}/explorer/${workflow}?function=${obj.info.name}`
+                                            history.push(`/n/${namespace}/explorer/${workflow}?function=${obj.info.name}`)
+                                            ev.stopPropagation()
+                                        }} key={obj.info.name} title={statusMessage}  className="event-list-item" style={{cursor:"pointer"}}>
+                                             
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                     <span>
                                                         {obj.info.name !== "" ? obj.info.name : obj.serviceName}({obj.info.image})
                                                     </span>
                                                 </div>
-                                            </Link>
                                         </li>
                                     )
                                 })}

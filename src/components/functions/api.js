@@ -112,7 +112,6 @@ export async function GlobalCreateFunction(fetch, handleError, svn, image, minSc
 }
 
 export async function GlobalDeleteFunction(fetch, handleError, svn) {
-    console.log("svn =", svn)
     try {
         let resp = await fetch(`/functions/${svn}`, {
             method: "DELETE"

@@ -7,7 +7,7 @@ import { ConfirmButton } from '../confirm-button'
 import { useCallback, useContext, useEffect, useState, useRef } from "react";
 import MainContext from "../../context";
 import LoadingWrapper  from "../loading";
-import { useHistory, useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { TemplateHighlighter } from "../instance-page/input-output";
 import { SuccessOrFailedWorkflows } from '../dashboard-page'
 import Details from "./explorer-components/details";
@@ -30,6 +30,10 @@ function ShowError(msg, setErr) {
     },5000)
 }
 
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
+
 export default function Explorer() {
 
     const {fetch, handleError, namespace} = useContext(MainContext)
@@ -37,10 +41,11 @@ export default function Explorer() {
     const [loading, setLoading] = useState(true)
     const [typeOfRequest, setTypeOfRequest] = useState("")
     const [err, setErr] = useState("")
+    const q = useQuery()
 
     useEffect(()=>{
         async function getTypeOfNode() {
-            if(typeOfRequest === "") {
+            if(typeOfRequest === "" && q.get("variables") === null && q.get("function") === null && q.get("rev") === null) {
                 try {
                     let type = await NamespaceTree(fetch, namespace, params, false, handleError)
                     setTypeOfRequest(type)
@@ -52,7 +57,14 @@ export default function Explorer() {
             }
         }
         getTypeOfNode()
-    },[fetch, handleError, params, typeOfRequest, namespace])
+    },[q, fetch, handleError, params, typeOfRequest, namespace])
+
+    if(q.get("variables")) {
+        return ""
+    }
+    if(q.get("function")) {
+        return ""
+    }
 
     return(
         <div className="container" style={{ flex: "auto" }}>
@@ -146,7 +158,6 @@ function WorkflowExplorer(props) {
                 // process the data here
                 // pass it to state to be rendered
                 let json = JSON.parse(e.data)
-                console.log(json, "workflow function stream")
                 switch (json.event) {
                 case "DELETED":
                     for (var i=0; i < funcs.length; i++) {
@@ -308,7 +319,7 @@ function WorkflowExplorer(props) {
             name: "Workflow Variables",
             func: async () => {
                 setTypeOfRequest("")
-                history.push(`/n/${params.namespace}/explorer/${params[0]}/variables` )
+                history.push(`/n/${params.namespace}/explorer/${params[0]}?variables=true` )
             }
         },
         {
@@ -777,7 +788,7 @@ function FileObject(props) {
                         <div title="Workflow Variables">
                             <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                                 setTypeOfRequest("")
-                                history.push(`/n/${namespace}/explorer/${id.replace("/", "")}/variables`)
+                                history.push(`/n/${namespace}/explorer/${id.replace("/", "")}?variables=true`)
                                 ev.preventDefault();
                                 ev.stopPropagation();
                             }}>

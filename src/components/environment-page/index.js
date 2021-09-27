@@ -3,7 +3,7 @@ import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { Plus, XCircle } from 'react-bootstrap-icons'
-import { useParams } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline, IoCloudDownloadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
 import { useDropzone } from 'react-dropzone'
@@ -12,6 +12,9 @@ import { NamespaceDeleteVariable, NamespaceDownloadVariable, NamespaceGetVariabl
 import { WorkflowDeleteVariable, WorkflowDownloadVariable, WorkflowGetVariable, WorkflowSetVariable, WorkflowVariables } from '../workflows-page/api'
 
 
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
 const EnvTableError = (props) => {
     const { error, hideError } = props
     return (
@@ -378,6 +381,11 @@ const EnvTableNewEntry = (props) => {
 };
 
 export default function EnvrionmentPage(props) {
+    const q = useQuery()
+
+    if(q.get("variables") === null) {
+        return ""
+    }
     return (
         <>
             <div className="container" style={{ flex: "auto", padding: "10px" }}>

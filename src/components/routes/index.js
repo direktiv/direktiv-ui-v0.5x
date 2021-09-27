@@ -48,14 +48,18 @@ export default function Routes(props) {
             <Route exact path="/n/:namespace" component={DashboardPage} />
             <Route exact path="/n/:namespace/functions" component={Functions}/>
             <Route exact path="/n/:namespace/functions/:service" component={Services}/>
+            {/* <Route exact path="/n/:namespace/functions/:service/wf/*" component={Services}/> */}
+
             <Route exact path="/n/:namespace/functions/:service/:revision" component={Revision}/>
             <Route exact path="/n/:namespace/explorer" component={Explorer} />
 
-            <Route exact path="/n/:namespace/explorer/*/service/:service" component={Services} />
 
-            <Route exact path="/n/:namespace/explorer/*/variables" component={EnvrionmentPage} />
             <Route exact path="/n/:namespace/explorer/*" component={Explorer} />
-            <Route exact path="/n/:namespace/w/:workflow/variables" component={EnvrionmentPage} />
+            <Route exact path="/n/:namespace/explorer/*" component={EnvrionmentPage} />
+            <Route exact path="/n/:namespace/explorer/*" component={Services} />
+            <Route exact path="/n/:namespace/explorer/*" component={Revision} />
+
+
             <Route exact path="/n/:namespace/w/:workflow/functions/:service" component={Services} />
             <Route exact path="/n/:namespace/w/:workflow/functions/:service/:revision" component={Revision}/>
             <Route exact path="/n/:namespace/w/:workflow" component={WorkflowPage} />

@@ -19,7 +19,6 @@ export default function Sankey(props) {
 
     const params = useParams()
 
-    console.log("params =", params)
 
 
     useEffect(()=>{
