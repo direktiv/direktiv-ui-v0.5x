@@ -1,12 +1,12 @@
 import Breadcrumbs from '../breadcrumbs'
-import {useContext, useEffect, useState, useRef} from "react"
+import { useContext, useEffect, useState, useRef } from "react"
 import TileTitle from '../tile-title'
 import { useHistory, useParams, useLocation } from 'react-router'
 import LoadingWrapper from "../loading"
 import { CopyToClipboard } from "../../util-funcs"
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
-import { IoList, IoCopy, IoEyeOffSharp, IoEyeSharp} from 'react-icons/io5'
+import { IoList, IoCopy, IoEyeOffSharp, IoEyeSharp } from 'react-icons/io5'
 import MainContext from '../../context'
 
 
@@ -15,10 +15,10 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 function useQuery() {
     return new URLSearchParams(useLocation().search);
-  }
+}
 export default function Revision() {
-    const {sse} = useContext(MainContext)
-    let {revision, namespace, service, workflow} = useParams()
+    const { sse } = useContext(MainContext)
+    let { revision, namespace, service, workflow } = useParams()
     const q = useQuery()
     const params = useParams()
 
@@ -32,27 +32,39 @@ export default function Revision() {
     const [tab, setTab] = useState("")
     const [err, setErr] = useState("")
 
-    if(q.get("rev")) {
+    if (q.get("rev")) {
         revision = q.get("rev")
     }
 
     // set revision soruce
-    useEffect(()=>{
-        if(revisionSource === null) {
+    useEffect(() => {
+        if (revisionSource === null) {
+            let service = params.service
+            let revision = params.revision
+            if (q.get("function")) {
+                service = q.get("function")
+            }
+            if (q.get("rev")) {
+                revision = q.get('rev')
+            }
             let x = `/functions/${service}/revisions/${revision}`
             if (namespace && params[0] === undefined) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revisions/${revision}`
-            } else if(params[0] !== undefined && q.get("rev") !== null) {
-                if(q.get("function") === null || q.get('rev') === null) {
+            } else if (params[0] !== undefined && q.get("rev") !== null) {
+                if (q.get("function") === null || q.get('rev') === null) {
                     return
                 }
                 //TODO: Change to workflow watcher
                 x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revision&svn=${q.get("function")}&rev=${q.get("rev")}`
                 // x = `/watch/functions/${service}/revisions/${revision}`
             }
+            if (service === undefined || revision === undefined) {
+                return
+            }
+            console.log(x, "CONNECTING TO")
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
-                if(e.type === "error") {
+                if (e.type === "error") {
                     let json = JSON.parse(e.data)
                     if (json["Code"]) {
                         setErr(`Error revision listen: ${json["Message"]}`)
@@ -60,7 +72,7 @@ export default function Revision() {
                         return
                     }
                 }
-                if(e.status === 403) {
+                if (e.status === 403) {
                     setErr("You are forbidden on watching revisions")
                 }
             }
@@ -73,7 +85,7 @@ export default function Revision() {
                 if (json.event === "ADDED" || json.event === "MODIFIED") {
                     setRevisionDetails(json.revision)
                 }
-                if(json.event === "DELETED"){
+                if (json.event === "DELETED") {
                     history.goBack()
                 }
             }
@@ -81,27 +93,37 @@ export default function Revision() {
             eventConnection.onmessage = e => getData(e)
             setRevisionSource(eventConnection)
         }
-    },[q, params,revisionSource, history, namespace, revision, service, sse, workflow])
+    }, [q, params, revisionSource, history, namespace, revision, service, sse, workflow])
 
     // set the pod source
-    useEffect(()=>{
- 
+    useEffect(() => {
 
-        if(podSource === null) {
+
+        if (podSource === null) {
             // setup
+            let service = params.service
+            let revision = params.revision
+            if (q.get("function")) {
+                service = q.get("function")
+            }
+            if (q.get("rev")) {
+                revision = q.get('rev')
+            }
             let x = `/functions/${service}/revisions/${revision}/pods`
             if (namespace && params[0] === undefined) {
                 x = `/functions/namespaces/${namespace}/function/${service}/revisions/${revision}/pods`
-            } else if(params[0] !== undefined) {
-                if(q.get("function") === null || q.get('rev') === null) {
+            } else if (params[0] !== undefined && q.get("rev") !== null) {
+                if (q.get("function") === null || q.get('rev') === null) {
                     return
                 }
                 x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=pods&svn=${q.get("function")}&rev=${q.get("rev")}`
             }
-
+            if (service === undefined || revision === undefined) {
+                return
+            }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
-                if(e.type === "error") {
+                if (e.type === "error") {
                     let json = JSON.parse(e.data)
                     if (json["Code"]) {
                         setErr(`Error pods listen: ${json["Message"]}`)
@@ -109,7 +131,7 @@ export default function Revision() {
                         return
                     }
                 }
-                if(e.status === 403) {
+                if (e.status === 403) {
                     setErr("You are forbidden on watching pods.")
                 }
             }
@@ -121,11 +143,11 @@ export default function Revision() {
                     return
                 }
                 let json = JSON.parse(e.data)
-        
+
                 switch (json.event) {
                     case "DELETED":
-                        for (var i=0; i < pods.length; i++) {
-                            if(podz[i].name === json.pod.name) {
+                        for (var i = 0; i < pods.length; i++) {
+                            if (podz[i].name === json.pod.name) {
                                 podz.splice(i, 1)
                                 podsRef.current = pods
                                 break
@@ -133,7 +155,7 @@ export default function Revision() {
                         }
                         break
                     case "MODIFIED":
-                        for(i=0; i < podz.length; i++) {
+                        for (i = 0; i < podz.length; i++) {
                             if (podz[i].name === json.pod.name) {
                                 podz[i] = json.pod
                                 podsRef.current = podz
@@ -143,171 +165,171 @@ export default function Revision() {
                         break
                     default:
                         let found = false
-                        for(i=0; i < podz.length; i++) {
-                            if(podz[i].name === json.pod.name) {
-                                found = true 
+                        for (i = 0; i < podz.length; i++) {
+                            if (podz[i].name === json.pod.name) {
+                                found = true
                                 break
                             }
                         }
-                        if (!found){
+                        if (!found) {
                             podz.push(json.pod)
                             podsRef.current = pods
                         }
                 }
                 // update tab to display first pod
-                if(pods[0]){
+                if (pods[0]) {
                     if (tab === "" && pods[0].status === "Running") {
                         setTab(pods[0].name)
                     }
                 }
-                
+
                 setPods(JSON.parse(JSON.stringify(podsRef.current)))
             }
 
             eventConnection.onmessage = e => getData(e)
             setPodSource(eventConnection)
         }
-    },[q, params, podSource, namespace, pods, revision, service, sse, tab, workflow])
+    }, [q, params, podSource, namespace, pods, revision, service, sse, tab, workflow])
 
     // unmount the sources
-    useEffect(()=>{
+    useEffect(() => {
         return () => {
             if (podSource !== null) {
                 podSource.close()
             }
-            if(revisionSource !== null) {
+            if (revisionSource !== null) {
                 revisionSource.close()
             }
         }
-    },[podSource, revisionSource])
+    }, [podSource, revisionSource])
 
     let podSubTabs = []
-    for (let i=0; i < pods.length; i++) {
+    for (let i = 0; i < pods.length; i++) {
         podSubTabs.push(
-            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === pods[i].name? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setTab(pods[i].name) }} >
+            <div style={{ display: "flex", alignItems: "center", fontSize: "10pt", color: tab === pods[i].name ? "#2396d8" : "" }} className={"workflow-expand "} onClick={() => { setTab(pods[i].name) }} >
                 {pods[i].name.replace(`${revision}-deployment-`, "")}
             </div>
         )
     }
 
-    if(service === undefined && q.get("rev") === null) {
+    if (service === undefined && q.get("rev") === null) {
         return ""
     }
-    return(
+    return (
         <div className="container" style={{ flex: "auto", padding: "10px" }}>
             <div className="container">
                 <div style={{ flex: "auto" }}>
                     <Breadcrumbs appendQueryParams={true} />
                 </div>
             </div>
-            <div className="shadow-soft rounded tile" style={{ flex: 1, overflow:"hidden", maxHeight:"300px" }}>
+            <div className="shadow-soft rounded tile" style={{ flex: 1, overflow: "hidden", maxHeight: "300px" }}>
                 <TileTitle name={`Details for ${revision}`}>
                     <IoList />
                 </TileTitle>
                 <LoadingWrapper isLoading={false} text={"Loading Revision Details"}>
                     {err !== "" ?
-                    <>
-                        <div style={{ fontSize: "12px", paddingTop: "8px", paddingBottom: "5px", marginRight:"20px", color: "red" }}>
-                        {err}
-                        </div>
-                    </>
-                    :
-                    <>
-                    { revisionDetails !== null ? <DetailedRevision serviceName={revision} pods={pods}  revision={revisionDetails} /> : "" }
-                    </>}
+                        <>
+                            <div style={{ fontSize: "12px", paddingTop: "8px", paddingBottom: "5px", marginRight: "20px", color: "red" }}>
+                                {err}
+                            </div>
+                        </>
+                        :
+                        <>
+                            {revisionDetails !== null ? <DetailedRevision serviceName={revision} pods={pods} revision={revisionDetails} /> : ""}
+                        </>}
                 </LoadingWrapper>
             </div>
             {pods.length > 0 ?
-            <div className="shadow-soft rounded tile" style={{ flex: 1, overflow:"hidden" }}>
-                <TileTitle actionsDiv={podSubTabs} name={`Pods`}>
-                    <IoList />
-                </TileTitle>
-                <LoadingWrapper isLoading={false} text={"Loading Pod Logs"}>
-                    <PodLogs sse={sse} pod={tab} service={service} namespace={namespace} revision={revision} />
-                </LoadingWrapper>
-            </div>:""}
+                <div className="shadow-soft rounded tile" style={{ flex: 1, overflow: "hidden" }}>
+                    <TileTitle actionsDiv={podSubTabs} name={`Pods`}>
+                        <IoList />
+                    </TileTitle>
+                    <LoadingWrapper isLoading={false} text={"Loading Pod Logs"}>
+                        <PodLogs sse={sse} pod={tab} service={service} namespace={namespace} revision={revision} />
+                    </LoadingWrapper>
+                </div> : ""}
         </div>
     )
 }
 
 function DetailedRevision(props) {
-    const {revision, pods, serviceName} = props
+    const { revision, pods, serviceName } = props
     let size = ""
-    if(revision.size === 0) {
+    if (revision.size === 0) {
         size = "small"
     } else if (revision.size === 1) {
         size = "medium"
     } else if (revision.size === 2) {
         size = "large"
     }
-    return(
-        <div style={{fontSize:"11pt"}}>
-            <div style={{display:"flex", width:"100%"}}>
-                <div style={{flex: 1, textAlign:"left"}}>
-                    <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Created:</b></span>  {dayjs.unix(revision.created).format('h:mm a, DD-MM-YYYY')}</p>
-                    {size !== "" ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Size:</b></span> {size}</p> : ""}
-                    {revision.generation ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Generation:</b></span> {revision.generation}</p> : ""}
-                    {revision.cmd !== "" ?  <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Cmd:</b></span> {revision.cmd}</p> : ""}
+    return (
+        <div style={{ fontSize: "11pt" }}>
+            <div style={{ display: "flex", width: "100%" }}>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                    <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Created:</b></span>  {dayjs.unix(revision.created).format('h:mm a, DD-MM-YYYY')}</p>
+                    {size !== "" ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Size:</b></span> {size}</p> : ""}
+                    {revision.generation ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Generation:</b></span> {revision.generation}</p> : ""}
+                    {revision.cmd !== "" ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Cmd:</b></span> {revision.cmd}</p> : ""}
                 </div>
-                <div style={{flex: 1, textAlign:"left"}}>
-                    {revision.image !== "" ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Image:</b></span> {revision.image}</p> : ""}
-                    {revision.minScale ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Scale:</b></span> {revision.minScale}</p> : ""}
-                    {revision.actualReplicas ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Actual Replicas:</b></span> {revision.actualReplicas}</p> : ""}
-                    {revision.desiredReplicas ? <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Desired Replicas:</b></span> {revision.desiredReplicas}</p> : ""}
+                <div style={{ flex: 1, textAlign: "left" }}>
+                    {revision.image !== "" ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Image:</b></span> {revision.image}</p> : ""}
+                    {revision.minScale ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Scale:</b></span> {revision.minScale}</p> : ""}
+                    {revision.actualReplicas ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Actual Replicas:</b></span> {revision.actualReplicas}</p> : ""}
+                    {revision.desiredReplicas ? <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Desired Replicas:</b></span> {revision.desiredReplicas}</p> : ""}
                 </div>
             </div>
-            <div style={{display:"flex", width:"100%"}}>
-                <div style={{flex: 1, textAlign:"left"}}>
-                    <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Conditions:</b></span></p>
-                    <ul style={{margin:"5px", fontSize:"10pt"}}>
-                        {revision.conditions.map((obj)=>{
+            <div style={{ display: "flex", width: "100%" }}>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                    <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Conditions:</b></span></p>
+                    <ul style={{ margin: "5px", fontSize: "10pt" }}>
+                        {revision.conditions.map((obj) => {
                             let circleFill = "success"
                             if (obj.status === "False") {
                                 circleFill = "failed"
                             }
-                            if (obj.status === "Unknown"){
+                            if (obj.status === "Unknown") {
                                 circleFill = "crashed"
                             }
-                            return(
-                                <li key={obj.name} style={{lineHeight:"24px"}}>
+                            return (
+                                <li key={obj.name} style={{ lineHeight: "24px" }}>
                                     <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
-                                    <span style={{fontWeight:500}}>{obj.name}</span> {obj.reason!==""?<i style={{fontSize:"12px"}}>({obj.reason})</i>:""} <span style={{fontSize:'12px'}}>{obj.message}</span>
+                                    <span style={{ fontWeight: 500 }}>{obj.name}</span> {obj.reason !== "" ? <i style={{ fontSize: "12px" }}>({obj.reason})</i> : ""} <span style={{ fontSize: '12px' }}>{obj.message}</span>
                                 </li>
                             )
                         })}
                     </ul>
                 </div>
                 {pods.length > 0 ?
-                <div style={{flex: 1, textAlign:"left"}}>
-                    <p style={{margin:"5px"}}><span style={{width:"150px", display:"inline-block"}}><b>Pods:</b></span></p>
-                    <ul style={{margin:"5px", fontSize:"10pt"}}>
-                        {pods.map((obj)=>{
-                            let circleFill = "crashed"
-                            if (obj.status === "Succeeded" || obj.status === "Running") {
-                                circleFill = "success"
-                            }
-                            if (obj.status === "Failed") {
-                                circleFill = "failed"
-                            }
-                            if (obj.status === "Pending") {
-                                circleFill = "pending"
-                            }
-                            return(
-                                <li key={obj.name} style={{lineHeight:"24px"}}>
-                                    <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
-                                    <span style={{fontWeight:500}}>{obj.name.replace(`${serviceName}-deployment-`, "")}</span>
-                                </li>
-                            )
-                        })}
-                    </ul>
-                </div>:""}
+                    <div style={{ flex: 1, textAlign: "left" }}>
+                        <p style={{ margin: "5px" }}><span style={{ width: "150px", display: "inline-block" }}><b>Pods:</b></span></p>
+                        <ul style={{ margin: "5px", fontSize: "10pt" }}>
+                            {pods.map((obj) => {
+                                let circleFill = "crashed"
+                                if (obj.status === "Succeeded" || obj.status === "Running") {
+                                    circleFill = "success"
+                                }
+                                if (obj.status === "Failed") {
+                                    circleFill = "failed"
+                                }
+                                if (obj.status === "Pending") {
+                                    circleFill = "pending"
+                                }
+                                return (
+                                    <li key={obj.name} style={{ lineHeight: "24px" }}>
+                                        <CircleFill className={circleFill} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} />
+                                        <span style={{ fontWeight: 500 }}>{obj.name.replace(`${serviceName}-deployment-`, "")}</span>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div> : ""}
             </div>
         </div>
     )
 }
 
 function PodLogs(props) {
-    const {service, namespace, revision, pod, sse} = props
+    const { service, namespace, revision, pod, sse } = props
 
     const [logSource, setLogSource] = useState(null)
     const [tail, setTail] = useState(true)
@@ -317,8 +339,8 @@ function PodLogs(props) {
     const [err, setErr] = useState("")
 
     // set new log watcher on pod
-    useEffect(()=>{
-        if(pod !== "") {
+    useEffect(() => {
+        if (pod !== "") {
             let x = `/functions/logs/pod/${pod}`
             if (namespace) {
                 x = `/functions/logs/pod/${pod}`
@@ -329,13 +351,13 @@ function PodLogs(props) {
                     setErr("You are forbidden on watching pod logs")
                     return
                 }
-                if(e.data){
+                if (e.data) {
                     try {
                         let json = JSON.parse(e.data)
                         if (json.Message.includes("could not get logs")) {
                             setErr(`Container still starting: ${json.Message}`)
                         }
-                    } catch(er) {
+                    } catch (er) {
                         // this error can probably be ignored.
                         console.log(er)
                     }
@@ -352,7 +374,7 @@ function PodLogs(props) {
                 }
 
                 let json = JSON.parse(e.data)
-                log += "\n"+json.data
+                log += "\n" + json.data
                 document.getElementById("pod-logs").innerHTML += log
                 setLogs(log)
                 if (tailRef.current) {
@@ -365,11 +387,11 @@ function PodLogs(props) {
             eventConnection.onmessage = e => getRealtimeData(e)
             setLogSource(eventConnection)
         }
-    },[pod, namespace, revision, service, sse])
+    }, [pod, namespace, revision, service, sse])
 
     // clean up log watch
     // unmount the sources
-    useEffect(()=>{
+    useEffect(() => {
         return () => {
             if (logSource !== null) {
                 logSource.close()
@@ -379,43 +401,43 @@ function PodLogs(props) {
                 }
             }
         }
-    },[logSource])
+    }, [logSource])
 
-    return(
-        <div id="logs-toggle" className="editor-wrapper" style={{display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight:"300px",  top:"-28px", position: "relative", boxShadow:"none"}}>
-            <div style={{width: "100%", height: "100%"}}>
-                <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
-                    <div id="logs" style={{ position: "absolute", right:"0", left:"0", borderRadius:"8px", overflow: tail ? "hidden":"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a",  top:"28px", bottom:"30px", paddingBottom:"10px" }}>
-                        <pre id="pod-logs" style={{marginTop:"-14px"}} >
-                            {err !== "" ? err:""}
+    return (
+        <div id="logs-toggle" className="editor-wrapper" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative", boxShadow: "none" }}>
+            <div style={{ width: "100%", height: "100%" }}>
+                <div style={{ background: "#2a2a2a", height: "100%", top: "28px", marginTop: "28px" }}>
+                    <div id="logs" style={{ position: "absolute", right: "0", left: "0", borderRadius: "8px", overflow: tail ? "hidden" : "auto", textAlign: "left", height: "auto", color: "white", fontSize: "12pt", padding: "5px", background: "#2a2a2a", top: "28px", bottom: "30px", paddingBottom: "10px" }}>
+                        <pre id="pod-logs" style={{ marginTop: "-14px" }} >
+                            {err !== "" ? err : ""}
 
                         </pre>
                     </div>
                 </div>
             </div>
             <div id="test" className="editor-footer">
-                    <div className="editor-footer-buffer" />
-                    <div className="editor-footer-actions">
-                        <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
-                            if(!tail){
-                                document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
-                            }
-                            tailRef.current = !tail
-                            setTail(!tail)
-                        }}>
-                            <span style={{}} >{tail ? "Stop Watching": "Watch"}</span>
-                            {tail ? 
-                                <IoEyeOffSharp style={{marginLeft:"5px"}}/>
-                                :
-                                <IoEyeSharp style={{marginLeft:"5px"}}/>
-                            }
-                        </div>
-                        <div  className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none"}} onClick={() => { 
-                            CopyToClipboard(logs)
-                         }}>
-                            <span style={{}} >Copy</span>
-                            <IoCopy style={{ marginLeft: "5px" }} />
-                        </div>
+                <div className="editor-footer-buffer" />
+                <div className="editor-footer-actions">
+                    <div className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => {
+                        if (!tail) {
+                            document.getElementById('logs').scrollTop = document.getElementById('logs').scrollHeight
+                        }
+                        tailRef.current = !tail
+                        setTail(!tail)
+                    }}>
+                        <span style={{}} >{tail ? "Stop Watching" : "Watch"}</span>
+                        {tail ?
+                            <IoEyeOffSharp style={{ marginLeft: "5px" }} />
+                            :
+                            <IoEyeSharp style={{ marginLeft: "5px" }} />
+                        }
+                    </div>
+                    <div className="editor-footer-button" style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => {
+                        CopyToClipboard(logs)
+                    }}>
+                        <span style={{}} >Copy</span>
+                        <IoCopy style={{ marginLeft: "5px" }} />
+                    </div>
                 </div>
             </div>
         </div>
