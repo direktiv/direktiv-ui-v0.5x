@@ -50,6 +50,7 @@ export default function Services() {
 
     const [revisionSource, setRevisionSource] = useState(null)
     const [trafficSource, setTrafficSource] = useState(null)
+    const [vers, setVers] = useState(undefined)
 
     let workflow = params[0]
 
@@ -82,7 +83,7 @@ export default function Services() {
 
     // setup sse for traffic updates
     useEffect(() => {
-        if (trafficSource === null) {
+        if (trafficSource === null || vers !== q.get("vers")) {
             let x = `/functions/${service}`
             if (namespace && params[0] === undefined) {
                 x = `/functions/namespaces/${namespace}/function/${service}`
@@ -90,8 +91,16 @@ export default function Services() {
                 if (q.get("function") === null) {
                     return
                 }
-                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function&svn=${q.get("function")}`
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function&svn=${q.get("function")}&version=${q.get('vers')}`
+                setVers(q.get("vers"))
             }
+
+            if(trafficSource !== null) {
+                trafficSource.close()
+
+                setTraffic(null)
+            }
+            
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
@@ -134,11 +143,11 @@ export default function Services() {
             eventConnection.onmessage = e => getRealtimeData(e)
             setTrafficSource(eventConnection)
         }
-    }, [q, trafficSource, editable, namespace, service, sse, workflow, params])
+    }, [q, trafficSource, vers, editable, namespace, service, sse, workflow, params])
 
     // setup sse for revisions
     useEffect(() => {
-        if (revisionSource === null) {
+        if (revisionSource === null || vers !== q.get("vers")) {
 
             let x = `/functions/${service}/revisions`
             if (namespace && params[0] === undefined) {
@@ -148,8 +157,15 @@ export default function Services() {
                     return
                 }
                 //TODO: update route
-                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revisions&svn=${q.get("function")}`
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revisions&svn=${q.get("function")}&version=${q.get("vers")}`
+                setVers(q.get("vers"))
                 // x = `/watch/functions/${service}/revisions/`
+            }
+            console.log(revisionSource)
+            if(revisionSource !== null) {
+                setRevisions(null)
+                revisionsRef.current = []
+                revisionSource.close()
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -221,7 +237,7 @@ export default function Services() {
             setRevisionSource(eventConnection)
         }
 
-    }, [q, revisionSource, history, namespace, service, sse, workflow, params])
+    }, [q, revisionSource, vers, history, namespace, service, sse, workflow, params])
 
     useEffect(() => {
         return () => {
@@ -269,7 +285,7 @@ export default function Services() {
                                     {errFetchRev}
                                 </div>
                                 :
-                                <ListRevisions handleError={handleError} workflow={workflow} namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch} revisions={revisions !== null ? revisions : []} />
+                                <ListRevisions vers={vers} handleError={handleError} workflow={workflow} namespace={namespace} serviceName={service} traffic={traffic} fetch={fetch} revisions={revisions !== null ? revisions : []} />
 
                             }
                         </LoadingWrapper>
@@ -328,7 +344,7 @@ export default function Services() {
 }
 
 function ListRevisions(props) {
-    const { revisions, workflow, getService, fetch, traffic, namespace, serviceName, handleError } = props
+    const { revisions, workflow, vers, getService, fetch, traffic, namespace, serviceName, handleError } = props
     return (
         <div style={{ overflowX: "visible", maxHeight: "785px" }}>
             {revisions.map((obj, i) => {
@@ -368,7 +384,7 @@ function ListRevisions(props) {
                 }
 
                 return (
-                    <Revision handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic} revision={obj.rev} />
+                    <Revision vers={vers} handleError={handleError} workflow={workflow} namespace={namespace} serviceName={serviceName} hideDelete={hideDelete} titleColor={titleColor} cmd={obj.cmd} conditions={obj.conditions} size={sizeTxt} minScale={obj.minScale} fetch={fetch} fetchServices={getService} name={obj.name} image={obj.image} statusMessage={obj.statusMessage} generation={obj.generation} created={obj.created} status={obj.status} traffic={obj.traffic} revision={obj.rev} />
                 )
             })}
         </div>
@@ -376,7 +392,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const { titleColor, name, fetch, workflow, fetchServices, created, conditions, status, traffic, hideDelete, namespace, serviceName, handleError, revision } = props
+    const { titleColor, name, vers, fetch, workflow, fetchServices, created, conditions, status, traffic, hideDelete, namespace, serviceName, handleError, revision } = props
     let panelID = name;
     function toggleItem() {
         let x = document.getElementById(panelID);
@@ -411,7 +427,7 @@ function Revision(props) {
     if (namespace && workflow === undefined) {
         url = `/n/${namespace}/functions/${serviceName}/${revision}`
     } else if (workflow) {
-        url = `/n/${namespace}/explorer/${workflow}?rev=${revision}&function=${serviceName}`
+        url = `/n/${namespace}/explorer/${workflow}?rev=${revision}&function=${serviceName}&vers=${vers}`
     }
 
     return (

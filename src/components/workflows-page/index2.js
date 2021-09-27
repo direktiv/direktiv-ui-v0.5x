@@ -423,7 +423,7 @@ function WorkflowExplorer(props) {
                             </div>]}>
                                 <IoList /> Details
                         </TileTitle>
-                        <Details      setTypeOfRequest={setTypeOfRequest} workflowFuncErr={workflowFuncErr} tab={tab} functions={functions} />
+                        <Details setTypeOfRequest={setTypeOfRequest} workflowFuncErr={workflowFuncErr} tab={tab} functions={functions} />
                     </div>
                     <Attribute setErr={setErr} ShowError={ShowError} attributes={attributes} setAttributes={setAttributes} />
                 </div>

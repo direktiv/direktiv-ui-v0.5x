@@ -90,15 +90,16 @@ export function FuncComponent(props) {
                                             statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
                                         }
                                     }
+                                    console.log(obj, "FUNCTION")
                                     return(
                                         <li onClick={(ev)=>{
                                             // setTypeOfRequest("")
                                             ev.preventDefault()
                                             // `/n/${namespace}/functions/${obj.serviceName}?path=${workflow}`
                                             // `/n/${namespace}/explorer/${workflow}?function=${obj.info.name}`
-                                            history.push(`/n/${namespace}/explorer/${workflow}?function=${obj.info.name}`)
+                                            history.push(`/n/${namespace}/explorer/${workflow}?function=${obj.info.name}&vers=${obj.info.revision}`)
                                             ev.stopPropagation()
-                                        }} key={obj.info.name} title={statusMessage}  className="event-list-item" style={{cursor:"pointer"}}>
+                                        }} key={`${obj.info.name}:${obj.info.revision}`} title={statusMessage}  className="event-list-item" style={{cursor:"pointer"}}>
                                              
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
