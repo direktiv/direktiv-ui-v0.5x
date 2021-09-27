@@ -50,7 +50,7 @@ export default function Services() {
 
     const [revisionSource, setRevisionSource] = useState(null)
     const [trafficSource, setTrafficSource] = useState(null)
-    const [vers, setVers] = useState(undefined)
+    const [vers, setVers] = useState(null)
 
     let workflow = params[0]
 
@@ -92,15 +92,8 @@ export default function Services() {
                     return
                 }
                 x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function&svn=${q.get("function")}&version=${q.get('vers')}`
-                setVers(q.get("vers"))
             }
 
-            if(trafficSource !== null) {
-                trafficSource.close()
-
-                setTraffic(null)
-            }
-            
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // error log here
@@ -142,6 +135,7 @@ export default function Services() {
 
             eventConnection.onmessage = e => getRealtimeData(e)
             setTrafficSource(eventConnection)
+            setVers(q.get("vers"))
         }
     }, [q, trafficSource, vers, editable, namespace, service, sse, workflow, params])
 
@@ -162,10 +156,9 @@ export default function Services() {
                 // x = `/watch/functions/${service}/revisions/`
             }
             console.log(revisionSource)
-            if(revisionSource !== null) {
-                setRevisions(null)
+            if(q.get('vers') !== null) {
+                setRevisionSource(null)
                 revisionsRef.current = []
-                revisionSource.close()
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
@@ -235,6 +228,7 @@ export default function Services() {
 
             eventConnection.onmessage = e => getRealtimeData(e)
             setRevisionSource(eventConnection)
+            setVers(q.get("vers"))
         }
 
     }, [q, revisionSource, vers, history, namespace, service, sse, workflow, params])

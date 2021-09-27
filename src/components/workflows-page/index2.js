@@ -21,6 +21,7 @@ import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
 import Attribute from "./attributes";
+import { NoResults } from "../../util-funcs";
 
 
 function ShowError(msg, setErr) {
@@ -487,13 +488,16 @@ function ListExplorer(props) {
                         <IoSearch />
                     </TileTitle >
                     <LoadingWrapper isLoading={loading}>
+                        <>
+                        {objects.length > 0 ?
                         <ul>
                             {objects.map((obj)=>{
                                 return(
                                     <FileObject handleError={handleError} fetchData={fetchData} setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
                                 )
                             })}
-                        </ul>
+                        </ul>: <NoResults/>}
+                        </>
                     </LoadingWrapper>
                 </div>
                 <div className="container" style={{ flexDirection: "column", flex: "1"}} >
