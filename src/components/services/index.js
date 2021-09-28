@@ -47,7 +47,7 @@ export default function Services() {
     const [rev1Percentage, setRev1Percentage] = useState(0)
 
     const [isLoading, setIsLoading] = useState(true)
-
+    const [queryString, setQueryString] = useState("")
     const [revisionSource, setRevisionSource] = useState(null)
     const [trafficSource, setTrafficSource] = useState(null)
     const [vers, setVers] = useState(null)
@@ -80,6 +80,17 @@ export default function Services() {
         }
         return getServices()
     }, [fetch, handleError, namespace, service, history, params])
+
+    useEffect(()=>{
+        if(q.toString() !== queryString && trafficSource !== null && revisionSource !== null){
+            trafficSource.close()
+            revisionSource.close()
+            setTrafficSource(null)
+            setRevisionSource(null)
+        } else {
+            setQueryString(q.toString())
+        }
+    },[q, queryString])
 
     // setup sse for traffic updates
     useEffect(() => {

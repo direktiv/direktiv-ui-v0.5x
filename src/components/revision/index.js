@@ -26,6 +26,7 @@ export default function Revision() {
     const [revisionSource, setRevisionSource] = useState(null)
     const history = useHistory()
     const [revisionDetails, setRevisionDetails] = useState(null)
+    const [queryString, setQueryString] = useState("")
 
     const [pods, setPods] = useState([])
     const podsRef = useRef(pods)
@@ -35,6 +36,17 @@ export default function Revision() {
     if (q.get("rev")) {
         revision = q.get("rev")
     }
+
+    useEffect(()=>{
+        if(q.toString() !== queryString && podSource !== null && revisionSource !== null){
+            podSource.close()
+            revisionSource.close()
+            setPodSource(null)
+            setRevisionSource(null)
+        } else {
+            setQueryString(q.toString())
+        }
+    },[q, queryString])
 
     // set revision soruce
     useEffect(() => {

@@ -217,7 +217,7 @@ export async function WorkflowStateMillisecondMetrics(fetch, namespace, workflow
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=metrics-state-milliseconds`, {})
         if (resp.ok) {
             let json = await resp.json()
-            console.log(json, "TODO return proper metrics")   
+            return json.results
         } else {
             await handleError("unable to get state metrics", resp, "getMetrics")
         }
