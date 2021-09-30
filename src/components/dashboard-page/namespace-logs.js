@@ -53,7 +53,7 @@ export default function NamespaceLogsComponent() {
                 let json = JSON.parse(e.data)
             
                 for(let i=0; i < json.edges.length; i++) {
-                    log += `\u001b[38;5;248m[${dayjs.utc(json.edges[i].node.t).local().format("HH:mm:ss")}]\u001b[0m `
+                    log += `\u001b[38;5;248m[${dayjs.utc(json.edges[i].node.t).local().format("HH:mm:ss.SSS")}]\u001b[0m `
                     log += `${json.edges[i].node.msg}`
                     log += `\n`
                 }

@@ -125,26 +125,6 @@ export default function InstancePage() {
         }
     },[instanceId, fetch, fetchWf, instanceDetails.status, params.instance, handleError])
 
-
-    useEffect(()=>{
-        async function getStateMetrics() {
-            try {
-                let resp = await fetch(`/namespaces/${params.namespace}/tree/${params.workflow}?op=metrics-state-milliseconds`, {})
-                if(resp.ok) {
-                    let json = await resp.json()
-                    setStateMetrics(json.results)
-                } else {
-                    await handleError("unable to get state metrics", resp, "getMetrics")
-                }
-            } catch(e) {
-                sendNotification("Error:", e.message, 0)
-            }
-        }
-        if(metricsLoading) {
-            getStateMetrics().finally(()=>{setMetricsLoading(false)})
-        }
-    },[handleError, fetch, metricsLoading, params.namespace, params.workflow])
-
     // Wait for instanceDetails to be populated
     useEffect(()=>{
         if (instanceDetails && Object.keys(instanceDetails).length > 0 && isLoading) {

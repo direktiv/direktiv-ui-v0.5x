@@ -79,6 +79,7 @@ export default function Instance() {
             // todo
             try {
                 let json = await WorkflowStateMillisecondMetrics(fetch, namespace, instanceDetails.as, handleError)
+                setStateMetrics(json)
             } catch(e) {
                 sendNotification("Error: ", e.message, 0)
             }

@@ -63,12 +63,12 @@ export default function Breadcrumbs(props) {
             :""}
             {q.get('function') ?
             <span onClick={()=>{
-                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}`)
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}&vers=${q.get("vers")}`)
             }}>{q.get("function")}</span>
             :""}
             {q.get('rev') ?
             <span onClick={()=>{
-                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}&rev=${q.get("rev")}`)
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}&rev=${q.get("rev")}&vers=${q.get("vers")}`)
             }}>
                 {q.get("rev")}
             </span>

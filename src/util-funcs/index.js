@@ -34,7 +34,7 @@ export async function HandleError(summary, resp, perm) {
 export function NoResults() {
 
   return(
-      <div style={{textAlign:"center"}}>
+      <div style={{textAlign:"center", fontSize:"12pt"}}>
           No results are found.
       </div>
   )

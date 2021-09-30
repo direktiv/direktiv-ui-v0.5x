@@ -415,6 +415,7 @@ function WorkflowDiagram(props) {
         if(metrics.length > 0) {
             for(let i=0; i < metrics.length; i++) {
                 if(data.label === metrics[i].metric.state){
+                    console.log(metrics[i].metric.state)
                     let msTime  = parseInt(metrics[i].value[1])
                     timeEllapsed= `${msTime}ms`
                 }
@@ -479,6 +480,7 @@ function WorkflowDiagram(props) {
 
 export default function Diagram(props) {
     const {value, functions, flow, status, metrics} = props
+    console.log(metrics, "METRICS CHECK")
     const params = useParams()
 
     const [elements, setElements] = useState([])

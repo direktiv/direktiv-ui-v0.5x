@@ -15,12 +15,12 @@ import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
 
-import { FiFile, FiFileMinus, FiFolder, FiFolderMinus, FiTrash } from "react-icons/fi";
-import { checkStartType, Workflow, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
+import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
 import Attribute from "./attributes";
+import { NoResults } from "../../util-funcs";
 
 
 function ShowError(msg, setErr) {
@@ -256,7 +256,14 @@ function WorkflowExplorer(props) {
     // fetch metrics
     useEffect(()=>{
         async function getStateMetrics() {
-            setStateMetrics([])
+               // todo
+               try {
+                let json = await WorkflowStateMillisecondMetrics(fetch, namespace, params[0], handleError)
+                console.log(json, "JSON RETURN")
+                setStateMetrics(json)
+            } catch(e) {
+                setActionErr(e.message)
+            }
         }
         if(metricsLoading) {
             getStateMetrics().finally(()=>{setMetricsLoading(false)})
@@ -423,7 +430,7 @@ function WorkflowExplorer(props) {
                             </div>]}>
                                 <IoList /> Details
                         </TileTitle>
-                        <Details      setTypeOfRequest={setTypeOfRequest} workflowFuncErr={workflowFuncErr} tab={tab} functions={functions} />
+                        <Details setTypeOfRequest={setTypeOfRequest} workflowFuncErr={workflowFuncErr} tab={tab} functions={functions} />
                     </div>
                     <Attribute setErr={setErr} ShowError={ShowError} attributes={attributes} setAttributes={setAttributes} />
                 </div>
@@ -487,13 +494,16 @@ function ListExplorer(props) {
                         <IoSearch />
                     </TileTitle >
                     <LoadingWrapper isLoading={loading}>
+                        <>
+                        {objects.length > 0 ?
                         <ul>
                             {objects.map((obj)=>{
                                 return(
                                     <FileObject handleError={handleError} fetchData={fetchData} setTypeOfRequest={setTypeOfRequest} fetch={fetch} setErr={setErr} path={params[0]} namespace={namespace} name={obj.node.name}  key={obj.node.name} type={obj.node.type} id={obj.node.path} />
                                 )
                             })}
-                        </ul>
+                        </ul>: <NoResults/>}
+                        </>
                     </LoadingWrapper>
                 </div>
                 <div className="container" style={{ flexDirection: "column", flex: "1"}} >
