@@ -743,7 +743,7 @@ function FileObject(props) {
             ev.preventDefault()
             setTypeOfRequest("")
             history.push(`/n/${namespace}/explorer/${id.replace("/", "")}`)
-        }} className="neumorph-hover" style={{display:"flex", gap:"10px", fontSize:"16pt", marginTop:"10px", padding:"5px", cursor:"pointer"}}>
+        }} className="neumorph-hover" style={{display:"flex", gap:"10px", fontSize:"14pt", marginTop:"10px", padding:"5px", cursor:"pointer"}}>
             <div>
                 {
                     type === "workflow" ?
@@ -753,7 +753,7 @@ function FileObject(props) {
                     <IoFolderOutline />
                 }
             </div>
-            <div style={{flex: 1, fontSize:"12pt"}}>
+            <div style={{flex: 1, fontSize:"11pt"}}>
                 {name}
             </div>
             <div style={{display:"flex", gap:"10px"}}>
