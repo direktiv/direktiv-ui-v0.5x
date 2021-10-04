@@ -169,6 +169,9 @@ export default function Instance() {
                                 document.getElementById("logs-test").innerHTML = ""
                             }
                             instanceSource.close()
+                            
+                            // Reset to null to trigger getData again for new instanceDetails
+                            setInstanceSource(null)
                             history.push(`/n/${namespace}/i/${id}`)
                         } catch(e) {
                             setActionErr(e.message)
