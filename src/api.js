@@ -6,6 +6,11 @@ export async function Namespaces(fetch, handleError, load, val) {
         let newNamespace = ""
         let namespaces = []
         let resp = await fetch(`/namespaces`, {})
+        // if (resp.redirected){
+        //     let url = new URL(resp.url)
+        //     url.searchParams.set('redirect_uri', `${window.location.origin}/`)
+        //     window.location.replace(url.toString())
+        // }
         let storageNamespace = localStorage.getItem("namespace")
 
         if(resp.ok) {
@@ -22,6 +27,7 @@ export async function Namespaces(fetch, handleError, load, val) {
                 if(load) {
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
+                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true
@@ -41,7 +47,8 @@ export async function Namespaces(fetch, handleError, load, val) {
                         // window.location.pathname = `/n/${val}`
                         return {
                             namespaces: namespaces,
-                            namespace: val
+                            namespace: val,
+                            admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
                         }
                     }
 
@@ -53,7 +60,8 @@ export async function Namespaces(fetch, handleError, load, val) {
                         // window.location.pathname = "/"
                         return {
                             namespaces: namespaces,
-                            namespace: newNamespace
+                            namespace: newNamespace,
+                            admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
                         }
                     }
 
@@ -65,7 +73,8 @@ export async function Namespaces(fetch, handleError, load, val) {
                     if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
                         return {
                             namespaces: namespaces,
-                            namespace: newNamespace
+                            namespace: newNamespace,
+                            admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
                         }
                     } else if (!exist && newNamespace !== "") {
                         window.location.pathname = `/n/${newNamespace}`
@@ -75,11 +84,13 @@ export async function Namespaces(fetch, handleError, load, val) {
                     // Namespace exists 
                     return {
                         namespaces: namespaces,
-                        namespace: newNamespace
+                        namespace: newNamespace,
+                        admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
                     }
                 } else {
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
+                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true
@@ -104,7 +115,8 @@ export async function Namespaces(fetch, handleError, load, val) {
 
                     return {
                         namespaces: namespaces,
-                        namespace: newNamespace
+                        namespace: newNamespace,
+                        admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
                     }
                 }
             }
@@ -115,7 +127,6 @@ export async function Namespaces(fetch, handleError, load, val) {
         throw new Error(`${e.message}`)
     }
 }
-
 export async function NamespaceCreate(fetch, handleError, val) {
     try {
         let resp = await fetch(`/namespaces/${val}`, {
