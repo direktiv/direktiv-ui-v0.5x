@@ -17,7 +17,7 @@ export default function Details(props) {
             </div>:""
             }
             {tab === "functions" ?
-                    <div id="workflow-page-events" style={{ maxHeight: "512px", maxWidth:"270px", minWidth:"270px", overflowY: "auto" }}>
+                    <div id="workflow-page-events" style={{ maxHeight: "512px", overflowY: "auto" }}>
                     {
                         workflowFuncErr !== "" ? 
                         <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
