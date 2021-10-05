@@ -27,12 +27,11 @@ export default function Instance() {
     const [detailsErr, setDetailsErr] = useState("")
     const [,setActionErr] = useState("")
     const [isLoading, setIsLoading] = useState(true)
-    const [detailsLoad, setDetailsLoad] = useState(true)
+    const [, setDetailsLoad] = useState(true)
     const [metricsLoading, setMetricsLoading] = useState(true)
     const [stateMetrics, setStateMetrics] = useState([])
     const [iid, setIid] = useState("")
     const [startType, setStartType] = useState(true)
-    const [timer, setTimer] = useState(null)
     const [input, setInput] = useState(null)
 
     const [instanceSource, setInstanceSource] = useState(null)

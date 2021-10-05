@@ -107,7 +107,7 @@ export default function Sankey(props) {
         }
         gatherMetrics()
 
-    },[fetch, namespace, params.workflow, handleError])
+    },[fetch, namespace,  handleError, params])
     // useEffect(()=>{
     //     setLoad(true)
     //     let n = []

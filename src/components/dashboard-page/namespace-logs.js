@@ -73,7 +73,7 @@ export default function NamespaceLogsComponent() {
             setNamespaceLogSource(eventConnection)
             setOldNamespace(namespace)
         }
-    },[namespace, namespaceLogSource, sse])
+    },[namespace, namespaceLogSource, sse, oldNamespace])
 
     useEffect(()=>{
         return () => {

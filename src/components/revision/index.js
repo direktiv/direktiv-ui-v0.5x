@@ -46,7 +46,7 @@ export default function Revision() {
         } else {
             setQueryString(q.toString())
         }
-    },[q, queryString])
+    },[q, podSource, revisionSource, queryString])
 
     // set revision soruce
     useEffect(() => {

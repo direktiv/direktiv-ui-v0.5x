@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoCodeWorkingSharp, IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp, IoShapesSharp, IoTerminalSharp } from 'react-icons/io5'
+import {  IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp,  IoTerminalSharp } from 'react-icons/io5'
 import { NamespaceCreate } from '../../api'
 
 export default function Navbar(props) {

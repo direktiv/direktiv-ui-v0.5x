@@ -116,7 +116,7 @@ export async function WorkflowLogToEventStatus(fetch, namespace, workflow, handl
             method: "GET"
         })
         if(resp.ok) {
-            let json = await resp.json()
+            return
         } else {
             await handleError('fetch workflow log to events', resp, 'getWorkflow')
         }

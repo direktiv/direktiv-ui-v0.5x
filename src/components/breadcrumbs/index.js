@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 
-import { useHistory, useLocation, useParams } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 import useBreadcrumbs from 'use-react-router-breadcrumbs'
 import MainContext from '../../context'
 
@@ -11,18 +11,13 @@ function useQuery() {
   
 export default function Breadcrumbs(props) {
 
-    const {resetData, appendQueryParams} = props
-    const {namespace, bcRoutes} = useContext(MainContext)
-    const params = useParams()
+    const {resetData} = props
+    const {bcRoutes} = useContext(MainContext)
     const breadcrumbs = useBreadcrumbs(bcRoutes)
     const history = useHistory()
     const q = useQuery()
 
 
-    let queryParams = `?`
-    q.forEach((v, k)=>{
-        queryParams += `${k}=${v}&`
-    })
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{

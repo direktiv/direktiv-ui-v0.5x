@@ -17,7 +17,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { sendNotification } from "../notifications";
 import { NamespaceFunction, NamespaceUpdateFunction, NamespaceUpdateTrafficFunction, NamespaceDeleteFunctionRevision } from '../../api';
 import { GlobalFunction, GlobalUpdateFunction, GlobalUpdateTrafficFunction, GlobalDeleteFunctionRevision } from "../functions/api"
-import { WorkflowFunction } from "../workflows-page/api";
 
 function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -90,7 +89,7 @@ export default function Services() {
         } else {
             setQueryString(q.toString())
         }
-    },[q, queryString])
+    },[q, queryString, trafficSource, revisionSource])
 
     // setup sse for traffic updates
     useEffect(() => {
@@ -396,7 +395,7 @@ function ListRevisions(props) {
 }
 
 function Revision(props) {
-    const { titleColor, name, vers, fetch, workflow, fetchServices, created, conditions, status, traffic, hideDelete, namespace, serviceName, handleError, revision } = props
+    const { titleColor, name, vers, fetch, workflow, created, conditions, status, traffic, hideDelete, namespace, serviceName, handleError, revision } = props
     let panelID = name;
     function toggleItem() {
         let x = document.getElementById(panelID);

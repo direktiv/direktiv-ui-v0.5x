@@ -18,7 +18,7 @@ export default function Tag(props) {
 
     const inputKeyDown = async (e) => {
         const val = e.target.value
-        if(e.key === " " || e.key === "Enter" && val) {
+        if((e.key === " " || e.key === "Enter") && val) {
             if(attributes.find(tag => tag.toLowerCase() === val.toLowerCase())){
                 return;
             }

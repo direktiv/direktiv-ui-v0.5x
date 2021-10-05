@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoBookOutline, IoToggle, IoToggleOutline, IoDocumentSharp, IoFolderSharp, IoDocumentOutline } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -40,7 +40,7 @@ export default function Explorer() {
     const params = useParams()
     const [loading, setLoading] = useState(true)
     const [typeOfRequest, setTypeOfRequest] = useState("")
-    const [err, setErr] = useState("")
+    const [, setErr] = useState("")
     const q = useQuery()
 
     useEffect(()=>{
@@ -124,7 +124,7 @@ function WorkflowExplorer(props) {
     const [err, setErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
     const [actionErr, setActionErr] = useState("")
-    const [toggleErr, setToggleErr] = useState("")
+    const [, setToggleErr] = useState("")
     const [workflowFuncErr, setWorkflowFuncErr] = useState("")
 
     // export modal
@@ -267,7 +267,7 @@ function WorkflowExplorer(props) {
         if(metricsLoading) {
             getStateMetrics().finally(()=>{setMetricsLoading(false)})
         }
-    },[metricsLoading])
+    },[metricsLoading, fetch, handleError, namespace, params])
     
 
     async function updateLogEvent() {
@@ -445,7 +445,7 @@ function ListExplorer(props) {
     const [init, setInit] = useState(false)
     const [objects, setObjects] = useState([])
 
-    const [pageInfo, setPageInfo] = useState(null)
+    const [, setPageInfo] = useState(null)
     const [err, setErr] = useState("")
 
     const paramsRef = useRef("")
@@ -556,7 +556,7 @@ function SendNamespaceEvent(props){
 
 function CreateWorkflow(props) {
 
-    const {fetch, handleError, path, setErr, namespace, fetchData, setTypeOfRequest} = props
+    const {fetch, handleError, path, setErr, namespace, setTypeOfRequest} = props
 
     const [wfName, setWfName] = useState("")
     const [template, setTemplate] = useState("default")

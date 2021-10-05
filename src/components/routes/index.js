@@ -10,7 +10,6 @@ import Services from "../services"
 import Revision from "../revision"
 import Explorer from "../workflows-page/index2"
 import Instance from "../instance-page/index2"
-import { useEffect, useState } from "react"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props

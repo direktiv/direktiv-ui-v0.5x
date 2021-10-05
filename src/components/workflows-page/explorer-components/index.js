@@ -73,7 +73,7 @@ export function EventsList(props) {
 }
 
 export function FuncComponent(props) {
-    const {functions, namespace, workflow, setTypeOfRequest} = props
+    const {functions, namespace, workflow} = props
     const history = useHistory()
     return(
       <div>

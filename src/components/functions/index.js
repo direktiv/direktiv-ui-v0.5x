@@ -124,7 +124,7 @@ export default function Functions() {
             })
         }
         return fetchFunctions()
-    },[fetch, params.namespace])
+    },[fetch, params.namespace, handleError])
 
     useEffect(()=>{
         if (config === null && functions === null) {
