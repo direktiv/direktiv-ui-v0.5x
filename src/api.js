@@ -11,6 +11,14 @@ export async function Namespaces(fetch, handleError, load, val) {
         //     url.searchParams.set('redirect_uri', `${window.location.origin}/`)
         //     window.location.replace(url.toString())
         // }
+
+        let admin = false
+        if(resp.headers.get("x-direktiv-admin")){
+            if(resp.headers.get("x-direktiv-admin").toLowerCase() === 'true') {
+                admin = true
+            }
+        }
+
         let storageNamespace = localStorage.getItem("namespace")
 
         if(resp.ok) {
@@ -48,7 +56,7 @@ export async function Namespaces(fetch, handleError, load, val) {
                         return {
                             namespaces: namespaces,
                             namespace: val,
-                            admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
+                            admin: admin
                         }
                     }
 
@@ -61,7 +69,7 @@ export async function Namespaces(fetch, handleError, load, val) {
                         return {
                             namespaces: namespaces,
                             namespace: newNamespace,
-                            admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
+                            admin: admin
                         }
                     }
 
@@ -85,7 +93,7 @@ export async function Namespaces(fetch, handleError, load, val) {
                     return {
                         namespaces: namespaces,
                         namespace: newNamespace,
-                        admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
+                        admin: admin
                     }
                 } else {
                     // loop through ns and push ns to list. also check if path ns exists
@@ -116,7 +124,7 @@ export async function Namespaces(fetch, handleError, load, val) {
                     return {
                         namespaces: namespaces,
                         namespace: newNamespace,
-                        admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
+                        admin: admin
                     }
                 }
             }
