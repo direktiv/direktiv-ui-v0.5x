@@ -163,6 +163,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         if(newElements[j].source === "startNode" && newElements[j].target === flow[i]){
                             newElements[j].animated = true
                         }
+
                         
                         if(newElements[j].target === flow[i] && newElements[j].source === flow[i-1]) {
                             newElements[j].animated = true
@@ -189,7 +190,7 @@ const generateElements = (getLayoutedElements, value, flow, status) => {
                         // check if theres more flow if not its the end node
                         if(!flow[i+1]){
                             for(let j=0; j < newElements.length; j++) {
-                                if(newElements[j].source === flow[i] && newElements[j].target === "endNode" && status === "complete"){
+                                if(newElements[j].source === flow[i] && newElements[j].target === "endNode" && (status === "complete"|| status === "failed") ){
                                     newElements[j].animated = true
                                 }
                             }
