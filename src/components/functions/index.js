@@ -44,7 +44,7 @@ export default function Functions() {
                 // error log here
                 // after logging, close the connection   
                 if(e.status === 403) {
-                    setErr("You are forbidden on watching functions.")
+                    setErr("Permission denied.")
                 }
             }
             

@@ -85,7 +85,7 @@ export default function Revision() {
                     }
                 }
                 if (e.status === 403) {
-                    setErr("You are forbidden on watching revisions")
+                    setErr("Permission denied.")
                 }
             }
 
@@ -144,7 +144,7 @@ export default function Revision() {
                     }
                 }
                 if (e.status === 403) {
-                    setErr("You are forbidden on watching pods.")
+                    setErr("Permission denied.")
                 }
             }
 
@@ -360,7 +360,7 @@ function PodLogs(props) {
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 if (e.status === 403) {
-                    setErr("You are forbidden on watching pod logs")
+                    setErr("Permission denied.")
                     return
                 }
                 if (e.data) {

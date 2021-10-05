@@ -146,7 +146,7 @@ function WorkflowExplorer(props) {
             let eventConnection = sse(`${x}`,{})
             eventConnection.onerror = (e) => {
                 if(e.status === 403) {
-                    setWorkflowFuncErr("You are forbidden on watching workflow functions")
+                    setWorkflowFuncErr("Permission denied.")
                 }
             }
 
@@ -386,13 +386,13 @@ function WorkflowExplorer(props) {
                             ""
                         }
                         <TileTitle name="Details" actionsDiv={[
-                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "editor" ? "#2396d8":""}} onClick={() => { setEditorTab("editor") }}>
+                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "editor" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("editor") }}>
                                 <IoPencil /> Editor
                             </div>,
-                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "diagram" ? "#2396d8":""}} onClick={() => { setEditorTab("diagram") }}>
+                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "diagram" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("diagram") }}>
                                 <IoImageSharp /> Diagram
                             </div>,
-                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "sankey" ? "#2396d8":""}} onClick={() => { setEditorTab("sankey") }}>
+                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "sankey" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("sankey") }}>
                                 <IoPieChartSharp /> Sankey
                             </div>
                         ]}>

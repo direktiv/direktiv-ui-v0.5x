@@ -110,7 +110,7 @@ export default function Services() {
                 // error log here
                 // after logging, close the connection   
                 if (e.status === 403) {
-                    setErrFetchRev("You are forbidden on watching on traffic source")
+                    setErrFetchRev("Permission denied.")
                 }
             }
 
@@ -176,7 +176,7 @@ export default function Services() {
                 // error log here
                 // after logging, close the connection   
                 if (e.status === 403) {
-                    setErrFetchRev("You are forbidden on watching revisions")
+                    setErrFetchRev("Permission denied.")
                     return
                 }
             }

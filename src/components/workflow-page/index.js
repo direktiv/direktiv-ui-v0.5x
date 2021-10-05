@@ -101,7 +101,7 @@ export default function WorkflowPage() {
             let eventConnection = sse(`${x}`,{})
             eventConnection.onerror = (e) => {
                 if(e.status === 403) {
-                    setWorkflowFuncErr("You are forbidden on watching workflow functions")
+                    setWorkflowFuncErr("Permission denied.")
                 }
             }
 
