@@ -3,7 +3,7 @@ import { useContext, useEffect, useState, useRef } from "react"
 import TileTitle from '../tile-title'
 import { useHistory, useParams, useLocation } from 'react-router'
 import LoadingWrapper from "../loading"
-import { CopyToClipboard } from "../../util-funcs"
+import { CopyToClipboard, isBodyStreamError } from "../../util-funcs"
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
 
 import { IoList, IoCopy, IoEyeOffSharp, IoEyeSharp } from 'react-icons/io5'
@@ -76,12 +76,26 @@ export default function Revision() {
             console.log(x, "CONNECTING TO")
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
+                // Check if body stream error
+                if (isBodyStreamError(e)) {
+                    // No need to comment body stream errors
+                    console.log("Function Revision lost due to bodystream error")
+                    eventConnection.close()
+                    return
+                }
+                
                 if (e.type === "error") {
-                    let json = JSON.parse(e.data)
-                    if (json["Code"]) {
-                        setErr(`Error revision listen: ${json["Message"]}`)
-                        eventConnection.close()
-                        return
+                    // check for connection lost error
+                    try {
+                        let json = JSON.parse(e.data)
+                        if (json["Code"]) {
+                            setErr(`Error revision listen: ${json["Message"]}`)
+                            eventConnection.close()
+                            return
+                        }
+                    } catch (er) {
+                        // TODO: We most likely dont need to worry about this error, but should keep an eye on it
+                        console.log("Function Revision SSE connection closed with unhandled error: " + er)
                     }
                 }
                 if (e.status === 403) {
@@ -135,12 +149,26 @@ export default function Revision() {
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
+                // Check if body stream error
+                if (isBodyStreamError(e)) {
+                    // No need to comment body stream errors
+                    console.log("Pod connection lost due to bodystream error")
+                    eventConnection.close()
+                    return
+                }
+
                 if (e.type === "error") {
-                    let json = JSON.parse(e.data)
-                    if (json["Code"]) {
-                        setErr(`Error pods listen: ${json["Message"]}`)
-                        eventConnection.close()
-                        return
+                    // check for connection lost error
+                    try {
+                        let json = JSON.parse(e.data)
+                        if (json["Code"]) {
+                            setErr(`Error pods listen: ${json["Message"]}`)
+                            eventConnection.close()
+                            return
+                        }
+                    } catch (er) {
+                        // TODO: We most likely dont need to worry about this error, but should keep an eye on it
+                        console.log("Pod SSE connection closed with unhandled error: " + er)
                     }
                 }
                 if (e.status === 403) {
@@ -359,6 +387,14 @@ function PodLogs(props) {
             }
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
+                // Check if body stream error
+                if (isBodyStreamError(e)) {
+                    // No need to comment body stream errors
+                    console.log("Pod Log connection lost due to bodystream error")
+                    eventConnection.close()
+                    return
+                }
+
                 if (e.status === 403) {
                     setErr("Permission denied.")
                     return
@@ -370,8 +406,8 @@ function PodLogs(props) {
                             setErr(`Container still starting: ${json.Message}`)
                         }
                     } catch (er) {
-                        // this error can probably be ignored.
-                        console.log(er)
+                        // TODO: We most likely dont need to worry about this error, but should keep an eye on it
+                        console.log("Pod Log SSE connection closed with unhandled error: " + er)
                     }
                 }
 

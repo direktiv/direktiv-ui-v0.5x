@@ -199,3 +199,18 @@ export function validateAgainstVariableRegex(str, label) {
   return `${label} must container only alphanumeric characters, underscores, and dashes, must start with an alphabetic character, and must not end with '_' or '-'`
 
 }
+
+// Returns bool = true if returned error has the follow properities
+// 'type' : 'error'
+// 'error.message' : 'message'
+export function isBodyStreamError(err) {
+  if (!err || !err.type || !err.error || !err.error.message) {
+    return false
+  }
+  
+  if ( err.type === "error" && err.error.message === "Error in body stream") {
+    return true
+  }
+
+  return false
+}
