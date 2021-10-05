@@ -6,7 +6,7 @@ states:
     result: Hello world!
 `
 
-export const action = `description: A simple 'action' state that sends a get request"
+export const action = `description: A simple 'action' state that sends a get request
 functions:
 - id: get
   image: vorteil/request:v6
