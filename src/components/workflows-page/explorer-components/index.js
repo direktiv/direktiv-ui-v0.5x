@@ -90,7 +90,6 @@ export function FuncComponent(props) {
                                             statusMessage += `${obj.conditions[x].name}: ${obj.conditions[x].message}\n`
                                         }
                                     }
-                                    console.log(obj, "FUNCTION")
                                     return(
                                         <li onClick={(ev)=>{
                                             // setTypeOfRequest("")

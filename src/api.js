@@ -35,7 +35,6 @@ export async function Namespaces(fetch, handleError, load, val) {
                 if(load) {
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
-                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true
@@ -98,7 +97,6 @@ export async function Namespaces(fetch, handleError, load, val) {
                 } else {
                     // loop through ns and push ns to list. also check if path ns exists
                     for(let i=0; i < json.edges.length; i++) {
-                        console.log("i =", i)
                         namespaces.push(json.edges[i].node.name)
                         if(json.edges[i].node.name === pathNamespace){
                             exist = true

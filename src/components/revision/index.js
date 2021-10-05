@@ -73,7 +73,6 @@ export default function Revision() {
             if (service === undefined || revision === undefined) {
                 return
             }
-            console.log(x, "CONNECTING TO")
             let eventConnection = sse(`${x}`, {})
             eventConnection.onerror = (e) => {
                 // Check if body stream error

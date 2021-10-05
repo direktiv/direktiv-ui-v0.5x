@@ -166,7 +166,6 @@ export default function Services() {
                 setVers(q.get("vers"))
                 // x = `/watch/functions/${service}/revisions/`
             }
-            console.log(revisionSource)
             if(q.get('vers') !== null) {
                 setRevisionSource(null)
                 revisionsRef.current = []

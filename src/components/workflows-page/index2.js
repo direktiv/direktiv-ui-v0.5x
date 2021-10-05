@@ -259,7 +259,6 @@ function WorkflowExplorer(props) {
                // todo
                try {
                 let json = await WorkflowStateMillisecondMetrics(fetch, namespace, params[0], handleError)
-                console.log(json, "JSON RETURN")
                 setStateMetrics(json)
             } catch(e) {
                 setActionErr(e.message)
