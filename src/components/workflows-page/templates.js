@@ -37,7 +37,7 @@ states:
   type: action
   action:
     function: greeter
-    input: jq(.greetingcloudevent)
+    input: jq(.greetingcloudevent.data)
   transform:
     greeting: jq(.return.greeting)
 `
@@ -242,14 +242,14 @@ states:
   type: action
   action:
     function: greeter
-    input: jq(.greetingcloudevent)
+    input: jq(.greetingcloudevent.data)
   transform: 
     greeting: jq(.return.greeting)
 - id: solve
   type: action
   action:
     function: solve2
-    input: jq(.solveexpressioncloudevent)
+    input: jq(.solveexpressioncloudevent.data)
   transform: 
     solvedexpression: jq(.return)
 `
@@ -274,7 +274,7 @@ states:
   type: action
   action:
     function: greeter
-    input: .greetingcloudevent
+    input: jq(.greetingcloudevent.data)
   transform: 
     greeting: jq(.return.greeting)
     ceevent: jq(.solveexpressioncloudevent)
@@ -283,7 +283,7 @@ states:
   type: action
   action:
     function: solve
-    input: jq(.ceevent)
+    input: jq(.ceevent.data)
   transform: 
     msggreeting: jq(.greeting)
     solvedexpression: jq(.return)

@@ -119,7 +119,7 @@ function WorkflowExplorer(props) {
     const [jsonInput, setJsonInput] = useState("{\n\n}")
     const jsonRefInput = useRef(jsonInput)
     const [executable, setExecutable] = useState(true)
-
+    console.log(executable, "EXECUTABLE")
     // error handling
     const [err, setErr] = useState("")
     const [executeErr, setExecuteErr] = useState("")
@@ -309,6 +309,7 @@ function WorkflowExplorer(props) {
         }
     }
 
+    console.log(workflowInfo, "WORKFLOW INFO")
     let executeButton = (
         <div className={workflowInfo.active && executable ? "editor-footer-button" : "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => {
             if (workflowInfo.active && executable) {
@@ -639,6 +640,7 @@ function CreateWorkflow(props) {
                     <option value="default">noop</option>
                     <option value="action">action</option>
                     <option value="switch">switch</option>
+                    <option value="foreach">foreach</option>
                     <option value="delay">delay</option>
                     <option value="consumeEvent">consumeEvent</option>
                     <option value="eventAnd">eventAnd</option>
