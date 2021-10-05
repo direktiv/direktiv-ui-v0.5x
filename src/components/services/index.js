@@ -223,7 +223,7 @@ export default function Services() {
 
                 // filter based on revision dates
                 revisionsRef.current.sort(function (a, b) {
-                    return a.generation < b.generation ? 1 : -1;
+                    return parseInt(a.generation) < parseInt(b.generation) ? 1 : -1;
                 })
 
 
