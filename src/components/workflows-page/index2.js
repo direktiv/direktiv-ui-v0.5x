@@ -398,6 +398,7 @@ function WorkflowExplorer(props) {
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
                     <EditorDetails  
+                        path={params[0]} namespace={namespace}
                         workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics}
                         editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef}
                         actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow}
@@ -664,6 +665,9 @@ function CreateWorkflow(props) {
             </div>
             <div className="divider-dark"/>
             <div style={{ textAlign: "right" }}>
+                <input type="submit" value="Workflow Builder" style={{marginRight:"5px"}} onClick={() => {
+                    history.push(`/n/${namespace}/flowy?path=${path}`)
+                }} />
                 <input type="submit" value="Create Workflow" onClick={() => createWorkflow()} />
             </div>
         </div>

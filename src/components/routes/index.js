@@ -8,6 +8,7 @@ import EnvrionmentPage from "../environment-page"
 import Functions from "../functions"
 import Services from "../services"
 import Revision from "../revision"
+import Flowy from "../flowy"
 import Explorer from "../workflows-page/index2"
 import Instance from "../instance-page/index2"
 
@@ -27,6 +28,7 @@ export default function Routes(props) {
 
     return(
         <>
+            <Route exact path="/f/flowy" component={Flowy}/>
             <Route exact path="/functions/global" component={Functions}/>
             <Route exact path="/functions/global/:service" component={Services}/>
             <Route exact path="/functions/global/:service/:revision" component={Revision}/>
@@ -48,6 +50,8 @@ export default function Routes(props) {
             <Route exact path="/n/:namespace/functions" component={Functions}/>
             <Route exact path="/n/:namespace/functions/:service" component={Services}/>
             {/* <Route exact path="/n/:namespace/functions/:service/wf/*" component={Services}/> */}
+            <Route exact path="/n/:namespace/flowy" component={Flowy}/>
+            <Route exact path="/n/:namespace/flowy/*" component={Flowy}/>
 
             <Route exact path="/n/:namespace/functions/:service/:revision" component={Revision}/>
             <Route exact path="/n/:namespace/explorer" component={Explorer} />

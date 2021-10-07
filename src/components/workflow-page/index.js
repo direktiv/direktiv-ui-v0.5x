@@ -7,7 +7,7 @@ import YAML from 'js-yaml'
 
 import TileTitle from '../tile-title'
 import CircleFill from 'react-bootstrap-icons/dist/icons/circle-fill'
-import { IoExitOutline, IoEaselOutline, IoList, IoPencil,  IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand, IoCodeWorkingOutline, IoFlash } from 'react-icons/io5'
+import { IoExitOutline, IoEaselOutline, IoList, IoPencil,  IoSave, IoPlaySharp, IoChevronForwardOutline, IoCheckmarkSharp, IoToggleOutline, IoToggle, IoCodeOutline, IoExpand, IoCodeWorkingOutline, IoFlash, IoBuildSharp } from 'react-icons/io5'
 import Modal from 'react-modal';
 
 import { useHistory, useParams } from 'react-router'
@@ -45,7 +45,6 @@ export default function WorkflowPage() {
 
     const [showLogEvent, setShowLogEvent] = useState(false)
     const [logEvent, setLogEvent] = useState("hello-world")
-
     const [workflowValue, setWorkflowValue] = useState(null)
     const wfRefValue = useRef(workflowValue)
     const [workflowValueOld, setWorkflowValueOld] = useState("")
@@ -342,6 +341,13 @@ export default function WorkflowPage() {
         </div>
     );
 
+    let diagramBuildButton = (
+        <div onClick={()=>history.push(`/${namespace}/w/${params.workflow}/flowy`)} className={"editor-footer-button"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} >
+            <span style={{}} >Workflow Builder</span>
+            <IoBuildSharp style={{ marginLeft: "5px" }} />
+        </div>
+    )
+
     let logButton = (
         <>
             {!showLogEvent ?
@@ -476,7 +482,7 @@ export default function WorkflowPage() {
                                         <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                             <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                                    <Editor refValSet={wfRefValue} functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, saveButton]} commentKey={"#"}/>
+                                                    <Editor refValSet={wfRefValue} functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={fullscrenEditor ? [logButton, executeButton, saveButton] : [logButton, diagramBuildButton, saveButton]} commentKey={"#"}/>
                                                 </div>
                                             </div>
                                         </div>

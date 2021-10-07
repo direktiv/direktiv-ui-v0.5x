@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import {  IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp,  IoTerminalSharp } from 'react-icons/io5'
+import { IoBuildSharp,   IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp,  IoTerminalSharp } from 'react-icons/io5'
 import { NamespaceCreate } from '../../api'
 
 export default function Navbar(props) {
@@ -84,6 +84,11 @@ export default function Navbar(props) {
 
     let matchDashboard = matchPath(location.pathname, {
         path: "/n/:namespace",
+        exact: true
+    })
+
+    let matchWorkflowBuilder = matchPath(location.pathname, {
+        path: "/n/:namespace/flowy",
         exact: true
     })
 
@@ -240,6 +245,25 @@ export default function Navbar(props) {
                                 <div>
                                     <IoSearch style={{ marginRight: "10px" }} />
                                     <span>Explorer</span>
+                                </div>
+                            </Link>
+                        }
+                    </li>
+                    <li>
+                        {namespace === "" ? 
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                            <IoBuildSharp style={{ marginRight: "10px" }} />
+                            <span>Workflow Builder</span>
+                            </div>
+                            :
+                            <Link onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/n/${namespace}/flowy`} style={{color: matchWorkflowBuilder !== null ? "#4497f5": ""}} className="nav-link">
+                                <div>
+                                    <IoBuildSharp style={{ marginRight: "10px" }} />
+                                    <span>Workflow Builder</span>
                                 </div>
                             </Link>
                         }

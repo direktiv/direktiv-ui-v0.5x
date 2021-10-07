@@ -2,9 +2,10 @@ import Sankey from '../../workflow-page/sankey'
 import Diagram from '../../workflow-page/diagram'
 import Editor from "../../workflow-page/editor"
 import { IoCheckmarkSharp,  IoSave} from "react-icons/io5";
+import { useHistory } from 'react-router';
 
 export default function EditorDetails(props) {
-    const {editorTab, wfRefValue, functions, codemirrorRef, actionErr, workflowValue, setWorkflowValue, updateWorkflow, workflowValueOld, metricsLoading, stateMetrics, showLogEvent, updateLogEvent, setShowLogEvent, logEvent, setLogEvent} = props
+    const { namespace, path, editorTab, wfRefValue, functions, codemirrorRef, actionErr, workflowValue, setWorkflowValue, updateWorkflow, workflowValueOld, metricsLoading, stateMetrics, showLogEvent, updateLogEvent, setShowLogEvent, logEvent, setLogEvent} = props
     return(
         <>
             {editorTab === "editor" ? 
@@ -12,6 +13,7 @@ export default function EditorDetails(props) {
                             <div style={{ width: "100%", flex: "1", height: "100%", position: "relative" }}>
                                 <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: "-25px" }}>
                                     <Editor refValSet={wfRefValue} functions={functions} editorRef={codemirrorRef} err={actionErr} value={workflowValue} setValue={setWorkflowValue} saveCallback={updateWorkflow} showFooter={true} actions={[
+                                    <WorkflowBuilderButton namespace={namespace} path={path} />,
                                     <LogButton showLogEvent={showLogEvent} updateLogEvent={updateLogEvent} setShowLogEvent={setShowLogEvent} logEvent={logEvent} setLogEvent={setLogEvent} />,
                                     <SaveButton workflowValueOld={workflowValueOld} workflowValue={workflowValue} updateWorkflow={updateWorkflow} />]} commentKey={"#"}/>
                                 </div>
@@ -55,6 +57,19 @@ let SaveButton = (props) => {
         </div>
     )
 };
+
+let WorkflowBuilderButton = (props) => {
+    const history = useHistory()
+    const {path, namespace} = props
+    return (
+        <div className="editor-footer-button"   style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => { 
+            console.log(path, "PATH FOR WORKFLOW?")
+            history.push(`/n/${namespace}/flowy/${path}`)
+         }}>
+            <span style={{}} >Workflow Builder</span>
+        </div>
+    )
+}
 
 let LogButton = (props) => {
     const {showLogEvent, updateLogEvent, setShowLogEvent, logEvent, setLogEvent} = props

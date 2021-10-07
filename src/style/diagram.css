@@ -3,6 +3,17 @@
     border: none !important;
 }
 
+.test .react-flow__renderer .react-flow__nodes .react-flow__node .normal .react-flow__handle {
+    background-color: var(--primary-light) !important;
+    border: 1px solid #2396d8 !important;
+}
+
+.test .react-flow__renderer .react-flow__nodes .react-flow__node .state .react-flow__handle {
+    background-color: var(--primary-light) !important;
+    border: 1px solid #2396d8 !important;
+}
+
+
 .react-flow__minimap {
     border-radius: 4px;
     background-color: var(--primary-light);

@@ -1,0 +1,21 @@
+.state-item {
+    text-align: left;
+    padding-left: 10px
+}
+
+tr.spaceUnder > td {
+    padding-bottom: 5px;
+}
+
+.react-flow__node.selected .state{
+    background-color: rgba(94, 142, 219, 0.2);
+}
+.edit-input {
+    max-width: 255px;
+    min-width: 255px;
+}
+
+.edit-select{
+    max-width: 270px;
+    min-width: 270px;
+}

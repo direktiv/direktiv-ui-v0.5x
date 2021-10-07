@@ -14,7 +14,7 @@ hljs.registerLanguage("yaml", yaml);
 
 export const position = { x: 0, y: 0}
 
-const generateElements = (getLayoutedElements, value, flow, status) => {
+export const generateElements = (getLayoutedElements, value, flow, status) => {
     let newElements = []
    
     try {
