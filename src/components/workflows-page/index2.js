@@ -568,6 +568,7 @@ function CreateWorkflow(props) {
             let success = await NamespaceCreateNode(fetch, namespace, path, wfName, "workflow", templateData, handleError)
             if(success) {
                 if(path) {
+                    
                     history.push(`/n/${namespace}/explorer/${path}/${wfName}`)
                 } else {
                     history.push(`/n/${namespace}/explorer/${wfName}`)
@@ -666,7 +667,11 @@ function CreateWorkflow(props) {
             <div className="divider-dark"/>
             <div style={{ textAlign: "right" }}>
                 <input type="submit" value="Workflow Builder" style={{marginRight:"5px"}} onClick={() => {
-                    history.push(`/n/${namespace}/flowy?path=${path}`)
+                    if(path) {
+                        history.push(`/n/${namespace}/flowy?path=${path}`)
+                    } else {
+                        history.push(`/n/${namespace}/flowy`)
+                    }
                 }} />
                 <input type="submit" value="Create Workflow" onClick={() => createWorkflow()} />
             </div>
