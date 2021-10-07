@@ -130,23 +130,6 @@ export default function Instance() {
         }
     },[instanceDetails, isLoading])
 
-    for(var i=0; i < extraLinks.length; i++) {
-        let x = extraLinks[i]
-        let path = x.path
-        for (var j=0; j < x.replace.length; j++) {
-            if(x.replace[j].key === "namespace") {
-                path = path.replaceAll(x.replace[j].val, params.namespace)
-            }
-            if(x.replace[j].key === "workflow") {
-                path = path.replaceAll(x.replace[j].val, params.workflow)
-            }
-            if(x.replace[j].key === "instance") {
-                path = path.replaceAll(x.replace[j].val, params.instance)
-            }
-        }
-        x.path = path
-        extraLinks[i] = x
-    }
 
     let listElements = [
         {
