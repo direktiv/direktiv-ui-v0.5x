@@ -20,18 +20,19 @@ export default function Sankey(props) {
     const params = useParams()
 
 
+
     useEffect(()=>{
 
     async function fetchMet() {
         try {
-            let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics`, {
+            let resp = await fetch(`/namespaces/${namespace}/tree/${params["0"]}?op=metrics-sankey`, {
                 method: "GET"
             })
             if (resp.ok) {
                 let json = await resp.json()
                 return json.states
             } else {
-                await handleError('fetch workflow metrics', resp)
+                await handleError('fetch workflow metrics', resp, 'getMetrics')
             }
         } catch(e) {
             sendNotification(`Failed to fetch metrics for workflow:`, e.message, 0)
@@ -106,7 +107,7 @@ export default function Sankey(props) {
         }
         gatherMetrics()
 
-    },[fetch, namespace, params.workflow, handleError])
+    },[fetch, namespace,  handleError, params])
     // useEffect(()=>{
     //     setLoad(true)
     //     let n = []
@@ -129,7 +130,7 @@ export default function Sankey(props) {
 
                         return(
                             <div style={{textAlign:"center", paddingTop:"10px", fontSize:"11pt",  height:dim.height-20, width: dim.width}}>
-                                No Metrics are found to draw the sankey have you tried executing the workflow?
+                                No Metrics are found to draw the sankey.
                             </div>
                         )
                     }}

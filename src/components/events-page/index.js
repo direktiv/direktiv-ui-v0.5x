@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import { IoList } from 'react-icons/io5'
 import {NoResults} from '../../util-funcs'
 import LoadingWrapper from "../loading"
+import { NamespaceInstances } from '../../api';
 
 dayjs.extend(relativeTime);
 
@@ -50,20 +51,8 @@ export function EventsPageBody() {
     useEffect(()=>{
         async function fetchI() {
             try{
-                // fetch instances list
-                let resp = await fetch(`/instances/${namespace}?limit=100`, {
-                    method: "GET"
-                })
-                if(resp.ok) {
-                    let json = await resp.json()
-                    if(json.workflowInstances) {
-                        setInstances(json.workflowInstances)
-                    } else {
-                        setInstances([])
-                    }
-                } else {
-                    await handleError('fetch instances', resp, 'listInstances')
-                }
+                let instanceList = await NamespaceInstances(fetch, namespace, handleError)
+                setInstances(instanceList)
             } catch(e) {
                 setErr(`Failed to fetch instances: ${e.message}`)
             }
@@ -93,11 +82,11 @@ export function EventsPageBody() {
                         {
                             instances.map((obj)=>{
                                 return (
-                                    <Link key={obj.id} to={`/i/${obj.id}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
+                                    <Link key={obj.node.id} to={`/n/${namespace}/i/${obj.node.id}`} style={{ display: "contents", color: "inherit", textDecoration: "inherit" }}>
                                         <tr className="event-list-item">
-                                            <td style={{ textAlign: "center" }}><EventStatus status={obj.status} /></td>
-                                            <td style={{ textAlign: "left" }}>{obj.id}</td>
-                                            <td>{dayjs.unix(obj.beginTime.seconds).fromNow()}</td>
+                                            <td style={{ textAlign: "center" }}><EventStatus status={obj.node.status} /></td>
+                                            <td style={{ textAlign: "left" }}>{obj.node.as}</td>
+                                            <td>{dayjs.utc(obj.node.createdAt).local().fromNow()}</td>
                                         </tr>
                                     </Link>
                                 )

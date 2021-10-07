@@ -8,11 +8,14 @@ import dagre from 'dagre'
 import {SchemaSelected, GetterOrSetterSelected, EventAndXorSelected, ParallelSelected, FuncSelected, ConsumeEventSelected, ForeachSelected, ValidateSelected, GenerateEventSelected, ErrorSelected, ActionSelected, DelaySelected, SwitchSelected, NoopSelected, EdgeSelected} from "./selected"
 
 
-import { useHistory, useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import MainContext from "../../context";
 
 import "./vsc.css"
 import './flowy.css'
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
 
 
 export function ShowErr(message, setErr) {
@@ -23,8 +26,8 @@ export function ShowErr(message, setErr) {
 }
 
 export default function Flowy() {
-    
-    const {workflow, namespace} = useParams()
+    const ps = useParams()
+    const {namespace} = useParams()
     const {handleError, fetch} = useContext(MainContext)
     // blocks being handled
     const [blocks, setBlocks] = useState([{
@@ -39,9 +42,9 @@ export default function Flowy() {
         },
         type: "start"
     }])
-
+    const q = useQuery()
     // wfname and err check
-    const [wfName, setWfName] = useState(workflow ? workflow: "")
+    const [wfName, setWfName] = useState(ps[0] ? ps[0]: "")
     const [init, setInit] = useState(false)
     const [err, setErr] = useState("")
     
@@ -221,40 +224,52 @@ export default function Flowy() {
         }
     };
 
-    const createOrUpdateWorkflow = async (wf) => {
-        if(workflow) {
+    const createOrUpdateWorkflow = async (wfName, wf) => {
+        if(ps[0]) {
             try {
-               let resp = await fetch(`/namespaces/${namespace}/workflows/${workflow}`, {
-                method: "put",
+               let resp = await fetch(`/namespaces/${namespace}/tree/${ps[0]}?op=update-workflow`, {
+                method: "post",
                 headers: {
                     "Content-type": "text/yaml",
                     "Content-Length": wf.length,
                 },
                 body: wf
-            })
-            if (resp.ok) {
-                history.push(`/${namespace}/w/${workflow}`)
-
-            } else {
-                await handleError('update workflow', resp, 'updateWorkflow')
-            }
+                })
+                if (resp.ok) {
+                    history.push(`/n/${namespace}/explorer/${ps[0]}`)
+                } else {
+                    await handleError('update workflow', resp, 'updateWorkflow')
+                }
             } catch (e) {
                 ShowErr(`Failed to update workflow: ${e.message}`, setErr)
             }
         } else {
             // create a new workflow
+            let url = `/namespaces/${namespace}/tree/`
+            if(q.get('path')) {
+                url += `${q.get('path')}/${wfName}?op=create-workflow`
+            } else {
+                url += `${wfName}?op=create-workflow`
+            }
+            // const rpath = q.get('path')
             try {
-                let resp = await fetch(`/namespaces/${namespace}/workflows`, {
+                let resp = await fetch(url, {
                     headers: {
                         "Content-Type": "text/yaml",
                         "Content-Length": wf.length,
                     },
-                    method: "post",
+                    method: "PUT",
                     body: wf,
                 })
                 if (resp.ok) {
-                    let json = await resp.json()
-                    history.push(`/${namespace}/w/${json.id}`)
+                    // let json = await resp.json()
+                    let pushurl = `/n/${namespace}/explorer/`
+                    if(q.get('path')) {
+                        pushurl += `${q.get('path')}/${wfName}`
+                    } else {
+                        pushurl += `${wfName}`
+                    }
+                    history.push(`${pushurl}`)
                 } else {
                         await handleError('create workflow', resp, 'createWorkflow')
                 }
@@ -268,16 +283,16 @@ export default function Flowy() {
     useEffect(()=>{
         async function fetchWorkflowAndDraw() {
             if (!init) {
-                if(workflow) {
+                if(ps[0]) {
                     let wf = ""
                     try {
                         // todo pagination
-                        let resp = await fetch(`/namespaces/${namespace}/workflows/${workflow}`, {
+                        let resp = await fetch(`/namespaces/${namespace}/tree/${ps[0]}`, {
                             method: "get",
                         })
                         if (resp.ok) {
                             let json = await resp.json()
-                            wf = atob(json.workflow)
+                            wf = atob(json.revision.source)
                         }else {
                             await handleError('fetch workflow', resp, 'getWorkflow')
                         }
@@ -340,7 +355,7 @@ export default function Flowy() {
 
         }
         fetchWorkflowAndDraw()
-    },[blocks, setBlocks, init, workflow, namespace, handleError, fetch])
+    },[blocks, setBlocks, init, namespace, handleError, fetch, ps])
 
       
     return(
@@ -385,10 +400,10 @@ export default function Flowy() {
                 </table>
                 <hr />
                 <div>
-                        <div style={{fontSize:"12pt", fontWeight:"bold"}}>{workflow ? "Update Workflow":"Create Workflow"}</div>
-                        <input value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" disabled={workflow ? true: false} placeholder="Enter workflow name" style={{marginTop:"10px"}} />
+                        <div style={{fontSize:"12pt", fontWeight:"bold"}}>{ps[0] ? "Update Workflow":"Create Workflow"}</div>
+                        <input value={wfName} onChange={(e)=>setWfName(e.target.value)} type="text" disabled={ps[0] ? true: false} placeholder="Enter workflow name" style={{marginTop:"10px"}} />
                         <div style={{textAlign:"right", marginTop:"10px", fontSize:"8pt"}}>
-                            <input type="submit" value={workflow ? "Update Workflow":"Create Workflow"} onClick={()=>{
+                            <input type="submit" value={ps[0] ? "Update Workflow":"Create Workflow"} onClick={()=>{
                                 if(wfName) {
                                     diagramToYAML(wfName, blocks, setErr, createOrUpdateWorkflow)
                                 } else {

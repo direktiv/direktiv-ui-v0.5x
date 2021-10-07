@@ -12,6 +12,9 @@ import LoadingWrapper from "../loading"
 import { Link,  useParams } from 'react-router-dom'
 import { sendNotification } from '../notifications';
 
+import {GlobalFunctions, GlobalCreateFunction, GlobalDeleteFunction} from './api';
+
+import {NamespaceFunctions, NamespaceCreateFunction, NamespaceDeleteFunction} from '../../api';
 
 
 export default function Functions() {
@@ -30,14 +33,10 @@ export default function Functions() {
 
     useEffect(()=>{
         if (evSource === null && functions !== null) {
-            let x = "/watch/functions/?scope=global"
-            let body = {
-                scope: "global"
-            }
+            let x = "/functions"
+
             if(params.namespace) {
-                body.scope = "namespace"
-                x = `/watch/namespaces/${params.namespace}/functions/`
-                body["namespace"] = params.namespace 
+                x = `/functions/namespaces/${params.namespace}`
             }
             
             let eventConnection = sse(`${x}`, {})
@@ -45,7 +44,7 @@ export default function Functions() {
                 // error log here
                 // after logging, close the connection   
                 if(e.status === 403) {
-                    setErr("You are forbidden on watching functions.")
+                    setErr("Permission denied.")
                 }
             }
             
@@ -107,40 +106,25 @@ export default function Functions() {
 
     const fetchServices = useCallback(()=>{
         async function fetchFunctions() {
-            let x = "/functions/"
-            let body = {
-                scope: "global"
-            }
             if(params.namespace) {
-                body.scope = "namespace"
-                x = `/namespaces/${params.namespace}/functions/`
-                body["namespace"] = params.namespace
-            }
-            try {
-                let resp = await fetch(x, {
-                    method: "POST",
-                    body: JSON.stringify(body)
+                return NamespaceFunctions(fetch, handleError, params.namespace).then((resp) => {
+                    functionsRef.current = resp.functions
+                    setFunctions(resp.functions)
+                    setConfig(resp.config)
+                }).catch((e) => {
+                    setErr(e.message)
                 })
-                if(resp.ok) {
-                    let arr = await resp.json()
-                    setConfig(arr.config)
-                    if (arr.services.length > 0) {
-                        functionsRef.current = arr.services
-                        setFunctions(arr.services)
-
-                    } else {
-                        functionsRef.current = []
-                        setFunctions([])
-                    }
-                } else {
-                    await handleError('fetch services', resp, 'listServices')
-                }
-            } catch(e) {
-                setErr(e.message)
             }
+            return GlobalFunctions(fetch, handleError).then((resp) => {
+                functionsRef.current = resp.functions
+                setFunctions(resp.functions)
+                setConfig(resp.config)
+            }).catch((e) => {
+                setErr(e.message)
+            })
         }
         return fetchFunctions()
-    },[fetch, handleError, params.namespace])
+    },[fetch, params.namespace, handleError])
 
     useEffect(()=>{
         if (config === null && functions === null) {
@@ -256,40 +240,50 @@ function CreateKnativeFunc(props) {
     }
 
     const createService = async () => {
-        try {
-            let body = {
-                name: name,
-                image: image,
-                minScale: parseInt(scale),
-                size: parseInt(size),
-                cmd: cmd,
-            }
-            let x = "/functions/new"
-            if (namespace) {
-                x = `/namespaces/${namespace}/functions/new`
-                body["namespace"] = namespace
-            }
-            let resp = await fetch(x, {
-                method: "POST",
-                body: JSON.stringify(body)
+      if (namespace) {
+        return NamespaceCreateFunction(
+            fetch,
+            handleError,
+            namespace,
+            name,
+            image,
+            parseInt(scale),
+            parseInt(size),
+            cmd
+          )
+            .then(() => {
+              setErr("");
+              setName("");
+              setImage("");
+              setScale(0);
+              setSize(0);
+              setCmd("");
             })
-            if (resp.ok) {
-                // fetch functions
-                setErr("")
-                setName("")
-                setImage("")
-                setScale(0)
-                setSize(0)
-                setCmd("")
-                // await fetchServices()
-            } else {
-                await handleError('create service', resp, 'createService')
-
-            }
-        } catch(e) {
-            setErr(`Error creating service: ${e.message}`)
-        }
-    }
+            .catch((e) => {
+              setErr(e.message);
+            });
+      }
+      return GlobalCreateFunction(
+        fetch,
+        handleError,
+        name,
+        image,
+        parseInt(scale),
+        parseInt(size),
+        cmd
+      )
+        .then(() => {
+          setErr("");
+          setName("");
+          setImage("");
+          setScale(0);
+          setSize(0);
+          setCmd("");
+        })
+        .catch((e) => {
+          setErr(e.message);
+        });
+    };
     return(
         <LoadingWrapper isLoading={isLoading} text={"Creating Service"}>
         <div style={{ fontSize: "12pt"}}>
@@ -360,16 +354,14 @@ function KnativeFunc(props) {
     const {fetch, name, conditions, serviceName, namespace, image, status, checkPerm, permissions, handleError} = props
 
     const deleteService = async () => {
-        try {
-            let resp = await fetch(`/functions/${serviceName}`, {
-                method:"DELETE"
+        if(namespace) {
+            return NamespaceDeleteFunction(fetch, handleError, namespace, name).catch((e)=>{
+                sendNotification("Error:", e.message, 0)
             })
-            if (!resp.ok) {
-                await handleError("unable to delete service", resp, "deleteService")
-            }
-        } catch(e) {
-            sendNotification("Error:", e.message, 0)
         }
+        return GlobalDeleteFunction(fetch, handleError, name).catch((e)=>{
+            sendNotification("Error:", e.message, 0)
+        })
     }
 
     let circleFill = "success"
@@ -382,7 +374,7 @@ function KnativeFunc(props) {
 
     return(
         
-        <Link key={serviceName}  to={namespace !== undefined ? `/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
+        <Link key={serviceName}  to={namespace !== undefined ? `/n/${namespace}/functions/${name}`: `/functions/global/${name}`} className="neumorph-hover" style={{marginBottom: "10px", textDecoration:"none", color:"var(--font-dark)"}} >
             <div className="neumorph-hover">
             <div className="services-list-div">
                 <div>

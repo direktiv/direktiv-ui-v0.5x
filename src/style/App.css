@@ -16,6 +16,22 @@ html {
   }
 }
 
+/* Forces auto width when screen width is less than 780 */
+@media only screen and (max-width: 780px) {
+  .auto-width-780 {
+    width: auto !important;
+  }
+}
+
+/* Forces auto width and min/max width when screen width is less than 896 */
+@media only screen and (max-width: 896px) {
+  .auto-width-all-896 {
+    width: auto !important;
+    min-width: unset !important;
+    max-width: unset !important;
+  }
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

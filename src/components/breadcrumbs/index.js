@@ -1,58 +1,73 @@
 import React, { useContext } from 'react'
 
-import { useHistory, useParams } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 import useBreadcrumbs from 'use-react-router-breadcrumbs'
 import MainContext from '../../context'
 
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+  }
+
+  
 export default function Breadcrumbs(props) {
-    const {dashboard, instanceId } = props
+
+    const {resetData} = props
     const {bcRoutes} = useContext(MainContext)
     const breadcrumbs = useBreadcrumbs(bcRoutes)
     const history = useHistory()
-    const params = useParams()
+    const q = useQuery()
+
 
     return (
         <div id="breadcrumbs" className="shadow-soft rounded tile fit-content">
             {breadcrumbs.map((obj)=>{
-                // if namespace exists dont show it
-                if(obj.key === `/${params.namespace}` || obj.key === '/jq' || obj.key === '/iam' || obj.key === "/functions") {
+              
+                // If matching certain paths
+                if(obj.key === "/n" || obj.key === "/" || obj.key === "/functions") {
                     return ""
-                }
-                if( obj.breadcrumb) {
-                    if(obj.breadcrumb.props){
-                        if(obj.breadcrumb.props.children) {
-                            if(
-                                obj.breadcrumb.props.children === "WorkflowFuncs"
-                            ) {
-                                return ""
+                }     
+
+                return(
+                    <span onClick={()=>{
+                        // reset state back to empty string (used in explorer to update useEffect states)
+                        if(resetData){
+                            for(let i=0; i < resetData.length; i++) {
+                                let x = resetData[i]
+                                x("")
                             }
                         }
-                    }
-                }
-                // if no instance id use custom breadcrumbs
-                if (!instanceId) {
-                    if(obj.key !== "/") {
-                        return(
-                            <span onClick={()=>history.push(obj.key)} key={obj.key}>{obj.breadcrumb}</span>
-                        )
-                    }
-                    // return home key if dashboard
-                    if(dashboard){
-                        return(
-                            <span onClick={()=>history.push("/")} key={"/"}>Dashboard</span>
-                        )
-                    }
-                }
-                return ""
+
+                        // Handle workflow services with query parameters
+                        // if(appendQueryParams && obj.match.path !== `/n/${namespace}` && obj.match.path !== `/n/${namespace}/explorer` && obj.match.path !== `/n/${namespace}/explorer/${params[0]}`) {
+                            // history.push(`${obj.key}${queryParams}`)
+                        // } else {
+                            history.push(obj.key)
+                        // }
+                        
+                    }} key={obj.key}>
+                        {obj.breadcrumb}
+                    </span>
+                )
+                
+
             })}
-            {instanceId ?
-                <>
-                    <span key={"/i"} onClick={()=>history.push(`/${params.namespace}/i`)}>Instances</span>
-                    <span key={`/i${instanceId}`} onClick={()=>history.push(`/i/${instanceId}`)}>{instanceId}</span>        
-                </>
-            :
-            ""
-            }
+            {q.get("variables") ?
+            <span onClick={()=>{
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?variables=true`)
+            }}>Variables</span>
+            :""}
+            {q.get('function') ?
+            <span onClick={()=>{
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}&vers=${q.get("vers")}`)
+            }}>{q.get("function")}</span>
+            :""}
+            {q.get('rev') ?
+            <span onClick={()=>{
+                history.push(`${breadcrumbs[breadcrumbs.length-1].key}?function=${q.get("function")}&rev=${q.get("rev")}&vers=${q.get("vers")}`)
+            }}>
+                {q.get("rev")}
+            </span>
+            :""}
         </div>
     )
 }

@@ -51,21 +51,22 @@ function TotalTimeWorkflows(props) {
     useEffect(()=>{
         async function getDetails() {
             try{
-                let resp = await fetch(`/namespaces/${namespace}/metrics/workflows-milliseconds`, {})
+                let resp = await fetch(`/namespaces/${namespace}/metrics/milliseconds`, {})
                 if(resp.ok){
                     let json = await resp.json()
                     let arr = []
                     let total = 0
                     for(let i=0; i < json.results.length; i++) {
                         // create a key array for each line
-                        arr.push({name: json.results[i].metric.workflow, value: parseInt(json.results[i].value[1]/1000)})
-                        total += parseInt(json.results[i].value[1]/1000)
+                        arr.push({name: json.results[i].metric.workflow, value: parseInt(json.results[i].value[1])/1000})
+                        total += parseInt(json.results[i].value[1])/1000
                     }
+
                     setTimeMetrics(arr)
                     setTotalTime(total)
                     setOName(namespace)
                 } else {
-                    await handleError('get workflow time metrics', resp, 'getNamespaceMetrics')
+                    await handleError('get workflow time metrics', resp, 'getMetrics')
                 }
             } catch(e) {
                 setErr(e.message)
@@ -97,7 +98,7 @@ function TotalTimeWorkflows(props) {
                                 // label={renderLabel}
                                 data={timeMetrics}
                             >
-                                <Label style={{fontSize:"20pt"}} value={`${totalTime}s`} position="center" />
+                                <Label style={{fontSize:"20pt"}} value={`${Math.round(totalTime)}s`} position="center" />
                                 {timeMetrics.map((entry, index) => (
                                 <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
                                 ))}
@@ -125,11 +126,11 @@ export function SuccessOrFailedWorkflows(props) {
     useEffect(()=>{
         async function fetchDetails() {
             try{
-                let failedURL = `/namespaces/${namespace}/metrics/workflows-failed`
-                let successURL = `/namespaces/${namespace}/metrics/workflows-successful`
+                let failedURL = `/namespaces/${namespace}/metrics/failed`
+                let successURL = `/namespaces/${namespace}/metrics/successful`
                 if (workflow){
-                    failedURL = `/namespaces/${namespace}/workflows/${workflow}/metrics/failed`
-                    successURL = `/namespaces/${namespace}/workflows/${workflow}/metrics/successful`
+                    failedURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-failed`
+                    successURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-successful`
                 }
 
                 let failedResp = await fetch(failedURL,{})
@@ -168,15 +169,15 @@ export function SuccessOrFailedWorkflows(props) {
                 } else {
                     if(!failedResp.ok){
                         if (workflow) {
-                            await handleError('get workflow successful and failed metrics', failedResp, 'getWorkflowMetrics')
+                            await handleError('get workflow successful and failed metrics', failedResp, 'getMetrics')
                         } else {
-                            await handleError('get workflow successful and failed metrics', failedResp, 'getNamespaceMetrics')
+                            await handleError('get workflow successful and failed metrics', failedResp, 'getMetrics')
                         }
                     } else if (!successResp.ok) {
                         if (workflow) {
-                            await handleError('get workflow successful and failed metrics', successResp, 'getWorkflowMetrics')
+                            await handleError('get workflow successful and failed metrics', successResp, 'getMetrics')
                         } else {
-                            await handleError('get workflow successful and failed metrics', successResp, 'getNamespaceMetrics')
+                            await handleError('get workflow successful and failed metrics', successResp, 'getMetrics')
                         }           
                     }
                 }
@@ -241,7 +242,7 @@ function TotalWorkflows(props) {
     useEffect(()=>{
         async function fetchDetails() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/metrics/workflows-invoked`, {
+                let resp = await fetch(`/namespaces/${namespace}/metrics/invoked`, {
                     method: "GET"
                 })
                 if (resp.ok) {
@@ -266,7 +267,7 @@ function TotalWorkflows(props) {
                     setTWorkflowMetrics(arr)
                     setInvokedWorkflows(arrTotal[0].value)
                 } else {
-                    await handleError('get total workflow metrics', resp, 'getNamespaceMetrics')
+                    await handleError('get total workflow metrics', resp, 'getMetrics')
                 }
             } catch(e) {
                 setErr(e.message)

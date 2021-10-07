@@ -5,18 +5,25 @@ export const ResourceRegex = new RegExp("^[a-z][a-z0-9._-]{1,34}[a-z0-9]$");
 
 export async function HandleError(summary, resp, perm) {
     const contentType = resp.headers.get('content-type');
+    
     if (resp.status === 405) {
         // this shouldnt happen in the UI
         throw new Error(`${summary}: method is not allowed`)
-
+    } else if(resp.status === 409) {
+        throw new Error(`${summary}: object already exists`)
     }
+
     if(resp.status !== 403) {
-      if (!contentType || !contentType.includes('application/json')) {
-        let text = await resp.text()
-        throw new Error (`${summary}: ${text}`)
-      } else {
-          let text = (await resp.json()).Message
-          throw new Error (`${summary}: ${text}`)
+        if (!contentType || !contentType.includes('application/json')) {
+            let text = await resp.text()
+            throw new Error (`${summary}: ${text}`)
+        } else {
+          if(resp.headers.get('grpc-message')) {
+            throw new Error(`${summary}: ${resp.headers.get('grpc-message')}`)
+          } else {
+            let text = (await resp.json()).Message
+            throw new Error (`${summary}: ${text}`)
+          }
       }
      } else {
         throw new Error(`You are unable to '${summary}', contact system admin to grant '${perm}'.`)
@@ -27,7 +34,7 @@ export async function HandleError(summary, resp, perm) {
 export function NoResults() {
 
   return(
-      <div style={{textAlign:"center"}}>
+      <div style={{textAlign:"center", fontSize:"12pt"}}>
           No results are found.
       </div>
   )
@@ -69,18 +76,18 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
     try {
       let newNamespace = ""
       let namespaces = []
-      let resp = await fetch('/namespaces/', {
+      let resp = await fetch('/namespaces', {
         method: 'GET',
       })
   
       if(resp.ok) {
         let json = await resp.json()
         // if namespaces exist 
-        if(json.namespaces){
+        if(json.edges){
           // if initial load
           if(load){
             // if pathname isnt jqplayground check if namespace is provided
-            if(window.location.pathname !== "/jq/playground" && window.location.pathname.includes("/global/functions") ) {
+            if(window.location.pathname !== "/jq/playground" && window.location.pathname.includes("/functions/global") ) {
               // 1st. check if namespace is in the pathname 
               if (window.location.pathname.split("/")[1] !== "") {
                 // handle if pathname is /i as its a different route
@@ -92,8 +99,8 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
   
                 // check if namespace exists here if not redirect back to /
                 let f = false
-                  for (let i = 0; i < json.namespaces.length; i++) {
-                    if (json.namespaces[i].name === newNamespace) {
+                  for (let i = 0; i < json.edges.length; i++) {
+                    if (json.edges[i].node.name === newNamespace) {
                       f = true
                     }
                   }
@@ -115,52 +122,47 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
                     if (localStorage.getItem("namespace") === "") {
   
                       // if the json namespaces array is greater than 0 set it to the first
-                      if (json.namespaces.length > 0) {
-                        newNamespace = json.namespaces[0].name
+                      if (json.edges.length > 0) {
+                        newNamespace = json.edges[0].node.name
                       }
                     } else {
   
                       let found = false
                       // check if the namespace previously stored in localstorage exists in the list
-                      for (let i = 0; i < json.namespaces.length; i++) {
-                        if(json.namespaces[i] !== null) {
-                          if (json.namespaces[i].name === localStorage.getItem("namespace")) {
+                      for (let i = 0; i < json.edges.length; i++) {
+                        if(json.edges[i] !== null) {
+                          if (json.edges[i].node.name === localStorage.getItem("namespace")) {
                             found = true
                             newNamespace = localStorage.getItem("namespace")
                             break
                           }
                         }
                       }
-  
                       if (!found) {
-  
                         // check if json array is greater than 0 to set to the first
-                        if (json.namespaces.length > 0) {
-                          newNamespace = json.namespaces[0].name
-                          localStorage.setItem("namespace", json.namespaces[0].name)
-                          sendNotification("Namespace does not exist", `Changing to ${json.namespaces[0].name}`, 0)
+                        if (json.edges.length > 0) {
+                          newNamespace = json.edges[0].node.name
+                          localStorage.setItem("namespace", json.edges[0].node.name)
+                          sendNotification("Namespace does not exist", `Changing to ${json.edges[0].node.name}`, 0)
                         }
                       }
                     }
                   } else {
                     // if the json namespace array is greater than 0 set it to the first as no other options is valid
-                    if (json.namespaces.length > 0) {
-                      newNamespace = json.namespaces[0].name
+                    if (json.edges.length > 0) {
+                      newNamespace = json.edges[0].node.name
                     }
                   }
                 }
               }
-  
               if (newNamespace === "" && val) {
                 newNamespace = val
               }
-              for (let i = 0; i < json.namespaces.length; i++) {
-                namespaces.push(json.namespaces[i].name)
+              for (let i = 0; i < json.edges.length; i++) {
+                namespaces.push(json.edges[i].node.name)
               }
         }
-  
         return {namespaces: namespaces, namespace: newNamespace}
-      
       } else {
         await handleError('fetch namespaces', resp)
       }
@@ -196,4 +198,19 @@ export function validateAgainstVariableRegex(str, label) {
 
   return `${label} must container only alphanumeric characters, underscores, and dashes, must start with an alphabetic character, and must not end with '_' or '-'`
 
+}
+
+// Returns bool = true if returned error has the follow properities
+// 'type' : 'error'
+// 'error.message' : 'message'
+export function isBodyStreamError(err) {
+  if (!err || !err.type || !err.error || !err.error.message) {
+    return false
+  }
+  
+  if ( err.type === "error" && err.error.message === "Error in body stream") {
+    return true
+  }
+
+  return false
 }

@@ -94,12 +94,13 @@ export default function WorkflowPage() {
 
     useEffect(()=>{
         if(functions !== null && funcSource === null) {
+            // TODO: update route
             let x = `/watch/namespaces/${namespace}/workflows/${workflowRef.current}/functions/`
 
             let eventConnection = sse(`${x}`,{})
             eventConnection.onerror = (e) => {
                 if(e.status === 403) {
-                    setWorkflowFuncErr("You are forbidden on watching workflow functions")
+                    setWorkflowFuncErr("Permission denied.")
                 }
             }
 
@@ -184,7 +185,7 @@ export default function WorkflowPage() {
                         setFunctions([])
                     }
                 } else {
-                    await handleError('get workflow functions', resp, "getWorkflowFunctions")
+                    await handleError('get workflow functions', resp, "listServices")
                 }
             } catch(e) {
                 setWorkflowFuncErr(e.message)
@@ -299,12 +300,12 @@ export default function WorkflowPage() {
     useEffect(()=>{
         async function getStateMetrics() {
             try {
-                let resp = await fetch(`/namespaces/${namespace}/workflows/${params.workflow}/metrics/state-milliseconds`, {})
+                let resp = await fetch(`/namespaces/${namespace}/tree/${params.workflow}?op=metrics-state-milliseconds`, {})
                 if(resp.ok) {
                     let json = await resp.json()
                     setStateMetrics(json.results)
                 } else {
-                    await handleError("unable to get state metrics", resp, "getWorkflowMetrics")
+                    await handleError("unable to get state metrics", resp, "getMetrics")
                 }
             } catch(e) {
                 sendNotification("Error:", e.message, 0)
@@ -620,7 +621,7 @@ let statusMessage = ""
 
                                     return(
                                         <li key={obj.info.name} title={statusMessage}  className="event-list-item">
-                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
+                                           <Link style={{textDecoration:"none", color:"#4a4e4e"}} to={`/n/${namespace}/w/${workflow}/functions/${obj.serviceName}`}>
                                                 <div>
                                                     <span><CircleFill className={obj.status === "True" ? "success": "failed"} style={{ paddingTop: "5px", marginRight: "4px", maxHeight: "8px" }} /></span>
                                                     <span>
@@ -659,7 +660,7 @@ function EventsList(props) {
                         setInstances([])
                     }
                 } else {
-                    await handleError('fetch workflow instances', resp, 'listWorkflowInstances')
+                    await handleError('fetch workflow instances', resp, 'listInstances')
                 }
             } catch (e) {
                 setErr(`Unable to fetch workflow instances: ${e.message}`)
@@ -725,7 +726,7 @@ function WorkflowActions(props) {
             <>
             <div title="Workflow Variables" >
                 <Link className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit", marginRight: "10px"}} 
-                to={`/${namespace}/w/${workflowName}/variables`}>
+                to={`/n/${namespace}/w/${workflowName}/variables`}>
                     <span style={{fontWeight: "bold"}}>
                         VAR
                     </span>

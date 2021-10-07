@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react'
+import React, { useContext, useState, useCallback, useEffect, useRef } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import Editor from "../workflow-page/editor"
 import MainContext from '../../context'
@@ -90,10 +90,12 @@ const cheatSheetMap = [
 export default function JQPlaygroundPage() {
     const { fetch, handleError } = useContext(MainContext)
     const [jqInput, setJQInput] = useState(localStorage.getItem('jqInput'))
+    const wfRefValue = useRef(localStorage.getItem('jqInput'))
     const [jqFilter, setJQFilter] = useState(localStorage.getItem('jqFilter'))
     const [jqOutput, setJQOutput] = useState("")
     const [fetching, setFetching] = useState(false)
     const [err, setErr] = useState("")
+
 
     useEffect(() => {
         if (jqInput === null ) {
@@ -142,7 +144,7 @@ export default function JQPlaygroundPage() {
             try {
                 rBody = JSON.stringify({
                     query: `${filter}`,
-                    input: JSON.parse(input),
+                    data: btoa(input),
                 });
             } catch (e) {
                 setErr(`Invalid JQ Input: ${e.toString().replace("SyntaxError: JSON.parse: ", "")}`)
@@ -150,7 +152,7 @@ export default function JQPlaygroundPage() {
             }
 
             try {
-                let resp = await fetch(`/jq-playground`, {
+                let resp = await fetch(`/jq`, {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json",
@@ -162,8 +164,8 @@ export default function JQPlaygroundPage() {
                 if (!resp.ok) {
                     await handleError('execute jq', resp, 'jqPlayground')
                 } else {
-                    let jqOut = await resp.text();
-                    setJQOutput(jqOut)
+                    let jqOut = await resp.json();
+                    setJQOutput(jqOut.results.toString())
                 }
             } catch (e) {
                 setErr(`Invalid JQ Command: ${e.message}`)
@@ -251,7 +253,7 @@ export default function JQPlaygroundPage() {
                                 <div className="jqeditor" style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", height: "100%", minHeight: "300px", top: "-28px", position: "relative" }}>
                                     <div style={{ width: "100%", height: "100%", position: "relative" }}>
                                         <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
-                                            <Editor value={jqInput} setValue={setJQInput} />
+                                            <Editor refValSet={wfRefValue} value={jqInput} setValue={setJQInput} />
                                         </div>
                                     </div>
                                 </div>

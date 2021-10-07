@@ -7,8 +7,9 @@ import NotificationSystem, { sendNotification } from './components/notifications
 import { useState, useContext, useCallback, useEffect } from 'react';
 import MainContext from './context'
 import Modal from 'react-modal'
-import {fetchNs, HandleError} from './util-funcs'
+import { HandleError} from './util-funcs'
 import Routes from './components/routes'
+import {Namespaces} from './api'
 
 Modal.setAppElement("#root")
 
@@ -272,20 +273,24 @@ states:
 ]
 
 export const  bcRoutes = [
+    {
+        path: '/n/:namespace/variables',
+        breadcrumb: "",
+    },
   {
-      path: '/:namespace',
+      path: '/n/:namespace',
       breadcrumb: "",
   },
   {
-      path: '/:namespace/w',
+      path: '/n/:namespace/w',
       breadcrumb: 'Workflows'
   },
   {
-      path: '/:namespace/i',
+      path: '/n/:namespace/i',
       breadcrumb: 'Instances'
   },
   {
-      path: '/:namespace/s',
+      path: '/n/:namespace/s',
       breadcrumb: 'Settings'
   },
   {
@@ -297,7 +302,7 @@ export const  bcRoutes = [
       breadcrumb: "JQ Playground"
   },
   {
-      path: "/:namespace/functions",
+      path: "/n/:namespace/functions",
       breadcrumb: "Knative Services"
   },
   {
@@ -305,7 +310,7 @@ export const  bcRoutes = [
       breadcrumb: "Knative Services"
   },
   {
-      path: "/:namespace/w/:workflow/functions",
+      path: "/n/:namespace/w/:workflow/functions",
       breadcrumb: "WorkflowFuncs",
   }
 ]
@@ -342,13 +347,12 @@ function Content() {
     async function fd() {
       setLoad(true)
       try {
-          let namespacesObj = await fetchNs(netch, loaded, setLoad, val, HandleError)
-            setLoad(false)
-            setNamespace(namespacesObj.namespace)
-            setNamespaces(namespacesObj.namespaces)
-          
+        let namespacesObj = await Namespaces(netch, HandleError, loaded, val)
+        setLoad(false)
+        setNamespace(namespacesObj.namespace)
+        setNamespaces(namespacesObj.namespaces)
       } catch (e) {
-        sendNotification("Failed to fetch namespaces", e.message, 0)
+        sendNotification("Error:", e.message, 0)
         setLoad(false)
       }
     }
@@ -359,7 +363,7 @@ function Content() {
   const checkAuth = useCallback(()=>{
     async function fd() {
       try {
-        let resp = await netch(`/namespaces/`, {
+        let resp = await netch(`/namespaces`, {
           method: "GET"
         })
         if(resp.status === 401) {
@@ -416,27 +420,24 @@ function Content() {
       instanceInteractions: InstanceInteractions,
     }}>
       {!load ?
-
-        <div id="content">
-          <Router>
+        <div id="content" className="nav-panel">
+            <Router>
             <div id="nav-panel">
-              {namespaces !== null ?
-              <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace} />
+                {namespaces !== null ?
+                <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace} />
             :""}
-              </div>
+                </div>
             <div id="main-panel">
-              <Switch>
+                <Switch>
                 <Routes noNamespaces={"You are not a part of any namespaces! Create a namespace to continue using Direktiv."} namespaces={namespaces} namespace={namespace}/>
-              </Switch>
+                </Switch>
             </div>
-          </Router>
+            </Router>
         </div>
         :
         <></>}
-      <NotificationSystem />
-
+        <NotificationSystem />
     </MainContext.Provider>
-
   )
 }
 

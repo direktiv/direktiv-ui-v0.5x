@@ -2,8 +2,8 @@ import React from "react";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { Link } from "react-router-dom";
 
-const DropDownCard = ({ data = [], setOpen }) => (
-    <div className="shadow-soft rounded tile" style={{padding:"0px", margin:"0px", height: "auto", width:"140px", position:"absolute", right: "-2px", bottom: "-104px"}}>
+const DropDownCard = ({ data = [], setOpen, height }) => (
+    <div className="shadow-soft rounded tile" style={{padding:"0px", margin:"0px", height: "auto", width:"140px", position:"absolute", right: "-2px", bottom: height}}>
       <ul style={{textAlign:"center"}}>
         {data.map((item, i) => 
             {
@@ -36,7 +36,7 @@ const DropDownCard = ({ data = [], setOpen }) => (
 );
   
 const ButtonWithDropDownCmp = (props) => {
-  const {data} = props
+  const {data, height} = props
   const [open, setOpen] = React.useState(false);
   const drop = React.useRef(null);
   function handleClick(e) {
@@ -61,7 +61,7 @@ const ButtonWithDropDownCmp = (props) => {
        style={{cursor:"pointer", zIndex: "20", maxHeight:"36px", display:"flex", alignItems:"center", height:"18px" }}
     >
         <IoEllipsisVertical className={"toggled-switch"} style={{ fontSize: "11pt",  marginLeft: "0px" }} />
-      {open && <DropDownCard data={data} setOpen={setOpen} />}
+      {open && <DropDownCard height={height} data={data} setOpen={setOpen} />}
     </div>
   );
 };

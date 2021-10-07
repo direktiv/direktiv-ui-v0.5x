@@ -325,7 +325,6 @@ export function addState(e, elementData, setBlocks) {
 
 export function diagramToYAML(wfname, blocks, setErr , func) {
     let wf = {
-        id: wfname,
         states: [],
         functions: [],
         schemas: []
@@ -491,5 +490,5 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
         }
     }
 
-    func(YAML.stringify(wf))
+    func(wfname, YAML.stringify(wf))
 }

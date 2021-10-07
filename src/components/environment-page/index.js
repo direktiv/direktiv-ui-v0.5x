@@ -3,13 +3,18 @@ import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import { Plus, XCircle } from 'react-bootstrap-icons'
-import { useParams } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 import { IoLockOpen, IoSave, IoTrash, IoEyeOffOutline, IoWarningOutline, IoCloudUploadOutline, IoCloudDownloadOutline } from 'react-icons/io5'
 import { MiniConfirmButton } from '../confirm-button'
 import { useDropzone } from 'react-dropzone'
 import LoadingWrapper from "../loading"
+import { NamespaceDeleteVariable, NamespaceDownloadVariable, NamespaceGetVariable, NamespaceSetVariable, NamespaceVariables } from '../../api'
+import { WorkflowDeleteVariable, WorkflowDownloadVariable, WorkflowGetVariable, WorkflowSetVariable, WorkflowVariables } from '../workflows-page/api'
 
 
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
+}
 const EnvTableError = (props) => {
     const { error, hideError } = props
     return (
@@ -53,7 +58,7 @@ const EnvTableHeader = () => {
 };
 
 const EnvTableRow = (props) => {
-    const { env, index, setVar, getVar, downloadVar, setError } = props
+    const { fetch, fetchVariables, env, index, setVar, getVar, downloadVar, setError, namespace, params, mode, handleError } = props
     const [localValue, setLocalValue] = useState("")
     const [remoteValue, setRemoteValue] = useState("")
     const [show, setShow] = useState(false)
@@ -74,12 +79,12 @@ const EnvTableRow = (props) => {
         <div className={`var-table-row ? "show-value" : ""}`}>
             <div style={{ flexGrow: "2", flexBasis: "0px", minWidth: "130pt" }}>
                 {/* Name column */}
-                {env.name}
+                {env.node.name}
             </div>
             <div style={{ flexGrow: "4", flexBasis: "0px" }}>
                 {/* Value column */}
 
-                {env.size < 1000000 ? (<>{show === true ?
+                {env.node.size < 1000000 ? (<>{show === true ?
                         <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" 
                         style={{
                             width: "100%",
@@ -91,7 +96,7 @@ const EnvTableRow = (props) => {
                         }} />
                         :
                         <div style={{ width: "100%" }} className={`var-table-input show-button rounded button ${isBinary ? "disabled": ""}`} onClick={() => {
-                            getVar(env.name).then((newVal) => {
+                            getVar(env.node.name).then((newVal) => {
                                 if (!newVal) {
                                     return // TODO: Throw error
                                 }
@@ -129,15 +134,15 @@ const EnvTableRow = (props) => {
             </div>
             <div style={{ flexGrow: "1", flexBasis: "0px" }}>
                 {/* Size column */}
-                {env.size} B
+                {env.node.size} B
             </div>
             <div style={{ flexGrow: "1", flexBasis: "0px", display: "flex" }}>
                 {/* Actions column */}
-                <EnvTableAction setError={setError} downloadVar={(vName) => {
+                <EnvTableAction fetch={fetch} fetchVariables={fetchVariables} handleError={handleError} namespace={namespace} mode={mode} params={params} setError={setError} downloadVar={(vName) => {
                     setIsDownloading(true)
                     downloadVar(vName, setIsDownloading)
                 }} 
-                name={env.name} 
+                name={env.node.name} 
                 setVar={setVar} 
                 setLoading={setIsLoading} 
                 value={localValue} 
@@ -158,7 +163,7 @@ const EnvTableRow = (props) => {
 };
 
 const EnvTableAction = (props) => {
-    const { value, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading, downloadVar } = props
+    const { value, fetchVariables, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading, downloadVar, namespace, mode, params, handleError, fetch } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
@@ -226,7 +231,19 @@ const EnvTableAction = (props) => {
 
     buttons.push(
         <div title="Delete Variable" key={`${name}-btn-delete`}>
-            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={IoTrash} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={() => { setVar(name, undefined, true) }} />
+            <MiniConfirmButton IconConfirm={IoWarningOutline} IconConfirmColor={"#ff9104"} style={{ fontSize: "12pt" }} Icon={IoTrash} IconColor={"var(--danger-color)"} Minified={true} OnConfirm={async () => { 
+                try {
+                    if(mode === "namespace") {
+                        await NamespaceDeleteVariable(fetch, namespace, name, handleError)
+                        fetchVariables()
+                    } else {
+                        await WorkflowDeleteVariable(fetch, namespace, params[0], name, handleError)
+                        fetchVariables()
+                    }
+                } catch(e) {
+                    setError(e.message)
+                }
+             }} />
         </div>
     )
 
@@ -364,6 +381,13 @@ const EnvTableNewEntry = (props) => {
 };
 
 export default function EnvrionmentPage(props) {
+    const q = useQuery()
+    let mode = "namespace"
+    if(q.get("variables") === null) {
+        return ""
+    } else {
+        mode ="workflow"
+    }
     return (
         <>
             <div className="container" style={{ flex: "auto", padding: "10px" }}>
@@ -372,7 +396,7 @@ export default function EnvrionmentPage(props) {
                         <Breadcrumbs elements={["Namespace Settings"]} />
                     </div>
                 </div>
-                <EnvrionmentContainer />
+                <EnvrionmentContainer mode={mode} />
             </div>
         </>
     )
@@ -390,83 +414,60 @@ export function EnvrionmentContainer(props) {
 
     const params = useParams()
 
-    const getPath = useCallback(() => {
-        function generatePath() {
-            if (mode === "namespace") {
-                return `/namespaces/${namespace}`
-            } else {
-                return `/namespaces/${namespace}/workflows/${params.workflow}`
-            }
-
-
-        }
-        return generatePath()
-    }, [namespace, params.workflow, mode])
 
     const fetchVariables = useCallback(() => {
         setError("")
         setFetching(true)
         async function fetchVars() {
             try {
-                let resp = await fetch(`${getPath()}/variables/`, {
-                    method: "get",
-                })
-                if (resp.ok) {
-                    let json = await resp.json()
-                    if (json.variables) {
-                        setEnvList([...json.variables])
-                    } else {
-                        setEnvList([])
-                    }
+                let vars = null
+                if(mode === "namespace") {
+                    vars = await NamespaceVariables(fetch, namespace, handleError)
                 } else {
-                    await handleError('fetch variables', resp, 'getVariables')
+                    vars = await WorkflowVariables(fetch, namespace, params[0], handleError) 
                 }
+                setEnvList([...vars])
             } catch (e) {
-                setError(`Failed to fetch variables: ${e.message}`)
+                setError(`Error: ${e.message}`)
             }
         }
         return fetchVars().finally(() => { setFetching(false) })
-    }, [fetch, handleError, getPath, setFetching])
+    }, [fetch, handleError,  setFetching, mode, namespace ,params])
 
-    const downloadVaraible = useCallback((varName, setIsDownloading) => {
+    const downloadVariable = useCallback((varName, setIsDownloading) => {
         setError("")
         setFetching(true)
         async function fetchVars() {
             try {
-                let resp = await fetch(`${getPath()}/variables/${varName}`, {
-                    method: "get",
-                })
-                if (resp.ok) {
-                    let blob = await resp.blob()
-
-                    // Create blob link to download
-                    const url = window.URL.createObjectURL(
-                        new Blob([blob]),
-                    );
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute(
-                        'download',
-                        `${varName}`,
-                    );
-                
-                    // Append to html link element page
-                    document.body.appendChild(link);
-                
-                    // Start download
-                    link.click();
-                
-                    // Clean up and remove the link
-                    link.parentNode.removeChild(link);
+                let rr = null
+                if(mode === "namespace") {
+                    rr = await NamespaceDownloadVariable(fetch, namespace, varName, handleError)
                 } else {
-                    await handleError('fetch variables', resp, 'getVariables')
+                    rr = await WorkflowDownloadVariable(fetch, namespace, params[0], varName, handleError)
                 }
+                const url = window.URL.createObjectURL(
+                    new Blob([rr.blob],{
+                        type: rr.contentType
+                    }),
+                )
+                
+                const link = document.createElement('a')
+                link.href = url;
+                link.setAttribute(
+                    'download',
+                    `${varName}`
+                )
+
+                document.body.appendChild(link)
+
+                link.click()
+                link.parentNode.removeChild(link)
             } catch (e) {
-                setError(`Failed to fetch variables: ${e.message}`)
+                setError(`Error: ${e.message}`)
             }
         }
         fetchVars().finally(() => { setFetching(false); setIsDownloading(false)})
-    }, [fetch, handleError, getPath, setFetching])
+    }, [fetch, handleError, setFetching, mode, namespace, params])
 
     useEffect(() => {
         if (namespace !== "") {
@@ -492,7 +493,7 @@ export function EnvrionmentContainer(props) {
         if (!force) {
             for (let i = 0; i < envList.length; i++) {
                 if (envList[i].name === envName) {
-                    setError("Failed To Create New Varaible: Variable Name Already Exists")
+                    setError("Failed To Create New Variable: Variable Name Already Exists")
                     setFetching(false)
                     return ok
                 }
@@ -501,51 +502,43 @@ export function EnvrionmentContainer(props) {
 
         envValue = envValue === undefined ? "" : envValue
         try {
-            let resp = await fetch(`${getPath()}/variables/${envName}`, {
-                method: "post",
-                body: envValue,
-            })
-            if (resp.ok) {
-                ok = true
-                fetchVariables()
+            if(mode === "namespace") {
+                ok = await NamespaceSetVariable(fetch, namespace, envName, envValue, handleError)            
             } else {
-                await handleError('fetch variables', resp, 'getVariables')
+                ok = await WorkflowSetVariable(fetch, namespace, params[0], envName, envValue, handleError)
             }
+            fetchVariables()
         } catch (e) {
-            setError(`Failed to fetch variables: ${e.message}`)
+            setError(`Error: ${e.message}`)
         }
         setFetching(false)
         return ok
     }
 
     async function getRemoteVariable(envName) {
-        let returnValue
+        let data
         setError("")
         setFetching(true)
         try {
-            let resp = await fetch(`${getPath()}/variables/${envName}`, {
-                method: "get",
-            })
-            if (resp.ok) {
-                returnValue = await resp.text()
-                setEnvList((oldE) => {
-                    for (let i = 0; i < oldE.length; i++) {
-                        if (oldE[i].name === envName) {
-                            oldE[i].value = returnValue
-                            return oldE
-                        }
-                    }
-
-                    oldE.push({ name: envName, value: returnValue, size: 999 })
-                })
+            if(mode === "namespace") {
+                data = await NamespaceGetVariable(fetch, namespace, envName, handleError)
             } else {
-                await handleError('fetch variable', resp, 'getVariables')
+                data = await WorkflowGetVariable(fetch, namespace, params[0], envName, handleError)
             }
+            setEnvList((oldE) => {
+                for (let i = 0; i < oldE.length; i++) {
+                    if (oldE[i].node.name === envName) {
+                        oldE[i].node.value = data
+                        return oldE
+                    }
+                }
+                oldE.push({ name: envName, value: data, size: 999 })
+            })
         } catch (e) {
-            setError(`Failed to get variable: ${e.message}`)
+            setError(e.message)
         }
         setFetching(false)
-        return returnValue
+        return data
     }
 
     return (
@@ -560,8 +553,8 @@ export function EnvrionmentContainer(props) {
                             <div><EnvTableError error={error} hideError={() => { setError("") }} /></div>
                             <div className={`var-table-accent-header`}><EnvTableHeader /></div>
                             {envList.map((env, index) => {
-                                return (<div key={`var-${env.name}`} className={`var-table-accent-${index % 2}`}>
-                                    <EnvTableRow env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVaraible}/></div>)
+                                return (<div key={`var-${env.node.name}`} className={`var-table-accent-${index % 2}`}>
+                                    <EnvTableRow fetchVariables={fetchVariables} fetch={fetch} handleError={handleError} namespace={namespace} params={params} mode={mode} env={env} index={index} getVar={getRemoteVariable} setVar={setRemoteVariable} setError={setError} downloadVar={downloadVariable}/></div>)
                             })}
                             {
                                 envList.length === 0 ? (
