@@ -181,7 +181,7 @@ export async function NamespaceLogs(fetch, namespace, handleError, endCursor) {
     try {
         let uri = `/namespaces/${namespace}/logs`
         if(endCursor !== "") {
-            uri += `?pagination.after=${endCursor}`
+            uri += `?after=${endCursor}`
         }
         let resp = await fetch(uri, {})
         if(resp.ok) {

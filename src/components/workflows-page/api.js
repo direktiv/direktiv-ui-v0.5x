@@ -200,7 +200,7 @@ export async function Workflow(fetch, namespace, workflow, handleError) {
 
 export async function WorkflowInstances(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/namespaces/${namespace}/instances?pagination.filter.field=AS&pagination.filter.type=CONTAINS&pagination.filter.val=${workflow}`,{})
+        let resp = await fetch(`/namespaces/${namespace}/instances?filter.field=AS&filter.type=CONTAINS&filter.val=${workflow}`,{})
         if (resp.ok) {
             let json = await resp.json()
             return json.instances.edges
