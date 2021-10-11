@@ -20,7 +20,7 @@ import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
 import Attribute from "./attributes";
-import { NoResults } from "../../util-funcs";
+import { NoResults, validateAgainstNameRegex } from "../../util-funcs";
 
 
 function ShowError(msg, setErr) {
@@ -564,6 +564,14 @@ function CreateWorkflow(props) {
     const history = useHistory()
 
     const createWorkflow = async () => {
+
+       // Regex Check
+       let regexError = validateAgainstNameRegex(wfName, "Workflow")
+       if (regexError) {
+        ShowError(`Error: ${regexError}`, setErr)
+        return
+       }
+
        try {
             let success = await NamespaceCreateNode(fetch, namespace, path, wfName, "workflow", templateData, handleError)
             if(success) {
@@ -681,6 +689,14 @@ function CreateDirectory(props) {
     const history = useHistory()
 
     const createDirectory = async () => {
+
+       // Regex Check
+       let regexError = validateAgainstNameRegex(dir, "Directory")
+       if (regexError) {
+        ShowError(`Error: ${regexError}`, setErr)
+        return
+       }
+       
         try {
             let success = await NamespaceCreateNode(fetch, namespace, path, dir, "directory", undefined, handleError)
             if(success) {

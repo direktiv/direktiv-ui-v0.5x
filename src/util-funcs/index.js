@@ -176,11 +176,23 @@ export async function fetchNs(fetch, load, setLoad, val, handleError) {
   
 // New regex patterns to match values against
 export const PrimaryRegex = new RegExp("^(([a-z][a-z0-9_-]*[a-z0-9])|([a-z]))$")
+export const NameRegx = new RegExp("^(([a-z][a-z0-9_\-]*[a-z0-9])|([a-z]))$")
 export const VarRegex = new RegExp("^(([a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9])|([a-zA-Z]))$")
 
 export function validateAgainstPrimaryRegex(str, label) {
 
   if (PrimaryRegex.test(str)) {
+    // str matches regex pattern, return without error
+    return 
+  }
+
+  return `${label} must container only lower-case alphanumeric characters, underscores, and dashes, must start with an alphabetic character, and must not end with '_' or '-'`
+
+}
+
+export function validateAgainstNameRegex(str, label) {
+
+  if (NameRegx.test(str)) {
     // str matches regex pattern, return without error
     return 
   }
