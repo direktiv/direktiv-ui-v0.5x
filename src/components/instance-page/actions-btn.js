@@ -7,28 +7,33 @@ const DropDownCard = ({ data = [], setOpen, height }) => (
       <ul style={{textAlign:"center"}}>
         {data.map((item, i) => 
             {
-                if (item.hreflink) {
+                if(item) {
+                    if (item.hreflink) {
+                        return(
+                            <li style={{padding:"0px"}} key={i} className="list-instance-page-item">
+                                <a style={{textDecoration:"none", color:"var(--font-dark)"}} href={item.path}>{item.name}</a>
+                            </li>
+                        )   
+                    }
+                    if (item.link) {
+                        return(
+                            <li style={{padding:"0px"}} key={i} className="list-instance-page-item">
+                                <Link style={{textDecoration:"none", color:"var(--font-dark)"}} to={item.path}>{item.name}</Link>
+                            </li>
+                        )
+                    }
                     return(
-                        <li style={{padding:"0px"}} key={i} className="list-instance-page-item">
-                            <a style={{textDecoration:"none", color:"var(--font-dark)"}} href={item.path}>{item.name}</a>
-                        </li>
-                    )   
-                }
-                if (item.link) {
-                    return(
-                        <li style={{padding:"0px"}} key={i} className="list-instance-page-item">
-                            <Link style={{textDecoration:"none", color:"var(--font-dark)"}} to={item.path}>{item.name}</Link>
+                        <li style={{padding:"0px"}} key={i} className={"list-instance-page-item"} onClick={() => {
+                            item.func()
+                            setOpen(false)
+                        }}>
+                            {item.name}
                         </li>
                     )
+                } else {
+                    return ""
                 }
-                return(
-                    <li style={{padding:"0px"}} key={i} className={"list-instance-page-item"} onClick={() => {
-                        item.func()
-                        setOpen(false)
-                    }}>
-                        {item.name}
-                    </li>
-                )
+           
             }
         )}
       </ul>
