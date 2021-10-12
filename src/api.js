@@ -227,7 +227,7 @@ export async function NamespaceCreateSecret(fetch, namespace, key, value, handle
     try {
         let resp = await fetch(`/namespaces/${namespace}/secrets/${key}`,{
             method: "PUT",
-            body: JSON.stringify({ data: value})
+            body: value
         })
         if(resp.ok){
             return
