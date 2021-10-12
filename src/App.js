@@ -19,77 +19,87 @@ export function CheckPerm() {
 
 const InstanceInteractions = (namespace, workflow, instance) => [
   {
-    title: `Get details for '${namespace}/${workflow}/${instance}'`,
-    url: `${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}`,
+    title: `Get details for '${instance}'`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/instances/${instance}`,
     description: `The request returns details about the instance. Input and Output are base64 encoded.
 
-{
-  "id": "test/test/ikENVF",
-  "status": "complete",
-  "invokedBy": "f84f27c5-488c-46ef-85eb-673da6a37c35",
-  "revision": 10,
-  "beginTime": {
-    "seconds": 1620601680,
-    "nanos": 590045000
-  },
-  "endTime": {
-    "seconds": 1620601680,
-    "nanos": 606927000
-  },
-  "flow": [
-    "helloworld"
-  ],
-  "input": "ewogICJpbnB1dCI6ICIiCn0=",
-  "output": "eyJyZXN1bHQiOiJIZWxsbyB3b3JsZCEifQ=="
-}
+    {
+        "namespace": "test",
+        "instance": {
+          "createdAt": "2021-10-12T02:12:23.311563Z",
+          "updatedAt": "2021-10-12T02:12:23.352306Z",
+          "id": "6b482c1f-03c2-49cd-93e7-3917c434d0d6",
+          "as": "test",
+          "status": "complete",
+          "errorCode": "",
+          "errorMessage": ""
+        },
+        "invokedBy": "",
+        "flow": [
+          "helloworld"
+        ],
+        "workflow": {
+          "path": "test",
+          "name": "test",
+          "parent": "",
+          "revision": "1d7ef2c5-ba16-4c41-9084-4697052c0ec7"
+        }
+      }
 `,
     method: "GET"
   },
   {
-    title: `Get logs for '${namespace}/${workflow}/${instance}'`,
-    url: `${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}/logs`,
+    title: `Get logs for '${instance}'`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/instances/${instance}/logs`,
     description: `The request returns a list of logs
 
-{
-  "workflowInstanceLogs": [
     {
-      "timestamp": {
-        "seconds": 1620601680,
-        "nanos": 593677449
-      },
-      "message": "Beginning workflow triggered by API."
-    },
-    {
-      "timestamp": {
-        "seconds": 1620601680,
-        "nanos": 601790929
-      },
-      "message": "Running state logic -- helloworld:1 (noop)"
-    },
-    {
-      "timestamp": {
-        "seconds": 1620601680,
-        "nanos": 601799453
-      },
-      "message": "Transforming state data."
-    },
-    {
-      "timestamp": {
-        "seconds": 1620601680,
-        "nanos": 611023873
-      },
-      "message": "Workflow completed."
-    }
-  ],
-  "offset": 0,
-  "limit": 10
-}
+        "totalCount": 4,
+        "pageInfo": {
+          "hasNextPage": false,
+          "hasPreviousPage": false,
+          "startCursor": "eyJpZCI6ImNkYzI3NzhmLWMzYWMtNDU1OC04YWRlLWJjY2U2YWQ0ZWQzNCIsInYiOiIyMDIxLTEwLTEyVDAyOjEyOjIzLjMxNzc0NloifQ==",
+          "endCursor": "eyJpZCI6ImNlYmM2ZDU4LTVjZGYtNDA1Zi05NTcwLWQ1MjM2Y2E3OGI1MyIsInYiOiIyMDIxLTEwLTEyVDAyOjEyOjIzLjM1MDA4MVoifQ=="
+        },
+        "edges": [
+          {
+            "node": {
+              "t": "2021-10-12T02:12:23.317746Z",
+              "msg": "Preparing workflow triggered by API."
+            },
+            "cursor": "eyJpZCI6ImNkYzI3NzhmLWMzYWMtNDU1OC04YWRlLWJjY2U2YWQ0ZWQzNCIsInYiOiIyMDIxLTEwLTEyVDAyOjEyOjIzLjMxNzc0NloifQ=="
+          },
+          {
+            "node": {
+              "t": "2021-10-12T02:12:23.335730Z",
+              "msg": "Running state logic (step:1) -- helloworld"
+            },
+            "cursor": "eyJpZCI6IjgwZDAwYzY4LWNiMjktNDBhZC1hNjljLTFjOWU5MTZkN2U5YiIsInYiOiIyMDIxLTEwLTEyVDAyOjEyOjIzLjMzNTczWiJ9"
+          },
+          {
+            "node": {
+              "t": "2021-10-12T02:12:23.341512Z",
+              "msg": "Transforming state data."
+            },
+            "cursor": "eyJpZCI6IjI3Y2ZmYjM2LWQ2YTItNGJiNS1hYjhmLThjMDNiZGMyNjE5NiIsInYiOiIyMDIxLTEwLTEyVDAyOjEyOjIzLjM0MTUxMloifQ=="
+          },
+          {
+            "node": {
+              "t": "2021-10-12T02:12:23.350081Z",
+              "msg": "Workflow completed."
+            },
+            "cursor": "eyJpZCI6ImNlYmM2ZDU4LTVjZGYtNDA1Zi05NTcwLWQ1MjM2Y2E3OGI1MyIsInYiOiIyMDIxLTEwLTEyVDAyOjEyOjIzLjM1MDA4MVoifQ=="
+          }
+        ],
+        "namespace": "test",
+        "instance": "6b482c1f-03c2-49cd-93e7-3917c434d0d6"
+      }
 `,
     method:" GET"
   },
   {
-    title: `Cancel '${namespace}/${workflow}/${instance}'`,
-    url: `${window.location.origin}/api/instances/${namespace}/${workflow}/${instance}`,
+    title: `Cancel '${instance}'`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/instances/${instance}/cancel`,
     description: `No description required.`,
     method: "DELETE"
   }
@@ -98,27 +108,35 @@ const InstanceInteractions = (namespace, workflow, instance) => [
 const WorkflowInteractions = (namespace, workflow) => [
   {
     title: `Get '${workflow}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}`,
-    description: `The request returns a json struct which contains 'workflow' which is a base64 encoded version of the YAML workflow.
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/${workflow}`,
+    description: `The request returns a json struct which contains 'revision' which has a 'source' field that is a base64 encoded workflow yaml.
 
-{
-  "name": "helloworld",
-  "revision": 1,
-  "active": true,
-  "createdAt": {
-    "seconds": 1621203025,
-    "nanos": 122176000
-  },
-  "description": "A simple no-op workflow",
-  "workflow": "aWQ6IHRlc3QKZGVzY3JpcHRpb246ICIiCnN0YXRlczoKICAtIGlkOiBoZWxsb3dvcmxkCiAgICB0eXBlOiBub29wCiAgICB0cmFuc2Zvcm06ICd7IHJlc3VsdDogIkhlbGxvIHdvcmxkISIgfScK",
-  "logToEvents": ""
-}
+    {
+        "namespace": "trent",
+        "node": {
+          "createdAt": "2021-10-10T23:57:17.705020Z",
+          "updatedAt": "2021-10-10T23:57:17.705020Z",
+          "name": "test2",
+          "path": "/test2",
+          "parent": "/",
+          "type": "workflow",
+          "attributes": [],
+          "oid": ""
+        },
+        "revision": {
+          "createdAt": "2021-10-11T04:36:10.865057Z",
+          "hash": "92049a9c4db789f20300467dadc3e139b680c7e1fa112ab6b5f2c90d96e183ef",
+          "source": "c3RhcnQ6CiAgdHlwZTogZXZlbnQKICBldmVudDoKICAgIHR5cGU6IE1pY3Jvc29mdC5TdG9yYWdlLkJsb2JDcmVhdGVkCnN0YXRlczoKICAtIHR5cGU6IG5vb3AKICAgIGlkOiBub29wLWNoZWNrCg=="
+        },
+        "eventLogging": "",
+        "oid": "3db23098-61cf-44a1-a795-8097b181387b"
+      }
     `,
     method: "GET"
   },
   {
     title: `Update '${workflow}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/${workflow}?op=update-workflow`,
     description: `The request requires a yaml definition of a new workflow to update the previous.
 
 id: test
@@ -127,104 +145,101 @@ states:
   - id: helloworld
     type: noop
     transform: '{ result: "Hello world!" }'
-
-The request returns the following JSON.
-
-{
-  "uid": "f84f27c5-488c-46ef-85eb-673da6a37c35",
-  "id": "test",
-  "revision": 11,
-  "active": true,
-  "createdAt": {
-    "seconds": 1620598113,
-    "nanos": 366473000
-  }
-}
 `,
     method: "PUT"
   },
   {
     title: `Execute '${workflow}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/execute`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/${workflow}?op=execute`,
     description: `The request has an optional input where you can provide any json data.
 
 {
   "key": "value"
 }
 
-The request returns an instanceId to allow you to get details about the instance that just ran.
+The request returns an instance id to allow you to get details about the instance that just ran.
 
 {
-  "instanceId": "test/test/ikENVF"
-}
+    "namespace": "test",
+    "instance": "6b482c1f-03c2-49cd-93e7-3917c434d0d6"
+  }
 `,
     method: "POST"
   },
   {
     title: `Toggle '${workflow}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/toggle`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/${workflow}?op=toggle`,
     description: `No description required.`,
-    method: "PUT"
-  },
-  {
-    title: `Get instances for '${workflow}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/${workflow}/instances/`,
-    description: `The request returns a list of instances 
-
-{
-  "workflowInstances": [
-    {
-      "id": "test/test3/ikENVF",
-      "status": "complete",
-      "beginTime": {
-        "seconds": 1620601680,
-        "nanos": 590045000
-      }
-    }
-  ],
-  "offset": 0,
-  "limit": 0
-}
-`,
-    method: "GET"
-
+    method: "POST"
   }
 ]
 
-const NamespaceInteractions = (namespace) => [
+const NamespaceInteractions = (namespace, path) => [
   // {
   //   title: "Generate an Auth Token",
   //   description: `Generate an authentication token for '${namespace}' which can be created here.\n For any request simply apply the following header to authenticate.\n{\n\t"Authroization": "Bearer AUTH_TOKEN"\n}\n`
   // },
   {
-    title: `List Workflows in '${namespace}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}`,
-    description: `The request returns a list of workflows.
+    title: `List Nodes at '${namespace}/${path ? path:""}'`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/${path ? path: ""}`,
+    description: `The request returns a list of nodes which could be a directory or workflow depending on the request.
 
-{
-  "workflows": [
     {
-      "id": "test1",
-      "revision": 10,
-      "active": true,
-      "createdAt": {
-        "seconds": 1620598113,
-        "nanos": 366473000
-      },
-      "description": "A simple 'no-op' state that returns 'Hello world!'",
-      "logToEvents": ""
+        "namespace": "test",
+        "node": {
+          "createdAt": "2021-10-11T22:42:18.737218Z",
+          "updatedAt": "2021-10-11T22:42:18.737219Z",
+          "name": "",
+          "path": "/",
+          "parent": "/",
+          "type": "directory",
+          "attributes": [],
+          "oid": ""
+        },
+        "children": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": "eyJpZCI6IjliNjU3NGJlLWFkZDAtNDgyOS1iMDY4LTFiZDRhNDczMTM3MiIsInYiOiJ0ZXN0In0=",
+            "endCursor": "eyJpZCI6IjM1YmUxOTE2LTNhMDQtNDkwMi05MmM3LWY5YmUyNDkwN2Q5YSIsInYiOiJ0ZXN0MiJ9"
+          },
+          "edges": [
+            {
+              "node": {
+                "createdAt": "2021-10-11T23:53:32.343755Z",
+                "updatedAt": "2021-10-11T23:53:32.343756Z",
+                "name": "test",
+                "path": "/test",
+                "parent": "/",
+                "type": "workflow",
+                "attributes": [],
+                "oid": ""
+              },
+              "cursor": "eyJpZCI6IjliNjU3NGJlLWFkZDAtNDgyOS1iMDY4LTFiZDRhNDczMTM3MiIsInYiOiJ0ZXN0In0="
+            },
+            {
+              "node": {
+                "createdAt": "2021-10-11T23:53:44.869690Z",
+                "updatedAt": "2021-10-11T23:53:44.869691Z",
+                "name": "test2",
+                "path": "/test2",
+                "parent": "/",
+                "type": "workflow",
+                "attributes": [],
+                "oid": ""
+              },
+              "cursor": "eyJpZCI6IjM1YmUxOTE2LTNhMDQtNDkwMi05MmM3LWY5YmUyNDkwN2Q5YSIsInYiOiJ0ZXN0MiJ9"
+            }
+          ]
+        }
     }
-  ],
-  "offset": 0,
-  "limit": 0,
-  "total": 1
-}
 `,
     method: "GET"
   },
   {
     title: `Send Event to '${namespace}'`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/event`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/broadcast`,
     description: `The request requires a cloud event json.
 
 {
@@ -246,7 +261,7 @@ const NamespaceInteractions = (namespace) => [
   },
   {
     title: `Create a new Workflow`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/PATH_TO_CREATE_WORKFLOW?op=create-workflow`,
     description: `The request requires a yaml definition of a workflow.
 
 id: helloworld
@@ -256,19 +271,19 @@ states:
     type: noop
     transform: '{ result: "Hello World!" }'
     `,
-    method: "POST"
+    method: "PUT"
   },
   {
     title: `Delete a workflow`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/WORKFLOW_NAME`,
-    description: `Replace WORKFLOW_NAME with the workflow you wish to delete.`,
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/PATH_TO_WORKFLOW?op=delete-node`,
+    description: `Replace PATH_TO_WORKFLOW with the workflow you wish to delete.`,
     method: "DELETE"
   },
   {
     title: `Toggle a workflow`,
-    url: `${window.location.origin}/api/namespaces/${namespace}/workflows/WORKFLOW_NAME/toggle`,
-    description: `Replace WORKFLOW_NAME with the workflow you wish to toggle.`,
-    method: "PUT"
+    url: `${window.location.origin}/api/namespaces/${namespace}/tree/PATH_TO_WORKFLOW?op=toggle`,
+    description: `Replace PATH_TO_WORKFLOW with the workflow you wish to toggle.`,
+    method: "POST"
   }
 ]
 

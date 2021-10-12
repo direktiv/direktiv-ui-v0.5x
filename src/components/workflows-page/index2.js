@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList, IoCodeOutline,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -23,6 +23,8 @@ import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, Name
 import Attribute from "./attributes";
 import { NoResults, validateAgainstNameRegex } from "../../util-funcs";
 
+import Interactions from './interactions'
+
 
 function ShowError(msg, setErr) {
     setErr(msg)
@@ -37,7 +39,7 @@ function useQuery() {
 
 export default function Explorer() {
 
-    const {fetch, handleError, namespace} = useContext(MainContext)
+    const {fetch, handleError, namespace, namespaceInteractions, workflowInteractions} = useContext(MainContext)
     const params = useParams()
     const [loading, setLoading] = useState(true)
     const [typeOfRequest, setTypeOfRequest] = useState("")
@@ -71,12 +73,12 @@ export default function Explorer() {
         <div className="container" style={{ flex: "auto" }}>
             <LoadingWrapper isLoading={loading}>
                 {typeOfRequest === "workflow" ? 
-                    <WorkflowExplorer setTypeOfRequest={setTypeOfRequest} />
+                    <WorkflowExplorer workflowInteractions={workflowInteractions} setTypeOfRequest={setTypeOfRequest} />
                     :
                     ""
                 }  
                 {typeOfRequest === "directory" ?
-                    <ListExplorer setTypeOfRequest={setTypeOfRequest} fetch={fetch} params={params} namespace={namespace} handleError={handleError} />
+                    <ListExplorer namespaceInteractions={namespaceInteractions} setTypeOfRequest={setTypeOfRequest} fetch={fetch} params={params} namespace={namespace} handleError={handleError} />
                     :
                     ""
                 }
@@ -88,7 +90,7 @@ export default function Explorer() {
 function WorkflowExplorer(props) {
 
     // context
-    const {fetch, handleError,  sse, namespace} = useContext(MainContext)
+    const {fetch, handleError,  sse, namespace, workflowInteractions} = useContext(MainContext)
     const { setTypeOfRequest} = props
     // params
     const params = useParams()
@@ -139,6 +141,13 @@ function WorkflowExplorer(props) {
     // const [functions, setFunctions] = useState(null)
     const functionsRef = useRef(functions ? functions: [])
     const [funcSource, setFuncSource] = useState(null)
+
+    const [modalOpen, setModalOpen] = useState(false)
+
+    function toggleModal() {
+        setModalOpen(!modalOpen)
+    }
+
     useEffect(()=>{
         if(functions !== null && funcSource === null) {
             // TODO: update route
@@ -329,13 +338,13 @@ function WorkflowExplorer(props) {
                 history.push(`/n/${params.namespace}/explorer/${params[0]}?variables=true` )
             }
         },
-        // {
-        //     name: "Export Workflow",
-        //     func: async () => {
-        //         // TODO
-        //         toggleExportModal()
-        //     },
-        // },
+        {
+            name: "API Interactions",
+            func: async () => {
+                // TODO
+                toggleModal()
+            },
+        },
         {
             name: workflowInfo.active ? "Disable" : "Enable",
             func: async () => {
@@ -360,6 +369,13 @@ function WorkflowExplorer(props) {
 
     return(
         <>
+            <Modal 
+                isOpen={modalOpen}
+                onRequestClose={toggleModal}
+                contentLabel="API Interactions"
+            >
+                <Interactions interactions={workflowInteractions(namespace, params[0])} type="Workflow" />
+            </Modal>
             <div className="flex-row">
                 <div style={{ flex: "auto", display:"flex", width:"100%" }}>
                     <Breadcrumbs resetData={[setTypeOfRequest]} />
@@ -441,10 +457,17 @@ function WorkflowExplorer(props) {
 }
 
 function ListExplorer(props) {
-    const {fetch, params, namespace, handleError, setTypeOfRequest} = props
+    const {fetch, params, namespace, handleError, setTypeOfRequest, namespaceInteractions} = props
     const [loading, setLoading] = useState(true)
     const [init, setInit] = useState(false)
     const [objects, setObjects] = useState([])
+    const [modalOpen, setModalOpen] = useState(false)
+
+    function toggleModal() {
+        setModalOpen(!modalOpen)
+    }
+
+
 
     const [, setPageInfo] = useState(null)
     const [err, setErr] = useState("")
@@ -475,10 +498,24 @@ function ListExplorer(props) {
 
     return(
         <>
+            <Modal 
+                isOpen={modalOpen}
+                onRequestClose={toggleModal}
+                contentLabel="API Interactions"
+            >
+                <Interactions interactions={namespaceInteractions(namespace, params[0])} type="Namespace" />
+            </Modal>
              <div className="flex-row">
                 <div style={{ flex: "auto", display:"flex", width:"100%" }}>
                     <Breadcrumbs resetData={[setTypeOfRequest]} />
                 </div>
+                <div style={{ display: "flex", flex:2, flexDirection: "row-reverse", alignItems: "center", marginRight: "12px" }}>
+                                <div onClick={() => toggleModal()} title={"APIs"} className="circle button" style={{ position: "relative", zIndex: "5" }}>
+                                    <span style={{ flex: "auto" }}>
+                                        <IoCodeOutline className={"toggled-switch"} style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
+                                    </span>
+                                </div> 
+                            </div>
             </div>
             <div className="container" style={{ flexDirection: "row", flexWrap: "wrap", flex: "auto" }} >
                 <div className="shadow-soft rounded tile" style={{ flex: "5"}}>

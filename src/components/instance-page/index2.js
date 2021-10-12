@@ -16,9 +16,12 @@ import { sendNotification } from '../notifications'
 import LoadingWrapper from '../loading'
 import InstanceInputOutput from './instance-input-output'
 import { InstanceCancel, InstanceInput } from './api'
+import Interactions from '../workflows-page/interactions'
+import Modal from 'react-modal';
+
 
 export default function Instance() {
-    const {fetch, namespace, handleError, extraLinks, sse, checkPerm, permissions} = useContext(MainContext)
+    const {fetch, namespace, handleError, extraLinks, sse, checkPerm, permissions, instanceInteractions} = useContext(MainContext)
     const [init, setInit] = useState(null)
     const [instanceDetails, setInstanceDetails] = useState({})
     const [wf, setWf] = useState("")
@@ -38,6 +41,14 @@ export default function Instance() {
 
     const params = useParams()
     const history = useHistory()
+
+
+
+    const [modalOpen, setModalOpen] = useState(false)
+
+    function toggleModal() {
+        setModalOpen(!modalOpen)
+    }
 
     useEffect(()=>{
         async function fetchInput() {
@@ -136,6 +147,12 @@ export default function Instance() {
             name: "View Workflow",
             link: true,
             path: `/n/${params.namespace}/explorer/${instanceDetails.as}`
+        },
+        {
+            name: "API Interactions",
+            func: () => {
+                toggleModal()
+            }
         }, ...extraLinks
     ]
 
@@ -180,6 +197,13 @@ export default function Instance() {
     return(
         <LoadingWrapper isLoading={isLoading} text={`Loading Instance Details`}>
                <div className="container" style={{  padding: "10px" }}>
+               <Modal 
+                isOpen={modalOpen}
+                onRequestClose={toggleModal}
+                contentLabel="API Interactions"
+            >
+                <Interactions interactions={instanceInteractions(namespace, "", params.id)} type="Instance" />
+            </Modal>
                     <div className="flex-row" style={{ maxHeight: "64px" }}>
                         <div style={{ flex: "auto", display: "flex" }}>
                                 <div style={{ flex: "auto" }}>

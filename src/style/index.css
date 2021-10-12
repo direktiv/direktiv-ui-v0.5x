@@ -11,7 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
+.ReactModal__Overlay {
+    z-index: 30 !important;
+}
 
 /* API Interactions CSS */
 .api-item {

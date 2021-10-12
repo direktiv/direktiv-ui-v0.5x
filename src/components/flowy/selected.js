@@ -1704,12 +1704,22 @@ export function ActionSelected(props) {
             }
             if(element.data.action) {
                 if(Object.keys(element.data.action).length === 0) {
-                    setAction("")
+                    setAction(YAML2String.stringify({
+                        function: "",
+                        input: {
+                            placeholder: "value"
+                        }
+                    }))
                 } else {
                     setAction(YAML2String.stringify(element.data.action))
                 }
             } else {
-                setAction("")
+                setAction(YAML2String.stringify({
+                    function: "",
+                    input: {
+                        placeholder: "value"
+                    }
+                }))
             }
         }
         setCurrId(element.data.id)
