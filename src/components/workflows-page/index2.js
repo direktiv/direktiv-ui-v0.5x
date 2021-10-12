@@ -14,6 +14,7 @@ import Details from "./explorer-components/details";
 import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
+import YAML from 'js-yaml'
 
 import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";

@@ -4,6 +4,7 @@ import {  ActionFunc, GeneralState, Schema } from "./states";
 import {State, diagramToYAML, Start, addState, ActionFunction, SchemaNode, generateElementsForBuilder} from "./util"
 import Breadcrumbs from '../breadcrumbs'
 import dagre from 'dagre'
+import YAML from 'js-yaml'
 
 import {SchemaSelected, GetterOrSetterSelected, EventAndXorSelected, ParallelSelected, FuncSelected, ConsumeEventSelected, ForeachSelected, ValidateSelected, GenerateEventSelected, ErrorSelected, ActionSelected, DelaySelected, SwitchSelected, NoopSelected, EdgeSelected} from "./selected"
 
@@ -219,6 +220,7 @@ export default function Flowy() {
     };
 
     const onElementClick = (event, element) => {
+        console.log(event.target, event, element, "TEST")
         if(element.type !== "start"){
             setElementSelected(element)
         }
@@ -274,7 +276,11 @@ export default function Flowy() {
                         await handleError('create workflow', resp, 'createWorkflow')
                 }
             } catch (e) {
-                ShowErr(`Workflow creation failed: ${e.message}`, setErr)
+                let y = YAML.load(wf)
+                let stateIndex = parseInt(e.message.match(/(?<=\[).+?(?=\])/)[0])
+                let errMessage = e.message.match(/(?<=\]:\ )[\w\s]+/)
+                let id = y.states[stateIndex].id
+                ShowErr(`Workflow creation failed: state '${id}': ${errMessage}`, setErr)
             }
         }
     }
@@ -451,7 +457,12 @@ export default function Flowy() {
                             schema: SchemaNode,
                             function: ActionFunction,
                         }}
+                        onClick={(e)=>{
+                            console.log(e, "HELLO")
+                            setElementSelected(null)
+                        }}
                         onConnect={onConnect}
+                        onNodeDrag={onElementClick}
                         onElementClick={onElementClick}
                         onEdgeUpdate={onEdgeUpdate}
                         elements={blocks}
