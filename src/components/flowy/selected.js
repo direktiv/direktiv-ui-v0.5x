@@ -69,10 +69,24 @@ export function GetterOrSetterSelected(props) {
                         })
                     }
                 } else {
-                    vars.push({
-                        name: `variable-${variables.length}`,
-                        value: ""
-                    })
+                    if(element.data.type === "setter"){
+                        vars.push({
+                            name: `variable-${variables.length}`,
+                            value: YAML2String.stringify({
+                                key: "variable name",
+                                scope: "instance, workflow or namespace",
+                                value: "value of variable"
+                            })
+                        })
+                    } else {
+                        vars.push({
+                            name: `variable-${variables.length}`,
+                            value: YAML2String.stringify({
+                                key: "variable name",
+                                scope: "instance, workflow or namespace"
+                            })
+                        })
+                    }
                 }
                 setVariables(vars)
                 if(element.data.transform) {
@@ -151,10 +165,25 @@ export function GetterOrSetterSelected(props) {
                     }}  style={{marginRight:"3px"}} />: "" }
                                 <input type="submit" value="Add" onClick={()=>{
                         let acs = variables
-                        variables.push({
-                            name: `action-${variables.length}`,
-                            value: ""
-                        })
+                        if(element.data.type === "setter"){
+                            acs.push({
+                                name: `variable-${variables.length}`,
+                                value: YAML2String.stringify({
+                                    key: "variable name",
+                                    scope: "instance, workflow or namespace",
+                                    value: "value of variable"
+                                })
+                            })
+                        } else {
+                            acs.push({
+                                name: `variable-${variables.length}`,
+                                value: YAML2String.stringify({
+                                    key: "variable name",
+                                    scope: "instance, workflow or namespace"
+                                })
+                            })
+                        }
+
                         setVariables(JSON.parse(JSON.stringify(acs)))
                     }} />
             </div>
@@ -229,10 +258,27 @@ export function EventAndXorSelected(props) {
                     })
                 }
             } else {
-                evs.push({
-                    name: `event-${events.length}`,
-                    value: ""
-                })
+                if(element.data.type == "eventXor") {
+                    evs.push({
+                        name: `event-${events.length}`,
+                        value: YAML2String.stringify({
+                            event: {
+                                type: "placeholderEventType"
+                            },
+                            transform: {
+                                object: "value"
+                            }
+                        })
+                    })
+                } else {
+                    evs.push({
+                        name: `event-${events.length}`,
+                        value: YAML2String.stringify({
+                            type: "placeholderEventType"
+                        })
+                    })
+                }
+                
             }
             setEvents([...evs])
             if(element.data.transform) {
@@ -309,10 +355,27 @@ export function EventAndXorSelected(props) {
                     }}  style={{marginRight:"3px"}} /> : ""}
                                 <input type="submit" value="Add" onClick={()=>{
                         let acs = events
-                        events.push({
-                            name: `action-${events.length}`,
-                            value: ""
-                        })
+                        if(element.data.type == "eventXor") {
+                            acs.push({
+                                name: `event-${events.length}`,
+                                value: YAML2String.stringify({
+                                    event: {
+                                        type: "placeholderEventType"
+                                    },
+                                    transform: {
+                                        object: "value"
+                                    }
+                                })
+                            })
+                        } else {
+                            acs.push({
+                                name: `event-${events.length}`,
+                                value: YAML2String.stringify({
+                                    type: "placeholderEventType"
+                                })
+                            })
+                        }
+         
                         setEvents(JSON.parse(JSON.stringify(acs)))
                     }} />
             </div>
@@ -379,7 +442,12 @@ export function ParallelSelected(props) {
             } else {
                 acts.push({
                     name: `action-${actions.length}`,
-                    value: ""
+                    value: YAML2String.stringify({
+                        function: "",
+                        input: {
+                            placeholder: "value"
+                        }
+                    })
                 })
             }
             setActions([...acts])
@@ -460,7 +528,12 @@ export function ParallelSelected(props) {
                         let acs = actions
                         actions.push({
                             name: `action-${actions.length}`,
-                            value: ""
+                            value: YAML2String.stringify({
+                                function: "",
+                                input: {
+                                    placeholder: "value"
+                                }
+                            })
                         })
                         setActions(JSON.parse(JSON.stringify(acs)))
                     }} />
@@ -630,7 +703,10 @@ export function FuncSelected(props) {
             }else {
                 acts.push({
                     name: `file-${files.length}`,
-                    value: ""
+                    value: YAML2String.stringify({
+                        key: "identifier",
+                        scope: "namespace, workflow or instance"
+                    })
                 })
             }
             setFiles(acts)
@@ -721,7 +797,10 @@ export function FuncSelected(props) {
                                     let acs = files
                                     acs.push({
                                         name: `file-${files.length}`,
-                                        value: ""
+                                        value: YAML2String.stringify({
+                                            key: "identifier",
+                                            scope: "namespace, workflow or instance"
+                                        })
                                     })
                                     setFiles(JSON.parse(JSON.stringify(acs)))
                                 }} />
@@ -1117,7 +1196,12 @@ export function ForeachSelected(props) {
             if(element.data.action) {
                 setAction(YAML2String.stringify(element.data.action))
             } else {
-                setAction("")
+                setAction(YAML2String.stringify({
+                    function: "",
+                    input: {
+                        placeholder: "value"
+                    }
+                }))
             }
             if(element.data.transform) {
                 setTransform(YAML2String.stringify(element.data.transform))

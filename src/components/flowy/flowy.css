@@ -10,6 +10,7 @@ tr.spaceUnder > td {
 .react-flow__node.selected .state{
     background-color: rgba(94, 142, 219, 0.2);
 }
+
 .edit-input {
     max-width: 255px;
     min-width: 255px;

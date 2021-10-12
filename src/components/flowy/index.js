@@ -400,8 +400,8 @@ export default function Flowy() {
                         <tr><th>Utility</th></tr>
                     </thead>
                     <tbody>
-                        <ActionFunc setElementData={setElementData}  />
-                        <Schema setElementData={setElementData}/>
+                        <ActionFunc type="function" setElementData={setElementData}  />
+                        <Schema type="schema" setElementData={setElementData}/>
                     </tbody>
                 </table>
                 <hr />
@@ -458,7 +458,7 @@ export default function Flowy() {
                             function: ActionFunction,
                         }}
                         onClick={(e)=>{
-                            console.log(e, "HELLO")
+                            console.log("hello ive been clicked", e)
                             setElementSelected(null)
                         }}
                         onConnect={onConnect}

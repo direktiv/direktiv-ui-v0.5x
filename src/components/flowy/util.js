@@ -256,31 +256,43 @@ export function Start() {
 
 export function ActionFunction(props) {
     const {data} = props
-    return (
-        <div className="state" style={{width:"80px", height:"30px"}}>
-            <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                <IoChevronForwardSharp/>
-                <div style={{flex:"auto", color: "#2396d8"}}>
-                    {data.type}
-                </div>
+    return(
+        <div key={`function-${randomWords()}`} className="state" style={{width:"80px", height:"30px"}}>
+        <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
+            <IoChevronForwardSharp/>
+            <div style={{flex:"auto"}}>
+                {data.type}
             </div>
-            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px", color:"#2396d8"}}>{data.id}</h1>
         </div>
+        <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.id}</h1>
+    </div>
     )
+    // return (
+    //     <div className="state" style={{width:"80px", height:"30px"}}>
+            
+    //         <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
+    //             <IoChevronForwardSharp/>
+    //             <div style={{flex:"auto", color: "#2396d8"}}>
+    //                 {data.type}
+    //             </div>
+    //         </div>
+    //         <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px", color:"#2396d8"}}>{data.id}</h1>
+    //     </div>
+    // )
 }
 
 export function SchemaNode(props) {
     const {data, id} = props
-    return (
-        <div className="state" style={{width:"80px", height:"30px"}}>
-            <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
-                <IoChevronForwardSharp/>
-                <div style={{flex:"auto", color: "rgb(6 158 84)"}}>
-                    {data.type}
-                </div>
+    return(
+        <div key={`function-${randomWords()}`} className="state" style={{width:"80px", height:"30px"}}>
+        <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 
+            <IoChevronForwardSharp/>
+            <div style={{flex:"auto"}}>
+                {data.type}
             </div>
-            <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px", color:"rgb(6 158 84)"}}>{id}</h1>
         </div>
+        <h1 style={{fontWeight:"300", fontSize:"7pt", marginTop:"2px"}}>{data.id}</h1>
+    </div>
     )
 }
 
