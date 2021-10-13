@@ -87,27 +87,29 @@ function TotalTimeWorkflows(props) {
                 {err !== "" ?
                 <ErrorComp error={err}/>
                 :
-                <>
-                    {timeMetrics.length > 0 ? 
-                    <ResponsiveContainer height={300} width="100%">
-                        <PieChart>
-                            <Pie
-                                nameKey="name"
-                                innerRadius={70}
-                                paddingAngle={5}
-                                // label={renderLabel}
-                                data={timeMetrics}
-                            >
-                                <Label style={{fontSize:"20pt"}} value={`${Math.round(totalTime)}s`} position="center" />
-                                {timeMetrics.map((entry, index) => (
-                                <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                    </ResponsiveContainer>:
-                    <NoMetrics/>}
-                </>
+                    <div className="piechart-wrapper" style={{height: "100%"}}>
+                        <div style={{ height: "300px", width: "300px" }}>
+                            {timeMetrics.length > 0 ?
+                                <ResponsiveContainer width="98%">
+                                    <PieChart>
+                                        <Pie
+                                            nameKey="name"
+                                            innerRadius={70}
+                                            paddingAngle={5}
+                                            // label={renderLabel}
+                                            data={timeMetrics}
+                                        >
+                                            <Label style={{ fontSize: "20pt" }} value={`${Math.round(totalTime)}s`} position="center" />
+                                            {timeMetrics.map((entry, index) => (
+                                                <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer> :
+                                <NoMetrics />}
+                        </div>
+                    </div>
                 }                
             </LoadingWrapper>
         </div>
@@ -201,27 +203,29 @@ export function SuccessOrFailedWorkflows(props) {
                 {err !== "" ? 
                 <ErrorComp error={err}/>
                 :
-                <>
-                {sWorkflowMetrics.length > 0 ?
-                <ResponsiveContainer height={workflow ? 250: 300} width="100%">
-                    <PieChart>
-                        <Pie
-                            innerRadius={workflow? 55 :70}
-                            nameKey="name"
-                            // label={renderLabel}
-                            paddingAngle={5}
-                            data={sWorkflowMetrics}
-                        >
-                            <Label style={{fontSize:"20pt"}} value={`${percentage}%`} position="center" />
-                            {sWorkflowMetrics.map((entry, index) => (
-                              <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                </ResponsiveContainer>
-                : <NoMetrics/>}
-                </>
+                    <div className="piechart-wrapper" style={{height: workflow ? "250px" : "100%"}}>
+                        <div style={{ height: workflow ? "250px" : "300px", width: workflow ? "250px" : "300px" }}>
+                            {sWorkflowMetrics.length > 0 ?
+                                <ResponsiveContainer width="98%">
+                                    <PieChart>
+                                        <Pie
+                                            innerRadius={workflow ? 55 : 70}
+                                            nameKey="name"
+                                            // label={renderLabel}
+                                            paddingAngle={5}
+                                            data={sWorkflowMetrics}
+                                        >
+                                            <Label style={{ fontSize: "20pt" }} value={`${percentage}%`} position="center" />
+                                            {sWorkflowMetrics.map((entry, index) => (
+                                                <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                : <NoMetrics />}
+                        </div>
+                    </div>
 }
             </LoadingWrapper>
         </div>
@@ -287,30 +291,32 @@ function TotalWorkflows(props) {
                 {err !== "" ?
                     <ErrorComp error={err} /> 
                 :
-                <>
-                {tWorkflowMetrics.length > 0 ? 
-                <ResponsiveContainer height={300} width="100%">
-                    <PieChart>
-                        <Pie
-                            innerRadius={70}
-                            nameKey="name"
-                            // label={renderLabel}
-                            paddingAngle={5}
-                            data={tWorkflowMetrics}
-                        >
-                            <Label style={{fontSize:"20pt"}} value={invokedWorkflows} position="center" />
-                            {tWorkflowMetrics.map((entry, index) => (
-                              <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                   
-                </ResponsiveContainer>
-                 :
-                 <NoMetrics />
-                }
-                </>
+                    <div className="piechart-wrapper" style={{height: "100%"}}>
+                        <div style={{ height: "300px", width: "300px" }}>
+                            {tWorkflowMetrics.length > 0 ?
+                                <ResponsiveContainer width="98%">
+                                    <PieChart>
+                                        <Pie
+                                            innerRadius={70}
+                                            nameKey="name"
+                                            // label={renderLabel}
+                                            paddingAngle={5}
+                                            data={tWorkflowMetrics}
+                                        >
+                                            <Label style={{ fontSize: "20pt" }} value={invokedWorkflows} position="center" />
+                                            {tWorkflowMetrics.map((entry, index) => (
+                                                <Cell className="pie-sect" key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+
+                                </ResponsiveContainer>
+                                :
+                                <NoMetrics />
+                            }
+                        </div>
+                    </div>
             }
             </LoadingWrapper>
         </div>

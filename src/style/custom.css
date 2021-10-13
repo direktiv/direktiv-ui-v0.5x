@@ -1124,3 +1124,10 @@ pre {
 .hide{
     display: none;
 }
+
+
+.piechart-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
