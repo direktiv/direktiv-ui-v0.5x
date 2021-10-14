@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline, IoGitCommitSharp, IoAlbumsSharp, IoPricetagSharp, IoClose, IoCheckmark } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -15,7 +15,7 @@ import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
 
-import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
+import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate, WorkflowRefs, WorkflowSave, WorkflowTag, WorkflowDiscard, WorkflowDeleteRevision } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
@@ -91,6 +91,7 @@ function WorkflowExplorer(props) {
     const { setTypeOfRequest} = props
     // params
     const params = useParams()
+    const q = useQuery()
     const history = useHistory()
 
     // Workflow States
@@ -98,7 +99,7 @@ function WorkflowExplorer(props) {
     const wfRefValue = useRef("")
     const [workflowValueOld, setWorkflowValueOld] = useState("")
     const [workflowInfo, setWorkflowInfo] = useState({ revision: 0, active: true, fetching: true })
-    
+    const [wfLoad, setWfLoad] = useState(true)
     // tabs
     const [tab, setTab] = useState("functions")
     const [editorTab, setEditorTab] = useState("editor")
@@ -133,15 +134,54 @@ function WorkflowExplorer(props) {
     const [attributes, setAttributes] = useState([])
 
     const codemirrorRef = useRef()
-    const workflowRef = useRef(params[0])
+    const workflowRef = useRef()
+
+
+    console.log(q.get("ref"))
+    // revisions
+    const [refs, setRefs] = useState([])
+    const [ref, setRef] = useState(q.get("ref") !== null ? q.get("ref"): "latest")
+    console.log(ref)
+    const [tag, setTag] = useState(false)
+    const [inputTag, setInputTag] = useState("")
+    const [revLoad, setRevLoad] = useState(true)
+
+    useEffect(()=>{
+        async function getRefs() {
+            try {
+                let revs = await WorkflowRefs(fetch, params.namespace, params[0], handleError)
+                setRefs(revs) 
+            } catch(e) {
+                ShowError(e.message, setErr)
+            }
+        }
+        if(revLoad){
+            getRefs()
+            setRevLoad(false)
+        }
+        if(ref !== q.get("ref") && !revLoad) {
+            setRef(q.get("ref") !== null ? q.get("ref"): "latest")
+            setTag(false)
+        }
+    },[revLoad, fetch, handleError, params, q, ref])
 
     // const [functions, setFunctions] = useState(null)
     const functionsRef = useRef(functions ? functions: [])
     const [funcSource, setFuncSource] = useState(null)
+    
     useEffect(()=>{
-        if(functions !== null && funcSource === null) {
+        let rev = q.get("ref")
+        if(rev === null) {
+            rev = "latest"
+        }
+        console.log(rev, ref)
+        if(rev !== ref || funcSource === null) {
+            if (funcSource) {
+                setFunctions(null)
+                funcSource.close()
+            }
             // TODO: update route
-            let x = `/functions/namespaces/${namespace}/tree/${workflowRef.current}?op=services`
+            let x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=services&ref=${rev}`
 
             let eventConnection = sse(`${x}`,{})
             eventConnection.onerror = (e) => {
@@ -207,7 +247,7 @@ function WorkflowExplorer(props) {
             eventConnection.onmessage = e => getData(e)
             setFuncSource(eventConnection)
         }   
-    },[functions, funcSource, namespace, sse])
+    },[functions, funcSource, namespace, sse, q, ref, params])
     useEffect(()=>{
         return () => {
             if (funcSource !== null) {
@@ -229,8 +269,12 @@ function WorkflowExplorer(props) {
         setFetching(true)
         async function fetchData() {
             try {
-                let {eventLogging, source, attributes} = await Workflow(fetch, params.namespace, params[0])
-                let active = await WorkflowActiveStatus(fetch, params.namespace, params[0])
+                let rev = q.get("ref")
+                if(rev === null) {
+                    rev = "latest"
+                }
+                let {eventLogging, source, attributes} = await Workflow(fetch, params.namespace, params[0], handleError, rev)
+                let active = await WorkflowActiveStatus(fetch, params.namespace, params[0], handleError, rev)
 
                 wfRefValue.current = source
                 setWorkflowValue(source)
@@ -247,32 +291,45 @@ function WorkflowExplorer(props) {
             }
         }
         return fetchData().finally((()=>{setFetching(false)}))
-    },[params, fetch])
+    },[params, fetch,  handleError,q])
 
     useEffect(()=>{
-        fetchWorkflow()
-    },[fetchWorkflow])
+
+        let rev = q.get("ref")
+        if(rev === null) {
+            rev = "latest"
+        }
+        if(wfLoad || rev !== ref) {
+            fetchWorkflow()
+            setWfLoad(false)
+        }
+    },[fetchWorkflow, wfLoad])
 
     // fetch metrics
     useEffect(()=>{
         async function getStateMetrics() {
                // todo
                try {
-                let json = await WorkflowStateMillisecondMetrics(fetch, namespace, params[0], handleError)
+                let json = await WorkflowStateMillisecondMetrics(fetch, namespace, params[0], handleError, ref)
                 setStateMetrics(json)
             } catch(e) {
                 setActionErr(e.message)
             }
         }
-        if(metricsLoading) {
-            getStateMetrics().finally(()=>{setMetricsLoading(false)})
+        let rev = q.get("ref")
+        if(rev === null) {
+            rev = "latest"
         }
-    },[metricsLoading, fetch, handleError, namespace, params])
+        if(metricsLoading || rev !== ref) {
+            getStateMetrics()
+            setMetricsLoading(false)
+        }
+    },[metricsLoading, fetch, handleError, namespace, params, ref])
     
 
     async function updateLogEvent() {
         try {
-            let val = await WorkflowSetLogToEvent(fetch, namespace, params[0], logEvent, handleError)
+            let val = await WorkflowSetLogToEvent(fetch, namespace, params[0], logEvent, handleError, ref)
             setLogEvent(val)
         } catch(e) {
             setActionErr(e.message)
@@ -300,9 +357,37 @@ function WorkflowExplorer(props) {
         setFetching(false)
     }
 
+    async function saveWorkflow() {
+        try {
+            await WorkflowSave(fetch, params.namespace, params[0], handleError, ref)
+            let refs = await WorkflowRefs(fetch, params.namespace, params[0], handleError)
+            // set ref back to the latest.
+            setTimeout(()=>{
+                setRefs(refs)
+                history.push(`/n/${params.namespace}/explorer/${params[0]}?ref=latest`)
+            },200)
+        } catch(e) {
+            ShowError(e.message, setErr)
+        }
+    }
+
+    async function discardWorkflow() {
+        try{
+            await WorkflowDeleteRevision(fetch, params.namespace, params[0], handleError, ref)
+            let refs = await WorkflowRefs(fetch, params.namespace, params[0], handleError)
+            setTimeout(()=>{
+                setRefs(refs)
+                history.push(`/n/${params.namespace}/explorer/${params[0]}?ref=latest`)
+            },200)
+        } catch(e) {
+            ShowError(e.message, setErr)
+        }
+    }
+    
+
     async function executeWorkflow() {
         try {
-            let id = await WorkflowExecute(fetch, params.namespace, params[0], handleError, jsonInput)
+            let id = await WorkflowExecute(fetch, params.namespace, params[0], handleError, jsonInput, ref)
             history.push(`/n/${namespace}/i/${id}`)
         } catch (e) {
             setExecuteErr(e.message)
@@ -339,7 +424,7 @@ function WorkflowExplorer(props) {
             name: workflowInfo.active ? "Disable" : "Enable",
             func: async () => {
                 try {
-                    let active = await WorkflowSetActive(fetch, params.namespace, params[0], handleError, !workflowInfo.active)
+                    let active = await WorkflowSetActive(fetch, params.namespace, params[0], handleError, !workflowInfo.active, ref)
                     setWorkflowInfo((wfI)=>{
                         wfI.active = active
                         return { ...wfI }
@@ -354,6 +439,46 @@ function WorkflowExplorer(props) {
 
     function toggleExportModal() {
         setExportModalOpen(!exportModalOpen)
+    }
+
+    let actionRevs = []
+
+    if(ref !== "latest"){
+        // if tag has been clicked offer ability to cancel tag
+        if(tag) {
+            actionRevs.push(
+                <div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={async() => { 
+
+                    await WorkflowTag(fetch, params.namespace, params[0], handleError, ref, inputTag)
+                    let refs = await WorkflowRefs(fetch, params.namespace, params[0], handleError)
+
+                    setTimeout(()=>{
+                        setRefs(refs)
+                        history.push(`/n/${params.namespace}/explorer/${params[0]}?ref=${inputTag}`)
+                        setInputTag("")
+                        setTag(!tag)
+                    },200)
+                
+                }}>
+                <IoCheckmark /> Tag
+            </div>
+            )
+            actionRevs.push(
+                <div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { setTag(!tag) }}>
+                <IoClose /> Cancel
+            </div>
+            )
+        } else {
+            actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { discardWorkflow() }}>
+            <IoTrash /> Delete
+        </div>)
+            actionRevs.push(
+                <div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { setTag(!tag) }}>
+                <IoPricetagSharp /> Tag
+            </div>
+            )
+        }
+        
     }
 
 
@@ -398,6 +523,7 @@ function WorkflowExplorer(props) {
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
                     <EditorDetails  
+                        saveWorkflow={saveWorkflow}
                         workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics}
                         editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef}
                         actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow}
@@ -418,7 +544,27 @@ function WorkflowExplorer(props) {
                     </div>
                 </div>
                 <div className="container auto-width-all-896" style={{ flexDirection: "column", maxWidth:"380px", minWidth:"380px", flex: "auto" }} >
-                    <SuccessOrFailedWorkflows namespace={params.namespace} fetch={fetch} workflow={params["0"]} handleError={handleError}/>
+                    <div className="item-0 shadow-soft rounded tile" style={{fontSize:"12px", maxHeight:"65px"}}>
+                        <TileTitle actionsDiv={actionRevs}>
+                            <IoAlbumsSharp /> Revisions
+                        </TileTitle>
+                        <div style={{display:"flex"}}>
+                            {tag ? 
+                            <div style={{width:"100%"}}>
+                                <input onChange={e=>setInputTag(e.target.value)} value={inputTag} style={{width:"95%"}} placeholder="Enter tag (leave blank to untag)" type="text"/>
+                            </div>
+                             :
+                            <select value={ref} onChange={e=>{
+                                history.push(`/n/${params.namespace}/explorer/${params[0]}?ref=${e.target.value}`)
+                            }}>
+                                {refs.map((obj)=>{
+                                    return(
+                                        <option key={obj.node.name} value={obj.node.name}>{obj.node.name}</option>
+                                    )
+                                })}
+                            </select>}
+                        </div>
+                    </div>
                     <div className="item-0 shadow-soft rounded tile">
                         <TileTitle actionsDiv={[
                             <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: tab === "events"? "#2396d8":""}} className={"workflow-expand"} onClick={() => { setTab("events") }} >
@@ -431,6 +577,7 @@ function WorkflowExplorer(props) {
                         </TileTitle>
                         <Details setTypeOfRequest={setTypeOfRequest} workflowFuncErr={workflowFuncErr} tab={tab} functions={functions} />
                     </div>
+                    <SuccessOrFailedWorkflows refs={ref} namespace={params.namespace} fetch={fetch} workflow={params["0"]} handleError={handleError}/>
                     <Attribute setErr={setErr} ShowError={ShowError} attributes={attributes} setAttributes={setAttributes} />
                 </div>
             </div>
@@ -730,7 +877,7 @@ function FileObject(props) {
 
     async function toggleObject() {
         try {
-            let active2 = await WorkflowSetActive(fetch, namespace, id, handleError, !active)
+            let active2 = await WorkflowSetActive(fetch, namespace, id, handleError, !active, "latest")
             setActive(active2)
         } catch(e) {
             ShowError(`Error: ${e.message}`, setErr)

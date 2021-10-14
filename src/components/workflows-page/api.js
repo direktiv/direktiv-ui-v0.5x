@@ -1,3 +1,4 @@
+import { json } from 'd3-fetch'
 import YAML from 'js-yaml'
 
 export async function checkStartType(wf) {
@@ -31,9 +32,13 @@ export async function WorkflowFunction(fetch, handleError, namespace, path, serv
 }
 
 
-export async function WorkflowSetLogToEvent(fetch, namespace, workflow, val, handleError) {
+export async function WorkflowSetLogToEvent(fetch, namespace, workflow, val, handleError, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-workflow-event-logging`,{
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-workflow-event-logging&ref=${rev}`,{
             method: "POST",
             body: JSON.stringify({
                 logger: val
@@ -48,9 +53,13 @@ export async function WorkflowSetLogToEvent(fetch, namespace, workflow, val, han
         throw new Error(`Failed to fetch log to events: ${e.message}`)
     }
 }
-export async function WorkflowSetActive(fetch, namespace, workflow, handleError, active) {
+export async function WorkflowSetActive(fetch, namespace, workflow, handleError, active, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=toggle`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=toggle&ref=${rev}`, {
             method: "POST",
             body: JSON.stringify({
                 live: active
@@ -66,9 +75,13 @@ export async function WorkflowSetActive(fetch, namespace, workflow, handleError,
     }
 }
 
-export async function WorkflowExecute(fetch, namespace, workflow, handleError, jsonInput) {
+export async function WorkflowExecute(fetch, namespace, workflow, handleError, jsonInput, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=execute`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=execute&ref=${rev}`, {
             method: "POST",
             body: jsonInput
         })
@@ -79,6 +92,25 @@ export async function WorkflowExecute(fetch, namespace, workflow, handleError, j
             await handleError('execute workflow', resp, 'executeWorkflow')
         }
     } catch (e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function WorkflowSave(fetch, namespace, workflow, handleError, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=save-workflow&ref=${rev}`, {
+            method: "POST"
+        })
+        if (resp.ok) {
+            return true
+        } else {
+            await handleError('save workflow', resp, 'saveWorkflow')
+        }
+    } catch(e) {
         throw new Error(`${e.message}`)
     }
 }
@@ -110,6 +142,50 @@ export async function WorkflowUpdate(fetch, namespace, workflow, handleError, wo
     }
 }
 
+export async function WorkflowDeleteRevision(fetch, namespace, workflow, handleError, ref) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=delete-revision&ref=${ref}`, {
+            method:"POST"
+        })
+        if(resp.ok) {
+            return
+        } else {
+            await handleError(`discard workflow`, resp, 'discard')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+export async function WorkflowDiscard(fetch, namespace, workflow, handleError, ref) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=discard&ref=${ref}`, {
+            method:"POST"
+        })
+        if(resp.ok) {
+            return
+        } else {
+            await handleError(`discard workflow`, resp, 'discard')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function WorkflowTag(fetch, namespace, workflow, handleError, ref, tag) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=tag&ref=${ref}&tag=${tag}`,{
+            method: "POST"
+        })
+        if(resp.ok) {
+            return
+        } else {
+            await handleError(`tag workflow`, resp, 'tag')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
 export async function WorkflowLogToEventStatus(fetch, namespace, workflow, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-workflow-event-logging`,{
@@ -125,9 +201,13 @@ export async function WorkflowLogToEventStatus(fetch, namespace, workflow, handl
     }
 }
 
-export async function WorkflowActiveStatus(fetch, namespace, workflow, handleError) {
+export async function WorkflowActiveStatus(fetch, namespace, workflow, handleError, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=router`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=router&ref=${rev}`, {
             method: "get",
         })
         if (resp.ok) {
@@ -177,9 +257,27 @@ export async function WorkflowDeleteAttributes(fetch, namespace, workflow, attri
     }
 }
 
-export async function Workflow(fetch, namespace, workflow, handleError) {
+export async function WorkflowRefs(fetch, namespace, workflow, handleError) {
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}`, {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=refs`,{})
+        if(resp.ok) {
+            let js = await resp.json()
+            return js.edges
+        } else {
+            await handleError('fetch workflow refs', resp, 'getWorkflow')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function Workflow(fetch, namespace, workflow, handleError, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?ref=${rev}`, {
             method: "get",
         })
         if (resp.ok) {
@@ -212,9 +310,13 @@ export async function WorkflowInstances(fetch, namespace, workflow, handleError)
     }
 }
 
-export async function WorkflowStateMillisecondMetrics(fetch, namespace, workflow, handleError) {
+export async function WorkflowStateMillisecondMetrics(fetch, namespace, workflow, handleError, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=metrics-state-milliseconds`, {})
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=metrics-state-milliseconds&ref=${rev}`, {})
         if (resp.ok) {
             let json = await resp.json()
             return json.results

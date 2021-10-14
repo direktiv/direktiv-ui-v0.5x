@@ -115,7 +115,7 @@ function TotalTimeWorkflows(props) {
 }
 
 export function SuccessOrFailedWorkflows(props) {
-    const {fetch, namespace, workflow, handleError} = props
+    const {fetch, namespace, workflow, handleError, refs} = props
 
     const [isLoading, setIsLoading] = useState(true)
     const [percentage, setPercentage] = useState(0)
@@ -129,8 +129,8 @@ export function SuccessOrFailedWorkflows(props) {
                 let failedURL = `/namespaces/${namespace}/metrics/failed`
                 let successURL = `/namespaces/${namespace}/metrics/successful`
                 if (workflow){
-                    failedURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-failed`
-                    successURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-successful`
+                    failedURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-failed&ref=${refs}`
+                    successURL = `/namespaces/${namespace}/tree/${workflow}?op=metrics-successful&ref=${refs}`
                 }
 
                 let failedResp = await fetch(failedURL,{})
@@ -188,7 +188,7 @@ export function SuccessOrFailedWorkflows(props) {
         if(isLoading || oname !== namespace) {
             fetchDetails().finally(()=> {setIsLoading(false)})    
         }
-    },[fetch, isLoading, namespace, workflow, oname, handleError])
+    },[fetch, refs, isLoading, namespace, workflow, oname, handleError])
 
     let colors = ["#2fa64d", "#db3447"]
 

@@ -52,13 +52,18 @@ export default function Instance() {
             fetchInput()
         }
     },[fetch, handleError, namespace, input, iid])
+
     // fetch the workflow for that instance
     const fetchWorkflow = useCallback((id)=>{
         async function fetchDetails() {
             setInit(true)
             if(!init) {
                 try {
-                    let {source} = await Workflow(fetch, params.namespace, id, handleError)
+                    let split = id.split(":")
+                    let pathWF = split[0]
+                    let rev = split[1]
+                    console.log(pathWF, rev)
+                    let {source} = await Workflow(fetch, params.namespace, pathWF, handleError, rev)
                     let start = await checkStartType(source, setWorkflowErr)
                     setWf(source)
                     setStartType(start)
