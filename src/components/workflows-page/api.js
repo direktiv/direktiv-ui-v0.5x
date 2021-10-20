@@ -18,6 +18,8 @@ export async function checkStartType(wf) {
     }
 }
 
+
+
 export async function WorkflowFunction(fetch, handleError, namespace, path, service) {
     try {
         let resp = await fetch(`/functions/namespaces/${namespace}/tree/${path}?op=function`, {})
@@ -157,14 +159,18 @@ export async function WorkflowDeleteRevision(fetch, namespace, workflow, handleE
     }
 }
 export async function WorkflowDiscard(fetch, namespace, workflow, handleError, ref) {
+    let rev = ref
+    if(rev === undefined){
+        rev = "latest"
+    }
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=discard&ref=${ref}`, {
-            method:"POST"
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=discard-workflow&ref=${rev}`, {
+            method: "POST"
         })
         if(resp.ok) {
             return
         } else {
-            await handleError(`discard workflow`, resp, 'discard')
+            await handleError('discard workflow', resp, 'discardWorkflow')
         }
     } catch(e) {
         throw new Error(`${e.message}`)

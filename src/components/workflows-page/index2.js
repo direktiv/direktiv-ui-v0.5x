@@ -332,7 +332,8 @@ function WorkflowExplorer(props) {
             let val = await WorkflowSetLogToEvent(fetch, namespace, params[0], logEvent, handleError, ref)
             setLogEvent(val)
         } catch(e) {
-            setActionErr(e.message)
+            ShowError(e.message, setErr)
+
         }
     }
 
@@ -352,11 +353,18 @@ function WorkflowExplorer(props) {
             setWorkflowValueOld(workflowValue)
             setActionErr("")
         } catch(e) {
-            setActionErr(e.message)
+            ShowError(e.message, setErr)
         }
         setFetching(false)
     }
 
+    async function discardWorkflow() {
+        try {
+            await WorkflowDiscard(fetch, params.namespace, params[0], handleError, ref)
+        } catch(e) {
+            ShowError(e.message, setErr)
+        }
+    }
     async function saveWorkflow() {
         try {
             await WorkflowSave(fetch, params.namespace, params[0], handleError, ref)
@@ -371,7 +379,7 @@ function WorkflowExplorer(props) {
         }
     }
 
-    async function discardWorkflow() {
+    async function discardRevision() {
         try{
             await WorkflowDeleteRevision(fetch, params.namespace, params[0], handleError, ref)
             let refs = await WorkflowRefs(fetch, params.namespace, params[0], handleError)
@@ -469,7 +477,7 @@ function WorkflowExplorer(props) {
             </div>
             )
         } else {
-            actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { discardWorkflow() }}>
+            actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { discardRevision() }}>
             <IoTrash /> Delete
         </div>)
             actionRevs.push(
@@ -523,6 +531,7 @@ function WorkflowExplorer(props) {
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
                     <EditorDetails  
+                        discardWorkflow={discardWorkflow}
                         saveWorkflow={saveWorkflow}
                         workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics}
                         editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef}
