@@ -263,6 +263,42 @@ export async function WorkflowDeleteAttributes(fetch, namespace, workflow, attri
     }
 }
 
+export async function WorkflowRoute(fetch, namespace, workflow, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=router`, {
+            method: "GET"
+        })
+        if (resp.ok) {
+            let json = await resp.json()
+            return json
+        } else {
+            await handleError('get workflow router', resp, 'getRouter')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function WorkflowEditRoute(fetch, namespace, workflow, handleError, routes, live) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=edit-router`, {
+            method: "POST",
+            body: JSON.stringify({
+                route: routes,
+                live: live,
+            })
+        })
+        if (resp.ok) {
+            let json = await resp.json()
+            return json
+        } else {
+            await handleError('edit workflow router', resp, 'editRouter')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
 export async function WorkflowRefs(fetch, namespace, workflow, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=refs`,{})

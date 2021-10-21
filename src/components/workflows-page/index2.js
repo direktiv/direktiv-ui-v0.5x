@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline, IoGitCommitSharp, IoAlbumsSharp, IoPricetagSharp, IoClose, IoCheckmark } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline, IoGitCommitSharp, IoAlbumsSharp, IoPricetagSharp, IoClose, IoCheckmark, IoGitNetwork } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -198,6 +198,7 @@ function WorkflowExplorer(props) {
                 // process the data here
                 // pass it to state to be rendered
                 let json = JSON.parse(e.data)
+                console.log(json)
                 switch (json.event) {
                 case "DELETED":
                     for (var i=0; i < funcs.length; i++) {
@@ -231,11 +232,11 @@ function WorkflowExplorer(props) {
                     }
                 }
                 let actFailed = true
-                for ( i=0; i < functionsRef.current.length; i++) {
-                    if (functionsRef.current[i].status === "False") {
-                        actFailed = false
-                    }
-                }
+                // for ( i=0; i < functionsRef.current.length; i++) {
+                //     if (functionsRef.current[i].status === "False") {
+                //         actFailed = false
+                //     }
+                // }
                 x = await checkStartType(wfRefValue.current)
                 if (!x) {
                     actFailed = false
@@ -361,6 +362,10 @@ function WorkflowExplorer(props) {
     async function discardWorkflow() {
         try {
             await WorkflowDiscard(fetch, params.namespace, params[0], handleError, ref)
+            fetchWorkflow()
+            setTimeout(()=>{
+                history.push(`/n/${params.namespace}/explorer/${params[0]}?ref=latest`)
+            }, 200)
         } catch(e) {
             ShowError(e.message, setErr)
         }
@@ -526,13 +531,22 @@ function WorkflowExplorer(props) {
                             </div>,
                             <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "sankey" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("sankey") }}>
                                 <IoPieChartSharp /> Sankey
+                            </div>,
+                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "routing" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("routing") }}>
+                              <IoGitNetwork /> Routing
                             </div>
                         ]}>
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
-                    <EditorDetails  
+                    <EditorDetails 
+                    refs={refs} 
+                    active={workflowInfo.active}
+                        fetch={fetch} namespace={params.namespace} workflow={params[0]} 
                         discardWorkflow={discardWorkflow}
                         saveWorkflow={saveWorkflow}
+                        showError={ShowError}
+                        setErr={setErr}
+                        handleError={handleError}
                         workflowValueOld={workflowValueOld} metricsLoading={metricsLoading} stateMetrics={stateMetrics}
                         editorTab={editorTab} wfRefValue={wfRefValue} functions={functions} editorRef={codemirrorRef}
                         actionErr={actionErr} workflowValue={workflowValue} setWorkflowValue={setWorkflowValue} updateWorkflow={updateWorkflow}
