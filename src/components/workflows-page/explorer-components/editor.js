@@ -63,24 +63,34 @@ export  function WorkflowRouting(props) {
         async function getWfRouter() {
             let json = await WorkflowRoute(fetch, namespace, workflow, handleError)
 
-            let rrs = refs
+            let rrs = []
+            for (var i=0; i < refs.length; i++) {
+                rrs.push(refs[i])
+            }
+            console.log(refs, "REFS")
             let routes = json.routes
 
             // check if ref already exists in routes
             for(var i=0; i < routes.length; i++) {
                 for(var x=0; x < rrs.length; x++) {
-                    if(routes[i].ref === rrs[x].node.name) {
-                        delete rrs[x]
+                    if(rrs[x]){
+                        if(routes[i].ref === rrs[x].node.name) {
+                            delete rrs[x]
+                        }
                     }
+                    
                 }
             }
 
             // add extra refs with weight of 0
             for(var i=0; i < rrs.length; i++) {
-                routes.push({
-                    weight: 0,
-                    ref: rrs[i].node.name,
-                })
+                if (rrs[x]) {
+                    routes.push({
+                        weight: 0,
+                        ref: rrs[i].node.name,
+                    })
+                }
+                
             }
 
             setRoutes(routes)

@@ -54,15 +54,15 @@ export default function Instance() {
     },[fetch, handleError, namespace, input, iid])
 
     // fetch the workflow for that instance
-    const fetchWorkflow = useCallback((id)=>{
+    const fetchWorkflow = useCallback((id, rev)=>{
         async function fetchDetails() {
             setInit(true)
             if(!init) {
                 try {
                     let split = id.split(":")
                     let pathWF = split[0]
-                    let rev = split[1]
-                    console.log(pathWF, rev)
+                    // let rev = split[1]
+                    // console.log(pathWF, rev)
                     let {source} = await Workflow(fetch, params.namespace, pathWF, handleError, rev)
                     let start = await checkStartType(source, setWorkflowErr)
                     setWf(source)
@@ -113,7 +113,7 @@ export default function Instance() {
                 let json = JSON.parse(e.data)
                 json["instance"]["flow"] = json.flow
                 setInstanceDetails(json.instance)
-                fetchWorkflow(json.instance.as)
+                fetchWorkflow(json.instance.as, json.workflow.revision)
                 setDetailsLoad(false)
             }
             eventConnection.onmessage = e => getData(e)
@@ -135,14 +135,20 @@ export default function Instance() {
         }
     },[instanceDetails, isLoading])
 
+    let listElements = []
+    if(instanceDetails.as){
+        let split = instanceDetails.as.split(":")
+        let pathWf = split[0]
+        let rev = split[1]
+        listElements.push(
+            {
+                name: "View Workflow",
+                link: true,
+                path: `/n/${params.namespace}/explorer/${pathWf}?ref=${rev}`
+            }, ...extraLinks
+        )
+    }
 
-    let listElements = [
-        {
-            name: "View Workflow",
-            link: true,
-            path: `/n/${params.namespace}/explorer/${instanceDetails.as}`
-        }, ...extraLinks
-    ]
 
     if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete") {
         if(startType && checkPerm(permissions, "executeWorkflow")) {

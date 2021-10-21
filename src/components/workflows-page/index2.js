@@ -890,7 +890,7 @@ function FileObject(props) {
                 let active = await WorkflowActiveStatus(fetch, namespace, id, handleError)
                 setActive(active)
             } catch(e) {
-                ShowError(`Error: ${e.message}`)
+                ShowError(`Error: ${e.message}`, setErr)
             }
         }
         if(active === null && type === "workflow"){

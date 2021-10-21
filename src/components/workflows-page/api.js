@@ -82,8 +82,13 @@ export async function WorkflowExecute(fetch, namespace, workflow, handleError, j
     if(rev === undefined){
         rev = "latest"
     }
+    let uri = `/namespaces/${namespace}/tree/${workflow}?op=execute&ref=${rev}`
+    // if(rev === "latest") {
+    //     uri = `/namespaces/${namespace}/tree/${workflow}?op=execute`
+    // }
+
     try {
-        let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=execute&ref=${rev}`, {
+        let resp = await fetch(uri, {
             method: "POST",
             body: jsonInput
         })
