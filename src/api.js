@@ -215,6 +215,36 @@ export async function NamespaceSecrets(fetch, namespace, handleError) {
     }
 }
 
+export async function NamespaceConfiguration(fetch, namespace, handleError) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/config`,{})
+        if(resp.ok) {
+            return await resp.json()
+        } else {
+            await handleError('fetch config', resp, 'getConfig')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function SetNamespaceConfiguration(fetch, namespace, handleError, value) {
+    try {
+        let resp = await fetch(`/namespaces/${namespace}/config`, {
+            method: "PATCH",
+            body: value
+        })
+
+        if (resp.ok) {
+            return await resp.json()
+        } else {
+            await handleError('set config', resp, 'setConfig')
+        }
+    } catch (e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
 export async function NamespaceRegistries(fetch, namespace, handleError) {
     try {
         let resp = await fetch(`/functions/namespaces/${namespace}/registries`,{})
