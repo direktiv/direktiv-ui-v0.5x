@@ -38,7 +38,7 @@ function SettingsAction(props) {
             } else {
                 localStorage.setItem("namespace", goto)
                 await fetchNamespaces(false, goto)
-                history.push(`/${goto}`)
+                history.push(`/n/${goto}`)
             }
         } catch (e) {
             setErr(`Error: ${e.message}`)

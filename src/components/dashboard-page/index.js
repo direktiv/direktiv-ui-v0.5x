@@ -58,7 +58,7 @@ function TotalTimeWorkflows(props) {
                     let total = 0
                     for(let i=0; i < json.results.length; i++) {
                         // create a key array for each line
-                        arr.push({name: json.results[i].metric.workflow, value: parseInt(json.results[i].value[1])/1000})
+                        arr.push({name: json.results[i].metric.direktiv_workflow, value: parseInt(json.results[i].value[1])/1000})
                         total += parseInt(json.results[i].value[1])/1000
                     }
 
@@ -260,7 +260,7 @@ function TotalWorkflows(props) {
                         // i think prometheus gives it back as timestamp, value for the value object
                         arr.push(
                             {
-                                name: json.results[i].metric.workflow,
+                                name: json.results[i].metric.direktiv_workflow,
                                 value: parseInt(json.results[i].value[1])
                             }
                         )

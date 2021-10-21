@@ -78,10 +78,16 @@ export async function Namespaces(fetch, handleError, load, val) {
 
                     // Check routes that dont require namespace
                     if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
+                        let ad = false
+                        if (resp.headers.get("x-direktiv-admin")){
+                            if (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true') {
+                                ad = true
+                            }
+                        }
                         return {
                             namespaces: namespaces,
                             namespace: newNamespace,
-                            admin: (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true')
+                            admin: ad
                         }
                     } else if (!exist && newNamespace !== "") {
                         window.location.pathname = `/n/${newNamespace}`
@@ -150,7 +156,7 @@ export async function NamespaceCreate(fetch, handleError, val) {
 
 export async function NamespaceDelete(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/namespaces/${namespace}`,{
+        let resp = await fetch(`/namespaces/${namespace}?recursive=true`,{
             method:"DELETE"
         })
         if(resp.ok) {
