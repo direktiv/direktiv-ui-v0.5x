@@ -67,7 +67,7 @@ export default function Revision() {
                     return
                 }
                 //TODO: Change to workflow watcher
-                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revision&svn=${q.get("function")}&rev=${q.get("rev")}`
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=function-revision&svn=${q.get("function")}&rev=${q.get("rev")}&version=${q.get("vers")}`
                 // x = `/watch/functions/${service}/revisions/${revision}`
             }
             if (service === undefined || revision === undefined) {
@@ -141,7 +141,7 @@ export default function Revision() {
                 if (q.get("function") === null || q.get('rev') === null) {
                     return
                 }
-                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=pods&svn=${q.get("function")}&rev=${q.get("rev")}`
+                x = `/functions/namespaces/${namespace}/tree/${params[0]}?op=pods&svn=${q.get("function")}&rev=${q.get("rev")}&version=${q.get('vers')}`
             }
             if (service === undefined || revision === undefined) {
                 return
