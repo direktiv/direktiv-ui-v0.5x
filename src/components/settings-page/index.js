@@ -1,15 +1,20 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState, useRef } from 'react'
 import Breadcrumbs from '../breadcrumbs'
 import TileTitle from '../tile-title'
 import MainContext from '../../context'
 import PlusCircle from 'react-bootstrap-icons/dist/icons/plus-circle'
 import XCircle from 'react-bootstrap-icons/dist/icons/x-circle'
 import { useHistory } from 'react-router'
-import { IoLockOpen, IoLogoDocker, IoTrash, IoWarningOutline } from 'react-icons/io5'
+import { IoLockOpen, IoLogoDocker, IoSave, IoTrash, IoWarningOutline, IoSettingsSharp } from 'react-icons/io5'
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 import { EnvrionmentContainer } from "../environment-page"
 import LoadingWrapper from "../loading"
-import { NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDelete, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets } from '../../api'
+import { SetNamespaceConfiguration, NamespaceConfiguration, NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDelete, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets } from '../../api'
+import Editor from "../workflow-page/editor"
+
+import YAML2String from 'yaml'
+import YAML from 'js-yaml'
+
 
 
 
@@ -76,18 +81,26 @@ export default function SettingsPage() {
                         <SettingsAction />
                     </div>
                     <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
-                        <div className="container" style={{ flexDirection: "row" }}>
-                            <div className="item-0 shadow-soft rounded tile" style={{ minHeight: "300px" }}>
-                                <TileTitle name="Secrets">
-                                    <IoLockOpen />
-                                </TileTitle>
-                                <Secrets />
+                        <div className="container" style={{ flexDirection: "row", flexWrap: "nowrap" }}>
+                            <div className="container" style={{ flexDirection: "column", flexGrow: 1, flexBasis: "0px" }}>
+                                <div className="item-0 shadow-soft rounded tile" style={{ minHeight: "300px" }}>
+                                    <TileTitle name="Secrets">
+                                        <IoLockOpen />
+                                    </TileTitle>
+                                    <Secrets />
+                                </div>
+                                <div className="item-0 shadow-soft rounded tile" style={{ flexBasis: "unset" }}>
+                                    <TileTitle name="Container Registries">
+                                        <IoLogoDocker />
+                                    </TileTitle>
+                                    <Registries />
+                                </div>
                             </div>
-                            <div className="item-0 shadow-soft rounded tile">
-                                <TileTitle name="Container Registries">
-                                    <IoLogoDocker />
+                            <div className="item-0 shadow-soft rounded tile" style={{ flexBasis: "0px"}}>
+                                <TileTitle name="Configuration">
+                                    <IoSettingsSharp />
                                 </TileTitle>
-                                <Registries />
+                                <Configuration />
                             </div>
                         </div>
                         <EnvrionmentContainer mode={"namespace"} />
@@ -381,5 +394,79 @@ function Registries() {
         </LoadingWrapper >
     )
 }
+
+function Configuration() {
+
+    const { fetch, namespace, handleError, permissions, checkPerm } = useContext(MainContext)
+    const [configuration, setConfiguration] = useState("")
+    const [configurationOld, setConfigurationOld] = useState("")
+    const configurationInput = useRef(configuration)
+    const [err, setErr] = useState("")
+
+    // Loading 
+    const [isLoading, setIsLoading] = useState(true)
+    const [opacity, setOpacity] = useState(null)
+    const [loadingText, setLoadingText] = useState("Loading Configuration")
+
+
+    const fetchR = useCallback(() => {
+        async function fetchData() {
+            try {
+                let config = await NamespaceConfiguration(fetch, namespace, handleError)
+                let configString = YAML2String.stringify(config)
+                setConfiguration(configString)
+                setConfigurationOld(configString)
+            } catch (e) {
+                setErr(e.message)
+            }
+        }
+        return fetchData()
+    }, [fetch, namespace, handleError])
+
+    useEffect(() => {
+        fetchR().finally(() => { setIsLoading(false); setOpacity(30) })
+    }, [fetchR])
+
+    const updateConfig = useCallback(() => {
+        async function updateCfg() {
+            setErr("")
+            try {
+                let jsonConfig = YAML.load(configuration)
+                let config = await SetNamespaceConfiguration(fetch, namespace, handleError, JSON.stringify(jsonConfig))
+                let configString = YAML2String.stringify(config)
+                setConfiguration(configString)
+                setConfigurationOld(configString)
+            } catch (e) {
+                setErr(e.message)
+            }
+        }
+        updateCfg().finally(() => {})
+    }, [fetch, namespace, handleError, configuration])
+
+    let saveButton = (
+        <div className={configurationOld !== configuration ? "editor-footer-button" : "editor-footer-button-disabled"} style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => { updateConfig() }}>
+            <span style={{}} >Save</span>
+            <IoSave style={{ marginLeft: "5px" }} />
+        </div>
+    );
+
+    return (
+        <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", height: "100%", maxHeight: "740px", overflow: "auto", minHeight: "600px" }}>
+                <>
+                {err !== "" ? <div style={{ fontSize: "12px", paddingTop: "3px", paddingBottom: "12px", color: "red" }}>
+                        {err}
+                    </div> : <></>}
+                        <div style={{ width: "100%", height: "100%", position: "relative", top: "-28px" }}>
+                            <div style={{ height: "auto", position: "absolute", left: 0, right: 0, top: "25px", bottom: 0 }}>
+                                <Editor refValSet={configurationInput} setValue={setConfiguration} value={configuration} showFooter={true} saveCallback={()=>{updateConfig()}} readOnly={!checkPerm(permissions, "setNamespaceConfiguration")} actions={checkPerm(permissions, "setNamespaceConfiguration") ? [saveButton] : []}/>
+                            </div>
+                        </div>
+                </>
+            </div>
+        </LoadingWrapper >
+    )
+}
+
 
 
