@@ -11,6 +11,7 @@ import Revision from "../revision"
 import Flowy from "../flowy"
 import Explorer from "../workflows-page/index2"
 import Instance from "../instance-page/index2"
+import Login from "../login"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -34,6 +35,7 @@ export default function Routes(props) {
             <Route exact path="/functions/global/:service/:revision" component={Revision}/>
             <Route exact path="/jq/playground" component={JQPlaygroundPage} />
             <Route exact path="/n/:namespace/i/:id" component={Instance} />
+            <Route exact path="/login" component={Login} />
             <Route exact path="/">
               {
                 namespace !== "" ?

@@ -382,9 +382,10 @@ function Content() {
           method: "GET"
         })
         if(resp.status === 401) {
-          const newAPIKey = prompt("Please Enter APIKey", "");
-          setAPIKey(newAPIKey)
-          localStorage.setItem('apikey', newAPIKey);
+            // history.push("/login")
+        //   const newAPIKey = prompt("Please Enter APIKey", "");
+        //   setAPIKey(newAPIKey)
+        //   localStorage.setItem('apikey', newAPIKey);
         }
       } catch(e) {
         // ignore catch
