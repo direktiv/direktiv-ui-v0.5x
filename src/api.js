@@ -486,7 +486,10 @@ export async function NamespaceBroadcastEvent(fetch, namespace, data, handleErro
     try {
         let resp = await fetch(`/namespaces/${namespace}/broadcast`,{
             method: "POST",
-            body: data
+            body: data,
+            headers: {
+                "content-type": "application/cloudevents+json; charset=UTF-8"
+            }
         })
         if(resp.ok) {
             return true
