@@ -171,7 +171,7 @@ function Secrets() {
 
     return (
         <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
-            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight: "370px", overflow: "auto", minHeight: "300px" }}>
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight: "320px", overflow: "auto", minHeight: "265px", height:"1px" }}>
 
                 {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                     {actionErr}
@@ -191,7 +191,26 @@ function Secrets() {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody>                        {checkPerm(permissions, "createSecret") ?
+                            <tr>
+                                <td style={{ paddingLeft: "10px" }}>
+                                    <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e) => setKey(e.target.value)} />
+                                </td>
+                                <td style={{ paddingRight: "10px" }} colSpan="2">
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        <input type="text" style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
+                                        <div className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
+                                            setLoadingText("Creating Secret")
+                                            setIsLoading(true)
+                                            createSecret().finally(() => { setIsLoading(false)})
+                                        }}>
+                                            <span style={{ flex: "auto" }}>
+                                                <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr> : ""}
                         {
                             err !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                                 {err}
@@ -219,26 +238,7 @@ function Secrets() {
                                         </tr>
                                     )
                                 })}
-                        {checkPerm(permissions, "createSecret") ?
-                            <tr>
-                                <td style={{ paddingLeft: "10px" }}>
-                                    <input style={{ maxWidth: "150px" }} type="text" placeholder="Enter Key.." value={key} onChange={(e) => setKey(e.target.value)} />
-                                </td>
-                                <td style={{ paddingRight: "10px" }} colSpan="2">
-                                    <div style={{ display: "flex", alignItems: "center" }}>
-                                        <input type="text" style={{ maxWidth: "150px" }} placeholder="Enter Value.." value={value} onChange={(e) => setValue(e.target.value)} />
-                                        <div className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
-                                            setLoadingText("Creating Secret")
-                                            setIsLoading(true)
-                                            createSecret().finally(() => { setIsLoading(false)})
-                                        }}>
-                                            <span style={{ flex: "auto" }}>
-                                                <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr> : ""}
+
                     </tbody>
                 </table>
             </div>
@@ -309,7 +309,7 @@ function Registries() {
 
     return (
         <LoadingWrapper isLoading={isLoading} text={loadingText} opacity={opacity}>
-            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight:"370px", overflow:"auto", minHeight:"300px" }}>
+            <div style={{ display: "flex", alignItems: "center", flexDirection: "column", maxHeight: "320px", overflow: "auto", minHeight: "265px", height:"1px"  }}>
         
                 {actionErr !== "" ? <div style={{ fontSize: "12px", paddingTop: "5px", paddingBottom: "5px", color: "red" }}>
                     {actionErr}
@@ -337,7 +337,34 @@ function Registries() {
                     {err}
                     </div>
                 :
-                        registries.map((obj) => {
+                    checkPerm(permissions, "createRegistry") ? 
+
+<tr>
+    <td style={{ paddingLeft: "10px" }}>
+        <input style={{ maxWidth: "150px" }} type="text" onChange={(e) => setName(e.target.value)} value={name} placeholder="Enter URL" />
+    </td>
+    <td>
+        <input style={{ maxWidth: "150px" }} type="text" value={user} onChange={(e) => setUser(e.target.value)} placeholder="Enter User" />
+    </td>
+    <td style={{ paddingRight: "10px" }} colSpan="2">
+        <div style={{ display: "flex", alignItems: "center" }}>
+            <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e) => setToken(e.target.value)} />
+            <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
+                setLoadingText("Creating Registry")
+                setIsLoading(true)
+                createRegistry().finally(() => { setIsLoading(false) })
+                }}>
+                <span style={{ flex: "auto" }}>
+                    <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
+                </span>
+            </div>
+        </div>
+    </td>
+</tr>: ""}
+
+</>
+           
+                        {registries.map((obj) => {
                             return (
                                 <tr key={obj.name}>
                                     <td style={{ paddingLeft: "10px" }}>
@@ -363,31 +390,7 @@ function Registries() {
                                 </tr>
                             )
                         })}
-                            {checkPerm(permissions, "createRegistry") ? 
-
-                        <tr>
-                            <td style={{ paddingLeft: "10px" }}>
-                                <input style={{ maxWidth: "150px" }} type="text" onChange={(e) => setName(e.target.value)} value={name} placeholder="Enter URL" />
-                            </td>
-                            <td>
-                                <input style={{ maxWidth: "150px" }} type="text" value={user} onChange={(e) => setUser(e.target.value)} placeholder="Enter User" />
-                            </td>
-                            <td style={{ paddingRight: "10px" }} colSpan="2">
-                                <div style={{ display: "flex", alignItems: "center" }}>
-                                    <input style={{ maxWidth: "150px" }} type="password" value={token} placeholder="Enter Token" onChange={(e) => setToken(e.target.value)} />
-                                    <div title="Create Registry" className="circle button success" style={{ marginLeft: "10px" }} onClick={() => {
-                                        setLoadingText("Creating Registry")
-                                        setIsLoading(true)
-                                        createRegistry().finally(() => { setIsLoading(false) })
-                                        }}>
-                                        <span style={{ flex: "auto" }}>
-                                            <PlusCircle style={{ fontSize: "12pt", marginBottom: "6px" }} />
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>: ""}
-                        </>
+  
                     </tbody>
                 </table>
             </div>
