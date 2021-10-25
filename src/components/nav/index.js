@@ -97,6 +97,19 @@ export default function Navbar(props) {
         x.classList.toggle('active');
     }
 
+    // purely for login screen purposes
+    if (window.location.pathname === "/login") {
+        return(
+            <div id="nav">  
+                <Link to="/">
+                    <div id="nav-img-holder">
+                        <img src={Logo} alt="main-logo"/>
+                    </div>
+                </Link>
+            </div>
+        )
+    }
+
     return(
         <div id="nav">
             <Link to="/">

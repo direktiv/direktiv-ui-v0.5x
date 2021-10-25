@@ -220,7 +220,6 @@ export default function Flowy() {
     };
 
     const onElementClick = (event, element) => {
-        console.log(event.target, event, element, "TEST")
         if(element.type !== "start"){
             setElementSelected(element)
         }
@@ -458,7 +457,6 @@ export default function Flowy() {
                             function: ActionFunction,
                         }}
                         onClick={(e)=>{
-                            console.log("hello ive been clicked", e)
                             setElementSelected(null)
                         }}
                         onConnect={onConnect}
@@ -599,7 +597,6 @@ function ElementSelected(props) {
                 // this is an edge
                 return <EdgeSelected deleteElement={deleteElement} blocks={blocks} element={element} setBlocks={setBlocks} />
             }
-            console.log("unsupported state should never get hit", element.type)
             return ""
     }
 

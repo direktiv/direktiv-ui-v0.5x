@@ -6,7 +6,6 @@ export default function Details(props) {
 
     const {tab, workflowFuncErr, functions, setTypeOfRequest} = props
     const params = useParams()
-    console.log(params[0], "PARAMS check")
     return(
         <div>
             {tab === "events"?

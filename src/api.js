@@ -22,118 +22,130 @@ export async function Namespaces(fetch, handleError, load, val) {
         let storageNamespace = localStorage.getItem("namespace")
 
         if(resp.ok) {
-            let json = await resp.json() 
+            if(window.location.pathname !== "/login") {
+                let json = await resp.json() 
 
-            // if edges exists means theres namespaces to look at
-            if(json.edges){
-                // if its the first load
-                let exist = false
-                let storageNSFound = false
-                let nsValueFound = false
-                let pathNamespace = window.location.pathname.split("/")[2]
-                
-                if(load) {
-                    // loop through ns and push ns to list. also check if path ns exists
-                    for(let i=0; i < json.edges.length; i++) {
-                        namespaces.push(json.edges[i].node.name)
-                        if(json.edges[i].node.name === pathNamespace){
-                            exist = true
-                            newNamespace = json.edges[i].node.name
-                        }
-
-                        if(val && val !== "" && json.edges[i].node.name === val){
-                            nsValueFound = true
-                        }
-
-                        if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
-                            storageNSFound = true
-                        }
-                    }
-
-                    if (nsValueFound) {
-                        // window.location.pathname = `/n/${val}`
-                        return {
-                            namespaces: namespaces,
-                            namespace: val,
-                            admin: admin
-                        }
-                    }
-
-                    // if ns does not exist, and there is atleast 1 ns in list then set it to first ns
-                    if(!exist && namespaces.length > 0 && !storageNSFound) {
-                        newNamespace = namespaces[0]
-                    } else if (pathNamespace === "" && !storageNSFound) {
-                        // otherwise set it to root
-                        // window.location.pathname = "/"
-                        return {
-                            namespaces: namespaces,
-                            namespace: newNamespace,
-                            admin: admin
-                        }
-                    }
-
-                    if (newNamespace === "" && storageNSFound) {
-                        newNamespace = storageNamespace
-                    }
-
-                    // Check routes that dont require namespace
-                    if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
-                        let ad = false
-                        if (resp.headers.get("x-direktiv-admin")){
-                            if (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true') {
-                                ad = true
+                // if edges exists means theres namespaces to look at
+                if(json.edges){
+                    // if its the first load
+                    let exist = false
+                    let storageNSFound = false
+                    let nsValueFound = false
+                    let pathNamespace = window.location.pathname.split("/")[2]
+                    
+                    if(load) {
+                        // loop through ns and push ns to list. also check if path ns exists
+                        for(let i=0; i < json.edges.length; i++) {
+                            namespaces.push(json.edges[i].node.name)
+                            if(json.edges[i].node.name === pathNamespace){
+                                exist = true
+                                newNamespace = json.edges[i].node.name
+                            }
+    
+                            if(val && val !== "" && json.edges[i].node.name === val){
+                                nsValueFound = true
+                            }
+    
+                            if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
+                                storageNSFound = true
                             }
                         }
+    
+                        if (nsValueFound) {
+                            // window.location.pathname = `/n/${val}`
+                            return {
+                                namespaces: namespaces,
+                                namespace: val,
+                                admin: admin
+                            }
+                        }
+    
+                        // if ns does not exist, and there is atleast 1 ns in list then set it to first ns
+                        if(!exist && namespaces.length > 0 && !storageNSFound) {
+                            newNamespace = namespaces[0]
+                        } else if (pathNamespace === "" && !storageNSFound) {
+                            // otherwise set it to root
+                            // window.location.pathname = "/"
+                            return {
+                                namespaces: namespaces,
+                                namespace: newNamespace,
+                                admin: admin
+                            }
+                        }
+    
+                        if (newNamespace === "" && storageNSFound) {
+                            newNamespace = storageNamespace
+                        }
+    
+                        // Check routes that dont require namespace
+                        if (window.location.pathname === "/jq/playground" || window.location.pathname.startsWith("/functions/global")) {
+                            let ad = false
+                            if (resp.headers.get("x-direktiv-admin")){
+                                if (resp.headers.get("x-direktiv-admin").toLowerCase() === 'true') {
+                                    ad = true
+                                }
+                            }
+                            return {
+                                namespaces: namespaces,
+                                namespace: newNamespace,
+                                admin: ad
+                            }
+                        } else if (!exist && newNamespace !== "") {
+                            window.location.pathname = `/n/${newNamespace}`
+                            return
+                        }
+    
+                        // Namespace exists 
                         return {
                             namespaces: namespaces,
                             namespace: newNamespace,
-                            admin: ad
+                            admin: admin
                         }
-                    } else if (!exist && newNamespace !== "") {
-                        window.location.pathname = `/n/${newNamespace}`
-                        return
-                    }
-
-                    // Namespace exists 
-                    return {
-                        namespaces: namespaces,
-                        namespace: newNamespace,
-                        admin: admin
-                    }
-                } else {
-                    // loop through ns and push ns to list. also check if path ns exists
-                    for(let i=0; i < json.edges.length; i++) {
-                        namespaces.push(json.edges[i].node.name)
-                        if(json.edges[i].node.name === pathNamespace){
-                            exist = true
+                    } else {
+                        // loop through ns and push ns to list. also check if path ns exists
+                        for(let i=0; i < json.edges.length; i++) {
+                            namespaces.push(json.edges[i].node.name)
+                            if(json.edges[i].node.name === pathNamespace){
+                                exist = true
+                            }
+    
+                            if(val && val !== "" && json.edges[i].node.name === val){
+                                nsValueFound = true
+                            }
+    
+                            if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
+                                storageNSFound = true
+                            }
                         }
-
-                        if(val && val !== "" && json.edges[i].node.name === val){
-                            nsValueFound = true
+    
+                        if (nsValueFound) {
+                            newNamespace = val
+                        } else if (exist) {
+                            newNamespace = pathNamespace
+                        } else if (storageNSFound) {
+                            newNamespace = storageNamespace
                         }
-
-                        if(storageNamespace !== undefined && storageNamespace !== "" && json.edges[i].node.name === storageNamespace){
-                            storageNSFound = true
+    
+                        return {
+                            namespaces: namespaces,
+                            namespace: newNamespace,
+                            admin: admin
                         }
-                    }
-
-                    if (nsValueFound) {
-                        newNamespace = val
-                    } else if (exist) {
-                        newNamespace = pathNamespace
-                    } else if (storageNSFound) {
-                        newNamespace = storageNamespace
-                    }
-
-                    return {
-                        namespaces: namespaces,
-                        namespace: newNamespace,
-                        admin: admin
                     }
                 }
             }
+            
         } else {
-            await handleError('fetching namespaces', resp, "listNamespaces")
+            if (resp.status === 401) {
+                let text = await resp.json()
+                if(localStorage.getItem("apikey")) {
+                    window.location.href = `/login?err=${text.message}`
+                } else {
+                    window.location.href = `/login`
+                }
+            } else {
+                await handleError('fetching namespaces', resp, "listNamespaces")
+            }
         }
     } catch(e) {
         throw new Error(`${e.message}`)

@@ -63,7 +63,6 @@ let WorkflowBuilderButton = (props) => {
     const {path, namespace} = props
     return (
         <div className="editor-footer-button"   style={{ padding: "0 10px 0 10px", display: "flex", alignItems: "center", userSelect: "none" }} onClick={() => { 
-            console.log(path, "PATH FOR WORKFLOW?")
             history.push(`/n/${namespace}/flowy/${path}`)
          }}>
             <span style={{}} >Workflow Builder</span>

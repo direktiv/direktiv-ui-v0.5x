@@ -11,17 +11,18 @@ import Revision from "../revision"
 import Flowy from "../flowy"
 import Explorer from "../workflows-page/index2"
 import Instance from "../instance-page/index2"
+import Login from "../login"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
     const location = useLocation()
     const history = useHistory()
 
-    if(namespaces === null) {
+    if(namespaces === null && location.pathname !== "/login") {
       return ""
     }
 
-    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/functions/global") {
+    if(location.pathname !== "/login" && namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/functions/global") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
         history.push("/")
     } 
@@ -34,6 +35,7 @@ export default function Routes(props) {
             <Route exact path="/functions/global/:service/:revision" component={Revision}/>
             <Route exact path="/jq/playground" component={JQPlaygroundPage} />
             <Route exact path="/n/:namespace/i/:id" component={Instance} />
+            <Route exact path="/login" component={Login} />
             <Route exact path="/">
               {
                 namespace !== "" ?
