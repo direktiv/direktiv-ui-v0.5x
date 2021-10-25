@@ -18,11 +18,11 @@ export default function Routes(props) {
     const location = useLocation()
     const history = useHistory()
 
-    if(namespaces === null) {
+    if(namespaces === null && location.pathname !== "/login") {
       return ""
     }
 
-    if(namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/functions/global") {
+    if(location.pathname !== "/login" && namespace === "" && namespaces.length === 0 && location.pathname !== "/" && location.pathname !== "/jq/playground" && location.pathname !== "/functions/global") {
         // there is no namespaces handle if they get sent a link when they have access to no namespaces or can get a namespace but its in the path
         history.push("/")
     } 

@@ -340,22 +340,30 @@ function Content() {
 
 
   const sseGen = useCallback((path, opts) => {
-    if (!opts.headers) {
-        opts.headers = { Authorization: `apikey ${apiKey}` }
-    } else {
-        opts.headers =  {...opts.headers, Authorization: `apikey ${apiKey}`}
+    let apikey = localStorage.getItem("apikey")
+    
+    if (apikey !== null) {
+        if (!opts.headers) {
+            opts.headers = { apikey: `${apikey}` }
+        } else {
+            opts.headers["apikey"]  = `${apikey}`
+        }
     }
+    
     return new EventSourcePolyfill(`${context.SERVER_BIND}${path}`, opts)
-  },[context.SERVER_BIND, apiKey])
+  },[context.SERVER_BIND])
 
   const netch = useCallback((path, opts) => {
-    if (!opts.headers) {
-      opts.headers = { Authorization: `apikey ${apiKey}` }
-    } else {
-      opts.headers =  {...opts.headers, Authorization: `apikey ${apiKey}`}
+    let apikey = localStorage.getItem("apikey")
+    if (apikey !== null) {
+        if (!opts.headers) {
+            opts.headers = { apikey: `${apikey}` }
+          } else {
+            opts.headers["apikey"]  = `${apikey}`
+          }
     }
     return fetch(`${context.SERVER_BIND}${path}`, opts);
-  }, [context.SERVER_BIND, apiKey])
+  }, [context.SERVER_BIND])
 
 
   const fetchNamespaces = useCallback((loaded, val) => {
@@ -363,9 +371,11 @@ function Content() {
       setLoad(true)
       try {
         let namespacesObj = await Namespaces(netch, HandleError, loaded, val)
-        setLoad(false)
-        setNamespace(namespacesObj.namespace)
-        setNamespaces(namespacesObj.namespaces)
+        if(namespacesObj) {
+            setLoad(false)
+            setNamespace(namespacesObj.namespace)
+            setNamespaces(namespacesObj.namespaces)    
+        }
       } catch (e) {
         sendNotification("Error:", e.message, 0)
         setLoad(false)
@@ -374,46 +384,53 @@ function Content() {
     fd()
   }, [netch])
 
+
+
   // Check if api requires apikey by doing a simple namespace request
-  const checkAuth = useCallback(()=>{
-    async function fd() {
-      try {
-        let resp = await netch(`/namespaces`, {
-          method: "GET"
-        })
-        if(resp.status === 401) {
-            // history.push("/login")
-        //   const newAPIKey = prompt("Please Enter APIKey", "");
-        //   setAPIKey(newAPIKey)
-        //   localStorage.setItem('apikey', newAPIKey);
-        }
-      } catch(e) {
-        // ignore catch
-      }
-    }
-    return fd()
-  },[netch])
+//   const checkAuth = useCallback(()=>{
+//     async function fd() {
+//       try {
+//         let resp = await netch(`/namespaces`, {
+//           method: "GET"
+//         })
+//         if(resp.status === 401) {
+//         //   window.location = "/login"
+//             // history.push("/login")
+//         //   const newAPIKey = prompt("Please Enter APIKey", "");
+//         //   setAPIKey(newAPIKey)
+//         //   localStorage.setItem('apikey', newAPIKey);
+//         }
+//       } catch(e) {
+//         // ignore catch
+//       }
+//     }
+//     return fd()
+//   },[netch])
 
   // if namespaces is empty and keycloak has been initialized do things
   useEffect(() => {
-    if (!initialized){
-      return
-    }
-
-    if (namespaces === null) {
+    if (namespaces === null && window.location.pathname !== "/login") {
       fetchNamespaces(true)
+      setAPIKey(localStorage.getItem("apikey"))
     }
   }, [namespaces, fetchNamespaces, initialized])
 
-  useEffect(()=> {
-    if (!initialized){
-      checkAuth().finally(()=>{
-        setInitialized(true)
-      })
-    }
-  }, [checkAuth, initialized])
-
-
+//   useEffect(()=> {
+//     if (!initialized){
+//       checkAuth().finally(()=>{
+//         setInitialized(true)
+//       })
+//     }
+//   }, [checkAuth, initialized])
+  let footer = null 
+  if (apiKey !== null) {
+    footer = <div onClick={()=>{
+        localStorage.setItem("apikey", null)
+        window.location.pathname = "/login"
+    }} id="nav-user-holder" style={{ paddingBottom: "40px", fontSize:"12pt" }}>
+        Logout
+    </div>
+  }
   return (
 
     <MainContext.Provider value={{
@@ -439,8 +456,8 @@ function Content() {
         <div id="content" className="nav-panel">
             <Router>
             <div id="nav-panel">
-                {namespaces !== null ?
-                <Navbar fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace} />
+                {namespaces !== null || window.location.pathname === "/login" ?
+                <Navbar footer={footer} fetchNamespaces={fetchNamespaces} namespaces={namespaces} setNamespaces={setNamespaces} namespace={namespace} setNamespace={setNamespace} />
             :""}
                 </div>
             <div id="main-panel">
