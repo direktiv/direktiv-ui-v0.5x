@@ -406,7 +406,7 @@ function Configuration() {
     // Loading 
     const [isLoading, setIsLoading] = useState(true)
     const [opacity, setOpacity] = useState(null)
-    const [loadingText, setLoadingText] = useState("Loading Configuration")
+    const [loadingText, ] = useState("Loading Configuration")
 
 
     const fetchR = useCallback(() => {

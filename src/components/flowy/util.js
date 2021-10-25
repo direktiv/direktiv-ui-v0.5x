@@ -282,7 +282,7 @@ export function ActionFunction(props) {
 }
 
 export function SchemaNode(props) {
-    const {data, id} = props
+    const {data} = props
     return(
         <div key={`function-${randomWords()}`} className="state" style={{width:"80px", height:"30px"}}>
         <div style={{display:"flex", padding:"1px", gap:"3px", alignItems:"center", fontSize:"6pt", textAlign:"left", borderBottom: "solid 1px rgba(0, 0, 0, 0.1)"}}> 

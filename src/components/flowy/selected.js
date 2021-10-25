@@ -258,7 +258,7 @@ export function EventAndXorSelected(props) {
                     })
                 }
             } else {
-                if(element.data.type == "eventXor") {
+                if(element.data.type === "eventXor") {
                     evs.push({
                         name: `event-${events.length}`,
                         value: YAML2String.stringify({
@@ -355,7 +355,7 @@ export function EventAndXorSelected(props) {
                     }}  style={{marginRight:"3px"}} /> : ""}
                                 <input type="submit" value="Add" onClick={()=>{
                         let acs = events
-                        if(element.data.type == "eventXor") {
+                        if(element.data.type === "eventXor") {
                             acs.push({
                                 name: `event-${events.length}`,
                                 value: YAML2String.stringify({

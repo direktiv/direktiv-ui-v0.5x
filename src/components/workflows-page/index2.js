@@ -14,7 +14,6 @@ import Details from "./explorer-components/details";
 import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
-import YAML from 'js-yaml'
 
 import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
@@ -772,7 +771,7 @@ function FileObject(props) {
 
     const [active, setActive] = useState(null)
     const [rename, setRename] = useState(false)
-    const [rname, setRName] = useState(name)
+    const [rname, setRName] = useState(id)
 
     useEffect(()=>{
         async function checkActive() {
@@ -810,7 +809,11 @@ function FileObject(props) {
 
     async function renameObject() {
         try {
-            await RenameNode(fetch, namespace, path, name, rname, handleError)
+            let success = await RenameNode(fetch, namespace, path, name, rname, handleError)
+            if(success) {
+                fetchData()
+                setRename(false)
+            }
         } catch(e) {
             ShowError(`Error: ${e.message}`, setErr)
         }
@@ -846,10 +849,7 @@ function FileObject(props) {
                 {name}
             </div>}
             <div style={{display:"flex", gap:"10px"}}>
-                {
-                    type === "workflow" ? 
-                    <>
-                        <div title="Rename ">
+            <div title="Rename ">
                             <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
                                 setRename(true)
                                 setTimeout(()=>{
@@ -863,6 +863,9 @@ function FileObject(props) {
                                 </span>
                             </div>
                         </div>
+                {
+                    type === "workflow" ? 
+                    <>
                         {checkPerm(permissions, "toggleWorkflow") ?
                         <>
                             {active ?
