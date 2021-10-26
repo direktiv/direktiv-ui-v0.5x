@@ -5,7 +5,7 @@ export async function GetVersions(fetch, handleError) {
             let json = await resp.json()
             return json
         } else {
-            await handleError('fetching namespaces', resp, "listNamespaces")
+            await handleError('fetch versions', resp, "version")
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -247,7 +247,7 @@ export async function NamespaceConfiguration(fetch, namespace, handleError) {
         if(resp.ok) {
             return await resp.json()
         } else {
-            await handleError('fetch config', resp, 'getConfig')
+            await handleError('fetch config', resp, 'getNamespaceConfiguration')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -264,7 +264,7 @@ export async function SetNamespaceConfiguration(fetch, namespace, handleError, v
         if (resp.ok) {
             return await resp.json()
         } else {
-            await handleError('set config', resp, 'setConfig')
+            await handleError('set config', resp, 'setNamespaceConfiguration')
         }
     } catch (e) {
         throw new Error(`${e.message}`)
