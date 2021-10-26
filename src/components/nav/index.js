@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Logo from '../../img/direktiv.svg'
 
 
@@ -11,7 +11,7 @@ import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
 import { IoBuildSharp,   IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp,  IoTerminalSharp } from 'react-icons/io5'
-import { NamespaceCreate } from '../../api'
+import { GetVersions, NamespaceCreate } from '../../api'
 
 export default function Navbar(props) {
 
@@ -116,6 +116,7 @@ export default function Navbar(props) {
             <div id="nav-img-holder">
                 <img src={Logo} alt="main-logo"/>
             </div>
+
             </Link>
             <div className="divider" style={{ fontSize: "11pt", lineHeight: "24px" }}>
                 <ul id={"namespaces-ul"} style={{ margin: "0px" }}>
@@ -413,6 +414,30 @@ export default function Navbar(props) {
                 </div>    :""}  
             </div>
             {footer ? footer : "" }
+            {process.env.REACT_APP_VERSION ? <Version handleError={handleError} fetch={fetch} /> : ""}
         </div>
+    )
+}
+
+export function Version(props) {
+    const {fetch, handleError} = props
+    const [versions, setVersions] = useState(null)
+
+    useEffect(()=>{
+        async function get() {
+            try {
+                let results = await GetVersions(fetch, handleError)
+                setVersions(JSON.stringify(results, null, 2))
+            } catch(e) {
+                console.log(e)
+            }
+        }   
+        if(versions === null) {
+            get()
+        }
+    },[])
+
+    return(
+        <p title={versions} style={{fontSize:"10pt", cursor: "pointer"}}>{process.env.REACT_APP_VERSION}</p>
     )
 }

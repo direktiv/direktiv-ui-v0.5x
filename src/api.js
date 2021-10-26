@@ -1,3 +1,17 @@
+export async function GetVersions(fetch, handleError) {
+    try {
+        let resp = await fetch(`/version`,{})
+        if (resp.ok) {
+            let json = await resp.json()
+            return json
+        } else {
+            await handleError('fetching namespaces', resp, "listNamespaces")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
 //  val is a optional value of a namespace. If provided namespaces will be compared to val.
 //  This compareison has high proiority than path, and storage namespace comparison
 //  Comparison Priority: val -> path -> storage
