@@ -1,3 +1,17 @@
+export async function GetVersions(fetch, handleError) {
+    try {
+        let resp = await fetch(`/version`,{})
+        if (resp.ok) {
+            let json = await resp.json()
+            return json
+        } else {
+            await handleError('fetch versions', resp, "version")
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
 //  val is a optional value of a namespace. If provided namespaces will be compared to val.
 //  This compareison has high proiority than path, and storage namespace comparison
 //  Comparison Priority: val -> path -> storage
@@ -233,7 +247,7 @@ export async function NamespaceConfiguration(fetch, namespace, handleError) {
         if(resp.ok) {
             return await resp.json()
         } else {
-            await handleError('fetch config', resp, 'getConfig')
+            await handleError('fetch config', resp, 'getNamespaceConfiguration')
         }
     } catch(e) {
         throw new Error(`${e.message}`)
@@ -250,7 +264,7 @@ export async function SetNamespaceConfiguration(fetch, namespace, handleError, v
         if (resp.ok) {
             return await resp.json()
         } else {
-            await handleError('set config', resp, 'setConfig')
+            await handleError('set config', resp, 'setNamespaceConfiguration')
         }
     } catch (e) {
         throw new Error(`${e.message}`)
