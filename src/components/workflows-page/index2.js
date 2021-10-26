@@ -14,12 +14,11 @@ import Details from "./explorer-components/details";
 import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
-import YAML from 'js-yaml'
 
 import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
-import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
+import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree, RenameNode } from "../../api";
 import Attribute from "./attributes";
 import { NoResults, validateAgainstNameRegex } from "../../util-funcs";
 
@@ -771,6 +770,8 @@ function FileObject(props) {
     const history = useHistory()
 
     const [active, setActive] = useState(null)
+    const [rename, setRename] = useState(false)
+    const [rname, setRName] = useState(id)
 
     useEffect(()=>{
         async function checkActive() {
@@ -806,6 +807,18 @@ function FileObject(props) {
         }
     }
 
+    async function renameObject() {
+        try {
+            let success = await RenameNode(fetch, namespace, path, name, rname, handleError)
+            if(success) {
+                fetchData()
+                setRename(false)
+            }
+        } catch(e) {
+            ShowError(`Error: ${e.message}`, setErr)
+        }
+    }
+
     return(
         <li onClick={(ev)=>{
             ev.preventDefault()
@@ -821,10 +834,35 @@ function FileObject(props) {
                     <IoFolderOutline />
                 }
             </div>
+            {rename ? <div style={{flex: 1, fontSize:"11pt"}}>
+                <input onKeyPress={(e)=>{
+                    console.log(e)
+                    if(e.key === "Enter") {
+                        renameObject()
+                    }
+                }} onClick={(e)=>{
+                        e.preventDefault();
+                        e.stopPropagation();
+                }} type="text" id={name} value={rname} onChange={(e)=>setRName(e.target.value)}/>
+            </div> :
             <div style={{flex: 1, fontSize:"11pt"}}>
                 {name}
-            </div>
+            </div>}
             <div style={{display:"flex", gap:"10px"}}>
+            <div title="Rename ">
+                            <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {
+                                setRename(true)
+                                setTimeout(()=>{
+                                    document.getElementById(name).focus()
+                                },100)
+                                ev.preventDefault();
+                                ev.stopPropagation();
+                            }}>
+                                <span style={{fontWeight: "bold", marginTop:"6px"}}>
+                                    <IoPencil />
+                                </span>
+                            </div>
+                        </div>
                 {
                     type === "workflow" ? 
                     <>
@@ -852,6 +890,7 @@ function FileObject(props) {
                                 </div>
                             }
                         </>: ""}
+
                         {checkPerm(permissions, "getWorkflow") ?
                         <div title="Workflow Variables">
                             <div className="button circle" style={{display: "flex", justifyContent: "center", color: "inherit", textDecoration: "inherit"}}  onClick={(ev) => {

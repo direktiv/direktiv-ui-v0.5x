@@ -494,6 +494,26 @@ export async function NamespaceDeleteNode(fetch, namespace, path, name, handleEr
     }
 }
 
+export async function RenameNode(fetch, namespace, path, oname, nname, handleError) {
+    try {
+        let uriPath = `/namespaces/${namespace}/tree`
+        if(path) {
+            uriPath += `/${path}`
+        }
+        let resp = await fetch(`${uriPath}/${oname}?op=rename-node`,{
+            method: "POST",
+            body: JSON.stringify({new: nname})
+        })
+        if(resp.ok) {
+            return true
+        } else {
+            await handleError('rename node', resp, "renameNode")
+        }
+    } catch(e) {
+        throw new Error(e.message)
+    }
+}
+
 export async function NamespaceBroadcastEvent(fetch, namespace, data, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/broadcast`,{

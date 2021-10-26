@@ -277,7 +277,7 @@ export default function Flowy() {
             } catch (e) {
                 let y = YAML.load(wf)
                 let stateIndex = parseInt(e.message.match(/(?<=\[).+?(?=\])/)[0])
-                let errMessage = e.message.match(/(?<=\]:\ )[\w\s]+/)
+                let errMessage = e.message.match(/(?<=\]: )[\w\s]+/)
                 let id = y.states[stateIndex].id
                 ShowErr(`Workflow creation failed: state '${id}': ${errMessage}`, setErr)
             }

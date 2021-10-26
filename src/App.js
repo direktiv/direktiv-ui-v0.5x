@@ -335,7 +335,6 @@ function Content() {
   const [namespace, setNamespace] = useState("")
   const [load, setLoad] = useState(false)
   const [namespaces, setNamespaces] = useState(null)
-  const [initialized, setInitialized] = useState(false)
   const [apiKey, setAPIKey] = useState(localStorage.getItem('apikey'))
 
 
@@ -413,7 +412,7 @@ function Content() {
       fetchNamespaces(true)
       setAPIKey(localStorage.getItem("apikey"))
     }
-  }, [namespaces, fetchNamespaces, initialized])
+  }, [namespaces, fetchNamespaces])
 
 //   useEffect(()=> {
 //     if (!initialized){
