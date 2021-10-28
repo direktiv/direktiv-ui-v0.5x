@@ -233,7 +233,7 @@ function End(props) {
 
 
 function WorkflowDiagram(props) {
-    const { elements, functions,params, metrics } = props
+    const { elements, functions,params, metrics, disabled } = props
     const funcRef = useRef() 
     const { fitView } = useZoomPanHelper();
     funcRef.current = functions
@@ -463,11 +463,18 @@ function WorkflowDiagram(props) {
     },[params.namespace, metrics])
 
     return(
-        <ReactFlow elements={elements} nodeTypes={{
-            state: State,
-            start: Start,
-            end: End
-        }} 
+        <ReactFlow 
+            elements={elements} 
+            nodeTypes={{
+                state: State,
+                start: Start,
+                end: End
+            }} 
+            nodesDraggable={disabled}
+            nodesConnectable={disabled}
+            elementsSelectable={disabled}
+            paneMoveable={disabled}
+            
         >
             <MiniMap 
                 nodeColor={()=>{
@@ -479,7 +486,7 @@ function WorkflowDiagram(props) {
 }
 
 export default function Diagram(props) {
-    const {value, functions, flow, status, metrics} = props
+    const {value, functions, flow, status, metrics, disabled} = props
     const params = useParams()
 
     const [elements, setElements] = useState([])
@@ -541,7 +548,7 @@ export default function Diagram(props) {
     return(
         <div style={{height:"100%", width:"100%", minHeight:"300px"}}>
             <ReactFlowProvider>
-                    <WorkflowDiagram metrics={metrics} params={params} functions={functions} elements={elements} />
+                    <WorkflowDiagram disabled={disabled} metrics={metrics} params={params} functions={functions} elements={elements} />
             </ReactFlowProvider>
         </div>
 

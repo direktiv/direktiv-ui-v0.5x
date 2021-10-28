@@ -18,6 +18,7 @@ import InstanceInputOutput from './instance-input-output'
 import { InstanceCancel, InstanceInput } from './api'
 import Interactions from '../workflows-page/interactions'
 import Modal from 'react-modal';
+import { noop } from '../workflows-page/templates'
 
 
 export default function Instance() {
@@ -42,8 +43,8 @@ export default function Instance() {
     const params = useParams()
     const history = useHistory()
 
-
-
+    const [workflowDets, setWorkflowDets] = useState(null)
+    const [unableToRerun, setUnableToRerun] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
 
     function toggleModal() {
@@ -64,17 +65,22 @@ export default function Instance() {
         }
     },[fetch, handleError, namespace, input, iid])
     // fetch the workflow for that instance
-    const fetchWorkflow = useCallback((id)=>{
+    const fetchWorkflow = useCallback((workflow, revision)=>{
         async function fetchDetails() {
             setInit(true)
+
             if(!init) {
-                try {
-                    let {source} = await Workflow(fetch, params.namespace, id, handleError)
-                    let start = await checkStartType(source, setWorkflowErr)
-                    setWf(source)
-                    setStartType(start)
-                } catch(e) {
-                    setWorkflowErr(`${e.message}`)
+                if(workflow === "" && revision === "") {
+                    setUnableToRerun(true)
+                } else {
+                    try {
+                        let {source} = await Workflow(fetch, params.namespace, workflow, handleError)
+                        let start = await checkStartType(source, setWorkflowErr)
+                        setWf(source)
+                        setStartType(start)
+                    } catch(e) {
+                        setWorkflowErr(`${e.message}`)
+                    }
                 }
             }
         }
@@ -117,9 +123,12 @@ export default function Instance() {
                     return
                 }
                 let json = JSON.parse(e.data)
+                console.log(json)
                 json["instance"]["flow"] = json.flow
+
                 setInstanceDetails(json.instance)
-                fetchWorkflow(json.instance.as)
+                setWorkflowDets(json.workflow)
+                fetchWorkflow(json.workflow.name, json.workflow.revision)
                 setDetailsLoad(false)
             }
             eventConnection.onmessage = e => getData(e)
@@ -144,11 +153,6 @@ export default function Instance() {
 
     let listElements = [
         {
-            name: "View Workflow",
-            link: true,
-            path: `/n/${params.namespace}/explorer/${instanceDetails.as}`
-        },
-        {
             name: "API Interactions",
             func: () => {
                 toggleModal()
@@ -156,28 +160,38 @@ export default function Instance() {
         }, ...extraLinks
     ]
 
+    if (!unableToRerun) {
+        listElements.push(        {
+            name: "View Workflow",
+            link: true,
+            path: `/n/${params.namespace}/explorer/${instanceDetails.as}`
+        },)
+    }
+
     if (instanceDetails.status === "failed" || instanceDetails.status === "cancelled" || instanceDetails.status === "crashed" || instanceDetails.status === "complete") {
         if(startType && checkPerm(permissions, "executeWorkflow")) {
-            listElements.push(
-                {
-                    name: "Rerun Workflow",
-                    func: async ()=>{
-                        try {
-                            let id = await WorkflowExecute(fetch, namespace, instanceDetails.as, handleError, input)
-                            if(document.getElementById("logs-test")){
-                                document.getElementById("logs-test").innerHTML = ""
+            if(!unableToRerun){
+                listElements.push(
+                    {
+                        name: "Rerun Workflow",
+                        func: async ()=>{
+                            try {
+                                let id = await WorkflowExecute(fetch, namespace, instanceDetails.as, handleError, input)
+                                if(document.getElementById("logs-test")){
+                                    document.getElementById("logs-test").innerHTML = ""
+                                }
+                                instanceSource.close()
+                                
+                                // Reset to null to trigger getData again for new instanceDetails
+                                setInstanceSource(null)
+                                history.push(`/n/${namespace}/i/${id}`)
+                            } catch(e) {
+                                setActionErr(e.message)
                             }
-                            instanceSource.close()
-                            
-                            // Reset to null to trigger getData again for new instanceDetails
-                            setInstanceSource(null)
-                            history.push(`/n/${namespace}/i/${id}`)
-                        } catch(e) {
-                            setActionErr(e.message)
                         }
                     }
-                }
-            )
+                )
+            }
         }
     } else if(checkPerm(permissions, "cancelInstance")) {
         listElements.push(
@@ -193,6 +207,7 @@ export default function Instance() {
           }
         )
     }
+    console.log(wf, "WORKFLOW CHECK")
 
     return(
         <LoadingWrapper isLoading={isLoading} text={`Loading Instance Details`}>
@@ -210,6 +225,20 @@ export default function Instance() {
                                     <Breadcrumbs instanceId={params.id} />
                                 </div>
                         </div>
+                        {unableToRerun ? 
+                        <div id="instance-status-tile" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt",  maxHeight: "36px", background: "#ffc107" }}>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <span id="instance-status-text" style={{ marginRight: "10px" }}>
+                                    Workflow does not exist anymore
+                                </span>
+                            </div>
+                        </div> : <div id="instance-status-tile" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt",  maxHeight: "36px" }}>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <span id="instance-status-text" style={{ marginRight: "10px" }}>
+                                    Workflow: {workflowDets ? workflowDets.name:""}:{workflowDets ? workflowDets.revision: ""}
+                                </span>
+                            </div>
+                        </div> }
                         <div id="instance-status-tile" className="shadow-soft rounded tile fit-content" style={{ fontSize: "11pt", width: "130px", maxHeight: "36px" }}>
                             <div style={{ display: "flex", alignItems: "center" }}>
                                 <span id="instance-status-text" style={{ marginRight: "10px" }}>
@@ -266,16 +295,20 @@ export default function Instance() {
                                     {detailsErr !== "" ? detailsErr : workflowErr}
                                 </div>
                             :
-                                <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }}>
+                                <div style={{ display: "flex", width: "100%", height: "100%", position: "relative", top: "-28px" }} className={unableToRerun ? "blur" : ""}>
                                     <div style={{ flex: "auto" }}>
                                             <>
-                                            {instanceDetails.flow && wf ? 
-                                                <Diagram metrics={stateMetrics} flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
-                                                :
-                                                <div style={{ marginTop:"28px", fontSize:"12pt"}}>
-                                                    Unable to fetch workflow have you renamed the workflow recently?
-                                                </div>
-                                            }
+                                                {unableToRerun ?
+                                                <Diagram disabled={false} metrics={[]} value={noop} /> :
+                                                <>
+                                                    {instanceDetails.flow && wf ? 
+                                                        <Diagram disabled={true} metrics={stateMetrics} flow={instanceDetails.flow} value={wf} status={instanceDetails.status} />   
+                                                        :
+                                                        <div style={{ marginTop:"28px", fontSize:"12pt"}}>
+                                                            Unable to fetch workflow have you renamed the workflow recently?
+                                                        </div>
+                                                    }
+                                                </>}
                                             </>
                                     </div>
                                 </div>
