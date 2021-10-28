@@ -1,5 +1,6 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline, IoGitCommitSharp, IoAlbumsSharp, IoPricetagSharp, IoClose, IoCheckmark, IoGitNetwork } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline,  IoAlbumsSharp, IoPricetagSharp, IoClose, IoCheckmark, IoGitNetwork } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
+import Slider, { SliderTooltip, Handle } from 'rc-slider';
 
 import TileTitle from '../tile-title'
 import Breadcrumbs from '../breadcrumbs'
@@ -15,7 +16,7 @@ import EditorDetails from "./explorer-components/editor";
 import ExportWorkflow from '../workflow-page/export'
 import Modal from 'react-modal';
 
-import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate, WorkflowRefs, WorkflowSave, WorkflowTag, WorkflowDiscard, WorkflowDeleteRevision } from "./api";
+import { checkStartType, Workflow, WorkflowStateMillisecondMetrics, WorkflowActiveStatus, WorkflowExecute, WorkflowSetActive, WorkflowSetLogToEvent, WorkflowUpdate, WorkflowRefs, WorkflowSave, WorkflowTag, WorkflowDiscard, WorkflowDeleteRevision, WorkflowEditRoute, WorkflowRoute } from "./api";
 import ButtonWithDropDownCmp from "../instance-page/actions-btn";
 import { action, consumeEvent, delay, error, eventAnd, eventXor, foreach, generateEvent, generateSolveEvent, getAndSet, noop, parallel, validate, zwitch } from "./templates";
 import { NamespaceBroadcastEvent, NamespaceCreateNode, NamespaceDeleteNode, NamespaceTree } from "../../api";
@@ -134,7 +135,8 @@ function WorkflowExplorer(props) {
     const [attributes, setAttributes] = useState([])
 
     const codemirrorRef = useRef()
-    const workflowRef = useRef()
+
+    const [refsTab, setRefsTab] = useState("default")
 
 
     console.log(q.get("ref"))
@@ -304,7 +306,7 @@ function WorkflowExplorer(props) {
             fetchWorkflow()
             setWfLoad(false)
         }
-    },[fetchWorkflow, wfLoad])
+    },[fetchWorkflow, wfLoad, q, ref])
 
     // fetch metrics
     useEffect(()=>{
@@ -325,7 +327,7 @@ function WorkflowExplorer(props) {
             getStateMetrics()
             setMetricsLoading(false)
         }
-    },[metricsLoading, fetch, handleError, namespace, params, ref])
+    },[metricsLoading, fetch, handleError, namespace, params, ref, q])
     
 
     async function updateLogEvent() {
@@ -482,16 +484,34 @@ function WorkflowExplorer(props) {
             </div>
             )
         } else {
-            actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { discardRevision() }}>
-            <IoTrash /> Delete
-        </div>)
-            actionRevs.push(
-                <div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { setTag(!tag) }}>
-                <IoPricetagSharp /> Tag
-            </div>
-            )
+            if(refsTab !== "routing") {
+                actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { discardRevision() }}>
+                <IoTrash /> Delete
+            </div>)
+                actionRevs.push(
+                    <div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { setTag(!tag) }}>
+                    <IoPricetagSharp /> Tag
+                </div>
+                )
+            }
+           
         }
         
+    } 
+    if (!tag && refsTab === "default"){
+        actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { 
+            setRefsTab("routing")
+        }}>
+            <IoGitNetwork/> Routing
+        </div>)
+    }
+
+    if (!tag && refsTab === "routing") {
+        actionRevs.push(<div style={{display:"flex", alignItems:"center", fontSize:"10pt"}} className={"workflow-expand "} onClick={() => { 
+            setRefsTab("default")
+        }}>
+            <IoAlbumsSharp/> Revisions
+        </div>)
     }
 
 
@@ -531,16 +551,13 @@ function WorkflowExplorer(props) {
                             </div>,
                             <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "sankey" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("sankey") }}>
                                 <IoPieChartSharp /> Sankey
-                            </div>,
-                            <div style={{display:"flex", alignItems:"center", fontSize:"10pt", color: editorTab === "routing" ? "#2396d8":""}} className={"workflow-expand "} onClick={() => { setEditorTab("routing") }}>
-                              <IoGitNetwork /> Routing
                             </div>
                         ]}>
                             <IoEllipsisVerticalSharp />
                         </TileTitle >
                     <EditorDetails 
-                    refs={refs} 
-                    active={workflowInfo.active}
+                        refs={refs} 
+                        active={workflowInfo.active}
                         fetch={fetch} namespace={params.namespace} workflow={params[0]} 
                         discardWorkflow={discardWorkflow}
                         saveWorkflow={saveWorkflow}
@@ -567,11 +584,16 @@ function WorkflowExplorer(props) {
                     </div>
                 </div>
                 <div className="container auto-width-all-896" style={{ flexDirection: "column", maxWidth:"380px", minWidth:"380px", flex: "auto" }} >
-                    <div className="item-0 shadow-soft rounded tile" style={{fontSize:"12px", maxHeight:"65px"}}>
+                    <div className="item-0 shadow-soft rounded tile" style={{fontSize:"12px", maxHeight:"210px"}}>
                         <TileTitle actionsDiv={actionRevs}>
-                            <IoAlbumsSharp /> Revisions
+                            {refsTab === "default" ? <>
+                                <IoAlbumsSharp /> 
+                                    Revisions
+                                </> : <><IoGitNetwork/> Routing</>}
                         </TileTitle>
                         <div style={{display:"flex"}}>
+                            {refsTab === "default" ?
+                            <>
                             {tag ? 
                             <div style={{width:"100%"}}>
                                 <input onChange={e=>setInputTag(e.target.value)} value={inputTag} style={{width:"95%"}} placeholder="Enter tag (leave blank to untag)" type="text"/>
@@ -586,6 +608,9 @@ function WorkflowExplorer(props) {
                                     )
                                 })}
                             </select>}
+                            </>:
+                            
+                            <Routing fetch={fetch} handleError={handleError} namespace={params.namespace} workflow={params[0]} live={workflowInfo.active} setErr={setErr} refs={refs}/>}
                         </div>
                     </div>
                     <div className="item-0 shadow-soft rounded tile">
@@ -605,6 +630,153 @@ function WorkflowExplorer(props) {
                 </div>
             </div>
         </>
+    )
+}
+
+function Routing(props) {
+    const {refs, setErr, fetch, namespace, workflow, handleError,live} = props
+
+    const [rev, setRev] = useState("")
+    const [rev2, setRev2] = useState("")
+    const [rev1Percentage, setRev1Percentage] = useState(0)
+
+    const [load, setLoad] = useState(true)
+    useEffect(()=>{
+        async function getWfRouter() {
+            let json = await WorkflowRoute(fetch, namespace, workflow, handleError)
+            console.log(json)
+            if(json.routes[0]) {
+                setRev(json.routes[0].ref)
+                setRev1Percentage(json.routes[0].weight)
+            }
+            if(json.routes[1]){
+                setRev2(json.routes[1].ref)
+            }
+        }
+        if (load) {
+            getWfRouter()
+            setLoad(false)
+        }
+    },[fetch, handleError, load, namespace, workflow])
+
+    const handle = haprops => {
+        const { value, dragging, index, ...restProps } = haprops;
+
+        return (
+            <SliderTooltip
+                prefixCls="rc-slider-tooltip"
+                overlay={`${value} %`}
+                visible={dragging}
+                placement="top"
+                key={index}
+            >
+                <Handle value={value} {...restProps} />
+            </SliderTooltip>
+        )
+    }
+
+    const changeRouting = async () => {
+        try {   
+            let arr = []
+            // if rev and rev2 are selected use the slider to work out allocation 
+            if(rev !== "" && rev2 !== "") {
+                arr.push({
+                    ref: rev,
+                    weight: parseInt(rev1Percentage)
+                })
+                arr.push({
+                    ref: rev2,
+                    weight: parseInt(rev1Percentage !== 0 ? 100 - rev1Percentage : 100)
+                })
+            } else if(rev !== "") {
+                // if rev1 is selected set to 100
+                arr.push({
+                    ref: rev,
+                    weight: 100
+                })
+            } else if (rev2 !== "") {
+                // if rev2 is selected set to 100
+                arr.push({
+                    ref: rev2,
+                    weight: 100
+                })
+            }
+            
+            let js = await WorkflowEditRoute(fetch, namespace, workflow, handleError, arr, live)
+            if(js.routes[0]) {
+                setRev(js.routes[0].ref)
+                setRev1Percentage(js.routes[0].weight)
+            }
+            if(js.routes[1]){
+                setRev2(js.routes[1].ref)
+            }
+        }catch(err) {
+            ShowError(err.message, setErr)
+        }
+    }
+
+    return(
+        <div>
+            <div style={{display:"flex", alignItems:'center'}}>
+                <div style={{width:"100px"}}>Revision 1:</div> <select value={rev} onChange={e=>{
+                            setRev(e.target.value)
+                            }}>
+                                <option value="">Select a revision..</option>
+                                {refs.map((obj)=>{
+                                    if(rev2 !== obj.node.name){
+                                        return(
+                                            <option key={`rev2-${obj.node.name}`} value={obj.node.name}>{obj.node.name}</option>
+                                        )
+                                    }
+                                    return ""
+                                })}
+                            </select>
+            </div>
+            <div style={{display:"flex", marginTop:"5px", alignItems:"center"}}>
+                <div style={{width:"100px"}}>Revision 2:</div><select value={rev2} onChange={e=>{
+                    setRev2(e.target.value)
+                            }}>
+                                <option value="">Select a revision..</option>
+                                {refs.map((obj)=>{
+                                    if(rev !== obj.node.name) {
+                                        return(
+                                            <option key={`rev2-${obj.node.name}`} value={obj.node.name}>{obj.node.name}</option>
+                                        )
+                                    }
+                                    return ""
+                                })}
+                            </select>
+            </div>
+            {rev !== "" && rev2 !== "" ? 
+                          <div style={{ display: 'flex', gap: "10px", marginTop:"10px" }}>
+                          <div className="block-slider" style={{ minWidth: "200px", paddingLeft: '5px', paddingTop: '5px', flex: "auto" }}>
+                              <div style={{ position: "relative", width: "100%", padding: "0px" }}>
+                                  <div style={{ position: "relative", bottom: "6px" }}>
+                                      <div style={{ display: "flex", width: "100%" }}>
+                                          <div style={{ textAlign: "left", flex: "auto", fontSize: "8pt", fontWeight: "bold", color: "#4293c4" }}>Rev 1</div>
+                                          <div style={{ textAlign: "right", flex: "auto", fontSize: "8pt", fontWeight: "bold", color: "rgb(219, 58, 58)" }}>Rev 2</div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <Slider handle={handle} min={0} max={100} onChange={(e) => { setRev1Percentage(e) }} value={rev1Percentage} defaultValue={rev1Percentage} />
+                              <div style={{ position: "relative", width: "100%", padding: "0px" }}>
+                                  <div style={{ position: "relative", top: "4px" }}>
+                                      <div style={{ display: "flex", width: "100%" }}>
+                                          <div style={{ textAlign: "left", flex: "auto", fontSize: "8pt" }}>{rev1Percentage}%</div>
+                                          <div style={{ textAlign: "right", flex: "auto", fontSize: "8pt" }}>{rev1Percentage !== 0 ? 100 - rev1Percentage : 100}%</div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+            :""}
+            {rev === "" && rev2 === "" ? "":
+            <div style={{width:"100%", textAlign:"right"}}>
+                <input type="submit" value="Change Routing" style={{marginTop:"10px"}} onClick={() => {
+                    changeRouting()
+                }} />
+            </div>}
+        </div>
     )
 }
 
@@ -896,7 +1068,7 @@ function FileObject(props) {
         if(active === null && type === "workflow"){
             checkActive()
         }
-    },[active, type, fetch, handleError, id, namespace])
+    },[active, type, fetch, handleError, id, namespace, setErr])
 
     async function toggleObject() {
         try {

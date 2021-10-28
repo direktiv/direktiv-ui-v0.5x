@@ -1,4 +1,3 @@
-import { json } from 'd3-fetch'
 import YAML from 'js-yaml'
 
 export async function checkStartType(wf) {
