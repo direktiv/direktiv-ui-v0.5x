@@ -501,6 +501,6 @@ export function diagramToYAML(wfname, blocks, setErr , func) {
             }
         }
     }
-
+    console.log(wf, "WORKFLOW GEN")
     func(wfname, YAML.stringify(wf))
 }

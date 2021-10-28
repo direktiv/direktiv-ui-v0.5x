@@ -275,11 +275,17 @@ export default function Flowy() {
                         await handleError('create workflow', resp, 'createWorkflow')
                 }
             } catch (e) {
-                let y = YAML.load(wf)
-                let stateIndex = parseInt(e.message.match(/(?<=\[).+?(?=\])/)[0])
-                let errMessage = e.message.match(/(?<=\]: )[\w\s]+/)
-                let id = y.states[stateIndex].id
-                ShowErr(`Workflow creation failed: state '${id}': ${errMessage}`, setErr)
+                console.log(e.message)
+                if(e.message !== "create workflow: object already exists") {
+                    let y = YAML.load(wf)
+                    let stateIndex = parseInt(e.message.match(/(?<=\[).+?(?=\])/)[0])
+                    let errMessage = e.message.match(/(?<=\]: )[\w\s]+/)
+                    let id = y.states[stateIndex].id
+                    ShowErr(`Workflow creation failed: state '${id}': ${errMessage}`, setErr)
+                } else {
+                    ShowErr(e.message, setErr)
+                }
+   
             }
         }
     }

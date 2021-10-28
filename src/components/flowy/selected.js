@@ -627,7 +627,7 @@ export function FuncSelected(props) {
 
             for(let i=0 ; i < bs.length; i++) {
                 if(bs[i].id === element.id) {
-                    switch(element.data.type){
+                    switch(type){
                         case "knative-global":
                         case "knative-namespace":
                             bs[i].data["service"] = service
@@ -647,7 +647,10 @@ export function FuncSelected(props) {
                     let acts = []
                     for(let i=0; i < files.length; i++) {
                         try {
-                            if(files[i].value !== "") {
+                            if(files[i].value !== "" && files[i].value !== YAML2String.stringify({
+                                key: "identifier",
+                                scope: "namespace, workflow or instance"
+                            })) {
                                 let yml = YAML.load(files[i].value)
                                 if(!yml.key) {
                                     throw new Error(`File ${i} must have a key name`)
