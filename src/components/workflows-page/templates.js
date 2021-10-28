@@ -9,7 +9,7 @@ states:
 export const action = `description: A simple 'action' state that sends a get request
 functions:
 - id: get
-  image: vorteil/request:v6
+  image: direktiv/request:v1
   type: reusable
 states:
 - id: getter 
@@ -23,7 +23,7 @@ states:
 
 export const consumeEvent = `functions:
 - id: greeter
-  image: vorteil/greeting:v2
+  image: direktiv/greeting:v1
   type: reusable
 description: A simple 'consumeEvent' state that listens for the greetingcloudevent generated from the template 'generate-event'.
 states:
@@ -54,7 +54,7 @@ states:
 - id: data
   type: noop
   transform: 
-    email: "trent.hilliamvorteil.io"
+    email: "trent.hilliamdirektiv.io"
   transition: validate-email
 - id: validate-email
   type: validate
@@ -82,7 +82,7 @@ states:
 export const foreach =`description: A simple 'foreach' state that solves expressions
 functions: 
 - id: solve
-  image: vorteil/solve:v2
+  image: direktiv/solve:v1
   type: reusable
 states:
 - id: data
@@ -143,7 +143,7 @@ states:
 export const parallel=`description: A simple 'parallel' state workflow that runs solve container to solve expressions.
 functions: 
 - id: solve
-  image: vorteil/solve:v2
+  image: direktiv/solve:v1
   type: reusable
 states:
 - id: run
@@ -171,7 +171,7 @@ states:
 - id: data
   type: noop
   transform:
-    email: "trent.hilliam@vorteil.io"
+    email: "trent.hilliam@direktiv.io"
   transition: validate-email
 - id: validate-email
   type: validate
@@ -221,10 +221,10 @@ states:
 
 export const eventXor = `functions:
 - id: greeter
-  image: vorteil/greeting:v2
+  image: direktiv/greeting:v1
   type: reusable
 - id: solve2
-  image: vorteil/solve:v2
+  image: direktiv/solve:v1
   type: reusable
 description: A simple 'eventXor' that waits for events to be received.
 states:
@@ -256,10 +256,10 @@ states:
 
 export const eventAnd =`functions:
 - id: greeter
-  image: vorteil/greeting:v2
+  image: direktiv/greeting:v1
   type: reusable
 - id: solve
-  image: vorteil/solve:v2
+  image: direktiv/solve:v1
   type: reusable
 description: A simple 'eventAnd' that waits for events to be received.
 states:
