@@ -17,7 +17,7 @@ FULL_VERSION := $(shell v='$${RV}$${RV:+-}${GIT_HASH}${GIT_DIRTY}'; echo "$${v%.
 server:
 	echo ${RELEASE_TAG}
 	if [ ! -d ${mkfile_dir_main}reactjs-embed ]; then \
-		git clone https://github.com/vorteil/reactjs-embed.git; \
+		git clone https://github.com/direktiv/reactjs-embed.git; \
 	fi	
 	DOCKER_BUILDKIT=1 docker build . --tag ${docker_repo}/${docker_image}${RELEASE_TAG} --build-arg FULL_VERSION=${FULL_VERSION}
 	docker push ${docker_repo}/${docker_image}${RELEASE_TAG}
@@ -25,9 +25,9 @@ server:
 .PHONY: update-containers
 update-containers:
 	if [ ! -d ${mkfile_dir_main}reactjs-embed ]; then \
-                git clone https://github.com/vorteil/reactjs-embed.git; \
+                git clone https://github.com/direktiv/reactjs-embed.git; \
     fi 
-	DOCKER_BUILDKIT=1 docker build . --tag vorteil/ui --build-arg FULL_VERSION=${FULL_VERSION}
-	docker tag vorteil/ui:latest vorteil/ui${RELEASE_TAG}
-	docker push vorteil/ui
-	docker push vorteil/ui${RELEASE_TAG}
+	DOCKER_BUILDKIT=1 docker build . --tag direktiv/ui --build-arg FULL_VERSION=${FULL_VERSION}
+	docker tag direktiv/ui:latest direktiv/ui${RELEASE_TAG}
+	docker push direktiv/ui
+	docker push direktiv/ui${RELEASE_TAG}
