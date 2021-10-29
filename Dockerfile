@@ -6,7 +6,7 @@ RUN echo "building $FULL_VERSION"
 WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
-
+ENV NODE_OPTIONS --openssl-legacy-provider
 COPY public ./public
 COPY src ./src
 COPY package.json ./
