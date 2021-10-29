@@ -6,7 +6,8 @@ RUN echo "building $FULL_VERSION"
 WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
-ENV NODE_OPTIONS --openssl-legacy-provider
+
+
 COPY public ./public
 COPY src ./src
 COPY package.json ./
@@ -14,7 +15,7 @@ COPY yarn.lock ./
 COPY config-overrides.js ./
 
 RUN yarn install
-RUN REACT_APP_VERSION=$FULL_VERSION yarn build
+RUN NODE_OPTIONS=--openssl-legacy-provider REACT_APP_VERSION=$FULL_VERSION yarn build
 
 FROM golang:1.16-buster as server-build
 
