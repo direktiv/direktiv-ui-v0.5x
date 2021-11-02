@@ -435,7 +435,7 @@ export function Version(props) {
         if(versions === null) {
             get()
         }
-    },[])
+    },[fetch, handleError, versions])
 
     return(
         <p title={versions} style={{fontSize:"10pt", cursor: "pointer"}}>{process.env.REACT_APP_VERSION}</p>
