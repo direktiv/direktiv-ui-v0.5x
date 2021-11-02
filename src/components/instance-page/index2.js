@@ -123,7 +123,6 @@ export default function Instance() {
                     return
                 }
                 let json = JSON.parse(e.data)
-                console.log(json)
                 json["instance"]["flow"] = json.flow
 
                 setInstanceDetails(json.instance)
@@ -207,7 +206,6 @@ export default function Instance() {
           }
         )
     }
-    console.log(wf, "WORKFLOW CHECK")
 
     return(
         <LoadingWrapper isLoading={isLoading} text={`Loading Instance Details`}>
