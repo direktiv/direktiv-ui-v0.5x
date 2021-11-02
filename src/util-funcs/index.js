@@ -9,9 +9,8 @@ export async function HandleError(summary, resp, perm) {
     if (resp.status === 405) {
         // this shouldnt happen in the UI
         throw new Error(`${summary}: method is not allowed`)
-    } else if(resp.status === 409) {
-        throw new Error(`${summary}: object already exists`)
     }
+    
 
     if(resp.status !== 403) {
         if (!contentType || !contentType.includes('application/json')) {
@@ -21,7 +20,7 @@ export async function HandleError(summary, resp, perm) {
           if(resp.headers.get('grpc-message')) {
             throw new Error(`${summary}: ${resp.headers.get('grpc-message')}`)
           } else {
-            let text = (await resp.json()).Message
+            let text = (await resp.json()).message
             throw new Error (`${summary}: ${text}`)
           }
       }
