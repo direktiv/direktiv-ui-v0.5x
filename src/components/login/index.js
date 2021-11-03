@@ -21,7 +21,7 @@ export default function Login() {
                 </TileTitle >
                 <div>
                     <div>
-                        <input onChange={(e)=>setAPIKey(e.target.value)} type="text" placeholder="Please enter the API Key" style={{width:"90%"}} />
+                        <input onChange={(e)=>setAPIKey(e.target.value)} type="password" placeholder="Please enter the API Key" style={{width:"90%"}} />
                     </div>
                     {q.get("err") ? 
                     <div style={{color:"red", fontSize:"12pt", marginTop:"5px"}}>
