@@ -249,7 +249,10 @@ export async function WorkflowSetVariable(fetch, namespace, workflow, name, val,
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-var&var=${name}`, {
             method: "PUT",
-            body: val
+            body: val,
+            headers: {
+                "Content-type": "application/json",
+            },
         })
         if (resp.ok) {
             return true

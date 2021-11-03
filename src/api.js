@@ -370,7 +370,10 @@ export async function NamespaceSetVariable(fetch, namespace, name, val, handleEr
     try {
         let resp = await fetch(`/namespaces/${namespace}/vars/${name}`, {
             method: "PUT",
-            body: val
+            body: val,
+            headers: {
+                "Content-type": "application/json",
+            }
         })
         if (resp.ok) {
             return true
