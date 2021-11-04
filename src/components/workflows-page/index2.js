@@ -200,11 +200,11 @@ function WorkflowExplorer(props) {
                     }
                 }
                 let actFailed = true
-                for ( i=0; i < functionsRef.current.length; i++) {
-                    if (functionsRef.current[i].status === "False") {
-                        actFailed = false
-                    }
-                }
+                // for ( i=0; i < functionsRef.current.length; i++) {
+                //     if (functionsRef.current[i].status === "False") {
+                //         actFailed = false
+                //     }
+                // }
                 x = await checkStartType(wfRefValue.current)
                 if (!x) {
                     actFailed = false
