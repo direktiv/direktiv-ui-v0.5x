@@ -77,7 +77,7 @@ const EnvTableRow = (props) => {
                 </div>
             </div>
         </div>) : <></>}
-        <div className={`var-table-row ? "show-value" : ""}`}>
+        <div className={`var-table-row ${show ? "show-value" : ""}`}>
             <div style={{ flexGrow: "2", flexBasis: "0px", minWidth: "130pt" }}>
                 {/* Name column */}
                 {env.node.name}
@@ -89,7 +89,8 @@ const EnvTableRow = (props) => {
                         <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" 
                         style={{
                             width: "100%",
-                            maxHeight: "38px",
+                            height: "100pt",
+                            maxHeight: "100pt",
                             fontFamily: "Arial, Helvetica, sans-serif"
                         }}
                         onChange={(ev) => {
