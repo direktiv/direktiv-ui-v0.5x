@@ -245,13 +245,13 @@ export async function WorkflowVariables(fetch, namespace, workflow, handleError)
     }
 }
 
-export async function WorkflowSetVariable(fetch, namespace, workflow, name, val, handleError) {
+export async function WorkflowSetVariable(fetch, namespace, workflow, name, val, mimeType, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=set-var&var=${name}`, {
             method: "PUT",
             body: val,
             headers: {
-                "Content-type": "application/json",
+                "Content-type": mimeType,
             },
         })
         if (resp.ok) {
@@ -284,7 +284,7 @@ export async function WorkflowGetVariable(fetch, namespace, workflow, name, hand
     try {
         let resp = await fetch(`/namespaces/${namespace}/tree/${workflow}?op=var&var=${name}`, {})
         if(resp.ok) {
-            return await resp.text()
+            return {data: await resp.text(), contentType: resp.headers.get("Content-Type")}
         } else {
             await handleError('get variable', resp, 'getWorkflowVariable')
         }
