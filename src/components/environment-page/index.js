@@ -61,6 +61,8 @@ const EnvTableHeader = () => {
 const EnvTableRow = (props) => {
     const { fetch, fetchVariables, env, index, setVar, getVar, downloadVar, setError, namespace, params, mode, handleError } = props
     const [localValue, setLocalValue] = useState("")
+    const [localMimeType, setLocalMimeType] = useState("")
+    const [remoteMimeType, setRemoteMimeType] = useState("")
     const [remoteValue, setRemoteValue] = useState("")
     const [show, setShow] = useState(false)
     const [isBinary, setIsBinary] = useState(false)
@@ -86,6 +88,7 @@ const EnvTableRow = (props) => {
                 {/* Value column */}
 
                 {env.node.size < 1000000 ? (<>{show === true ?
+                        <>
                         <textarea id={`env-${index}`} className={"var-table-input"} value={localValue} spellCheck="false" 
                         style={{
                             width: "100%",
@@ -96,19 +99,37 @@ const EnvTableRow = (props) => {
                         onChange={(ev) => {
                             setLocalValue(ev.target.value)
                         }} />
+                            <div style={{ display: "flex", paddingTop: "6px", alignItems: "center" }}>
+                                <div style={{ textAlign: "start", fontWeight: "bolder", paddingRight: "15px" }} > Mime Type: </div>
+                                <div style={{ flexGrow: 1 }}>
+                                    <textarea id={`env-${index}`} className={"var-table-input"} value={localMimeType} spellCheck="false"
+                                        style={{
+                                            width: "100%",
+                                            height: "15pt",
+                                            maxHeight: "15pt",
+                                            fontFamily: "Arial, Helvetica, sans-serif"
+                                        }}
+                                        onChange={(ev) => {
+                                            setLocalMimeType(ev.target.value)
+                                        }} />
+                                </div>
+                            </div>
+                        </>
                         :
                         <div style={{ width: "100%" }} className={`var-table-input show-button rounded button ${isBinary ? "disabled": ""}`} onClick={() => {
-                            getVar(env.node.name).then((newVal) => {
-                                if (!newVal) {
+                            getVar(env.node.name).then((newVar) => {
+                                if (!newVar.data) {
                                     return // TODO: Throw error
                                 }
-                                const string_to_test = newVal.substring(0, 50)
+                                const string_to_test = newVar.data.substring(0, 50)
                                 if(/\ufffd/.test(string_to_test) === true){
                                     setShow(false)
                                     setIsBinary(true)
                                 }else{
-                                    setLocalValue(newVal)
-                                    setRemoteValue(newVal)
+                                    setLocalValue(newVar.data)
+                                    setRemoteValue(newVar.data)
+                                    setLocalMimeType(newVar.contentType)
+                                    setRemoteMimeType(newVar.contentType)
                                     setShow(true)
                                 }
                             })
@@ -140,7 +161,7 @@ const EnvTableRow = (props) => {
             </div>
             <div style={{ flexGrow: "1", flexBasis: "0px", display: "flex" }}>
                 {/* Actions column */}
-                <EnvTableAction fetch={fetch} fetchVariables={fetchVariables} handleError={handleError} namespace={namespace} mode={mode} params={params} setError={setError} downloadVar={(vName) => {
+                <EnvTableAction fetch={fetch} fetchVariables={fetchVariables} handleError={handleError} namespace={namespace} mode={mode} params={params} mimeType={localMimeType} setError={setError} downloadVar={(vName) => {
                     setIsDownloading(true)
                     downloadVar(vName, setIsDownloading)
                 }} 
@@ -149,15 +170,22 @@ const EnvTableRow = (props) => {
                 setLoading={setIsLoading} 
                 value={localValue} 
                 show={show} 
-                resetValue={() => { 
+                resetValue={() => {
                     setRemoteValue(localValue); 
+                    if (localMimeType === "") {
+                        setLocalMimeType("application/json")
+                        setRemoteMimeType("application/json")
+                    } else{
+                        setRemoteMimeType(localMimeType); 
+                    }
                     setIsBinary(false) 
                 }} hideEnv={() => { 
                         setShow(false); 
                         setLocalValue(remoteValue) 
+                        setLocalMimeType(remoteMimeType)
                 }} 
                 index={index}
-                edited={localValue !== remoteValue} />
+                edited={localValue !== remoteValue || localMimeType !== remoteMimeType} />
             </div>
         </div>
         </>
@@ -165,7 +193,7 @@ const EnvTableRow = (props) => {
 };
 
 const EnvTableAction = (props) => {
-    const { value, fetchVariables, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading, downloadVar, namespace, mode, params, handleError, fetch } = props
+    const { value, mimeType, fetchVariables, show, hideEnv, name, setVar, edited, resetValue, setError, setLoading, downloadVar, namespace, mode, params, handleError, fetch } = props
 
     const onDrop = useCallback(
         async (acceptedFiles, fileRejections) => {
@@ -204,7 +232,7 @@ const EnvTableAction = (props) => {
         )
 
         buttons.push(
-            <div key={`${name}-btn-save`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button ${edited && value !== "" ? "success" : "disabled"}`} onClick={() => { setLoading(true); setVar(name, value, true).then(() => { resetValue() }).finally(()=>{setLoading(false)}) }} >
+            <div key={`${name}-btn-save`} style={{ marginRight: "6pt", minWidth: "36px", minHeight: "36px" }} title="Save Variable" className={`circle button ${edited && value !== "" ? "success" : "disabled"}`} onClick={() => { setLoading(true); setVar(name, value, mimeType, true).then(() => { resetValue() }).finally(()=>{setLoading(false)}) }} >
                 <span style={{ flex: "auto" }}>
                     <IoSave style={{ fontSize: "12pt", marginBottom: "6px", marginLeft: "0px" }} />
                 </span>
@@ -477,7 +505,7 @@ export function EnvrionmentContainer(props) {
         }
     }, [fetchVariables, namespace])
 
-    async function setRemoteVariable(envName, envValue, force) {
+    async function setRemoteVariable(envName, envValue, mimeType, force) {
         let ok = false
         setError("")
         setFetching(true)
@@ -503,11 +531,14 @@ export function EnvrionmentContainer(props) {
         }
 
         envValue = envValue === undefined ? "" : envValue
+        mimeType = mimeType === undefined ? "application/json" : mimeType
+        mimeType = mimeType === "" ? "application/json" : mimeType
+
         try {
             if(mode === "namespace") {
-                ok = await NamespaceSetVariable(fetch, namespace, envName, envValue, handleError)            
+                ok = await NamespaceSetVariable(fetch, namespace, envName, envValue, mimeType, handleError)            
             } else {
-                ok = await WorkflowSetVariable(fetch, namespace, params[0], envName, envValue, handleError)
+                ok = await WorkflowSetVariable(fetch, namespace, params[0], envName, envValue, mimeType, handleError)
             }
             fetchVariables()
         } catch (e) {
@@ -518,29 +549,29 @@ export function EnvrionmentContainer(props) {
     }
 
     async function getRemoteVariable(envName) {
-        let data
+        let remoteVar
         setError("")
         setFetching(true)
         try {
             if(mode === "namespace") {
-                data = await NamespaceGetVariable(fetch, namespace, envName, handleError)
+                remoteVar = await NamespaceGetVariable(fetch, namespace, envName, handleError)
             } else {
-                data = await WorkflowGetVariable(fetch, namespace, params[0], envName, handleError)
+                remoteVar = await WorkflowGetVariable(fetch, namespace, params[0], envName, handleError)
             }
             setEnvList((oldE) => {
                 for (let i = 0; i < oldE.length; i++) {
                     if (oldE[i].node.name === envName) {
-                        oldE[i].node.value = data
+                        oldE[i].node.value = remoteVar.data
                         return oldE
                     }
                 }
-                oldE.push({ name: envName, value: data, size: 999 })
+                oldE.push({ name: envName, value: remoteVar.data, size: 999 })
             })
         } catch (e) {
             setError(e.message)
         }
         setFetching(false)
-        return data
+        return remoteVar
     }
 
     return (

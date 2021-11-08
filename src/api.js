@@ -366,13 +366,13 @@ export async function NamespaceVariables(fetch, namespace, handleError) {
     }
 }
 
-export async function NamespaceSetVariable(fetch, namespace, name, val, handleError) {
+export async function NamespaceSetVariable(fetch, namespace, name, val, mimeType, handleError) {
     try {
         let resp = await fetch(`/namespaces/${namespace}/vars/${name}`, {
             method: "PUT",
             body: val,
             headers: {
-                "Content-type": "application/json",
+                "Content-type": mimeType,
             }
         })
         if (resp.ok) {
@@ -404,7 +404,7 @@ export async function NamespaceGetVariable(fetch, namespace, name, handleError) 
     try {
         let resp = await fetch(`/namespaces/${namespace}/vars/${name}`, {})
         if(resp.ok) {
-            return await resp.text()
+            return {data: await resp.text(), contentType: resp.headers.get("Content-Type")}
         } else {
             await handleError('get variable', resp, 'getNamespaceVariable')
         }
