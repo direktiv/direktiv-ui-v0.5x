@@ -123,11 +123,12 @@ export default function Instance() {
                     return
                 }
                 let json = JSON.parse(e.data)
+                console.log(json, "JSON")
                 json["instance"]["flow"] = json.flow
 
                 setInstanceDetails(json.instance)
                 setWorkflowDets(json.workflow)
-                fetchWorkflow(json.workflow.name, json.workflow.revision)
+                fetchWorkflow(json.workflow.path, json.workflow.revision)
                 setDetailsLoad(false)
             }
             eventConnection.onmessage = e => getData(e)
