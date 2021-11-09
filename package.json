@@ -60,7 +60,7 @@
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "REACT_APP_API=https://rabbit.direktiv.io/api react-app-rewired start",
+    "start": "REACT_APP_API=http://172.16.67.147/api react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom --coverage",
     "eject": "react-app-rewired eject",
