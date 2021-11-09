@@ -1,7 +1,7 @@
 import YAML from 'js-yaml'
 import YAML2 from 'yaml'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import ReactFlow, { MiniMap, isNode, Handle, ReactFlowProvider, useZoomPanHelper } from 'react-flow-renderer';
+import ReactFlow, { MiniMap, isNode, Handle, ReactFlowProvider, useZoomPanHelper } from 'react-flow-renderer-pathfinder';
 import dagre from 'dagre'
 import { IoChevronForwardSharp, IoReorderFourOutline } from 'react-icons/io5';
 
@@ -30,14 +30,14 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                             id: `startNode-${v.start.state}`,
                             source: 'startNode',
                             target: v.start.state,
-                            type: 'bezier',
+                            type: 'pathfinding',
                         })
                     } else {
                         newElements.push({
                             id: `startNode-${v.states[i].id}`,
                             source: 'startNode',
                             target: v.states[i].id,
-                            type: 'bezier',
+                            type: 'pathfinding',
                         })
                     }
 
@@ -62,7 +62,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                                 source: v.states[i].id,
                                 target: v.states[i].events[j].transition,
                                 animated: false,
-                                type: 'bezier'
+                                type: 'pathfinding'
                             })
                         }
                     }
@@ -77,7 +77,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                                 source: v.states[i].id,
                                 target: v.states[i].conditions[y].transition,
                                 animated: false,
-                                type: 'bezier'
+                                type: 'pathfinding'
                             })
                             transitions = true
 
@@ -96,7 +96,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                                 source: v.states[i].id,
                                 target: v.states[i].catch[x].transition,
                                 animated: false,
-                                type: 'bezier'
+                                type: 'pathfinding'
                             })
                         }
                     }
@@ -111,7 +111,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                         source: v.states[i].id,
                         target: v.states[i].transition,
                         animated: false,
-                        type: 'bezier'
+                        type: 'pathfinding'
                     })
                 } else if(v.states[i].defaultTransition) {
                     transitions = true
@@ -121,7 +121,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                         source: v.states[i].id,
                         target: v.states[i].defaultTransition,
                         animated: false,
-                        type: 'bezier'
+                        type: 'pathfinding'
                     })
                 } else {
                         transitions = true
@@ -130,7 +130,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                             source: v.states[i].id,
                             target: `endNode`,
                             animated: false,
-                            type: 'bezier'
+                            type: 'pathfinding'
                         })
                 }
 
@@ -140,7 +140,7 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
                         id: `${v.states[i].id}-endNode`,
                         source: v.states[i].id,
                         target: `endNode`,
-                        type: 'bezier'
+                        type: 'pathfinding'
                     })
                 }
             }

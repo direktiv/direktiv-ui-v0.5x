@@ -1,7 +1,7 @@
 import YAML from 'yaml'
 import YAMLLoader from 'js-yaml'
 import { IoChevronForwardSharp } from "react-icons/io5";
-import { Handle} from "react-flow-renderer";
+import { Handle} from "react-flow-renderer-pathfinder";
 import { position } from '../workflow-page/diagram';
 var randomWords = require('random-words');
 

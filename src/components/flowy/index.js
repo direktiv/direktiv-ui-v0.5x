@@ -1,6 +1,6 @@
 
 import { useCallback, useContext, useEffect, useState } from "react"
-import ReactFlow, { ReactFlowProvider, isNode, addEdge, updateEdge, MiniMap } from "react-flow-renderer";
+import ReactFlow, { ReactFlowProvider, isNode, addEdge, updateEdge, MiniMap } from "react-flow-renderer-pathfinder";
 import {  ActionFunc, GeneralState, Schema } from "./states";
 import {State, diagramToYAML, Start, addState, ActionFunction, SchemaNode, generateElementsForBuilder} from "./util"
 import Breadcrumbs from '../breadcrumbs'
