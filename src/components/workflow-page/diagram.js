@@ -22,16 +22,26 @@ export const generateElements = (getLayoutedElements, value, flow, status) => {
         if(v.states) {
             for(let i=0; i < v.states.length; i++) {
                 let transitions = false
-
                 // check if starting element
                 if (i === 0) {
                     // starting element so create an edge to the state
-                    newElements.push({
-                        id: `startNode-${v.states[i].id}`,
-                        source: 'startNode',
-                        target: v.states[i].id,
-                        type: 'bezier',
-                    })
+                    if (v.start && v.start.state){
+                        newElements.push({
+                            id: `startNode-${v.start.state}`,
+                            source: 'startNode',
+                            target: v.start.state,
+                            type: 'bezier',
+                        })
+                    } else {
+                        newElements.push({
+                            id: `startNode-${v.states[i].id}`,
+                            source: 'startNode',
+                            target: v.states[i].id,
+                            type: 'bezier',
+                        })
+                    }
+
+               
                 }
 
                 // push new state
