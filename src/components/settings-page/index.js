@@ -282,7 +282,7 @@ export function Registries(props) {
             }
         }
         return fetchData()
-    }, [fetch, namespace, handleError])
+    }, [fetch, namespace, handleError, mode])
 
     useEffect(() => {
         fetchR().finally(() => { setIsLoading(false); setOpacity(30) })
