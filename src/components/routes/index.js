@@ -6,6 +6,7 @@ import  SettingsPage from '../settings-page'
 import  WorkflowPage from '../workflow-page'
 import EnvrionmentPage from "../environment-page"
 import Functions from "../functions"
+import GlobalRegistries from '../global-registries'
 import Services from "../services"
 import Revision from "../revision"
 import Flowy from "../flowy"
@@ -31,6 +32,7 @@ export default function Routes(props) {
         <>
             <Route exact path="/f/flowy" component={Flowy}/>
             <Route exact path="/functions/global" component={Functions}/>
+            <Route exact path="/functions/registries" component={GlobalRegistries}/>
             <Route exact path="/functions/global/:service" component={Services}/>
             <Route exact path="/functions/global/:service/:revision" component={Revision}/>
             <Route exact path="/jq/playground" component={JQPlaygroundPage} />

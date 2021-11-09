@@ -69,6 +69,10 @@ export default function Navbar(props) {
         path: "/functions/global"
     })
 
+    let matchGlobalRegistries = matchPath(location.pathname, {
+        path: "/functions/registries"
+    })
+
     let navItemMap = {}
     if(navItems){
         for(var i=0; i < navItems.length; i++) {
@@ -408,6 +412,16 @@ export default function Navbar(props) {
                             }} to={`/functions/global`} className="nav-link">
                                 <IoCubeOutline style={{marginRight:"10px"}}/>
                                 <span>Global Services</span>
+                            </Link>
+                        </li>
+                        <li>
+                        <Link style={{color: matchGlobalRegistries !== null ? "#4497f5": "", display:"flex", alignItems:"center"}} onClick={()=>{
+                                if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                    toggleNamespaceSelector()
+                                }
+                            }} to={`/functions/registries`} className="nav-link">
+                                <IoCubeOutline style={{marginRight:"10px"}}/>
+                                <span>Global Registries</span>
                             </Link>
                         </li>
                     </ul>

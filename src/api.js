@@ -273,7 +273,35 @@ export async function SetNamespaceConfiguration(fetch, namespace, handleError, v
 
 export async function NamespaceRegistries(fetch, namespace, handleError) {
     try {
-        let resp = await fetch(`/functions/namespaces/${namespace}/registries`,{})
+        let resp = await fetch(`/functions/registries/namespaces/${namespace}`,{})
+        if(resp.ok) {
+            let json = await resp.json()
+            return json.registries
+        } else {
+            await handleError('fetch registries', resp, 'listRegistries')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalRegistries(fetch, handleError) {
+    try {
+        let resp = await fetch(`/functions/registries/global`,{})
+        if(resp.ok) {
+            let json = await resp.json()
+            return json.registries
+        } else {
+            await handleError('fetch registries', resp, 'listRegistries')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalPrivateRegistries(fetch, handleError) {
+    try {
+        let resp = await fetch(`/functions/registries/private`,{})
         if(resp.ok) {
             let json = await resp.json()
             return json.registries
@@ -303,7 +331,39 @@ export async function NamespaceCreateSecret(fetch, namespace, key, value, handle
 
 export async function NamespaceCreateRegistry(fetch, namespace, key,val, handleError) {
     try {
-        let resp = await fetch(`/functions/namespaces/${namespace}/registries`, {
+        let resp = await fetch(`/functions/registries/namespaces/${namespace}`, {
+            method: "POST",
+            body: JSON.stringify({data:val, reg: key})
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('create registry', resp, 'createRegistry')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalCreateRegistry(fetch,key,val, handleError) {
+    try {
+        let resp = await fetch(`/functions/registries/global`, {
+            method: "POST",
+            body: JSON.stringify({data:val, reg: key})
+        })
+        if(resp.ok){
+            return
+        } else {
+            await handleError('create registry', resp, 'createRegistry')
+        }
+    } catch(e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalPrivateCreateRegistry(fetch, key,val, handleError) {
+    try {
+        let resp = await fetch(`/functions/registries/private`, {
             method: "POST",
             body: JSON.stringify({data:val, reg: key})
         })
@@ -334,7 +394,43 @@ export async function NamespaceDeleteSecret(fetch, namespace, val, handleError){
 
 export async function NamespaceDeleteRegistry(fetch, namespace, key, handleError) {
     try {
-        let resp = await fetch(`/functions/namespaces/${namespace}/registries`, {
+        let resp = await fetch(`/functions/registries/namespaces/${namespace}`, {
+            method: "DELETE",
+            body: JSON.stringify({
+                reg: key
+            })
+        })
+        if (resp.ok) {
+            return 
+        } else {
+            await handleError('delete registry', resp, 'deleteRegistry')
+        }
+    } catch (e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalDeleteRegistry(fetch, key, handleError) {
+    try {
+        let resp = await fetch(`/functions/registries/global`, {
+            method: "DELETE",
+            body: JSON.stringify({
+                reg: key
+            })
+        })
+        if (resp.ok) {
+            return 
+        } else {
+            await handleError('delete registry', resp, 'deleteRegistry')
+        }
+    } catch (e) {
+        throw new Error(`${e.message}`)
+    }
+}
+
+export async function GlobalPrivateDeleteRegistry(fetch,  key, handleError) {
+    try {
+        let resp = await fetch(`/functions/registries/private`, {
             method: "DELETE",
             body: JSON.stringify({
                 reg: key
