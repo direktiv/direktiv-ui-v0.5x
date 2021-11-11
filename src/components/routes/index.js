@@ -13,6 +13,7 @@ import Flowy from "../flowy"
 import Explorer from "../workflows-page/index2"
 import Instance from "../instance-page/index2"
 import Login from "../login"
+import { CloudEvents } from "../cevents"
 
 export default function Routes(props) {
     const {namespace, namespaces, noNamespaces} = props
@@ -71,6 +72,7 @@ export default function Routes(props) {
             <Route exact path="/n/:namespace/w/:workflow/functions/:service/:revision" component={Revision}/>
             <Route exact path="/n/:namespace/w/:workflow" component={WorkflowPage} />
             <Route exact path="/n/:namespace/i" component={EventsPage} />
+            <Route exact path="/n/:namespace/e" component={CloudEvents} />
             <Route exact path="/n/:namespace/s" component={SettingsPage} />
         </>
     )

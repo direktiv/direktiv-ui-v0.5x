@@ -29,6 +29,14 @@
     padding: 4px;
     cursor: pointer;
 }
+.services-list-div-event {
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    line-height: 46px;
+    padding: 4px;
+}
+
 
 .services-list-div:hover {
 
@@ -42,7 +50,17 @@
     display: flex;
     flex-direction: row;
 }
+.services-list-div-event .buttons {
+    float: right;
+    margin-top: 4px;
+    margin-right: 4px;
 
+    display: flex;
+    flex-direction: row;
+}
+.services-list-div-event .buttons > div {
+    margin-left: 10px;
+}
 .services-list-div .buttons > div {
     margin-left: 10px;
 }

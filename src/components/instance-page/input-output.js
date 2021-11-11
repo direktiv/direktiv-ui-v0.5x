@@ -24,11 +24,41 @@ export function Code({ id, code, language, padding }) {
 
     return (
       <div style={{height:"100%"}} className="Code">
-        <pre style={{overflow: "visible"}}>
+        <pre  style={{overflow: "visible"}}>
           <code  style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</code>
         </pre>
       </div>
     );
+}
+
+export function EditCode({id, code, language, setData}) {
+    const [load, setLoad] = useState(true)
+
+    useEffect(()=>{
+        async function highlightCodeBlock() {
+            setLoad(true)
+            Prism.highlightElement(document.getElementById(id))
+            setLoad(false)
+        }
+        highlightCodeBlock()
+    },[id, code])
+
+    return (
+        <div style={{height:"100%"}} className="Code">
+          <pre   style={{overflow: "visible"}}>
+              <textarea  style={{visibility: load ? "hidden": "visible"}} id={id} className={`language-${language}`}>{code}</textarea>
+          </pre>
+        </div>
+      );
+}
+
+export function EventEditor(props) {
+    const {data, setData, id} = props
+    return(
+        <div className="input-output"  style={{maxHeight: "300px", overflowY: "auto", overflowX: "auto", height: "100%", borderRadius:"8px", textAlign:"left",  color:"white", fontSize:"12pt", background:"#2a2a2a",left: 0, right: 0,  bottom: 0, padding:"10px"}}>
+            <EditCode setData={setData}  id={id} language={"json"} code={data} />
+        </div>
+    )
 }
 
 export function TemplateHighlighter(props) {

@@ -10,7 +10,7 @@ import { useContext } from 'react'
 import MainContext from '../../context'
 import { useState } from 'react'
 import { useRef } from 'react'
-import { IoBuildSharp,   IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoSearch, IoSettingsSharp,  IoTerminalSharp } from 'react-icons/io5'
+import { IoBuildSharp,   IoCubeOutline, IoExtensionPuzzle,  IoGrid, IoLogoDocker, IoSearch, IoSettingsSharp,  IoTerminalSharp } from 'react-icons/io5'
 import { GetVersions, NamespaceCreate } from '../../api'
 
 export default function Navbar(props) {
@@ -84,6 +84,10 @@ export default function Navbar(props) {
 
     let matchSettings = matchPath(location.pathname, {
         path: "/n/:namespace/s"
+    })
+
+    let matchEvents = matchPath(location.pathname, {
+        path: "/n/:namespace/events"
     })
 
     let matchDashboard = matchPath(location.pathname, {
@@ -228,6 +232,7 @@ export default function Navbar(props) {
                 </ul>
             </div>
             <div id="nav-ul-holder" className="nav-section divider">
+             
                 <ul>
                     <li>
                         {namespace === "" ?
@@ -302,6 +307,25 @@ export default function Navbar(props) {
                             <div>
                                 <IoTerminalSharp style={{ marginRight: "10px" }} />
                                 <span>Instances</span>
+                            </div>
+                        </Link>}
+                    </li>
+                    <li>
+                    {namespace === "" ?
+                            <div style={{color:"#b5b5b5", cursor: "default"}}>
+                                                               <IoTerminalSharp style={{ marginRight: "10px" }} />
+
+                                <span>Events</span>
+                            </div>
+                            :
+                        <Link style={{color: matchEvents  !== null ? "#4497f5": ""}} onClick={()=>{
+                            if (document.getElementById("namespaces-ul").classList.contains("active")){
+                                toggleNamespaceSelector()
+                            }
+                        }} to={`/n/${namespace}/e`} className="nav-link">
+                            <div>
+                                <IoTerminalSharp style={{ marginRight: "10px" }} />
+                                <span>Events</span>
                             </div>
                         </Link>}
                     </li>
@@ -403,6 +427,11 @@ export default function Navbar(props) {
         
                 </ul>
                 {checkPerm(permissions, "admin") ?    <div className="nav-section divider"> 
+                <div style={{cursor: "default", display:"flex",  padding:"5px", paddingLeft:"20px",  fontSize:"13pt", lineHeight:"32px"}}>
+                    {/* <IoGlobeSharp style={{ marginRight: "10px" }} /> */}
+                    <span>Global</span>
+                </div>
+                <div class="nav-section divider"></div>
                     <ul>
                         <li>
                         <Link style={{color: matchGlobal !== null ? "#4497f5": "", display:"flex", alignItems:"center"}} onClick={()=>{
@@ -411,7 +440,7 @@ export default function Navbar(props) {
                                 }
                             }} to={`/functions/global`} className="nav-link">
                                 <IoCubeOutline style={{marginRight:"10px"}}/>
-                                <span>Global Services</span>
+                                <span>Services</span>
                             </Link>
                         </li>
                         <li>
@@ -420,8 +449,8 @@ export default function Navbar(props) {
                                     toggleNamespaceSelector()
                                 }
                             }} to={`/functions/registries`} className="nav-link">
-                                <IoCubeOutline style={{marginRight:"10px"}}/>
-                                <span>Global Registries</span>
+                                <IoLogoDocker style={{marginRight:"10px"}}/>
+                                <span>Registries</span>
                             </Link>
                         </li>
                     </ul>

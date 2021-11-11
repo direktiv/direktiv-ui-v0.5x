@@ -556,12 +556,7 @@ function ListExplorer(props) {
                         </TileTitle >
                         <CreateDirectory fetchData={fetchData} namespace={namespace} path={params[0]} handleError={handleError} fetch={fetch} setErr={setErr} setTypeOfRequest={setTypeOfRequest}/>
                     </div>
-                    <div className="shadow-soft rounded tile"  style={{flex: "0 1"}}>
-                        <TileTitle name="Send Namespace Event">
-                            <IoAdd />
-                        </TileTitle>
-                        <SendNamespaceEvent fetch={fetch} namespace={namespace} handleError={handleError} setErr={setErr}/>
-                    </div>
+          
                 </div>
             </div>
         </>

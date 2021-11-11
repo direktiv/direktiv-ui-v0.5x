@@ -305,6 +305,10 @@ export const  bcRoutes = [
       breadcrumb: 'Instances'
   },
   {
+      path: '/n/:namespace/e',
+      breadcrumb: 'Events'
+  },
+  {
       path: '/n/:namespace/s',
       breadcrumb: 'Settings'
   },
