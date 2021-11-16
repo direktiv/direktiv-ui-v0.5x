@@ -1131,3 +1131,17 @@ pre {
     justify-content: center;
     align-items: center;
 }
+
+.order-btn {
+    padding: 3pt 3pt 3pt;
+    margin-right: 0px !important;
+}
+
+.order-btn:hover {
+    color: var(--nav-item-hover-color);
+    cursor: pointer;
+}
+
+.order-btn svg {
+    margin-right: 0px;
+}

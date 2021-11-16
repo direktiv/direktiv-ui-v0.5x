@@ -9,7 +9,7 @@ import { IoLockOpen, IoLogoDocker, IoSave, IoTrash, IoWarningOutline, IoSettings
 import { ConfirmButton, MiniConfirmButton } from '../confirm-button'
 import { EnvrionmentContainer } from "../environment-page"
 import LoadingWrapper from "../loading"
-import { SetNamespaceConfiguration, NamespaceConfiguration, NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDelete, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets } from '../../api'
+import { SetNamespaceConfiguration, NamespaceConfiguration, NamespaceCreateRegistry, NamespaceCreateSecret, NamespaceDelete, NamespaceDeleteRegistry, NamespaceDeleteSecret, NamespaceRegistries, NamespaceSecrets, GlobalCreateRegistry, GlobalDeleteRegistry, GlobalRegistries, GlobalPrivateCreateRegistry, GlobalPrivateDeleteRegistry, GlobalPrivateRegistries } from '../../api'
 import Editor from "../workflow-page/editor"
 
 import YAML2String from 'yaml'
@@ -246,8 +246,9 @@ function Secrets() {
     )
 }
 
-function Registries() {
+export function Registries(props) {
 
+    const { mode } = props
     const { fetch, namespace, handleError, permissions, checkPerm } = useContext(MainContext)
     const [name, setName] = useState("")
     const [user, setUser] = useState("")
@@ -261,18 +262,27 @@ function Registries() {
     const [opacity, setOpacity] = useState(null)
     const [loadingText, setLoadingText] = useState("Loading Registries")
 
-
     const fetchR = useCallback(() => {
         async function fetchData() {
             try {
-                let registries = await NamespaceRegistries(fetch, namespace, handleError)
-                setRegistries(registries)
+                var remoteRegistries
+                switch(mode) {
+                    case "global":
+                        remoteRegistries = await GlobalRegistries(fetch, handleError)
+                      break;
+                    case "global-private":
+                        remoteRegistries = await GlobalPrivateRegistries(fetch, handleError)
+                      break;
+                    default:
+                        remoteRegistries = await NamespaceRegistries(fetch, namespace, handleError)
+                  } 
+                setRegistries(remoteRegistries)
             } catch (e) {
                 setErr(e.message)
             }
         }
         return fetchData()
-    }, [fetch, namespace, handleError])
+    }, [fetch, namespace, handleError, mode])
 
     useEffect(() => {
         fetchR().finally(() => { setIsLoading(false); setOpacity(30) })
@@ -281,7 +291,16 @@ function Registries() {
     async function createRegistry() {
         if (name !== "" && user !== "" && token !== "") {
             try {
-                await NamespaceCreateRegistry(fetch, namespace, name, `${user}:${token}`, handleError)
+                switch(mode) {
+                    case "global":
+                        await GlobalCreateRegistry(fetch, name, `${user}:${token}`, handleError)
+                      break;
+                    case "global-private":
+                        await GlobalPrivateCreateRegistry(fetch, name, `${user}:${token}`, handleError)
+                      break;
+                    default:
+                        await NamespaceCreateRegistry(fetch, namespace, name, `${user}:${token}`, handleError)
+                  } 
                 setName("")
                 setToken("")
                 setUser("")
@@ -298,7 +317,16 @@ function Registries() {
 
     async function deleteRegistry(val) {
         try {
-            await NamespaceDeleteRegistry(fetch, namespace, val, handleError)
+            switch(mode) {
+                case "global":
+                    await GlobalDeleteRegistry(fetch,  val, handleError)
+                  break;
+                case "global-private":
+                    await GlobalPrivateDeleteRegistry(fetch,  val, handleError)
+                  break;
+                default:
+                    await NamespaceDeleteRegistry(fetch, namespace, val, handleError)
+              } 
             // fetch registries
             setActionErr("")
             return fetchR()

@@ -33,7 +33,7 @@ export default function Logs(props) {
                     setErr("You are unable to stream instance logs")
                     return
                 }
-                document.getElementById("logs-test").innerHTML = ""
+                document.getElementById("instance-logs").innerHTML = ""
                 setLogs("")
             }
             
@@ -50,7 +50,7 @@ export default function Logs(props) {
                     log += `\n`
                 }
                 let x = ansi_up.ansi_to_html(log)
-                document.getElementById("logs-test").innerHTML += x
+                document.getElementById("instance-logs").innerHTML += x
                 setLogs((str) => {return str + log})
                 if (tailRef.current) {
                     if (document.getElementById('logs')) {
@@ -69,8 +69,8 @@ export default function Logs(props) {
             if(logSource !== null) {
                 logSource.close()
                 setLogs("")
-                if(document.getElementById("logs-test")){
-                    document.getElementById("logs-test").innerHTML = ""
+                if(document.getElementById("instance-logs")){
+                    document.getElementById("instance-logs").innerHTML = ""
                 }
             }
         }
@@ -104,7 +104,7 @@ export default function Logs(props) {
             <div style={{width: "100%", height: "100%"}}>
                 <div style={{background:"#2a2a2a", height:"100%", top: "28px", marginTop:"28px"}}>
                     <div id="logs" style={{ position: "absolute", right:"0", left:"0", borderRadius:"8px", overflow: tail ? "hidden":"auto", textAlign:"left", height: "auto", color:"white", fontSize:"12pt", padding:"5px", background:"#2a2a2a",  top:"28px", bottom:"30px", paddingBottom:"10px" }}>
-                        <pre id="logs-test" >
+                        <pre id="instance-logs" >
                             {logs === "" ?  "Fetching logs...\n": ""}
                             {err !== "" ? err:""}
                         </pre>

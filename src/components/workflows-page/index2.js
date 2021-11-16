@@ -1,4 +1,4 @@
-import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList, IoCodeOutline,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline } from "react-icons/io5";
+import { IoAdd, IoFlash, IoCodeWorkingOutline, IoList, IoCodeOutline,  IoFolderOutline, IoPencil, IoSearch, IoPlaySharp, IoTrash, IoEllipsisVerticalSharp, IoImageSharp, IoPieChartSharp, IoToggle, IoToggleOutline, IoDocumentOutline, IoArrowUpSharp, IoTextSharp, IoArrowDownSharp, IoTimeOutline } from "react-icons/io5";
 import Editor from "../workflow-page/editor"
 
 import TileTitle from '../tile-title'
@@ -462,21 +462,37 @@ function ListExplorer(props) {
     const [objects, setObjects] = useState([])
     const [modalOpen, setModalOpen] = useState(false)
 
+    const [orderDirection, setOrderDirection] = useState(
+        (localStorage.getItem('orderDirection') && (localStorage.getItem('orderDirection') === "ASC" || localStorage.getItem('orderDirection') === "DESC")) ?
+        localStorage.getItem('orderDirection') :
+        "ASC"
+        )
+
+    const [orderField, setOrderField] =  useState(
+        (localStorage.getItem('orderField') && (localStorage.getItem('orderField') === "NAME" || localStorage.getItem('orderField') === "CREATED")) ?
+        localStorage.getItem('orderField') :
+        "NAME"
+        )
+
     function toggleModal() {
         setModalOpen(!modalOpen)
     }
-
-
 
     const [, setPageInfo] = useState(null)
     const [err, setErr] = useState("")
 
     const paramsRef = useRef("")
 
-    const fetchData = useCallback(()=>{
+    const fetchData = useCallback((pagination)=>{
+        let query = null
+
+        if (pagination) {
+            query = `?order.field=${pagination.orderField}&order.direction=${pagination.orderDirection}`
+        }
+
         async function grabData() {
             try {
-                let obj = await NamespaceTree(fetch, namespace, params, true, handleError) 
+                let obj = await NamespaceTree(fetch, namespace, params, true, handleError, query)
                 setObjects(obj.list)
                 setPageInfo(obj.pageInfo)
                 setInit(true)
@@ -489,11 +505,38 @@ function ListExplorer(props) {
 
     useEffect(()=>{
         if(!init || params[0] !== paramsRef.current){
-            fetchData()
+            fetchData({orderDirection: orderDirection, orderField: orderField})
             setLoading(false)
             paramsRef.current = params[0]
         }
-    },[fetchData, init, params])
+    },[fetchData, init, params, orderDirection, orderField])
+
+    let orderButton = (
+        <div style={{ display: "flex" }}>
+            <div title={`Sorting in ${orderDirection === "ASC" ? "Descending" : "Ascending"} order`} class="order-btn" onClick={() => {
+                let newDirection = orderDirection === "ASC" ? "DESC" : "ASC"
+                setOrderDirection(newDirection)
+                localStorage.setItem("orderDirection", newDirection)
+                fetchData({orderDirection: newDirection, orderField: orderField})
+            }}>
+                {orderDirection === "ASC" ?
+                    <IoArrowUpSharp /> :
+                    <IoArrowDownSharp />
+                }
+            </div>
+            <div title={`Sorting by ${orderField === "NAME" ? "Name" : "Created Time"}`} class="order-btn" onClick={() => {
+                let newField = orderField === "NAME" ? "CREATED" : "NAME"
+                setOrderField(newField)
+                localStorage.setItem("orderField", newField)
+                fetchData({orderDirection: orderDirection, orderField: newField})
+            }}>
+                {orderField === "NAME" ?
+                    <IoTextSharp /> :
+                    <IoTimeOutline />
+                }
+            </div>
+        </div>
+    );
 
     return(
         <>
@@ -527,7 +570,7 @@ function ListExplorer(props) {
                     :
                         ""
                     }
-                    <TileTitle name="Explorer">
+                    <TileTitle name="Explorer" actionsDiv={orderButton}>
                         <IoSearch />
                     </TileTitle >
                     <LoadingWrapper isLoading={loading}>
