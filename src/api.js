@@ -525,13 +525,20 @@ export async function NamespaceDownloadVariable(fetch, namespace, name, handleEr
     }
 }
 
-export async function NamespaceTree(fetch, namespace, path, children, handleError) {
+export async function NamespaceTree(fetch, namespace, path, children, handleError, queryString) {
     try {
+        console.log("path =", path)
         let uri = `/namespaces/${namespace}/tree`
         if(path[0]) {
             uri += `/${path[0]}`
         }
-        let resp = await fetch(`${uri}/`, {})
+        if(queryString) {
+            uri += `/${queryString}`
+        } else {
+            uri += `/`
+        }
+
+        let resp = await fetch(`${uri}`, {})
         if(resp.ok) {
             let json = await resp.json()
             if(children) {
